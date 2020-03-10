@@ -1,0 +1,8 @@
+bs4
+flask
+flask-socketio
+ipython
+jinja2
+lxml
+nbconvert
+nbformat

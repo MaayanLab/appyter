@@ -1,0 +1,13 @@
+<div class="ipynb-field">
+    <div class="form-group">
+        <p>{{ this.args.description }}</p>
+        <label for="{{ this.args.name }}">
+            {{ this.args.label }}
+        </label>
+        <ul class="list-group" name="{{ this.args.name }}">
+        {% for choice in this.args.choices %}
+            <li class="list-group-item"><input type="checkbox"{% if this.args.default in choices %}checked{% endif %} /></li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>

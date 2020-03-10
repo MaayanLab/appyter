@@ -1,0 +1,9 @@
+<div class="ipynb-field">
+    {% if this.args.description %}<p>{{ this.args.description }}</p>{% endif %}
+    <div class="form-group">
+        <label for="{{ this.args.name }}">
+            {{ this.args.label }}
+        </label>
+        <input name="{{ this.args.name }}" type="checkbox"{% if this.value %} checked{% endif %}>
+    </div>
+</div>

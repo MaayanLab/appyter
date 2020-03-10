@@ -1,0 +1,19 @@
+<div class="ipynb-field">
+    <div class="form-group">
+        <p>{{ this.args.description }}</p>
+        <label for="{{ this.args.name }}">
+            {{ this.args.label }}
+        </label>
+        <div class="input-group spinner" min={{ this.args.min }} max={{ this.args.max }}>
+            <input type="text" name="{{ this.args.name }}" class="form-control" value="{{ this.args.default }}">
+            <div class="input-group-btn-vertical">
+                <button class="btn btn-default" type="button">
+                    <i class="fa fa-caret-up"></i>
+                </button>
+                <button class="btn btn-default" type="button">
+                    <i class="fa fa-caret-down"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
