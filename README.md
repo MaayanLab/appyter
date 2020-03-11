@@ -98,12 +98,13 @@ assert render_jupyter(notebook_template, {
   'description': '',
   'number_1': 0,
   'number_2': 5,
+  'operator': 'subtract',
 }) == '''
 ---
 # Test
 
 ---
-answer = {{ number_1 }} {{ op }} {{ number_2 }}
+answer = 0 - 5
 ---
 ''' # in valid ipynb syntax
 
@@ -134,6 +135,7 @@ assert render_html_renderer(notebook_template, {
   'description': '',
   'number_1': 0,
   'number_2': 5,
+  'operator': 'subtract',
 }) == '''
 <div id="notebook"></div>
 <script src="./jupyter_template.js"></script>
@@ -146,6 +148,7 @@ assert render_html_renderer(notebook_template, {
         "description": "",
         "number_1": 0,
         "number_2": 5,
+        "operator": "subtract",
       }
     )
   })
