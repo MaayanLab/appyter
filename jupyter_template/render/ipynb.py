@@ -1,8 +1,8 @@
 import nbformat as nbf
+from copy import deepcopy
+from jupyter_template.parse.nbtemplate import cell_match
 
 def render_cell(env, cell):
-  from jupyter_template.parse.nbtemplate import cell_match
-
   if cell.cell_type == 'code':
     cell.outputs = []
     cell['execution_count'] = None
@@ -39,30 +39,13 @@ def render_cell(env, cell):
   return cell
 
 
-def render_notebook(env, nb):
-  nb.cells = [
-    cell
-    for cell in [
-      render_cell(
-        env,
-        cell,
-      )
-      for cell in nb.cells
-    ]
-    if cell is not None
-  ]
+def render_nb_from_nbtemplate(env, nb):
+  nb = deepcopy(nb)
+  nb.cells = list(filter(None, [
+    render_cell(
+      env,
+      cell,
+    )
+    for cell in nb.cells
+  ]))
   return nb
-
-
-def render_ipynb_from_ipynb(env, ipynb):
-  return render_notebook(
-    env,
-    nbf.reads(ipynb, as_version=4)
-  )
-
-
-def render_ipynb_from_ipynb_file(env, filename):
-  return render_notebook(
-    env,
-    nbf.read(open(filename, 'r'), as_version=4)
-  )
