@@ -2,10 +2,16 @@
 
 This module enables you to turn your jupyter notebook into a jinja2 template-driven web application. Or just parse `jupyter_templates` for other purposes.
 
+## Installation
+```bash
+# Install package from github repository master
+pip3 install --user --upgrade https://github.com/MaayanLab/jupyter-template/archive/master.zip
+```
+
 ## Usage
 Jupyter Template enables you to serve that notebook on an executable webapp.
 
-`jupyter_template jupyter_notebook.ipynb`
+`jupyter-template jupyter_notebook.ipynb`
 
 - In debug mode (`--debug`), changes to the notebook will automatically update the webapp.
 - The application listen uri (`--listen=http://0.0.0.0:80/my_prefix/`) will which ip/port/prefix the app will listen on

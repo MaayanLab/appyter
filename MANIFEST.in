@@ -1,0 +1,4 @@
+include LICENSE README.md requirements.txt
+recursive-exclude * __pycache__
+recursive-exclude * *.pyc
+recursive-include * *.j2
