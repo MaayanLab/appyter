@@ -3,6 +3,10 @@ from copy import deepcopy
 from jupyter_template.parse.nbtemplate import cell_match
 
 def render_cell(env, cell):
+  ''' Render a single cell, calling jinja2 templates when necessary
+  (only on %%jupyter_template -matched cells) and converting cells
+  to markdown / removing them as necessary.
+  '''
   if cell.cell_type == 'code':
     cell.outputs = []
     cell['execution_count'] = None
@@ -40,6 +44,8 @@ def render_cell(env, cell):
 
 
 def render_nb_from_nbtemplate(env, nb):
+  ''' Render the notebook by rendering the jinja2 templates using the context in env.
+  '''
   nb = deepcopy(nb)
   nb.cells = list(filter(None, [
     render_cell(
