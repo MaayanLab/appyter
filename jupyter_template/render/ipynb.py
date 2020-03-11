@@ -1,4 +1,3 @@
-import json
 import nbformat as nbf
 
 def render_cell(env, cell):
@@ -55,14 +54,14 @@ def render_notebook(env, nb):
   return nb
 
 
-def render_ipynb(env, ipynb):
+def render_ipynb_from_ipynb(env, ipynb):
   return render_notebook(
     env,
     nbf.reads(ipynb, as_version=4)
   )
 
 
-def render_ipynb_file(env, filename):
+def render_ipynb_from_ipynb_file(env, filename):
   return render_notebook(
     env,
     nbf.read(open(filename, 'r'), as_version=4)

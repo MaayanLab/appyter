@@ -47,9 +47,10 @@ class Field:
     '''
     return Markup(
       get_jinja2_env().get_template(
-        self.template,
-        globals={ 'this': self },
-      )
+        self.template
+      ).render({
+        'this': self
+      })
     )
 
   @property
@@ -62,7 +63,7 @@ class Field:
   def template(self):
     ''' Template to use for rendering field
     '''
-    return os.path.join('ipynb', 'form', self.field + '.j2')
+    return os.path.join('fields', self.field + '.j2')
 
   @property
   def choices(self):

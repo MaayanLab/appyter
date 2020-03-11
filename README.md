@@ -11,7 +11,6 @@ Jupyter Template enables you to serve that notebook on an executable webapp.
 - The application listen uri (`--listen=http://0.0.0.0:80/my_prefix/`) will which ip/port/prefix the app will listen on
 - Custom fields can be used by putting them in the directory of execution with the following format:
   - `./fields/YourField.py`: Python Field Implementation
-  - `./fields/YourField.jinja2`: Jinja2 Field Rendering
 - The templates used natively by the application can be modified to provide your own look and feel:
   - `./templates/head.jinja2`: Custom head (title, CSS, scripts)
   - `./templates/form.jinja2`: Custom form handling
