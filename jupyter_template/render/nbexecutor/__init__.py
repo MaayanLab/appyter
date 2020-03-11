@@ -11,7 +11,7 @@ def cell_has_error(cell):
     return False
 
 def render_nbexecutor_from_nb(env, nb):
-  def nbexecutor(emit, cleanup=None):
+  def nbexecutor(emit=print, session=None, session_dir='', cleanup=None):
     assert callable(emit), 'Emit must be callable'
     try:
       emit('notebook', nb)
@@ -20,7 +20,7 @@ def render_nbexecutor_from_nb(env, nb):
         timeout=None,
         kernel_name='python3',
       )
-      resources = { 'metadata': { 'path': env.globals.get('_session', '') } }
+      resources = {'metadata': {'path': session_dir} }
       index = 0
       code_cell_index = 0
       n_cells = len(nb.cells)
@@ -42,5 +42,5 @@ def render_nbexecutor_from_nb(env, nb):
       emit('error', str(e))
     finally:
       if callable(cleanup):
-        cleanup()
+        cleanup(session)
   return nbexecutor

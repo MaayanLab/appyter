@@ -3,6 +3,7 @@ import sys
 import uuid
 import json
 import time
+import shutil
 from threading import Lock
 from flask import Flask, request, abort, render_template, current_app, copy_current_request_context
 from flask_socketio import SocketIO, emit
@@ -92,7 +93,7 @@ def prepare_formdata(req):
     os.makedirs(session_dir)
     fh.save(os.path.join(session_dir, filename))
     data[fname] = filename
-  return dict(**data, _session_dir=session_dir)
+  return dict(**data, _session=session_id)
 
 @app.route(PREFIX, methods=['GET'])
 def get_index():
@@ -127,10 +128,14 @@ def post_index():
     return post_index_json_static(request.form.to_dict())
   abort(404)
 
-def cleanup():
+def sanitize_uuid(val):
+  return str(uuid.UUID(val))
+
+def cleanup(session):
   global thread
   with thread_lock:
     thread = None
+    shutil.rmtree(os.path.join(DATA_DIR, session))
 
 @socketio.on('init')
 def init(data):
@@ -138,12 +143,17 @@ def init(data):
   env = get_jinja2_env(context=data, cwd=kargs.get('cwd', os.getcwd()))
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
+  session = sanitize_uuid(data.get('_session'))
   global thread
   while True:
     with thread_lock:
       if not thread:
         thread = socketio.start_background_task(
-          nbexecutor, emit, cleanup
+          nbexecutor,
+          emit=emit,
+          session=session,
+          session_dir=os.path.join(DATA_DIR, session),
+          cleanup=cleanup,
         )
         break
     emit('status', 'Waiting for server...')
