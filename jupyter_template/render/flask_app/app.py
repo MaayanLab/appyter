@@ -2,14 +2,17 @@ import os
 import sys
 import uuid
 import json
-from flask import Flask, request, abort, jsonify
-from flask_socketio import SocketIO
+import time
+from threading import Lock
+from flask import Flask, request, abort, render_template, current_app, copy_current_request_context
+from flask_socketio import SocketIO, emit
 from jupyter_template.context import get_jinja2_env
 from jupyter_template.parse.nbtemplate import nbtemplate_from_ipynb_file
 from jupyter_template.render.form import render_form_from_nbtemplate
 from jupyter_template.render.nbviewer import render_nbviewer_from_nb
 from jupyter_template.render.ipynb import render_nb_from_nbtemplate
-from jupyter_template.render.json import render_json_from_nbtemplate
+from jupyter_template.render.json import render_nbtemplate_json_from_nbtemplate
+from jupyter_template.render.nbexecutor import render_nbexecutor_from_nb
 from werkzeug.utils import secure_filename
 
 from dotenv import load_dotenv
@@ -30,6 +33,9 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 socketio = SocketIO(app)
 
+thread = None
+thread_lock = Lock()
+
 def get_index_html():
   ''' Return options as form
   '''
@@ -40,12 +46,18 @@ def get_index_json():
   ''' Return options as json
   '''
   env = get_jinja2_env(cwd=kargs.get('cwd', os.getcwd()))
-  return render_json_from_nbtemplate(env, nbtemplate)
+  return render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
 
-def post_index_html_dynamic(session_id, data):
+def post_index_html_dynamic(data):
   ''' Return dynamic nbviewer
   '''
-  return '<div>Coming soon</div>'
+  env = get_jinja2_env(context=data, cwd=kargs.get('cwd', os.getcwd()))
+  nb = render_nb_from_nbtemplate(env, nbtemplate)
+  return render_template(
+    'dynamic.j2',
+    _nbviewer=render_nbviewer_from_nb(env, nb),
+    _data=json.dumps(data),
+  )
 
 def post_index_html_static(data):
   ''' Return static nbviewer
@@ -59,7 +71,7 @@ def post_index_json_static(data):
   '''
   env = get_jinja2_env(context=data, cwd=kargs.get('cwd', os.getcwd()))
   nb = render_nb_from_nbtemplate(env, nbtemplate)
-  return render_json_from_nbtemplate(env, nb)
+  return render_nbtemplate_json_from_nbtemplate(env, nb)
 
 def post_index_ipynb_static(data):
   ''' Return rendered ipynb
@@ -71,15 +83,16 @@ def post_index_ipynb_static(data):
 def prepare_formdata(req):
   # Get form variables
   session_id = str(uuid.uuid4())
+  session_dir = os.path.join(DATA_DIR, session_id)
   data = req.form.to_dict()
   # Process upload files
   for fname, fh in req.files.items():
     # Save files to datadir for session
     filename = secure_filename(fh.filename)
-    os.makedirs(os.path.join(DATA_DIR, session_id))
-    fh.save(os.path.join(DATA_DIR, session_id, filename))
+    os.makedirs(session_dir)
+    fh.save(os.path.join(session_dir, filename))
     data[fname] = filename
-  return session_id, data
+  return dict(**data, _session_dir=session_dir)
 
 @app.route(PREFIX, methods=['GET'])
 def get_index():
@@ -107,12 +120,35 @@ def post_index():
     if request.args.get('static') is not None:
       return post_index_html_static(request.form.to_dict())
     else:
-      return post_index_html_dynamic(*prepare_formdata(request))
+      return post_index_html_dynamic(prepare_formdata(request))
   elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
     return post_index_ipynb_static(request.form.to_dict())
   elif mimetype in {'application/json'}:
     return post_index_json_static(request.form.to_dict())
   abort(404)
+
+def cleanup():
+  global thread
+  with thread_lock:
+    thread = None
+
+@socketio.on('init')
+def init(data):
+  # TODO: Enable more than one thread
+  env = get_jinja2_env(context=data, cwd=kargs.get('cwd', os.getcwd()))
+  nb = render_nb_from_nbtemplate(env, nbtemplate)
+  nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
+  global thread
+  while True:
+    with thread_lock:
+      if not thread:
+        thread = socketio.start_background_task(
+          nbexecutor, emit, cleanup
+        )
+        break
+    emit('status', 'Waiting for server...')
+    time.sleep(1)
+
 
 def main():
   return socketio.run(

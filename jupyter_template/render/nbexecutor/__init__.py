@@ -26,7 +26,6 @@ def render_nbexecutor_from_nb(env, nb):
       n_cells = len(nb.cells)
       emit('progress', index)
       for cell, _ in yep.preprocess(nb, resources):
-        print('cell', cell)
         emit('cell', cell)
         if cell_is_code(cell):
           code_cell_index += 1
