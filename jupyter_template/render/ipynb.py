@@ -10,8 +10,8 @@ def render_cell(env, cell):
 
   cell_m = cell_match.match(cell.source)
   if cell_m:
-    line = cell_m.group(1).strip()
-    cell_source = cell_m.group(2).strip()
+    line = cell_m.group('type').strip()
+    cell_source = cell_m.group('source').strip()
 
     if line == 'init':
       return None
