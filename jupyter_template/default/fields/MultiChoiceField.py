@@ -1,6 +1,5 @@
-from jupyter_template.fields import register, Field
+from jupyter_template.fields import Field
 
-@register
 class MultiChoiceField(Field):
   @property
   def raw_value(self):

@@ -1,7 +1,6 @@
 import re
-from jupyter_template.fields import register, Field
+from jupyter_template.fields import Field
 
-@register
 class StringField(Field):
   def __init__(self, constraint=r'.*', hint=None, **kwargs):
     super(StringField, self).__init__(

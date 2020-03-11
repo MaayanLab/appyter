@@ -1,7 +1,6 @@
 import json
-from jupyter_template.fields import register, Field
+from jupyter_template.fields import Field
 
-@register
 class BoolField(Field):
   @property
   def raw_value(self):

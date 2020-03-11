@@ -1,5 +1,4 @@
-from jupyter_template.fields import register, Field
+from jupyter_template.fields import Field
 
-@register
 class ChoiceField(Field):
   pass

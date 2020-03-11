@@ -5,7 +5,7 @@ from copy import copy
 from flask import Markup
 from jupyter_template.context import get_jinja2_env
 
-def _build_fields(fields, context={}):
+def build_fields(fields, context={}):
   ''' Build a dictionary of Field instances
   '''
   return {
@@ -17,14 +17,6 @@ def _build_fields(fields, context={}):
     )
     for field_name, field in fields.items()
   }
-
-_fields = {}
-def register(field):
-  ''' Register a field for usage in templates
-  '''
-  global _fields
-  _fields[field.__name__] = field
-  return field
 
 class Field:
   def __init__(self,

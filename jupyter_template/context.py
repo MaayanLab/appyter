@@ -70,7 +70,8 @@ def find_template_dirs():
     os.path.join(os.getcwd(), 'templates'),
   ]))
 
-def get_jinja2_env():
+def get_jinja2_env(context={}):
+  from jupyter_template.fields import build_fields
   from jinja2 import Environment, ChoiceLoader, FileSystemLoader
   env = Environment(
     extensions=['jinja2.ext.do'],
@@ -80,5 +81,5 @@ def get_jinja2_env():
     ]),
   )
   env.filters.update(**find_filters())
-  env.globals.update(**find_fields())
+  env.globals.update(**build_fields(find_fields(), context=context))
   return env

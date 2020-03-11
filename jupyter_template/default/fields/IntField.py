@@ -1,6 +1,5 @@
-from jupyter_template.fields import register, Field
+from jupyter_template.fields import Field
 
-@register
 class IntField(Field):
   def __init__(self, min=0, max=10, **kwargs):
     super(IntField, self).__init__(
