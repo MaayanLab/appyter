@@ -56,7 +56,6 @@ def render_notebook(env, nb):
 
 
 def render_ipynb(env, ipynb):
-  nb = nbf.read(ipynb, as_version=4)
   return render_notebook(
     env,
     nbf.reads(ipynb, as_version=4)
