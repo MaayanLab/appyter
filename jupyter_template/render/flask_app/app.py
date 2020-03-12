@@ -4,6 +4,7 @@ import uuid
 import json
 import time
 import shutil
+from collections import Counter
 from threading import Lock
 from flask import Flask, request, abort, render_template, current_app, copy_current_request_context
 from flask_socketio import SocketIO, emit
@@ -16,6 +17,7 @@ from jupyter_template.render.json import render_nbtemplate_json_from_nbtemplate
 from jupyter_template.render.nbexecutor import render_nbexecutor_from_nb
 from werkzeug.utils import secure_filename
 
+# Prepare environment
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -25,34 +27,48 @@ PORT = json.loads(os.environ.get('PORT', '5000'))
 DATA_DIR = os.environ.get('DATA_DIR', 'data')
 SECRET_KEY = os.environ.get('SECRET_KEY', str(uuid.uuid4()))
 
-args = [arg for arg in sys.argv[1:] if not arg.startswith('-')]
-kargs = dict([arg[2:].split('=', maxsplit=1) for arg in sys.argv[1:] if arg.startswith('--')])
+# Prepare command line args
+args = []
+kargs = Counter()
+kwargs = {}
+for arg in sys.argv[1:]:
+  if arg.startswith('--'):
+    try:
+      k, v = arg[2:].split('=', maxsplit=1)
+    except:
+      k, v = arg[2:], True
+    kwargs[k] = v
+  elif arg.startswith('-'):
+    kargs.update({ arg[1:]: 1 })
+  else:
+    args.append(arg)
 
-nbtemplate = nbtemplate_from_ipynb_file(args[0])
-
+# Prepare app
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 socketio = SocketIO(app)
 
+# Prepare globals
+nbtemplate = None
 thread = None
 thread_lock = Lock()
 
 def get_index_html():
   ''' Return options as form
   '''
-  env = get_jinja2_env(cwd=kargs.get('cwd', os.getcwd()))
+  env = get_jinja2_env(**kwargs)
   return render_form_from_nbtemplate(env, nbtemplate)
 
 def get_index_json():
   ''' Return options as json
   '''
-  env = get_jinja2_env(cwd=kargs.get('cwd', os.getcwd()))
+  env = get_jinja2_env(**kwargs)
   return render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
 
 def post_index_html_dynamic(data):
   ''' Return dynamic nbviewer
   '''
-  env = get_jinja2_env(context=data, cwd=kargs.get('cwd', os.getcwd()))
+  env = get_jinja2_env(context=data, **kwargs)
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_template(
     'dynamic.j2',
@@ -63,21 +79,21 @@ def post_index_html_dynamic(data):
 def post_index_html_static(data):
   ''' Return static nbviewer
   '''
-  env = get_jinja2_env(context=data, cwd=kargs.get('cwd', os.getcwd()))
+  env = get_jinja2_env(context=data, **kwargs)
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nbviewer_from_nb(env, nb)
 
 def post_index_json_static(data):
   ''' Return rendered json
   '''
-  env = get_jinja2_env(context=data, cwd=kargs.get('cwd', os.getcwd()))
+  env = get_jinja2_env(context=data, **kwargs)
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nbtemplate_json_from_nbtemplate(env, nb)
 
 def post_index_ipynb_static(data):
   ''' Return rendered ipynb
   '''
-  env = get_jinja2_env(context=data, cwd=kargs.get('cwd', os.getcwd()))
+  env = get_jinja2_env(context=data, **kwargs)
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nb_from_nbtemplate(env, nb)
 
@@ -90,8 +106,10 @@ def prepare_formdata(req):
   for fname, fh in req.files.items():
     # Save files to datadir for session
     filename = secure_filename(fh.filename)
-    os.makedirs(session_dir)
-    fh.save(os.path.join(session_dir, filename))
+    os.makedirs(DATA_DIR, exist_ok=True)
+    os.makedirs(session_dir, exist_ok=False)
+    if filename != '':
+      fh.save(os.path.join(session_dir, filename))
     data[fname] = filename
   return dict(**data, _session=session_id)
 
@@ -140,7 +158,7 @@ def cleanup(session):
 @socketio.on('init')
 def init(data):
   # TODO: Enable more than one thread
-  env = get_jinja2_env(context=data, cwd=kargs.get('cwd', os.getcwd()))
+  env = get_jinja2_env(context=data, **kwargs)
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
   session = sanitize_uuid(data.get('_session'))
@@ -159,13 +177,27 @@ def init(data):
     emit('status', 'Waiting for server...')
     time.sleep(1)
 
+def do_help():
+  print('Usage: jupyter-template [OPTIONS] <template.ipynb>')
+  print('')
+  print('OPTIONS')
+  print('  --cwd=DIRECTORY    The directory where it should run (contains fields, templates and such)')
+  print('  --profile=PROFILE  The styling profile to use see `PROFILES`')
+  print('')
+  print('PROFILES')
+  print('  default  Bare profile with no styling')
 
 def main():
-  return socketio.run(
-      app,
-      host=HOST,
-      port=PORT,
-  )
+  if 'h' in kargs or 'help' in kwargs or args == []:
+    do_help()
+  else:
+    global nbtemplate
+    nbtemplate = nbtemplate_from_ipynb_file(args[0])
+    return socketio.run(
+        app,
+        host=HOST,
+        port=PORT,
+    )
 
 if __name__ == '__main__':
   main()
