@@ -1,9 +1,9 @@
 <div class="ipynb-field">
     <div class="form-group">
         <p>{{ this.args.description }}</p>
-        <label for="{{ this.args.name }}">
-            {{ this.args.label }}
-        </label>
-        <input type="file" name="{{ this.args.name }}" class="form-control" placeholder="{{ this.args.hint }}">
+        <div class="custom-file">
+            <input type="file" class="custom-file-input" id="{{ this.args.name }}" name="{{ this.args.name }}" >
+            <label class="custom-file-label" for="{{ this.args.name }}">Choose file</label>
+        </div>
     </div>
 </div>
