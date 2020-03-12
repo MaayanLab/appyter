@@ -31,11 +31,11 @@ def importdir_deep(_dirname_, _package_, _globals_, filter_mod=lambda k, v: not 
       if filter_mod(k, v)
     })
 
-def find_fields(cwd=os.getcwd()):
+def find_fields(cwd=os.getcwd(), profile='default'):
   from jupyter_template.fields import Field
   ctx = {}
   dirs = [
-    (os.path.join(os.path.dirname(__file__), 'default', 'fields'), __package__ + '.default.fields'),
+    (os.path.join(os.path.dirname(__file__), 'profiles', profile, 'fields'), __package__ + '.profiles.' + profile + '.fields'),
     (os.path.join(cwd, 'fields'), 'fields'),
   ]
   for _dirname_, _package_ in dirs:
@@ -48,10 +48,10 @@ def find_fields(cwd=os.getcwd()):
       )
   return ctx
 
-def find_filters(cwd=os.getcwd()):
+def find_filters(cwd=os.getcwd(), profile='default'):
   ctx = {}
   dirs = [
-    (os.path.join(os.path.dirname(__file__), 'default', 'filters'), __package__ + '.default.filters'),
+    (os.path.join(os.path.dirname(__file__), 'profiles', profile, 'filters'), __package__ + '.profiles.' + profile + '.filters'),
     (os.path.join(cwd, 'filters'), 'filters'),
   ]
   for _dirname_, _package_ in dirs:
@@ -64,13 +64,13 @@ def find_filters(cwd=os.getcwd()):
       )
   return ctx
 
-def find_template_dirs(cwd=os.getcwd()):
+def find_template_dirs(cwd=os.getcwd(), profile='default'):
   return list(filter(os.path.isdir, [
-    os.path.join(os.path.dirname(__file__), 'default', 'templates'),
+    os.path.join(os.path.dirname(__file__), 'profiles', profile, 'templates'),
     os.path.join(cwd, 'templates'),
   ]))
 
-def get_jinja2_env(context={}, cwd=os.getcwd()):
+def get_jinja2_env(context={}, cwd=os.getcwd(), profile='default'):
   import sys
   from jupyter_template.fields import build_fields
   from jinja2 import Environment, ChoiceLoader, FileSystemLoader
