@@ -1,6 +1,10 @@
+{% extends "base.j2" %}
+
+{% block body %}
 <form method="POST" enctype="multipart/form-data">
     {% for _field in _fields %}
         {{ _field.render() }}
     {% endfor %}
     <input type="submit" value="Submit" />
 </form>
+{% endblock %}
