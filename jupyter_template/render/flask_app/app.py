@@ -6,9 +6,9 @@ import time
 import shutil
 from collections import Counter
 from threading import Lock
-from flask import Flask, request, abort, render_template, current_app, copy_current_request_context
+from flask import Flask, request, abort, current_app, copy_current_request_context
 from flask_socketio import SocketIO, emit
-from jupyter_template.context import get_jinja2_env
+from jupyter_template.context import get_sys_env, get_jinja2_env
 from jupyter_template.parse.nbtemplate import nbtemplate_from_ipynb_file
 from jupyter_template.render.form import render_form_from_nbtemplate
 from jupyter_template.render.nbviewer import render_nbviewer_from_nb
@@ -27,22 +27,6 @@ PORT = json.loads(os.environ.get('PORT', '5000'))
 DATA_DIR = os.environ.get('DATA_DIR', 'data')
 SECRET_KEY = os.environ.get('SECRET_KEY', str(uuid.uuid4()))
 
-# Prepare command line args
-args = []
-kargs = Counter()
-kwargs = {}
-for arg in sys.argv[1:]:
-  if arg.startswith('--'):
-    try:
-      k, v = arg[2:].split('=', maxsplit=1)
-    except:
-      k, v = arg[2:], True
-    kwargs[k] = v
-  elif arg.startswith('-'):
-    kargs.update({ arg[1:]: 1 })
-  else:
-    args.append(arg)
-
 # Prepare app
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -56,22 +40,23 @@ thread_lock = Lock()
 def get_index_html():
   ''' Return options as form
   '''
-  env = get_jinja2_env(**kwargs)
+  env = get_jinja2_env()
   return render_form_from_nbtemplate(env, nbtemplate)
 
 def get_index_json():
   ''' Return options as json
   '''
-  env = get_jinja2_env(**kwargs)
+  env = get_jinja2_env()
   return render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
 
 def post_index_html_dynamic(data):
   ''' Return dynamic nbviewer
   '''
-  env = get_jinja2_env(context=data, **kwargs)
+  env = get_jinja2_env(context=data)
   nb = render_nb_from_nbtemplate(env, nbtemplate)
-  return render_template(
+  return env.get_template(
     'dynamic.j2',
+  ).render(
     _nbviewer=render_nbviewer_from_nb(env, nb),
     _data=json.dumps(data),
   )
@@ -79,21 +64,21 @@ def post_index_html_dynamic(data):
 def post_index_html_static(data):
   ''' Return static nbviewer
   '''
-  env = get_jinja2_env(context=data, **kwargs)
+  env = get_jinja2_env(context=data)
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nbviewer_from_nb(env, nb)
 
 def post_index_json_static(data):
   ''' Return rendered json
   '''
-  env = get_jinja2_env(context=data, **kwargs)
+  env = get_jinja2_env(context=data)
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nbtemplate_json_from_nbtemplate(env, nb)
 
 def post_index_ipynb_static(data):
   ''' Return rendered ipynb
   '''
-  env = get_jinja2_env(context=data, **kwargs)
+  env = get_jinja2_env(context=data)
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nb_from_nbtemplate(env, nb)
 
@@ -158,7 +143,7 @@ def cleanup(session):
 @socketio.on('init')
 def init(data):
   # TODO: Enable more than one thread
-  env = get_jinja2_env(context=data, **kwargs)
+  env = get_jinja2_env(context=data)
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
   session = sanitize_uuid(data.get('_session'))
@@ -188,6 +173,7 @@ def do_help():
   print('  default  Bare profile with no styling')
 
 def main():
+  args, kargs, kwargs = get_sys_env()
   if 'h' in kargs or 'help' in kwargs or args == []:
     do_help()
   else:
