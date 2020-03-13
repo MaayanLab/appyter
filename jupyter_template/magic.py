@@ -68,7 +68,12 @@ def init(_globals):
       if line == 'code_eval' or line == 'hide_code_eval':
         display(Markdown('```python\n%s\n```' % ('\n'.join((rendered, rendered_last)))))
       exec(rendered, global_internal)
-      display(eval(rendered_last, global_internal))
+      try:
+        # display the result of the last line's result if possible
+        display(eval(rendered_last, global_internal))
+      except:
+        # otherwise just execute the last line
+        exec(rendered_last, global_internal)
 
     '''
     Step 2. Check for new variables in the internal global
