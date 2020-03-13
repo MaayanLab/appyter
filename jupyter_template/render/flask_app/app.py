@@ -92,7 +92,7 @@ def prepare_formdata(req):
     # Save files to datadir for session
     filename = secure_filename(fh.filename)
     os.makedirs(DATA_DIR, exist_ok=True)
-    os.makedirs(session_dir, exist_ok=False)
+    os.makedirs(session_dir, exist_ok=True)
     if filename != '':
       fh.save(os.path.join(session_dir, filename))
     data[fname] = filename
