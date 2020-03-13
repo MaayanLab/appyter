@@ -4,7 +4,12 @@ from jupyter_template.fields import Field
 class BoolField(Field):
   @property
   def raw_value(self):
-    return self.args['value'] if type(self.args['value']) == bool else bool(json.loads(self.args['value'].lower()))
+    if self.args['value'] in {'true', 'True', True}:
+      return True
+    elif self.args['value'] in {'false', 'False', False}:
+      return False
+    else:
+      raise Exception('Invalid value for bool field')
 
   @property
   def choices(self):
