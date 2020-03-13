@@ -12,6 +12,6 @@ setup(
   packages=find_packages(exclude=('example',)),
   include_package_data=True,
   entry_points={
-    'console_scripts': ['jupyter-template=jupyter_template:__main__'],
+    'console_scripts': ['jupyter-template=jupyter_template.__main__:main'],
   }
 )
