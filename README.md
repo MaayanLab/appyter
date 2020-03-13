@@ -5,7 +5,7 @@ This module enables you to turn your jupyter notebook into a jinja2 template-dri
 ## Installation
 ```bash
 # Install package from github repository master
-pip3 install --user --upgrade https://github.com/MaayanLab/jupyter-template/archive/master.zip
+pip3 install --user --upgrade ---no-cache https://github.com/MaayanLab/jupyter-template/archive/master.zip
 ```
 
 ## Usage
@@ -13,27 +13,28 @@ Jupyter Template enables you to serve that notebook on an executable webapp.
 
 `jupyter-template jupyter_notebook.ipynb`
 
+- A dotenv file (`.env`) or environment variables can be use to configure HOST, PORT, and PREFIX of the webserver.
+- Some pre-configured profiles can be used for styling the form (`--profile=profile_name`) see `jupyter_template/profiles`
 - In debug mode (`--debug`), changes to the notebook will automatically update the webapp.
-- The application listen uri (`--listen=http://0.0.0.0:80/my_prefix/`) will which ip/port/prefix the app will listen on
 - Custom fields can be used by putting them in the directory of execution with the following format:
   - `./fields/YourField.py`: Python Field Implementation
 - The templates used natively by the application can be modified to provide your own look and feel:
   - `./templates/head.jinja2`: Custom head (title, CSS, scripts)
   - `./templates/form.jinja2`: Custom form handling
   - `./templates/fields/StringField.jinja2`: Override field style
-- Custom externally-referenced resources (i.e. images) can be put under the static directory
-  - `./static/img/your_image.png`: Reference in templates with `{% static 'img/your_image.png' %}`
 - Custom jinja2 filters can be added if necessary
   - `./filters/your_filter.py`: Python jinja2 filter (function)
+- Custom externally-referenced resources (i.e. images) can be put under the static directory
+  - `./static/img/your_image.png`: Reference in templates with `{% static 'img/your_image.png' %}`
 
 
 ## Creating a Jupyter Notebook Template
 
 Create a standard python jupyter notebook, make the first cell:
 ```
-#%%nbtemplate init
-from jupyter_template import nbtemplate
-nbtemplate.init(lambda _=globals: _())
+#%%jupyter_template init
+from jupyter_template import magic
+magic.init(lambda _=globals: _())
 ```
 
 Normal cells are allowed, you also have access to jinja2-rendered cells:
@@ -52,13 +53,13 @@ Consider the following notebook:
 
 ```
 %%jupyter_template markdown
-# {{ StringField(name='title', label='Title') }}
+# {{ StringField(name='title', label='Title', default='My Title') }}
 
-{{ TextField(name='description', label='Description') }}
+{{ TextField(name='description', label='Description', default='My description') }}
 ```
 
 ```
-%%jupyter_template eval
+%%jupyter_template code_eval
 {% set number_1 = IntField(name='number_1', label='First Number', min=0, max=10, default=5) %}
 {% set number_2 = IntField(name='number_2', label='Second Number', min=0, max=10, default=5) %}
 {% set op = ChoiceField(
