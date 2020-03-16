@@ -1,6 +1,7 @@
 {% extends "base.j2" %}
 
 {% block body %}
+{{ super() }}
 <form method="POST" enctype="multipart/form-data">
     {% for _field in _fields %}
         {{ _field.render() }}
