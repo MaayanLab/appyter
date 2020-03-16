@@ -28,9 +28,10 @@ DEBUG = json.loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
 STATIC_DIR = kwargs.get('static-dir', os.path.abspath(os.path.join(kwargs.get('cwd', os.curdir), 'static')))
 IPYNB = args[0] if len(args) > 0 else os.environ.get('APP', 'app.ipynb')
 SHOW_HELP = 'h' in kargs or 'help' in kwargs or args == []
+STATIC_PREFIX = '/' + '/'.join(filter(None, [*PREFIX.split('/'), 'static']))
 
 # Prepare app
-app = Flask(__name__, static_url_path=PREFIX, static_folder=STATIC_DIR)
+app = Flask(__name__, static_url_path=STATIC_PREFIX, static_folder=STATIC_DIR)
 app.config['SECRET_KEY'] = SECRET_KEY
 socketio = SocketIO(app)
 
