@@ -25,10 +25,11 @@ DATA_DIR = kwargs.get('data-dir', os.environ.get('DATA_DIR', 'data'))
 MAX_THREADS = json.loads(kwargs.get('max-threads', os.environ.get('MAX_THREADS', '10')))
 SECRET_KEY = kwargs.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
 DEBUG = json.loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
+STATIC_DIR = kwargs.get('static-dir', os.path.abspath(os.path.join(kwargs.get('cwd', os.curdir), 'static')))
 SHOW_HELP = 'h' in kargs or 'help' in kwargs or args == []
 
 # Prepare app
-app = Flask(__name__)
+app = Flask(__name__, static_url_path=PREFIX, static_folder=STATIC_DIR)
 app.config['SECRET_KEY'] = SECRET_KEY
 socketio = SocketIO(app)
 
