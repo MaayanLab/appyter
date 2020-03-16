@@ -17,5 +17,5 @@
 
 {% block script %}
 {{ super() }}
-<script src="test.js"></script>
+<script src="{{ url_for('static', filename='test.js') }}"></script>
 {% endblock %}
