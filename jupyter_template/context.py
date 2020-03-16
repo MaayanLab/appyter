@@ -122,6 +122,7 @@ def get_jinja2_env(context={}, cwd=None, profile=None):
     ]),
   )
   env.filters.update(**find_filters(cwd=cwd, profile=profile))
+  env.globals.update(**find_filters(cwd=cwd, profile=profile))
   env.globals.update(
     _args=args,
     _kargs=kargs,
