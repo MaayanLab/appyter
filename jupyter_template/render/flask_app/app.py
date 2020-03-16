@@ -5,7 +5,6 @@ import json
 import time
 import shutil
 from collections import Counter
-from threading import Lock
 from flask import Flask, request, abort, current_app, copy_current_request_context
 from flask_socketio import SocketIO, emit
 from jupyter_template.context import get_sys_env, get_jinja2_env, get_extra_files
@@ -90,7 +89,7 @@ def post_index_ipynb_static(data):
 
 def prepare_formdata(req):
   # Get form variables
-  session_id = str(uuid.uuid4())
+  session_id = str('00000000-0000-0000-0000-000000000000' if DEBUG else uuid.uuid4())
   session_dir = os.path.join(DATA_DIR, session_id)
   data = req.form.to_dict()
   # Process upload files
@@ -114,6 +113,8 @@ def get_index():
   if mimetype in {'text/html'}:
     return get_index_html()
   elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
+    env = get_jinja2_env()
+    nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
     return nbtemplate
   elif mimetype in {'application/json'}:
     return get_index_json()
@@ -145,7 +146,8 @@ def cleanup(session):
   print('cleanup', session)
   thread = threads.get(session)
   if thread is not None:
-    shutil.rmtree(os.path.join(DATA_DIR, session))
+    if not DEBUG:
+      shutil.rmtree(os.path.join(DATA_DIR, session))
     del threads[session]
 
 @socketio.on('init')
