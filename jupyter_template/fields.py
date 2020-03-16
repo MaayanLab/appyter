@@ -63,7 +63,7 @@ class Field:
   def template(self):
     ''' Template to use for rendering field
     '''
-    return os.path.join('fields', self.field + '.j2')
+    return '/'.join(['fields', self.field + '.j2'])
 
   @property
   def choices(self):
