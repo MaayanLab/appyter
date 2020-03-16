@@ -1,11 +1,8 @@
 import os
-import sys
 import uuid
 import json
-import time
 import shutil
-from collections import Counter
-from flask import Flask, request, abort, current_app, copy_current_request_context
+from flask import Flask, request, abort, copy_current_request_context, send_from_directory
 from flask_socketio import SocketIO, emit
 from jupyter_template.context import get_sys_env, get_jinja2_env, get_extra_files
 from jupyter_template.parse.nbtemplate import nbtemplate_from_ipynb_file
@@ -19,14 +16,16 @@ from werkzeug.utils import secure_filename
 # Prepare environment
 from dotenv import load_dotenv
 load_dotenv()
+args, kargs, kwargs = get_sys_env()
 
-PREFIX = os.environ.get('PREFIX', '/')
-HOST = os.environ.get('HOST', '127.0.0.1')
-PORT = json.loads(os.environ.get('PORT', '5000'))
-DATA_DIR = os.environ.get('DATA_DIR', 'data')
-MAX_THREADS = json.loads(os.environ.get('MAX_THREADS', '10'))
-SECRET_KEY = os.environ.get('SECRET_KEY', str(uuid.uuid4()))
-DEBUG = json.loads(os.environ.get('DEBUG', 'true'))
+PREFIX = kwargs.get('prefix', os.environ.get('PREFIX', '/'))
+HOST = kwargs.get('host', os.environ.get('HOST', '127.0.0.1'))
+PORT = json.loads(kwargs.get('port', os.environ.get('PORT', '5000')))
+DATA_DIR = kwargs.get('data-dir', os.environ.get('DATA_DIR', 'data'))
+MAX_THREADS = json.loads(kwargs.get('max-threads', os.environ.get('MAX_THREADS', '10')))
+SECRET_KEY = kwargs.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
+DEBUG = json.loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
+SHOW_HELP = 'h' in kargs or 'help' in kwargs or args == []
 
 # Prepare app
 app = Flask(__name__)
@@ -184,8 +183,7 @@ def do_help():
   print('  default  Bare profile with no styling')
 
 def main():
-  args, kargs, kwargs = get_sys_env()
-  if 'h' in kargs or 'help' in kwargs or args == []:
+  if SHOW_HELP:
     do_help()
   else:
     return socketio.run(
