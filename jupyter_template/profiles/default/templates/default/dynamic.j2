@@ -2,14 +2,27 @@
 
 {% block body %}
 {{ super() }}
-<div id="status"></div>
-<div id="nbviewer">{{ _nbviewer }}</div>
+<div class="row">
+  <div class="col-sm-8 offset-sm-2">
+    <div id="status" class="alert alert-primary" role="alert">
+      Loading...
+    </div>
+  </div>
+  <div class="col-sm-12 text-center">
+    <a id="download-notebook" class="btn btn-primary" role="button" disabled>Download Notebook</a>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <div id="nbviewer">{{ _nbviewer }}</div>
+  </div>
+</div>
 {% endblock %}
 
 {% block script %}
 {{ super() }}
 <script type="text/javascript" charset="utf-8">
-var $nbviewer, $status, current_index, current_code_cell, started, scroll
+var $nbviewer, $status, $downloadNotebook, current_index, current_code_cell, started, scroll, nb
 
 function find_or_create(root, classes) {
   var $el = root.find(classes.map(function (cls) { return `.cls` }).join(' '))
@@ -26,6 +39,7 @@ function find_or_create(root, classes) {
 socket.on('connect', function() {
   $nbviewer = $('#nbviewer')
   $status = $('#status')
+  $downloadNotebook = $('#download-notebook')
   current_index = undefined
   current_code_cell = 1
   started = false
@@ -34,8 +48,10 @@ socket.on('connect', function() {
   socket.emit('init', {{ _data }})
 })
 socket.on('notebook', function(data) {
-  console.debug('notebook')
-  console.debug(data)
+  nb = data
+  $downloadNotebook.attr('href', `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data))}`)
+  $downloadNotebook.attr('download', 'notebook.ipynb')
+  $downloadNotebook.attr('disabled', false)
 })
 socket.on('status', function(value) {
   $("#status").text(value)
