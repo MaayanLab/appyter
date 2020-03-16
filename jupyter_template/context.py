@@ -92,7 +92,15 @@ def get_extra_files(cwd=None, profile=None):
   paths = {
     os.path.abspath(f) + (os.path.sep if os.path.isdir(f) else '')
     for d in dirs
-    for f in [d, *glob.glob(os.path.join(d, '[!_]**'), recursive=True)]
+    for f in ({
+      d,
+      # all files recursively in these directories
+      *glob.glob(os.path.join(d, '**'), recursive=True),
+    } - ({
+      # exclude directories or files that begin with _
+      *glob.glob(os.path.join(d, '_**', '*'), recursive=True),
+      *glob.glob(os.path.join(d, '**', '_*'), recursive=True),
+    }))
   }
   paths.add(os.path.abspath(args[0]))
   return list(paths)
