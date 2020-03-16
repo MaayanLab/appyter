@@ -25,7 +25,9 @@ PREFIX = os.environ.get('PREFIX', '/')
 HOST = os.environ.get('HOST', '127.0.0.1')
 PORT = json.loads(os.environ.get('PORT', '5000'))
 DATA_DIR = os.environ.get('DATA_DIR', 'data')
+MAX_THREADS = json.loads(os.environ.get('MAX_THREADS', '10'))
 SECRET_KEY = os.environ.get('SECRET_KEY', str(uuid.uuid4()))
+DEBUG = json.loads(os.environ.get('DEBUG', 'true'))
 
 # Prepare app
 app = Flask(__name__)
@@ -33,26 +35,27 @@ app.config['SECRET_KEY'] = SECRET_KEY
 socketio = SocketIO(app)
 
 # Prepare globals
-nbtemplate = None
-thread = None
-thread_lock = Lock()
+threads = {}
 
 def get_index_html():
   ''' Return options as form
   '''
   env = get_jinja2_env()
+  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   return render_form_from_nbtemplate(env, nbtemplate)
 
 def get_index_json():
   ''' Return options as json
   '''
   env = get_jinja2_env()
+  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   return render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
 
 def post_index_html_dynamic(data):
   ''' Return dynamic nbviewer
   '''
   env = get_jinja2_env(context=data)
+  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return env.get_template(
     'dynamic.j2',
@@ -65,6 +68,7 @@ def post_index_html_static(data):
   ''' Return static nbviewer
   '''
   env = get_jinja2_env(context=data)
+  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nbviewer_from_nb(env, nb)
 
@@ -72,6 +76,7 @@ def post_index_json_static(data):
   ''' Return rendered json
   '''
   env = get_jinja2_env(context=data)
+  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nbtemplate_json_from_nbtemplate(env, nb)
 
@@ -79,6 +84,7 @@ def post_index_ipynb_static(data):
   ''' Return rendered ipynb
   '''
   env = get_jinja2_env(context=data)
+  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nb_from_nbtemplate(env, nb)
 
@@ -135,32 +141,35 @@ def sanitize_uuid(val):
   return str(uuid.UUID(val))
 
 def cleanup(session):
-  global thread
-  with thread_lock:
-    thread = None
+  global threads
+  print('cleanup', session)
+  thread = threads.get(session)
+  if thread is not None:
     shutil.rmtree(os.path.join(DATA_DIR, session))
+    del threads[session]
 
 @socketio.on('init')
 def init(data):
-  # TODO: Enable more than one thread
   env = get_jinja2_env(context=data)
+  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
   session = sanitize_uuid(data.get('_session'))
-  global thread
-  while True:
-    with thread_lock:
-      if not thread:
-        thread = socketio.start_background_task(
-          nbexecutor,
-          emit=emit,
-          session=session,
-          session_dir=os.path.join(DATA_DIR, session),
-          cleanup=cleanup,
-        )
-        break
-    emit('status', 'Waiting for server...')
-    time.sleep(1)
+  global threads
+  if len(threads) > MAX_THREADS:
+    emit('error', 'Too many connections, try again later')
+    # TODO: implement queue
+  elif threads.get(session) is None:
+    threads[session] = socketio.start_background_task(
+      nbexecutor,
+      emit=emit,
+      session=session,
+      session_dir=os.path.join(DATA_DIR, session),
+      cleanup=cleanup,
+    )
+    print('started', session)
+  else:
+    emit('status', 'Session already connected')
 
 def do_help():
   print('Usage: jupyter-template [OPTIONS] <template.ipynb>')
@@ -177,10 +186,10 @@ def main():
   if 'h' in kargs or 'help' in kwargs or args == []:
     do_help()
   else:
-    global nbtemplate
-    nbtemplate = nbtemplate_from_ipynb_file(args[0])
     return socketio.run(
         app,
+        use_reloader=DEBUG,
+        debug=DEBUG,
         host=HOST,
         port=PORT,
     )

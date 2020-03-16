@@ -74,7 +74,7 @@ def find_template_dirs(cwd=os.getcwd(), profile='default'):
   ]))
 
 def get_jinja2_env(context={}, cwd=None, profile=None):
-  _, _, kwargs = get_sys_env()
+  args, kargs, kwargs = get_sys_env()
   cwd = kwargs.get('cwd', os.getcwd())
   profile = kwargs.get('profile', 'default')
 
@@ -90,6 +90,11 @@ def get_jinja2_env(context={}, cwd=None, profile=None):
     ]),
   )
   env.filters.update(**find_filters(cwd=cwd, profile=profile))
+  env.globals.update(
+    _args=args,
+    _kargs=kargs,
+    _kwargs=kwargs,
+  )
   env.globals.update(**build_fields(find_fields(cwd=cwd, profile=profile), context=context))
   return env
 
