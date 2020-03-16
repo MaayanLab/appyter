@@ -8,7 +8,7 @@ from collections import Counter
 from threading import Lock
 from flask import Flask, request, abort, current_app, copy_current_request_context
 from flask_socketio import SocketIO, emit
-from jupyter_template.context import get_sys_env, get_jinja2_env
+from jupyter_template.context import get_sys_env, get_jinja2_env, get_extra_files
 from jupyter_template.parse.nbtemplate import nbtemplate_from_ipynb_file
 from jupyter_template.render.form import render_form_from_nbtemplate
 from jupyter_template.render.nbviewer import render_nbviewer_from_nb
@@ -188,10 +188,11 @@ def main():
   else:
     return socketio.run(
         app,
-        use_reloader=DEBUG,
-        debug=DEBUG,
         host=HOST,
         port=PORT,
+        debug=DEBUG,
+        use_reloader=DEBUG,
+        extra_files=get_extra_files(),
     )
 
 if __name__ == '__main__':

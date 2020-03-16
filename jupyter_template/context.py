@@ -1,3 +1,4 @@
+import glob
 import os, os.path
 import importlib
 
@@ -31,15 +32,18 @@ def importdir_deep(_dirname_, _package_, _globals_, filter_mod=lambda k, v: not 
       if filter_mod(k, v)
     })
 
+def find_fields_dir_mappings(cwd=os.getcwd(), profile='default'):
+  mappings = {}
+  if profile != 'default':
+    mappings[os.path.join(os.path.dirname(__file__), 'profiles', profile, 'fields') + os.path.sep] = __package__ + '.profiles.' + profile + '.fields'
+  mappings[os.path.join(os.path.dirname(__file__), 'profiles', 'default', 'fields') + os.path.sep] = __package__ + '.profiles.default.fields'
+  mappings[os.path.abspath(os.path.join(cwd, 'fields')) + os.path.sep] = 'fields'
+  return mappings
+
 def find_fields(cwd=os.getcwd(), profile='default'):
   from jupyter_template.fields import Field
   ctx = {}
-  dirs = [
-    (os.path.join(os.path.dirname(__file__), 'profiles', profile, 'fields'), __package__ + '.profiles.' + profile + '.fields'),
-    (os.path.join(os.path.dirname(__file__), 'profiles', 'default', 'fields'), __package__ + '.profiles.default.fields'),
-    (os.path.join(cwd, 'fields'), 'fields'),
-  ]
-  for _dirname_, _package_ in dirs:
+  for _dirname_, _package_ in find_fields_dir_mappings(cwd=cwd, profile=profile).items():
     if os.path.isdir(_dirname_):
       importdir_deep(
         _dirname_,
@@ -49,14 +53,17 @@ def find_fields(cwd=os.getcwd(), profile='default'):
       )
   return ctx
 
+def find_filters_dir_mappings(cwd=os.getcwd(), profile='default'):
+  mappings = {}
+  if profile != 'default':
+    mappings[os.path.join(os.path.dirname(__file__), 'profiles', profile, 'filters') + os.path.sep] = __package__ + '.profiles.' + profile + '.filters'
+  mappings[os.path.join(os.path.dirname(__file__), 'profiles', 'default', 'filters') + os.path.sep] = __package__ + '.profiles.default.filters'
+  mappings[os.path.abspath(os.path.join(cwd, 'filters')) + os.path.sep] = 'filters'
+  return mappings
+
 def find_filters(cwd=os.getcwd(), profile='default'):
   ctx = {}
-  dirs = [
-    (os.path.join(os.path.dirname(__file__), 'profiles', profile, 'filters'), __package__ + '.profiles.' + profile + '.filters'),
-    (os.path.join(os.path.dirname(__file__), 'profiles', 'default', 'filters'), __package__ + '.profiles.default.filters'),
-    (os.path.join(cwd, 'filters'), 'filters'),
-  ]
-  for _dirname_, _package_ in dirs:
+  for _dirname_, _package_ in find_filters_dir_mappings(cwd=cwd, profile=profile).items():
     if os.path.isdir(_dirname_):
       importdir_deep(
         _dirname_,
@@ -66,12 +73,29 @@ def find_filters(cwd=os.getcwd(), profile='default'):
       )
   return ctx
 
-def find_template_dirs(cwd=os.getcwd(), profile='default'):
+def find_templates_dir(cwd=os.getcwd(), profile='default'):
   return list(filter(os.path.isdir, [
-    os.path.join(os.path.dirname(__file__), 'profiles', profile, 'templates'),
-    os.path.join(os.path.dirname(__file__), 'profiles', 'default', 'templates'),
-    os.path.join(cwd, 'templates'),
+    os.path.join(os.path.dirname(__file__), 'profiles', profile, 'templates') + os.path.sep,
+    os.path.join(os.path.dirname(__file__), 'profiles', 'default', 'templates') + os.path.sep,
+    os.path.abspath(os.path.join(cwd, 'templates')) + os.path.sep,
   ]))
+
+def get_extra_files(cwd=None, profile=None):
+  args, _, kwargs = get_sys_env()
+  cwd = kwargs.get('cwd', os.getcwd())
+  profile = kwargs.get('profile', 'default')
+  dirs = [
+    *find_templates_dir(cwd=cwd, profile=profile),
+    *find_filters_dir_mappings(cwd=cwd, profile=profile).keys(),
+    *find_fields_dir_mappings(cwd=cwd, profile=profile).keys(),
+  ]
+  paths = {
+    os.path.abspath(f) + (os.path.sep if os.path.isdir(f) else '')
+    for d in dirs
+    for f in [d, *glob.glob(os.path.join(d, '[!_]**'), recursive=True)]
+  }
+  paths.add(os.path.abspath(args[0]))
+  return list(paths)
 
 def get_jinja2_env(context={}, cwd=None, profile=None):
   args, kargs, kwargs = get_sys_env()
@@ -86,7 +110,7 @@ def get_jinja2_env(context={}, cwd=None, profile=None):
     extensions=['jinja2.ext.do'],
     loader=ChoiceLoader([
       FileSystemLoader(d)
-      for d in find_template_dirs(cwd=cwd, profile=profile)
+      for d in find_templates_dir(cwd=cwd, profile=profile)
     ]),
   )
   env.filters.update(**find_filters(cwd=cwd, profile=profile))
