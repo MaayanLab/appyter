@@ -75,9 +75,9 @@ def find_filters(cwd=os.getcwd(), profile='default'):
 
 def find_templates_dir(cwd=os.getcwd(), profile='default'):
   return list(filter(os.path.isdir, [
+    os.path.abspath(os.path.join(cwd, 'templates')) + os.path.sep,
     os.path.join(os.path.dirname(__file__), 'profiles', profile, 'templates') + os.path.sep,
     os.path.join(os.path.dirname(__file__), 'profiles', 'default', 'templates') + os.path.sep,
-    os.path.abspath(os.path.join(cwd, 'templates')) + os.path.sep,
   ]))
 
 def get_extra_files(cwd=None, profile=None):
