@@ -1,0 +1,30 @@
+{% extends "biojupies/base.j2" %}
+
+{% block body %}
+{{ super() }}
+<div class="container">
+  <form method="POST" enctype="multipart/form-data">
+      {{ SectionField(
+        name="_primary",
+        section=null,
+        title="Customize Your Notebook",
+        subtitle="Customize your notebook",
+      ).render(_fields=_fields) }}
+      {% for _field in _fields %}
+          {% if _field.type == "section" %}
+            {{ _field.render(_fields=_fields) }}
+          {% endif %}
+      {% endfor %}
+      <div class="col-sm-12">
+        &nbsp;
+      </div>
+      <div class="col-sm-12 text-center">
+        <input
+          class="btn navigate white border-custom bg-blue nodecoration"
+          type="submit"
+          value="Submit"
+        />
+      </div>
+  </form>
+</div>
+{% endblock %}

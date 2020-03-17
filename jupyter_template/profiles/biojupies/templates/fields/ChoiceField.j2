@@ -1,0 +1,15 @@
+<div class="row px-3 pb-3">
+  <div class="col-2 px-2 bold text-right tiny my-auto">
+    <div>{{ this.args.label }}<sup><i class="fa fa-question-circle ml-1" data-toggle="tooltip" title="" data-original-title="{{ this.args.description }}"></i></sup>:</div>
+  </div>
+  <div class="col-3">
+    <select
+      name="{{ this.args.name }}"
+      class="form-control nodecoration tiny bg-white px-2 py-1 mb-0 select2"
+    >
+      {% for choice in this.args.choices %}
+          <option{% if choice == this.args.default %} selected{% endif %}>{{ choice }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
