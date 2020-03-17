@@ -42,15 +42,13 @@ class Field:
     '''
     return self.args['value'] in self.choices
 
-  def render(self):
+  def render(self, **kwargs):
     ''' Return a rendered version of the field (form)
     '''
     return Markup(
       get_jinja2_env().get_template(
         self.template
-      ).render({
-        'this': self
-      })
+      ).render(dict(**kwargs, this=self))
     )
 
   @property
