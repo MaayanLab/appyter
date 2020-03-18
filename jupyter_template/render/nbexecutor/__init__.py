@@ -11,9 +11,10 @@ def cell_has_error(cell):
     return False
 
 def render_nbexecutor_from_nb(env, nb):
-  def nbexecutor(emit=print, session=None, session_dir='', cleanup=None):
+  def nbexecutor(emit=print, session=None, session_dir='', cleanup=None, stopper=lambda: False):
     assert callable(emit), 'Emit must be callable'
     try:
+      emit('status', 'Starting...')
       emit('notebook', nb)
       yep = YieldingExecutePreprocessor(
         allow_errors=True,
@@ -24,8 +25,10 @@ def render_nbexecutor_from_nb(env, nb):
       index = 0
       code_cell_index = 0
       n_cells = len(nb.cells)
+      emit('status', 'Executing...')
       emit('progress', index)
       for cell, _ in yep.preprocess(nb, resources):
+        assert not stopper(), "Stopper"
         emit('cell', cell)
         if cell_is_code(cell):
           code_cell_index += 1
@@ -37,8 +40,9 @@ def render_nbexecutor_from_nb(env, nb):
         else:
           emit('status', 'Success')
           emit('notebook', nb)
+        assert not stopper(), "Stopper"
     except Exception as e:
-      print(e)
+      print('error', e)
       emit('error', str(e))
     finally:
       if callable(cleanup):

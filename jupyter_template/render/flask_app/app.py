@@ -33,7 +33,7 @@ STATIC_PREFIX = '/' + '/'.join(filter(None, [*PREFIX.split('/'), 'static']))
 # Prepare app
 app = Flask(__name__, static_url_path=STATIC_PREFIX, static_folder=STATIC_DIR)
 app.config['SECRET_KEY'] = SECRET_KEY
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode='threading')
 
 # Prepare globals
 threads = {}
@@ -183,22 +183,24 @@ def init(data):
     emit('error', 'Too many connections, try again later')
     return
     # TODO: implement queue
-  elif threads.get(session) is None:
-    nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
-    threads[session_id] = dict(
-      stop=False,
-      thread=socketio.start_background_task(
-        nbexecutor,
-        emit=emit,
-        session=session_id,
-        session_dir=os.path.join(DATA_DIR, session_id),
-        cleanup=cleanup,
-        stopper=lambda _threads=threads, _session=session_id: _threads.get(_session, {'stop': True})['stop']
-      ),
-    )
-    print('started', session_id)
-  else:
-    emit('status', 'Session already connected')
+  elif threads.get(session_id) is not None:
+    emit('status', 'Session already connected, kicking previous session')
+    threads[session_id]['stop'] = True
+    threads[session_id]['thread'].join()
+
+  nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
+  threads[session_id] = dict(
+    stop=False,
+    thread=socketio.start_background_task(
+      nbexecutor,
+      emit=emit,
+      session=session_id,
+      session_dir=os.path.join(DATA_DIR, session_id),
+      cleanup=cleanup,
+      stopper=lambda _threads=threads, _session=session_id: _threads.get(_session, {'stop': True})['stop']
+    ),
+  )
+  print('started', session_id)
 
 @socketio.on("siofu_start")
 def siofu_start(data):
