@@ -6,6 +6,24 @@
     {% for _field in _fields %}
         {{ _field.render() }}
     {% endfor %}
+    <input name="_session" type="text" style="display: none;" value="{{ _session }}" />
     <input type="submit" value="Submit" />
 </form>
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script>
+$(document).ready(function() {
+  $('form').submit(function (e) {
+    e.preventDefault();
+    // Replace files with text elements
+    $('form [type="file"]').each(function () {
+      $(this).attr('type', 'text')
+    })
+    // Submit form
+    this.submit()
+  })
+})
+</script>
 {% endblock %}

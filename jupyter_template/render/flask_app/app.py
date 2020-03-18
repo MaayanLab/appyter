@@ -37,11 +37,15 @@ socketio = SocketIO(app)
 
 # Prepare globals
 threads = {}
+session = {}
 
 def get_index_html():
   ''' Return options as form
   '''
   env = get_jinja2_env()
+  env.globals.update(
+    _session=str('00000000-0000-0000-0000-000000000000' if DEBUG else uuid.uuid4())
+  )
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   return render_form_from_nbtemplate(env, nbtemplate)
 
@@ -63,6 +67,7 @@ def post_index_html_dynamic(data):
   ).render(
     _nbviewer=render_nbviewer_from_nb(env, nb),
     _data=json.dumps(data),
+    _session=data['_session'], # NOTE: this should not be necessary..
   )
 
 def post_index_html_static(data):
@@ -91,9 +96,9 @@ def post_index_ipynb_static(data):
 
 def prepare_formdata(req):
   # Get form variables
-  session_id = str('00000000-0000-0000-0000-000000000000' if DEBUG else uuid.uuid4())
-  session_dir = os.path.join(DATA_DIR, session_id)
   data = req.form.to_dict()
+  session_id = sanitize_uuid(data.get('_session'))
+  session_dir = os.path.join(DATA_DIR, session_id)
   # Process upload files
   for fname, fh in req.files.items():
     # Save files to datadir for session
@@ -103,7 +108,7 @@ def prepare_formdata(req):
     if filename != '':
       fh.save(os.path.join(session_dir, filename))
     data[fname] = filename
-  return dict(**data, _session=session_id)
+  return data
 
 @app.route(PREFIX, methods=['GET'])
 def get_index():
@@ -152,28 +157,96 @@ def cleanup(session):
       shutil.rmtree(os.path.join(DATA_DIR, session))
     del threads[session]
 
+@socketio.on('session')
+def _(data):
+  print('session')
+  global session
+  session[request.sid] = dict(session.get(request.sid, {}), _session=sanitize_uuid(data['_session']))
+
+@socketio.on('disconnect')
+def _():
+  global session
+  if request.sid in session:
+    del session[request.sid]
+
 @socketio.on('init')
 def init(data):
+  print('init')
   env = get_jinja2_env(context=data)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
-  nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
-  session = sanitize_uuid(data.get('_session'))
+  session_id = sanitize_uuid(data.get('_session'))
+  global session
+  session[request.sid] = dict(session.get(request.sid, {}), _session=session_id, stop=False)
   global threads
   if len(threads) > MAX_THREADS:
     emit('error', 'Too many connections, try again later')
+    return
     # TODO: implement queue
   elif threads.get(session) is None:
-    threads[session] = socketio.start_background_task(
-      nbexecutor,
-      emit=emit,
-      session=session,
-      session_dir=os.path.join(DATA_DIR, session),
-      cleanup=cleanup,
+    nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
+    threads[session_id] = dict(
+      stop=False,
+      thread=socketio.start_background_task(
+        nbexecutor,
+        emit=emit,
+        session=session_id,
+        session_dir=os.path.join(DATA_DIR, session_id),
+        cleanup=cleanup,
+        stopper=lambda _threads=threads, _session=session_id: _threads.get(_session, {'stop': True})['stop']
+      ),
     )
-    print('started', session)
+    print('started', session_id)
   else:
     emit('status', 'Session already connected')
+
+@socketio.on("siofu_start")
+def siofu_start(data):
+  print('file upload start')
+  global session
+  session_id = session[request.sid]['_session']
+  session_dir = os.path.join(DATA_DIR, session_id)
+  filename = secure_filename(data.get('name'))
+  os.makedirs(DATA_DIR, exist_ok=True)
+  os.makedirs(session_dir, exist_ok=True)
+  if filename != '':
+    session[request.sid] = dict(session[request.sid], **{
+      'file_%d' % (data.get('id')): dict(data,
+        name=filename,
+        bytesLoaded=0,
+        fh=open(os.path.join(session_dir, filename), 'wb'),
+      ),
+    })
+
+    emit('siofu_ready', {
+      'id': data.get('id'),
+      'name': None,
+    })
+  else:
+    emit('siofu_error', 'Invalid filename')
+
+@socketio.on("siofu_progress")
+def siofu_progress(data):
+  global session
+  session[request.sid]['file_%d' % (data['id'])]['fh'].write(data['content'])
+  emit("siofu_chunk", {
+    'id': data['id'],
+  })
+
+@socketio.on("siofu_done")
+def siofu_done(data):
+  print('file upload complete')
+  global session
+  session[request.sid]['file_%d' % (data['id'])]['fh'].close()
+  del session[request.sid]['file_%d' % (data['id'])]
+  emit('siofu_complete', {
+    'id': data['id'],
+  })
+
+
+@socketio.on_error()
+def error_handler(e):
+  print(e)
 
 def do_help():
   print('Usage: jupyter-template [OPTIONS] <template.ipynb>')

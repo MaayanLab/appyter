@@ -15,6 +15,7 @@
             {{ _field.render(_fields=_fields) }}
           {% endif %}
       {% endfor %}
+      <input name="_session" type="text" style="display: none;" value="{{ _session }}" />
       <div class="col-sm-12">
         &nbsp;
       </div>
@@ -27,4 +28,8 @@
       </div>
   </form>
 </div>
+{% endblock %}
+
+{% block script %}
+{{ super() }}
 {% endblock %}
