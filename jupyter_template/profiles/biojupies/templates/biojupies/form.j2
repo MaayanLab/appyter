@@ -32,4 +32,17 @@
 
 {% block script %}
 {{ super() }}
+<script>
+$(document).ready(function() {
+  $('form').submit(function (e) {
+    e.preventDefault();
+    // Replace files with text elements
+    $('form [type="file"]').each(function () {
+      $(this).attr('type', 'text')
+    })
+    // Submit form
+    this.submit()
+  })
+})
+</script>
 {% endblock %}
