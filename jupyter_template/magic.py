@@ -57,7 +57,7 @@ def init(_globals):
     '''
     global_internal = _globals()
     template = env.from_string(cell)
-    rendered_template_lines = list(filter(None, map(str.strip, template.render().splitlines())))
+    rendered_template_lines = list(filter(None, map(str.rstrip, template.render().splitlines())))
     rendered = '\n'.join(rendered_template_lines[:-1])
     rendered_last = rendered_template_lines[-1]
     if line == 'markdown':
