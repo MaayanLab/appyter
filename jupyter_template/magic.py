@@ -70,7 +70,9 @@ def init(_globals):
       exec(rendered, global_internal)
       try:
         # display the result of the last line's result if possible
-        display(eval(rendered_last, global_internal))
+        result = eval(rendered_last, global_internal)
+        if result is not None:
+          display(result)
       except:
         # otherwise just execute the last line
         exec(rendered_last, global_internal)
