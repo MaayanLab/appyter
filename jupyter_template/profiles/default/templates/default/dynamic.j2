@@ -24,7 +24,7 @@
 {# Several extensions (i.e. plotly) rely on the presence RequireJS, so we'll just include it here #}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
 <script type="text/javascript" charset="utf-8">
-var $nbviewer, $status, $downloadNotebook, current_index, current_code_cell, started, scroll, nb
+var $nbviewer, $status, $downloadNotebook, current_index, current_code_cell, started, scroll, nb, md
 
 function find_or_create(root, classes) {
   var $el = root.find(classes.map(function (cls) { return `.cls` }).join(' '))
@@ -110,6 +110,16 @@ socket.on('cell', function (value) {
           var cell_output_html = ele.data['text/html']
           cell_output_container.append(cell_output_html)
           cell_output_subarea.append(cell_output_container)
+        } else if (ele.data['text/markdown'] !== undefined) {
+          var cell_output_container = $('<div class="output_stream output_' + ele.name + ' output_markdown">')
+          requirejs(["https://cdnjs.cloudflare.com/ajax/libs/markdown-it/10.0.0/markdown-it.min.js"], function (MarkdownIt) {
+            if (md === undefined) {
+              md = new MarkdownIt()
+            }
+            var cell_output_markdown = md.render(ele.data['text/markdown'])
+            cell_output_container.append(cell_output_markdown)
+            cell_output_subarea.append(cell_output_container)
+          })
         } else if (ele.data['text/plain'] !== undefined) {
           var cell_output_container = $('<div class="output_stream output_' + ele.name + ' output_text">')
           var cell_output_text = $('<pre>').text(ele.data['text/plain'])
