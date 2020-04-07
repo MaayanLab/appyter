@@ -58,24 +58,25 @@ def init(_globals):
     global_internal = _globals()
     template = env.from_string(cell)
     rendered_template_lines = list(filter(None, map(str.rstrip, template.render().splitlines())))
-    rendered = '\n'.join(rendered_template_lines[:-1])
-    rendered_last = rendered_template_lines[-1]
-    if line == 'markdown':
-      display(Markdown('\n'.join((rendered, rendered_last))))
-    elif line == 'code'  or line == 'hide_code':
-      display(Markdown('```python\n%s\n```' % ('\n'.join((rendered, rendered_last)))))
-    else:
-      if line == 'code_eval' or line == 'hide_code_eval':
+    if len(rendered_template_lines) > 0:
+      rendered = '\n'.join(rendered_template_lines[:-1])
+      rendered_last = rendered_template_lines[-1]
+      if line == 'markdown':
+        display(Markdown('\n'.join((rendered, rendered_last))))
+      elif line == 'code'  or line == 'hide_code':
         display(Markdown('```python\n%s\n```' % ('\n'.join((rendered, rendered_last)))))
-      exec(rendered, global_internal)
-      try:
-        # display the result of the last line's result if possible
-        result = eval(rendered_last, global_internal)
-        if result is not None:
-          display(result)
-      except:
-        # otherwise just execute the last line
-        exec(rendered_last, global_internal)
+      else:
+        if line == 'code_eval' or line == 'hide_code_eval':
+          display(Markdown('```python\n%s\n```' % ('\n'.join((rendered, rendered_last)))))
+        exec(rendered, global_internal)
+        try:
+          # display the result of the last line's result if possible
+          result = eval(rendered_last, global_internal)
+          if result is not None:
+            display(result)
+        except:
+          # otherwise just execute the last line
+          exec(rendered_last, global_internal)
 
     '''
     Step 2. Check for new variables in the internal global
