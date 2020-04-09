@@ -50,19 +50,23 @@
         var progressBar
 
         siofu.addEventListener('start', function (evt) {
-          var progressBarContainer = $('<div></div>')
-            .addClass('progress')
-          progressBar = $('<div></div>')
-            .addClass('progress-bar')
+          if (progressBar === undefined) {
+            var progressBarContainer = $('<div></div>')
+              .addClass('progress')
+            progressBar = $('<div></div>')
+              .addClass('progress-bar')
+              .attr('role', 'progressbar')
+              .attr('aria-valuemin', '0')
+              .attr('aria-valuemax', '100')
+              .appendTo(progressBarContainer)
+            $self.parent().append(progressBarContainer)
+          }
+          progressBar
+            .removeClass('bg-success')
             .addClass('progress-bar-striped')
             .addClass('progress-bar-animated')
-            .attr('role', 'progressbar')
-            .attr('aria-valuemin', '0')
-            .attr('aria-valuemax', '100')
             .css('width', '0%')
             .attr('aria-valuenow', '0')
-            .appendTo(progressBarContainer)
-          $self.parent().append(progressBarContainer)
         })
         siofu.addEventListener('progress', function (evt) {
           var perc = ((evt.bytesLoaded / evt.file.size) * 100).toPrecision(3)
@@ -75,6 +79,8 @@
             .css('width', '100%')
             .attr('aria-valuenow', '100')
             .addClass('bg-success')
+            .removeClass('progress-bar-striped')
+            .removeClass('progress-bar-animated')
           $self.attr('value', evt.file.name)
         })
         siofu.addEventListener('error', function (evt) {
