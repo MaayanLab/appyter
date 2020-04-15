@@ -5,7 +5,7 @@ This module enables you to turn your jupyter notebook into a jinja2 template-dri
 ## Installation
 ```bash
 # Install package from github repository master
-pip3 install --user --upgrade https://github.com/MaayanLab/jupyter-template/archive/master.zip
+pip3 install --user --upgrade git+git://github.com/Maayanlab/jupyter-template.git
 ```
 
 ## Usage
