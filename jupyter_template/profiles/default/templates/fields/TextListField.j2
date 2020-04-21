@@ -6,7 +6,7 @@
         </label>
         <ul class="list-group" name="{{ this.args.name }}">
         {% for choice in this.args.choices %}
-            <li class="list-group-item"><input type="checkbox"{% if this.args.default in choices %}checked{% endif %} /></li>
+            <li class="list-group-item"><input type="checkbox"{% if this.args.default in choices %}checked{% endif %} />{{ choice }}</li>
         {% endfor %}
         </ul>
     </div>
