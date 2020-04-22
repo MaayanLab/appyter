@@ -94,9 +94,18 @@ def post_index_ipynb_static(data):
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nb_from_nbtemplate(env, nb)
 
+def collapse(L):
+  if len(L) == 1:
+    return L[0]
+  else:
+    return L
+
 def prepare_formdata(req):
   # Get form variables
-  data = req.form.to_dict()
+  data = {
+    k: collapse(V)
+    for k, V in req.form.lists()
+  }
   session_id = sanitize_uuid(data.get('_session'))
   session_dir = os.path.join(DATA_DIR, session_id)
   # Process upload files
