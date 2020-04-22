@@ -1,0 +1,18 @@
+<div class="row px-3 pb-3">
+  <div class="col-lg-3 bold text-lg-right my-auto">
+    {{ this.args.label }}
+    {%- if this.args.description %}
+      <sup><i class="fa fa-question-circle ml-1" data-toggle="tooltip" title="" data-original-title="{{ this.args.description }}"></i></sup>
+    {% endif -%}:
+  </div>
+  <div class="col-lg-6 pt-2 pt-lg-0">
+    <ul class="list-group" name="{{ this.args.name }}">
+    {% for choice in this.args.choices %}
+        <li class="list-group-item">
+            <input type="checkbox"{% if choice in this.args.default %}checked{% endif %} />
+            {{ choice }}
+        </li>
+    {% endfor %}
+    </ul>
+  </div>
+</div>
