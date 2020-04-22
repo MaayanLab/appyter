@@ -12,5 +12,12 @@ class MultiChoiceField(Field):
     else:
       return None
 
+  @property
+  def value(self):
+    if type(self.choices) == dict:
+      return [self.choices[v] for v in self.raw_value]
+    else:
+      return self.raw_value
+
   def constraint(self):
     return self.raw_value is not None and all(v in self.choices for v in self.raw_value)
