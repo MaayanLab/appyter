@@ -1,7 +1,7 @@
 # Custom execute processor derived directly from ExecutePreprocessor source code
 #  we split up the preprocess method into setup, preprocess, and destroy with our
 #  new preprocess yielding results as they are available.
-
+import os
 from nbconvert.preprocessors import ExecutePreprocessor, CellExecutionError
 
 class YieldingExecutePreprocessor(ExecutePreprocessor):
@@ -9,6 +9,8 @@ class YieldingExecutePreprocessor(ExecutePreprocessor):
     path = resources.get('metadata', {}).get('path', '')
     if path == '':
       path = None
+    else:
+      os.makedirs(path, exist_ok=True)
 
     # clear display_id map
     self._display_id_map = {}
