@@ -36,6 +36,7 @@ class Field(dict):
         **kwargs,
       )
     )
+    assert name is not None, "Name should be defined and unique"
   
   @property
   def args(self):
