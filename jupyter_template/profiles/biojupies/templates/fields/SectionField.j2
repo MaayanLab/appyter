@@ -14,9 +14,7 @@
     <div id="{{ this.args.name }}" class="border-grey mx-2 border-top-0 rounded-bottom tiny collapse show">
       <div class="pt-3">
         {% for _field in _fields %}
-          {% if _field.args.section == this.args.section %}
-            {{ _field.render() }}
-          {% endif %}
+          {{ _field.render() }}
         {% endfor %}
       </div>
     </div>

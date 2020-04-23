@@ -4,28 +4,36 @@
 {{ super() }}
 <div class="container">
   <form method="POST" enctype="multipart/form-data">
-      {{ SectionField(
-        name="_primary",
-        section=null,
-        title="Customize Your Notebook",
-        subtitle="Customize your notebook",
-      ).render(_fields=_fields) }}
-      {% for _field in _fields %}
-          {% if _field.type == "section" %}
-            {{ _field.render(_fields=_fields) }}
-          {% endif %}
-      {% endfor %}
-      <input name="_session" type="text" style="display: none;" value="{{ _session }}" />
-      <div class="col-sm-12">
-        &nbsp;
-      </div>
-      <div class="col-sm-12 text-center">
-        <input
-          class="btn navigate white border-custom bg-blue nodecoration"
-          type="submit"
-          value="Submit"
-        />
-      </div>
+    {% with orphaned_fields = jq(_fields, '.[].args.name', '.[] | select(.type != "section" and .args.section == null)') %}
+      {% if orphaned_fields %}
+        {{ SectionField(
+          name="_primary",
+          section=null,
+          title="Customize Your Notebook",
+          subtitle="Customize your notebook",
+        ).render(_fields=orphaned_fields) }}
+      {% endif %}
+    {% endwith %}
+    {% for _field in jq(_fields, '.[].args.name', '.[] | select(.type == "section")') %}
+      {{ _field.render(
+        _fields=jq(
+          _fields,
+          '.[].args.name',
+          fmt('.[] | select(.args.section == "{}")', _field.args.name)
+        )
+      ) }}
+    {% endfor %}
+    <input name="_session" type="text" style="display: none;" value="{{ _session }}" />
+    <div class="col-sm-12">
+      &nbsp;
+    </div>
+    <div class="col-sm-12 text-center">
+      <input
+        class="btn navigate white border-custom bg-blue nodecoration"
+        type="submit"
+        value="Submit"
+      />
+    </div>
   </form>
 </div>
 {% endblock %}
