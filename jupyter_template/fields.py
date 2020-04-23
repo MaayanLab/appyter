@@ -18,24 +18,28 @@ def build_fields(fields, context={}):
     for field_name, field in fields.items()
   }
 
-class Field:
+class Field(dict):
   def __init__(self,
-      group=None,
       name=None,
       label=None,
       value=None,
       choices=[],
       default=None,
       **kwargs):
-    self.args = dict(
-      group=group,
-      name=name,
-      choices=choices,
-      label=label,
-      default=default,
-      value=value if value is not None else default,
-      **kwargs,
+    super().__init__(
+      args=dict(
+        name=name,
+        choices=choices,
+        label=label,
+        default=default,
+        value=value if value is not None else default,
+        **kwargs,
+      )
     )
+  
+  @property
+  def args(self):
+    return self['args']
 
   def constraint(self):
     ''' Return true if args.value satisfies constraints.
