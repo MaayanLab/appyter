@@ -3,6 +3,7 @@ flask
 flask-socketio
 ipython
 jinja2
+jq
 lxml
 nbconvert
 nbformat
