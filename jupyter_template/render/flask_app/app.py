@@ -42,7 +42,7 @@ session = {}
 def get_index_html():
   ''' Return options as form
   '''
-  env = get_jinja2_env()
+  env = get_jinja2_env(prefix=PREFIX)
   env.globals.update(
     _session=str('00000000-0000-0000-0000-000000000000' if DEBUG else uuid.uuid4())
   )
@@ -52,14 +52,14 @@ def get_index_html():
 def get_index_json():
   ''' Return options as json
   '''
-  env = get_jinja2_env()
+  env = get_jinja2_env(prefix=PREFIX)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   return render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
 
 def post_index_html_dynamic(data):
   ''' Return dynamic nbviewer
   '''
-  env = get_jinja2_env(context=data)
+  env = get_jinja2_env(prefix=PREFIX, context=data)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return env.get_template(
@@ -73,7 +73,7 @@ def post_index_html_dynamic(data):
 def post_index_html_static(data):
   ''' Return static nbviewer
   '''
-  env = get_jinja2_env(context=data)
+  env = get_jinja2_env(prefix=PREFIX, context=data)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nbviewer_from_nb(env, nb)
@@ -81,7 +81,7 @@ def post_index_html_static(data):
 def post_index_json_static(data):
   ''' Return rendered json
   '''
-  env = get_jinja2_env(context=data)
+  env = get_jinja2_env(prefix=PREFIX, context=data)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nbtemplate_json_from_nbtemplate(env, nb)
@@ -89,7 +89,7 @@ def post_index_json_static(data):
 def post_index_ipynb_static(data):
   ''' Return rendered ipynb
   '''
-  env = get_jinja2_env(context=data)
+  env = get_jinja2_env(prefix=PREFIX, context=data)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nb_from_nbtemplate(env, nb)
@@ -129,7 +129,7 @@ def get_index():
   if mimetype in {'text/html'}:
     return get_index_html()
   elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
-    env = get_jinja2_env()
+    env = get_jinja2_env(prefix=PREFIX)
     nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
     return nbtemplate
   elif mimetype in {'application/json'}:
@@ -181,7 +181,7 @@ def _():
 @socketio.on('init')
 def init(data):
   print('init')
-  env = get_jinja2_env(context=data)
+  env = get_jinja2_env(prefix=PREFIX, context=data)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   session_id = sanitize_uuid(data.get('_session'))
