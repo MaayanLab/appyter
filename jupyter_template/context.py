@@ -105,12 +105,14 @@ def get_extra_files(cwd=None, profile=None):
   paths.add(os.path.abspath(args[0]))
   return list(paths)
 
-def get_jinja2_env(context={}, cwd=None, profile=None):
+def get_jinja2_env(context={}, cwd=None, profile=None, prefix=None):
   args, kargs, kwargs = get_sys_env()
   if cwd is None:
     cwd = kwargs.get('cwd', os.getcwd())
   if profile is None:
     profile = kwargs.get('profile', 'default')
+  if prefix is None:
+    prefix = kwargs.get('prefix', '/')
 
   import sys
   from jupyter_template.fields import build_fields
@@ -126,6 +128,7 @@ def get_jinja2_env(context={}, cwd=None, profile=None):
   env.filters.update(**find_filters(cwd=cwd, profile=profile))
   env.globals.update(**find_filters(cwd=cwd, profile=profile))
   env.globals.update(
+    prefix=prefix,
     _args=args,
     _kargs=kargs,
     _kwargs=kwargs,

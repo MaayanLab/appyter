@@ -33,7 +33,7 @@ STATIC_PREFIX = '/' + '/'.join(filter(None, [*PREFIX.split('/'), 'static']))
 # Prepare app
 app = Flask(__name__, static_url_path=STATIC_PREFIX, static_folder=STATIC_DIR)
 app.config['SECRET_KEY'] = SECRET_KEY
-socketio = SocketIO(app, async_mode='threading')
+socketio = SocketIO(app, path=f"{PREFIX}socket.io", async_mode='threading')
 
 # Prepare globals
 threads = {}
