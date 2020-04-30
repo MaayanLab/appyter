@@ -107,8 +107,10 @@ def get_extra_files(cwd=None, profile=None):
 
 def get_jinja2_env(context={}, cwd=None, profile=None):
   args, kargs, kwargs = get_sys_env()
-  cwd = kwargs.get('cwd', os.getcwd())
-  profile = kwargs.get('profile', 'default')
+  if cwd is None:
+    cwd = kwargs.get('cwd', os.getcwd())
+  if profile is None:
+    profile = kwargs.get('profile', 'default')
 
   import sys
   from jupyter_template.fields import build_fields
