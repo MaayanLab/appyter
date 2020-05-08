@@ -46,5 +46,5 @@ def render_nbexecutor_from_nb(env, nb):
       emit('error', str(e))
     finally:
       if callable(cleanup):
-        cleanup(session)
+        cleanup(session, nb)
   return nbexecutor

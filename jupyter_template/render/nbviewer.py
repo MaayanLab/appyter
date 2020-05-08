@@ -1,4 +1,3 @@
-import nbformat
 import nbconvert
 from bs4 import BeautifulSoup
 

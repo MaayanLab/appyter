@@ -2,6 +2,7 @@ import os
 import uuid
 import json
 import shutil
+import nbformat as nbf
 from flask import Flask, request, abort, copy_current_request_context, send_from_directory
 from flask_socketio import SocketIO, emit
 from jupyter_template.context import get_sys_env, get_jinja2_env, get_extra_files
@@ -38,6 +39,9 @@ socketio = SocketIO(app, path=f"{PREFIX}socket.io", async_mode='threading')
 # Prepare globals
 threads = {}
 session = {}
+
+def sanitize_uuid(val):
+  return str(uuid.UUID(val))
 
 def get_index_html():
   ''' Return options as form
@@ -136,34 +140,38 @@ def get_index():
     return get_index_json()
   abort(404)
 
-@app.route(PREFIX, methods=['POST'])
-def post_index():
-  mimetype = request.accept_mimetypes.best_match([
-    'text/html',
-    'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json',
-    'application/json',
-  ], 'text/html')
-  if mimetype in {'text/html'}:
-    if request.args.get('static') is not None:
-      return post_index_html_static(request.form.to_dict())
-    else:
-      return post_index_html_dynamic(prepare_formdata(request))
-  elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
-    return post_index_ipynb_static(request.form.to_dict())
-  elif mimetype in {'application/json'}:
-    return post_index_json_static(request.form.to_dict())
+@app.route(PREFIX.rstrip('/') + '/<string:session>', methods=['GET', 'POST'])
+def post_index(session):
+  if request.method == 'GET':
+    session_id = sanitize_uuid(session)
+    nbfile = os.path.join(DATA_DIR, session_id, os.path.basename(IPYNB))
+    if os.path.exists(nbfile):
+      nb = nbf.read(open(nbfile, 'r'), as_version=4)
+      env = get_jinja2_env(prefix=PREFIX)
+      return render_nbviewer_from_nb(env, nb)
+  elif request.method == 'POST':
+    mimetype = request.accept_mimetypes.best_match([
+      'text/html',
+      'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json',
+      'application/json',
+    ], 'text/html')
+    if mimetype in {'text/html'}:
+      if request.args.get('static') is not None:
+        return post_index_html_static(prepare_formdata(request))
+      else:
+        return post_index_html_dynamic(prepare_formdata(request))
+    elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
+      return post_index_ipynb_static(request.form.to_dict())
+    elif mimetype in {'application/json'}:
+      return post_index_json_static(request.form.to_dict())
   abort(404)
 
-def sanitize_uuid(val):
-  return str(uuid.UUID(val))
-
-def cleanup(session):
+def cleanup(session, nb):
   global threads
   print('cleanup', session)
   thread = threads.get(session)
   if thread is not None:
-    if not DEBUG:
-      shutil.rmtree(os.path.join(DATA_DIR, session))
+    nbf.write(nb, open(os.path.join(DATA_DIR, session, os.path.basename(IPYNB)), 'w'))
     del threads[session]
 
 @socketio.on('session')
@@ -185,6 +193,7 @@ def init(data):
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   session_id = sanitize_uuid(data.get('_session'))
+  nbf.write(nb, open(os.path.join(DATA_DIR, session_id, os.path.basename(IPYNB)), 'w'))
   global session
   session[request.sid] = dict(session.get(request.sid, {}), _session=session_id, stop=False)
   global threads
@@ -253,7 +262,6 @@ def siofu_done(data):
   emit('siofu_complete', {
     'id': data['id'],
   })
-
 
 @socketio.on_error()
 def error_handler(e):
