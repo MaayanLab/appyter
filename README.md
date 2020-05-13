@@ -13,6 +13,8 @@ Jupyter Template enables you to serve that notebook on an executable webapp.
 
 `jupyter-template jupyter_notebook.ipynb`
 
+If for some reason, `jupyter-template` doesn't end up discoverable in your PATH, you can use `python3 -m jupyter_template` instead.
+
 - A dotenv file (`.env`) or environment variables can be use to configure HOST, PORT, and PREFIX of the webserver.
 - Some pre-configured profiles can be used for styling the form (`--profile=profile_name`) see `jupyter_template/profiles`
 - In debug mode (`--debug`), changes to the notebook will automatically update the webapp.
@@ -44,18 +46,18 @@ Normal cells are allowed, you also have access to jinja2-rendered cells:
 
 Supported cell_types:
 - `markdown`: Substitute jinja2 template variables, render as a markdown cell
-- `code`: Substitute jinja2 template variables, render as python and show it rendered in your notebook with the default values, but don't execute it
-- `code_eval`: Substitute jinja2 template variables, render as python, show it rendered in your notebook with the default values and execute it
-- `hide_code_eval`: Substitute jinja2 template variables, render as python, show it rendered in your notebook with the default values and execute it, but when executing publicly, don't show the cell.
+- `hide`: Substitute jinja2 template variables, show it rendered in your notebook with the default values, but when executing publicly, don't show/execute the cell.
+- `code_exec`: Substitute jinja2 template variables, render as python, show it rendered in your notebook with the default values and execute it
+- `code_eval`: Substitute jinja2 template variables, render as python, show it rendered in your notebook with the default values and execute it, "eval" the last line of the cell and display the result.
 
 ## Discussion
 Consider the following notebook:
 
 ```
 %%jupyter_template markdown
-# {{ StringField(name='title', label='Title', default='My Title') }}
+# {{ StringField(name='title', label='Title', default='My Title').render_value }}
 
-{{ TextField(name='description', label='Description', default='My description') }}
+{{ TextField(name='description', label='Description', default='My description').render_value }}
 ```
 
 ```

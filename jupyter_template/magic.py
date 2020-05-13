@@ -56,22 +56,24 @@ def init(_globals):
     current python globals dict.
     '''
     global_internal = _globals()
+    cell_type = line.split('_')
     template = env.from_string(cell)
     rendered_template_lines = list(filter(None, map(str.rstrip, template.render().splitlines())))
     if len(rendered_template_lines) > 0:
       rendered = '\n'.join(rendered_template_lines[:-1])
       rendered_last = rendered_template_lines[-1]
-      if line == 'markdown':
+      if cell_type == ['markdown']:
         display(Markdown('\n'.join((rendered, rendered_last))))
-      elif line == 'code'  or line == 'hide_code':
+      elif 'code' in cell_type:
         display(Markdown('```python\n%s\n```' % ('\n'.join((rendered, rendered_last)))))
-      elif line == 'code_eval' or line == 'hide_code_eval':
-        display(Markdown('```python\n%s\n```' % ('\n'.join((rendered, rendered_last)))))
-        exec(rendered, global_internal)
-        display(eval(rendered_last, global_internal))
-      elif line == 'code_exec' or line == 'hide_code_exec':
-        display(Markdown('```python\n%s\n```' % ('\n'.join((rendered, rendered_last)))))
-        exec('\n'.join((rendered, rendered_last)), global_internal)
+
+        if 'eval' in cell_type:
+          exec(rendered, global_internal)
+          display(eval(rendered_last, global_internal))
+        elif 'exec' in cell_type:
+          exec('\n'.join((rendered, rendered_last)), global_internal)
+      else:
+        raise Exception('Unrecognized cell_type')
 
     '''
     Step 2. Check for new variables in the internal global

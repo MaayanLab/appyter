@@ -17,6 +17,9 @@ class MultiChoiceField(Field):
     if type(self.choices) == dict:
       return [self.choices[v] for v in self.raw_value]
     else:
+      assert self.constraint(), '%s[%s] (%s) does not satisfy constraints' % (
+        self.field, self.args.get('name', ''), self.raw_value
+      )
       return self.raw_value
 
   def constraint(self):

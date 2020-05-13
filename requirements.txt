@@ -4,6 +4,7 @@ flask-socketio
 ipython
 jinja2
 jq
+jupyter
 jupyter_client
 lxml
 nbconvert

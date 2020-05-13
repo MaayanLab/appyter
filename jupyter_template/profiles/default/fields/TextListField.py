@@ -2,7 +2,7 @@ import re
 from jupyter_template.fields import Field
 
 class TextListField(Field):
-  def __init__(self, constraint=r'.*', hint=None, **kwargs):
+  def __init__(self, constraint=r'[^\n]*', hint=None, **kwargs):
     super(TextListField, self).__init__(
       constraint=constraint,
       hint=hint,
@@ -25,6 +25,9 @@ class TextListField(Field):
     if type(self.choices) == dict:
       return [self.choices[v] for v in self.raw_value]
     else:
+      assert self.constraint(), '%s[%s] (%s) does not satisfy constraints' % (
+        self.field, self.args.get('name', ''), self.raw_value
+      )
       return self.raw_value
 
   def constraint(self):
