@@ -151,6 +151,10 @@ def get_index():
     return get_index_json()
   abort(404)
 
+@route_join_with_or_without_slash(app, PREFIX, 'favicon.ico', methods=['GET'])
+def favicon():
+  return send_from_directory(STATIC_DIR, 'favicon.ico')
+
 @route_join_with_or_without_slash(app, PREFIX, '<string:session>', methods=['GET', 'POST'])
 def post_index(session):
   if request.method == 'GET':
