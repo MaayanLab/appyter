@@ -23,6 +23,8 @@
     var progressBar
 
     siofu.addEventListener('start', function (evt) {
+      $(`.custom-file-label[for="${$self.attr('id')}"]`).text(evt.file.name+'')
+
       if (progressBar === undefined) {
         var progressBarContainer = $('<div></div>')
           .addClass('progress')
