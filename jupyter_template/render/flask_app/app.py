@@ -177,6 +177,12 @@ def post_index(session):
       return post_index_json_static(request.form.to_dict())
   abort(404)
 
+@route_join_with_or_without_slash(app, PREFIX, '<string:session>', '<path:path>', methods=['GET'])
+def send_session_directory(session, path):
+  session_id = sanitize_uuid(session)
+  session_path = os.path.realpath(os.path.join(DATA_DIR, session_id))
+  return send_from_directory(session_path, path)
+
 def cleanup(session, nb):
   global threads
   print('cleanup', session)
