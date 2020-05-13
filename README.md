@@ -13,6 +13,8 @@ Jupyter Template enables you to serve that notebook on an executable webapp.
 
 `jupyter-template jupyter_notebook.ipynb`
 
+If for some reason, `jupyter-template` doesn't end up discoverable in your PATH, you can use `python3 -m jupyter_template` instead.
+
 - A dotenv file (`.env`) or environment variables can be use to configure HOST, PORT, and PREFIX of the webserver.
 - Some pre-configured profiles can be used for styling the form (`--profile=profile_name`) see `jupyter_template/profiles`
 - In debug mode (`--debug`), changes to the notebook will automatically update the webapp.
