@@ -53,9 +53,9 @@ Consider the following notebook:
 
 ```
 %%jupyter_template markdown
-# {{ StringField(name='title', label='Title', default='My Title') }}
+# {{ StringField(name='title', label='Title', default='My Title').render_value }}
 
-{{ TextField(name='description', label='Description', default='My description') }}
+{{ TextField(name='description', label='Description', default='My description').render_value }}
 ```
 
 ```
