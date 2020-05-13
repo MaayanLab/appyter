@@ -3,7 +3,7 @@
 {% block body %}
 {{ super() }}
 <div class="container">
-  <form method="POST" enctype="multipart/form-data" action="./{{ _session }}">
+  <form method="POST" enctype="multipart/form-data" action="./{{ _session }}/">
     {% with orphaned_fields = jq(_fields, '.[].args.name', '.[] | select(.type != "section" and .args.section == null)') %}
       {% if orphaned_fields %}
         {{ SectionField(

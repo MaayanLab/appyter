@@ -2,7 +2,7 @@
 
 {% block body %}
 {{ super() }}
-<form method="POST" enctype="multipart/form-data" action="./{{ _session }}">
+<form method="POST" enctype="multipart/form-data" action="./{{ _session }}/">
     {% for _field in _fields %}
         {{ _field.render() }}
     {% endfor %}
