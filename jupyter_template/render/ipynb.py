@@ -13,10 +13,10 @@ def render_cell(env, cell):
 
   cell_m = cell_match.match(cell.source)
   if cell_m:
-    cell_type = cell_m.group('type').strip()
+    cell_type = cell_m.group('type').strip().split('_')
     cell_source = cell_m.group('source').strip()
 
-    if cell_type == 'init':
+    if cell_type == ['init']:
       return None
 
     template = env.from_string(cell_source)
@@ -33,9 +33,9 @@ def render_cell(env, cell):
         env.globals[k] = v
 
     # Alter cell render based on cell_type
-    if cell_type == 'markdown':
+    if cell_type == ['markdown']:
       cell = nbf.v4.new_markdown_cell(rendered)
-    elif 'hide' in cell_type.split('_') or rendered == '':
+    elif 'hide' in cell_type or rendered.strip() == '':
       cell = None
     else:
       cell = nbf.v4.new_code_cell(rendered)

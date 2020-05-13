@@ -44,9 +44,9 @@ Normal cells are allowed, you also have access to jinja2-rendered cells:
 
 Supported cell_types:
 - `markdown`: Substitute jinja2 template variables, render as a markdown cell
-- `code`: Substitute jinja2 template variables, render as python and show it rendered in your notebook with the default values, but don't execute it
-- `code_eval`: Substitute jinja2 template variables, render as python, show it rendered in your notebook with the default values and execute it
-- `hide_code_eval`: Substitute jinja2 template variables, render as python, show it rendered in your notebook with the default values and execute it, but when executing publicly, don't show the cell.
+- `hide`: Substitute jinja2 template variables, show it rendered in your notebook with the default values, but when executing publicly, don't show/execute the cell.
+- `code_exec`: Substitute jinja2 template variables, render as python, show it rendered in your notebook with the default values and execute it
+- `code_eval`: Substitute jinja2 template variables, render as python, show it rendered in your notebook with the default values and execute it, "eval" the last line of the cell and display the result.
 
 ## Discussion
 Consider the following notebook:
