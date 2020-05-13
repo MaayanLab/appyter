@@ -43,6 +43,17 @@ session = {}
 def sanitize_uuid(val):
   return str(uuid.UUID(val))
 
+def route_join_with_or_without_slash(app, *routes, **kwargs):
+  ''' Like @app.route but doesn't care about trailing slash or not
+  '''
+  def wrapper(func):
+    routes_stripped = '/'.join([route.strip('/') for route in routes if route.strip('/')])
+    if routes_stripped:
+      app.route('/' + routes_stripped, **kwargs)(func)
+    app.route('/' + routes_stripped + '/', **kwargs)(func)
+    return func
+  return wrapper
+
 def get_index_html():
   ''' Return options as form
   '''
@@ -123,7 +134,7 @@ def prepare_formdata(req):
     data[fname] = filename
   return data
 
-@app.route(PREFIX, methods=['GET'])
+@route_join_with_or_without_slash(app, PREFIX, methods=['GET'])
 def get_index():
   mimetype = request.accept_mimetypes.best_match([
     'text/html',
@@ -140,7 +151,7 @@ def get_index():
     return get_index_json()
   abort(404)
 
-@app.route(PREFIX.rstrip('/') + '/<string:session>', methods=['GET', 'POST'])
+@route_join_with_or_without_slash(app, PREFIX, '<string:session>', methods=['GET', 'POST'])
 def post_index(session):
   if request.method == 'GET':
     session_id = sanitize_uuid(session)
