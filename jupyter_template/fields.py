@@ -92,10 +92,19 @@ class Field(dict):
     if type(choices) == dict:
       return choices[self.raw_value]
     else:
+      assert self.constraint(), '%s[%s] (%s) does not satisfy constraints' % (
+        self.field, self.args.get('name', ''), self.raw_value
+      )
       return self.raw_value
 
   @property
   def safe_value(self):
+    ''' Effective value of the field when used
+    '''
+    return repr(self.value)
+
+  @property
+  def render_value(self):
     ''' Effective value ready to be displayed
     '''
     assert self.constraint(), '%s[%s] (%s) does not satisfy constraints' % (
