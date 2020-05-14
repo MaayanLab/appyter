@@ -14,8 +14,7 @@ def render_nbexecutor_from_nb(env, nb):
   def nbexecutor(emit=print, session=None, session_dir='', cleanup=None, stopper=lambda: False):
     assert callable(emit), 'Emit must be callable'
     try:
-      emit('status', 'Starting...')
-      emit('notebook', nb)
+      emit('status', 'Starting')
       yep = YieldingExecutePreprocessor(
         allow_errors=True,
         timeout=None,
@@ -39,7 +38,6 @@ def render_nbexecutor_from_nb(env, nb):
           emit('progress', index)
         else:
           emit('status', 'Success')
-          emit('notebook', nb)
         assert not stopper(), "Stopper"
     except Exception as e:
       print('error', e)

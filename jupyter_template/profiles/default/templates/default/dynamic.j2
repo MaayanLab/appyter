@@ -14,7 +14,7 @@
 {% block script %}
 {{ super() }}
 <script type="text/javascript" charset="utf-8">
-var $nbviewer, $status, $downloadNotebook, current_index, current_code_cell, started, scroll, nb, md
+var $nbviewer, $status, $downloadNotebook, current_index, current_code_cell, started, scroll, md
 
 function find_or_create(root, classes) {
   var $el = root.find(classes.map(function (cls) { return `.cls` }).join(' '))
@@ -38,12 +38,6 @@ socket.on('connect', function() {
   scroll = false
 
   socket.emit('init', {{ _data }})
-})
-socket.on('notebook', function(data) {
-  nb = data
-  $downloadNotebook.attr('href', `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data))}`)
-  $downloadNotebook.attr('download', 'notebook.ipynb')
-  $downloadNotebook.attr('disabled', false)
 })
 socket.on('status', function(value) {
   $("#status").text(value)
