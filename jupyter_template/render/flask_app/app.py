@@ -3,6 +3,8 @@ import uuid
 import json
 import shutil
 import nbformat as nbf
+from functools import partial
+from queue import Queue
 from flask import Flask, request, abort, copy_current_request_context, send_from_directory
 from flask_socketio import SocketIO, emit
 from jupyter_template.context import get_sys_env, get_jinja2_env, get_extra_files
@@ -36,10 +38,27 @@ app = Flask(__name__, static_url_path=STATIC_PREFIX, static_folder=STATIC_DIR)
 app.config['SECRET_KEY'] = SECRET_KEY
 socketio = SocketIO(app, path=f"{PREFIX}socket.io", async_mode='threading')
 
-# Prepare globals
-threads = {}
 session = {}
+execution_queue = Queue()
 
+# Prepare background workers
+n_workers = 10
+
+def worker(n, execution_queue):
+  while True:
+    fn, kwargs = execution_queue.get()
+    print(f"worker {n}: {fn}({kwargs})")
+    socketio.start_background_task(fn, **kwargs)
+    execution_queue.task_done()
+
+@app.before_first_request
+def init_app():
+  os.makedirs(DATA_DIR, exist_ok=True)
+  print('Spawning workers...')
+  for n in range(n_workers):
+    socketio.start_background_task(worker, n=n, execution_queue=execution_queue)
+
+# Util
 def sanitize_uuid(val):
   return str(uuid.UUID(val))
 
@@ -87,6 +106,7 @@ def get_session_html_static(session_id):
     abort(404)
 
 def get_session_ipynb_static(session_id):
+  # TODO: if still executing, flush current state
   nbfile = os.path.join(DATA_DIR, session_id, os.path.basename(IPYNB))
   if os.path.exists(nbfile):
     return send_from_directory(os.path.join(DATA_DIR, session_id), os.path.basename(IPYNB))
@@ -220,16 +240,13 @@ def send_session_directory(session, path):
   return send_from_directory(session_path, path)
 
 def cleanup(session, nb):
-  global threads
-  print('cleanup', session)
-  thread = threads.get(session)
-  if thread is not None:
-    nbf.write(nb, open(os.path.join(DATA_DIR, session, os.path.basename(IPYNB)), 'w'))
-    del threads[session]
+  ''' Write notebook
+  '''
+  nbf.write(nb, open(os.path.join(DATA_DIR, session, os.path.basename(IPYNB)), 'w'))
 
 @socketio.on('session')
 def _(data):
-  print('session')
+  print('session', data)
   global session
   session[request.sid] = dict(session.get(request.sid, {}), _session=sanitize_uuid(data['_session']))
 
@@ -242,36 +259,28 @@ def _():
 @socketio.on('init')
 def init(data):
   print('init')
-  env = get_jinja2_env(prefix=PREFIX, context=data)
-  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
-  nb = render_nb_from_nbtemplate(env, nbtemplate)
   session_id = sanitize_uuid(data.get('_session'))
-  nbf.write(nb, open(os.path.join(DATA_DIR, session_id, os.path.basename(IPYNB)), 'w'))
-  global session
-  session[request.sid] = dict(session.get(request.sid, {}), _session=session_id, stop=False)
-  global threads
-  if len(threads) > MAX_THREADS:
-    emit('error', 'Too many connections, try again later')
-    return
-    # TODO: implement queue
-  elif threads.get(session_id) is not None:
-    emit('status', 'Session already connected, kicking previous session')
-    threads[session_id]['stop'] = True
-    threads[session_id]['thread'].join()
-
-  nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
-  threads[session_id] = dict(
-    stop=False,
-    thread=socketio.start_background_task(
+  session_dir = os.path.join(DATA_DIR, session_id)
+  if os.path.exists(os.path.join(session_dir, os.path.basename(IPYNB))) and not DEBUG:
+    print('exists')
+    emit('error', 'Notebook already exists')
+    emit('redirect', f"")
+  else:
+    env = get_jinja2_env(prefix=PREFIX, context=data)
+    nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
+    nb = render_nb_from_nbtemplate(env, nbtemplate)
+    os.makedirs(session_dir, exist_ok=True)
+    nbf.write(nb, open(os.path.join(session_dir, os.path.basename(IPYNB)), 'w'))
+    emit('status', 'Notebook created, queuing execution')
+    nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
+    execution_queue.put((
       nbexecutor,
-      emit=emit,
-      session=session_id,
-      session_dir=os.path.join(DATA_DIR, session_id),
-      cleanup=cleanup,
-      stopper=lambda _threads=threads, _session=session_id: _threads.get(_session, {'stop': True})['stop']
-    ),
-  )
-  print('started', session_id)
+      dict(
+        emit=emit,
+        session_dir=session_dir,
+        cleanup=partial(cleanup, session_id),
+      ),
+    ))
 
 @socketio.on("siofu_start")
 def siofu_start(data):

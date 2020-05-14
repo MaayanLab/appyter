@@ -11,7 +11,7 @@ def cell_has_error(cell):
     return False
 
 def render_nbexecutor_from_nb(env, nb):
-  def nbexecutor(emit=print, session=None, session_dir='', cleanup=None, stopper=lambda: False):
+  def nbexecutor(emit=print, session_dir='', cleanup=None, stopper=lambda: False):
     assert callable(emit), 'Emit must be callable'
     try:
       emit('status', 'Starting')
@@ -44,5 +44,5 @@ def render_nbexecutor_from_nb(env, nb):
       emit('error', str(e))
     finally:
       if callable(cleanup):
-        cleanup(session, nb)
+        cleanup(nb)
   return nbexecutor

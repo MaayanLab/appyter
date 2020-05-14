@@ -42,6 +42,10 @@ socket.on('connect', function() {
 socket.on('status', function(value) {
   $("#status").text(value)
 })
+socket.on('redirect', function(value) {
+  console.log('redirect')
+  window.location.replace(value)
+})
 socket.on('error', function(value) {
   $status.text(`Error: ${value}`)
 })
