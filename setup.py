@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
   name='jupyter_template',
-  version='0.2.0',
+  version='0.2.1',
   url='https://github.com/maayanLab/jupyter-template/',
   author='Daniel J. B. Clarke',
   author_email='u8sand@gmail.com',
