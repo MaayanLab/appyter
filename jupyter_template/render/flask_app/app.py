@@ -71,6 +71,28 @@ def get_index_json():
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   return render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
 
+def get_session_html_static(session_id):
+  nbfile = os.path.join(DATA_DIR, session_id, os.path.basename(IPYNB))
+  if os.path.exists(nbfile):
+    nb = nbf.read(open(nbfile, 'r'), as_version=4)
+    env = get_jinja2_env(prefix=PREFIX)
+    return env.get_template(
+      'static.j2',
+    ).render(
+      _nb=os.path.basename(IPYNB),
+      _nbviewer=render_nbviewer_from_nb(env, nb),
+      _session=session_id, # NOTE: this should not be necessary..
+    )
+  else:
+    abort(404)
+
+def get_session_ipynb_static(session_id):
+  nbfile = os.path.join(DATA_DIR, session_id, os.path.basename(IPYNB))
+  if os.path.exists(nbfile):
+    return send_from_directory(os.path.join(DATA_DIR, session_id), os.path.basename(IPYNB))
+  else:
+    abort(404)
+
 def post_index_html_dynamic(data):
   ''' Return dynamic nbviewer
   '''
@@ -80,6 +102,7 @@ def post_index_html_dynamic(data):
   return env.get_template(
     'dynamic.j2',
   ).render(
+    _nb=os.path.basename(IPYNB),
     _nbviewer=render_nbviewer_from_nb(env, nb),
     _data=json.dumps(data),
     _session=data['_session'], # NOTE: this should not be necessary..
@@ -91,7 +114,13 @@ def post_index_html_static(data):
   env = get_jinja2_env(prefix=PREFIX, context=data)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
-  return render_nbviewer_from_nb(env, nb)
+  return env.get_template(
+    'static.j2',
+  ).render(
+    _nbviewer=render_nbviewer_from_nb(env, nb),
+    _data=json.dumps(data),
+    _session=data['_session'], # NOTE: this should not be necessary..
+  )
 
 def post_index_json_static(data):
   ''' Return rendered json
@@ -162,18 +191,17 @@ def post_index(session):
   except:
     abort(404)
   else:
+    mimetype = request.accept_mimetypes.best_match([
+      'text/html',
+      'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json',
+      'application/json',
+    ], 'text/html')
     if request.method == 'GET':
-      nbfile = os.path.join(DATA_DIR, session_id, os.path.basename(IPYNB))
-      if os.path.exists(nbfile):
-        nb = nbf.read(open(nbfile, 'r'), as_version=4)
-        env = get_jinja2_env(prefix=PREFIX)
-        return render_nbviewer_from_nb(env, nb)
+      if mimetype in {'text/html'}:
+        return get_session_html_static(session_id)
+      elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
+        return get_session_ipynb_static(session_id)
     elif request.method == 'POST':
-      mimetype = request.accept_mimetypes.best_match([
-        'text/html',
-        'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json',
-        'application/json',
-      ], 'text/html')
       if mimetype in {'text/html'}:
         if request.args.get('static') is not None:
           return post_index_html_static(prepare_formdata(request))

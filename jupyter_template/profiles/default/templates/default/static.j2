@@ -1,0 +1,30 @@
+{% extends "base.j2" %}
+
+{% block body %}
+{{ super() }}
+<div class="row">
+  <div class="col-sm-12 text-center">
+    <a
+      id="download-notebook"
+      class="btn btn-primary"
+      role="button"
+      {%- if _nb %}
+      href="{{ _nb }}"
+      {% else %}
+      disabled
+      {% endif -%}
+    >Download Notebook</a>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <div id="nbviewer">{{ _nbviewer }}</div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+{# Several extensions (i.e. plotly) rely on the presence RequireJS, so we'll just include it here #}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+{% endblock %}
