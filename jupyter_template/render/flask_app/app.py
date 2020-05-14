@@ -157,29 +157,33 @@ def favicon():
 
 @route_join_with_or_without_slash(app, PREFIX, '<string:session>', methods=['GET', 'POST'])
 def post_index(session):
-  if request.method == 'GET':
+  try:
     session_id = sanitize_uuid(session)
-    nbfile = os.path.join(DATA_DIR, session_id, os.path.basename(IPYNB))
-    if os.path.exists(nbfile):
-      nb = nbf.read(open(nbfile, 'r'), as_version=4)
-      env = get_jinja2_env(prefix=PREFIX)
-      return render_nbviewer_from_nb(env, nb)
-  elif request.method == 'POST':
-    mimetype = request.accept_mimetypes.best_match([
-      'text/html',
-      'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json',
-      'application/json',
-    ], 'text/html')
-    if mimetype in {'text/html'}:
-      if request.args.get('static') is not None:
-        return post_index_html_static(prepare_formdata(request))
-      else:
-        return post_index_html_dynamic(prepare_formdata(request))
-    elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
-      return post_index_ipynb_static(request.form.to_dict())
-    elif mimetype in {'application/json'}:
-      return post_index_json_static(request.form.to_dict())
-  abort(404)
+  except:
+    abort(404)
+  else:
+    if request.method == 'GET':
+      nbfile = os.path.join(DATA_DIR, session_id, os.path.basename(IPYNB))
+      if os.path.exists(nbfile):
+        nb = nbf.read(open(nbfile, 'r'), as_version=4)
+        env = get_jinja2_env(prefix=PREFIX)
+        return render_nbviewer_from_nb(env, nb)
+    elif request.method == 'POST':
+      mimetype = request.accept_mimetypes.best_match([
+        'text/html',
+        'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json',
+        'application/json',
+      ], 'text/html')
+      if mimetype in {'text/html'}:
+        if request.args.get('static') is not None:
+          return post_index_html_static(prepare_formdata(request))
+        else:
+          return post_index_html_dynamic(prepare_formdata(request))
+      elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
+        return post_index_ipynb_static(request.form.to_dict())
+      elif mimetype in {'application/json'}:
+        return post_index_json_static(request.form.to_dict())
+    abort(404)
 
 @route_join_with_or_without_slash(app, PREFIX, '<string:session>', '<path:path>', methods=['GET'])
 def send_session_directory(session, path):
