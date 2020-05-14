@@ -1,7 +1,6 @@
-{% extends "biojupies/base.j2" %}
+{% extends "default/form.j2" %}
 
 {% block body %}
-{{ super() }}
 <div class="container">
   <form method="POST" enctype="multipart/form-data" action="./{{ _session }}/">
     {% with orphaned_fields = jq(_fields, '.[].args.name', '.[] | select(.type != "section" and .args.section == null)') %}
@@ -42,15 +41,8 @@
 {{ super() }}
 <script>
 $(document).ready(function() {
-  $('form').submit(function (e) {
-    e.preventDefault();
-    // Replace files with text elements
-    $('form [type="file"]').each(function () {
-      $(this).attr('type', 'text')
-    })
-    // Submit form
-    this.submit()
-  })
+  $('.collapse').collapse({ toggle: false })
+  $('[data-toggle="tooltip"]').tooltip()
 })
 </script>
 {% endblock %}

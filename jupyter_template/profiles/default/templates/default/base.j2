@@ -27,7 +27,6 @@
   {% block script %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js" integrity="sha256-Dul4c09cdrWKXVtallPxF558lwxMwCC8dXJdZ0PVW54=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/socketio-file-upload@0.7.0/client.min.js"></script>
     <script>
       var socket = io({ path: '{{ prefix }}socket.io' })
       var first_connect = true
@@ -39,55 +38,6 @@
         } else {
           window.location.reload()
         }
-      })
-    </script>
-    <script>
-      $('[type="file"]').each(function () {
-        var siofu = new SocketIOFileUpload(socket);
-        siofu.listenOnInput(this)
-        var $self = $(this)
-        var progressBarContainer
-        var progressBar
-
-        siofu.addEventListener('start', function (evt) {
-          if (progressBar === undefined) {
-            var progressBarContainer = $('<div></div>')
-              .addClass('progress')
-            progressBar = $('<div></div>')
-              .addClass('progress-bar')
-              .attr('role', 'progressbar')
-              .attr('aria-valuemin', '0')
-              .attr('aria-valuemax', '100')
-              .appendTo(progressBarContainer)
-            $self.parent().append(progressBarContainer)
-          }
-          progressBar
-            .removeClass('bg-success')
-            .addClass('progress-bar-striped')
-            .addClass('progress-bar-animated')
-            .css('width', '0%')
-            .attr('aria-valuenow', '0')
-        })
-        siofu.addEventListener('progress', function (evt) {
-          var perc = ((evt.bytesLoaded / evt.file.size) * 100).toPrecision(3)
-          progressBar
-            .css('width', `${perc}%`)
-            .attr('aria-valuenow', perc)
-        })
-        siofu.addEventListener('complete', function (evt) {
-          progressBar
-            .css('width', '100%')
-            .attr('aria-valuenow', '100')
-            .addClass('bg-success')
-            .removeClass('progress-bar-striped')
-            .removeClass('progress-bar-animated')
-          $self.attr('value', evt.file.name)
-        })
-        siofu.addEventListener('error', function (evt) {
-          console.error(evt)
-          progressBar
-            .addClass('bg-danger')
-        })
       })
     </script>
   {% endblock %}

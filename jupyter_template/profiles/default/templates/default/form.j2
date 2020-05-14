@@ -13,6 +13,58 @@
 
 {% block script %}
 {{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/socketio-file-upload@0.7.0/client.min.js"></script>
+<script>
+  $('[type="file"]').each(function () {
+    var siofu = new SocketIOFileUpload(socket);
+    siofu.listenOnInput(this)
+    var $self = $(this)
+    var progressBarContainer
+    var progressBar
+
+    siofu.addEventListener('start', function (evt) {
+      $(`.custom-file-label[for="${$self.attr('id')}"]`).text(evt.file.name+'')
+
+      if (progressBar === undefined) {
+        var progressBarContainer = $('<div></div>')
+          .addClass('progress')
+        progressBar = $('<div></div>')
+          .addClass('progress-bar')
+          .attr('role', 'progressbar')
+          .attr('aria-valuemin', '0')
+          .attr('aria-valuemax', '100')
+          .appendTo(progressBarContainer)
+        $self.parent().append(progressBarContainer)
+      }
+      progressBar
+        .removeClass('bg-success')
+        .addClass('progress-bar-striped')
+        .addClass('progress-bar-animated')
+        .css('width', '0%')
+        .attr('aria-valuenow', '0')
+    })
+    siofu.addEventListener('progress', function (evt) {
+      var perc = ((evt.bytesLoaded / evt.file.size) * 100).toPrecision(3)
+      progressBar
+        .css('width', `${perc}%`)
+        .attr('aria-valuenow', perc)
+    })
+    siofu.addEventListener('complete', function (evt) {
+      progressBar
+        .css('width', '100%')
+        .attr('aria-valuenow', '100')
+        .addClass('bg-success')
+        .removeClass('progress-bar-striped')
+        .removeClass('progress-bar-animated')
+      $self.attr('value', evt.file.name)
+    })
+    siofu.addEventListener('error', function (evt) {
+      console.error(evt)
+      progressBar
+        .addClass('bg-danger')
+    })
+  })
+</script>
 <script>
 $(document).ready(function() {
   $('form').submit(function (e) {
