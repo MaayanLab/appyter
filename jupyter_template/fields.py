@@ -107,9 +107,6 @@ class Field(dict):
   def render_value(self):
     ''' Effective value ready to be displayed
     '''
-    assert self.constraint(), '%s[%s] (%s) does not satisfy constraints' % (
-      self.field, self.args.get('name', ''), self.value
-    )
     return Markup(self.value)
 
   def __str__(self):
