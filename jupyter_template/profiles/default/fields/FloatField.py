@@ -5,3 +5,5 @@ class FloatField(Field):
   def raw_value(self):
     return float(self.args['value'])
 
+  def constraint(self):
+    return True

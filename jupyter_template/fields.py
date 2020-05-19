@@ -45,7 +45,7 @@ class Field(dict):
   def constraint(self):
     ''' Return true if args.value satisfies constraints.
     '''
-    return self.args['value'] in self.choices
+    return self.raw_value in self.choices
 
   def render(self, **kwargs):
     ''' Return a rendered version of the field (form)
