@@ -105,7 +105,7 @@ def get_extra_files(cwd=None, profile=None):
   paths.add(os.path.abspath(args[0]))
   return list(paths)
 
-def get_jinja2_env(context={}, cwd=None, profile=None, prefix=None):
+def get_jinja2_env(context={}, cwd=None, profile=None, prefix=None, debug=True):
   args, kargs, kwargs = get_sys_env()
   if cwd is None:
     cwd = kwargs.get('cwd', os.getcwd())
@@ -128,7 +128,8 @@ def get_jinja2_env(context={}, cwd=None, profile=None, prefix=None):
   env.filters.update(**find_filters(cwd=cwd, profile=profile))
   env.globals.update(**find_filters(cwd=cwd, profile=profile))
   env.globals.update(
-    prefix=prefix,
+    _prefix=prefix,
+    _debug=debug,
     _args=args,
     _kargs=kargs,
     _kwargs=kwargs,

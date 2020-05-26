@@ -76,7 +76,7 @@ def route_join_with_or_without_slash(app, *routes, **kwargs):
 def get_index_html():
   ''' Return options as form
   '''
-  env = get_jinja2_env(prefix=PREFIX)
+  env = get_jinja2_env(prefix=PREFIX, debug=DEBUG)
   env.globals.update(
     _session=str('00000000-0000-0000-0000-000000000000' if DEBUG else uuid.uuid4())
   )
@@ -86,7 +86,7 @@ def get_index_html():
 def get_index_json():
   ''' Return options as json
   '''
-  env = get_jinja2_env(prefix=PREFIX)
+  env = get_jinja2_env(prefix=PREFIX, debug=DEBUG)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   return render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
 
@@ -94,7 +94,7 @@ def get_session_html_static(session_id):
   nbfile = os.path.join(DATA_DIR, session_id, os.path.basename(IPYNB))
   if os.path.exists(nbfile):
     nb = nbf.read(open(nbfile, 'r'), as_version=4)
-    env = get_jinja2_env(prefix=PREFIX)
+    env = get_jinja2_env(prefix=PREFIX, debug=DEBUG)
     return env.get_template(
       'static.j2',
     ).render(
@@ -116,7 +116,7 @@ def get_session_ipynb_static(session_id):
 def post_index_html_dynamic(data):
   ''' Return dynamic nbviewer
   '''
-  env = get_jinja2_env(prefix=PREFIX, context=data)
+  env = get_jinja2_env(prefix=PREFIX, debug=DEBUG, context=data)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return env.get_template(
@@ -131,7 +131,7 @@ def post_index_html_dynamic(data):
 def post_index_html_static(data):
   ''' Return static nbviewer
   '''
-  env = get_jinja2_env(prefix=PREFIX, context=data)
+  env = get_jinja2_env(prefix=PREFIX, debug=DEBUG, context=data)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return env.get_template(
@@ -145,7 +145,7 @@ def post_index_html_static(data):
 def post_index_json_static(data):
   ''' Return rendered json
   '''
-  env = get_jinja2_env(prefix=PREFIX, context=data)
+  env = get_jinja2_env(prefix=PREFIX, debug=DEBUG, context=data)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nbtemplate_json_from_nbtemplate(env, nb)
@@ -153,7 +153,7 @@ def post_index_json_static(data):
 def post_index_ipynb_static(data):
   ''' Return rendered ipynb
   '''
-  env = get_jinja2_env(prefix=PREFIX, context=data)
+  env = get_jinja2_env(prefix=PREFIX, debug=DEBUG, context=data)
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nb_from_nbtemplate(env, nb)
@@ -193,7 +193,7 @@ def get_index():
   if mimetype in {'text/html'}:
     return get_index_html()
   elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
-    env = get_jinja2_env(prefix=PREFIX)
+    env = get_jinja2_env(prefix=PREFIX, debug=DEBUG)
     nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
     return nbtemplate
   elif mimetype in {'application/json'}:
@@ -266,7 +266,7 @@ def init(data):
     emit('error', 'Notebook already exists')
     emit('redirect', f"")
   else:
-    env = get_jinja2_env(prefix=PREFIX, context=data)
+    env = get_jinja2_env(prefix=PREFIX, debug=DEBUG, context=data)
     nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
     nb = render_nb_from_nbtemplate(env, nbtemplate)
     os.makedirs(session_dir, exist_ok=True)
