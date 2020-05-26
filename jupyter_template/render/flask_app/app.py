@@ -354,7 +354,6 @@ def main():
         debug=DEBUG,
         use_reloader=DEBUG,
         extra_files=get_extra_files(),
-        cors_allowed_origins='*',
     )
 
 if __name__ == '__main__':
