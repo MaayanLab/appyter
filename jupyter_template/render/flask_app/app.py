@@ -24,6 +24,7 @@ args, kargs, kwargs = get_sys_env()
 PREFIX = kwargs.get('prefix', os.environ.get('PREFIX', '/'))
 HOST = kwargs.get('host', os.environ.get('HOST', '127.0.0.1'))
 PORT = json.loads(kwargs.get('port', os.environ.get('PORT', '5000')))
+PROXY = json.loads(kwargs.get('proxy', os.environ.get('PROXY', 'false')))
 DATA_DIR = kwargs.get('data-dir', os.environ.get('DATA_DIR', 'data'))
 MAX_THREADS = json.loads(kwargs.get('max-threads', os.environ.get('MAX_THREADS', '10')))
 SECRET_KEY = kwargs.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
@@ -37,6 +38,9 @@ STATIC_PREFIX = '/' + '/'.join(filter(None, [*PREFIX.split('/'), 'static']))
 app = Flask(__name__, static_url_path=STATIC_PREFIX, static_folder=STATIC_DIR)
 app.config['SECRET_KEY'] = SECRET_KEY
 socketio = SocketIO(app, path=f"{PREFIX}socket.io", async_mode='threading')
+if PROXY:
+  from werkzeug.middleware.proxy_fix import ProxyFix
+  app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
 session = {}
 execution_queue = Queue()
