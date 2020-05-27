@@ -37,7 +37,13 @@ STATIC_PREFIX = '/' + '/'.join(filter(None, [*PREFIX.split('/'), 'static']))
 # Prepare app
 app = Flask(__name__, static_url_path=STATIC_PREFIX, static_folder=STATIC_DIR)
 app.config['SECRET_KEY'] = SECRET_KEY
-socketio = SocketIO(app, path=f"{PREFIX}socket.io", async_mode='threading', logger=DEBUG, engineio_logger=DEBUG)
+socketio = SocketIO(app,
+  path=f"{PREFIX}socket.io",
+  async_mode='threading',
+  logger=DEBUG,
+  engineio_logger=DEBUG,
+  cors_allowed_origins='*',
+)
 if PROXY:
   from werkzeug.middleware.proxy_fix import ProxyFix
   app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
