@@ -1,5 +1,5 @@
 import re
-from jupyter_template.fields import Field
+from appyter.fields import Field
 
 class TextListField(Field):
   def __init__(self, constraint=r'[^\n]*', hint=None, **kwargs):

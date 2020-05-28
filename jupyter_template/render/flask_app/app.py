@@ -7,13 +7,13 @@ from functools import partial
 from queue import Queue
 from flask import Flask, request, abort, copy_current_request_context, send_from_directory
 from flask_socketio import SocketIO, emit
-from jupyter_template.context import get_sys_env, get_jinja2_env, get_extra_files
-from jupyter_template.parse.nbtemplate import nbtemplate_from_ipynb_file
-from jupyter_template.render.form import render_form_from_nbtemplate
-from jupyter_template.render.nbviewer import render_nbviewer_from_nb
-from jupyter_template.render.ipynb import render_nb_from_nbtemplate
-from jupyter_template.render.json import render_nbtemplate_json_from_nbtemplate
-from jupyter_template.render.nbexecutor import render_nbexecutor_from_nb
+from appyter.context import get_sys_env, get_jinja2_env, get_extra_files
+from appyter.parse.nbtemplate import nbtemplate_from_ipynb_file
+from appyter.render.form import render_form_from_nbtemplate
+from appyter.render.nbviewer import render_nbviewer_from_nb
+from appyter.render.ipynb import render_nb_from_nbtemplate
+from appyter.render.json import render_nbtemplate_json_from_nbtemplate
+from appyter.render.nbexecutor import render_nbexecutor_from_nb
 from werkzeug.utils import secure_filename
 
 # Prepare environment

@@ -1,4 +1,4 @@
-from jupyter_template.parse.nbtemplate import parse_fields_from_nbtemplate
+from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
 
 def render_form_from_nbtemplate(env, nb):
   ''' Render a form with the Fields requested throughout the notebook.

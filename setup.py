@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-  name='jupyter_template',
+  name='appyter',
   version='0.2.7',
-  url='https://github.com/maayanLab/jupyter-template/',
+  url='https://github.com/maayanLab/appyter/',
   author='Daniel J. B. Clarke',
   author_email='u8sand@gmail.com',
   long_description=open('README.md', 'r').read(),
@@ -12,6 +12,6 @@ setup(
   packages=find_packages(exclude=('example',)),
   include_package_data=True,
   entry_points={
-    'console_scripts': ['jupyter-template=jupyter_template.__main__:main'],
+    'console_scripts': ['appyter=appyter.__main__:main'],
   }
 )

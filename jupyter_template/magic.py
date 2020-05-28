@@ -2,7 +2,7 @@
 IPython magic for making templating easy~. This basically
  just allows our jinja-type language to be executed in place
  injecting the defaults into the environment so we can easily
- debug the notebook at the same time as building the template.
+ debug the notebook at the same time as building the appyter.
 
 The same call structure is used during preprocess and at runtime
  but performing different tasks--this way setting up a notebook is
@@ -11,8 +11,8 @@ The same call structure is used during preprocess and at runtime
 
 Usage (put the following in the first cell):
 
-#%%jupyter_template init
-from jupyter_template import magic
+#%%appyter init
+from appyter import magic
 magic.init(lambda _=globals: _())
 '''
 
@@ -23,7 +23,7 @@ def init(_globals):
   '''
   Jinja environment for jinja templates
   '''
-  from jupyter_template.context import get_jinja2_env
+  from appyter.context import get_jinja2_env
   env = get_jinja2_env()
   '''
   IPython cell magic allows function to execute an entire cell.
@@ -43,9 +43,9 @@ def init(_globals):
   from IPython.display import display, Markdown
 
   @register_cell_magic
-  def jupyter_template(line, cell):
+  def appyter(line, cell):
     '''
-    Notebook Template Magic: See Steps for more information.
+    Appyter Magic: See Steps for more information.
     Compile jinja2 into source code, and then evaluate that
     source code.
     '''

@@ -41,7 +41,7 @@ def find_fields_dir_mappings(cwd=os.getcwd(), profile='default'):
   return mappings
 
 def find_fields(cwd=os.getcwd(), profile='default'):
-  from jupyter_template.fields import Field
+  from appyter.fields import Field
   ctx = {}
   for _dirname_, _package_ in find_fields_dir_mappings(cwd=cwd, profile=profile).items():
     if os.path.isdir(_dirname_):
@@ -115,7 +115,7 @@ def get_jinja2_env(context={}, cwd=None, profile=None, prefix=None, debug=True):
     prefix = kwargs.get('prefix', '/')
 
   import sys
-  from jupyter_template.fields import build_fields
+  from appyter.fields import build_fields
   from jinja2 import Environment, ChoiceLoader, FileSystemLoader
   sys.path.insert(0, cwd)
   env = Environment(

@@ -1,5 +1,5 @@
-from jupyter_template.render.nbviewer import render_nbviewer_from_nb
-from jupyter_template.render.nbexecutor.yielding_preprocessor import YieldingExecutePreprocessor
+from appyter.render.nbviewer import render_nbviewer_from_nb
+from appyter.render.nbexecutor.yielding_preprocessor import YieldingExecutePreprocessor
 
 def cell_is_code(cell):
     return cell.get('cell_type') == 'code'

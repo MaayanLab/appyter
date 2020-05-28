@@ -1,1 +1,1 @@
-from jupyter_template.magic import init
+from appyter.magic import init

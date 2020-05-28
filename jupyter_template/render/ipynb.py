@@ -1,10 +1,10 @@
 import nbformat as nbf
 from copy import deepcopy
-from jupyter_template.parse.nbtemplate import cell_match
+from appyter.parse.nbtemplate import cell_match
 
 def render_cell(env, cell):
   ''' Render a single cell, calling jinja2 templates when necessary
-  (only on %%jupyter_template -matched cells) and converting cells
+  (only on %%appyter -matched cells) and converting cells
   to markdown / removing them as necessary.
   '''
   if cell.cell_type == 'code':

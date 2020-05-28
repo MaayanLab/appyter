@@ -3,7 +3,7 @@ import re
 import json
 from copy import copy
 from flask import Markup
-from jupyter_template.context import get_jinja2_env
+from appyter.context import get_jinja2_env
 
 def build_fields(fields, context={}):
   ''' Build a dictionary of Field instances

@@ -1,4 +1,4 @@
-from jupyter_template.fields import Field
+from appyter.fields import Field
 
 class MultiChoiceField(Field):
   @property

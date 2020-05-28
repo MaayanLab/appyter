@@ -1,9 +1,9 @@
 import re
 import nbformat as nbf
 from copy import deepcopy
-from jupyter_template.parse.function_call import FunctionCallMatcher
+from appyter.parse.function_call import FunctionCallMatcher
 
-cell_match = re.compile(r'^(# *)?%%jupyter_template(?P<type>.*?\n)(?P<source>.+)$', re.MULTILINE | re.DOTALL)
+cell_match = re.compile(r'^(# *)?%%appyter(?P<type>.*?\n)(?P<source>.+)$', re.MULTILINE | re.DOTALL)
 template_match = re.compile(r'\{[\{%](?P<inner>.+?)[%\}]\}', re.MULTILINE | re.DOTALL)
 field_match = FunctionCallMatcher()
 

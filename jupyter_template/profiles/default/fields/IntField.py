@@ -1,4 +1,4 @@
-from jupyter_template.fields import Field
+from appyter.fields import Field
 
 class IntField(Field):
   def __init__(self, min=0, max=10, **kwargs):
