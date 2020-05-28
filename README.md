@@ -1,22 +1,21 @@
-# Jupyter Template
-
-This module enables you to turn your jupyter notebook into a jinja2 template-driven web application. Or just parse `jupyter_templates` for other purposes.
+# Appyter
+This module enables you to turn your jupyter notebook into a jinja2 template-driven web application. Or just parse for other purposes.
 
 ## Installation
 ```bash
 # Install package from github repository master
-pip3 install --user --upgrade git+git://github.com/Maayanlab/jupyter-template.git
+pip3 install --user --upgrade git+git://github.com/Maayanlab/appyter.git
 ```
 
 ## Usage
-Jupyter Template enables you to serve that notebook on an executable webapp.
+Appyter enables you to serve that notebook on an executable webapp.
 
-`jupyter-template jupyter_notebook.ipynb`
+`appyter jupyter_notebook.ipynb`
 
-If for some reason, `jupyter-template` doesn't end up discoverable in your PATH, you can use `python3 -m jupyter_template` instead.
+If for some reason, `appyter` doesn't end up discoverable in your PATH, you can use `python3 -m appyter` instead.
 
 - A dotenv file (`.env`) or environment variables can be use to configure HOST, PORT, and PREFIX of the webserver.
-- Some pre-configured profiles can be used for styling the form (`--profile=profile_name`) see `jupyter_template/profiles`
+- Some pre-configured profiles can be used for styling the form (`--profile=profile_name`) see `appyter/profiles`
 - In debug mode (`--debug`), changes to the notebook will automatically update the webapp.
 - Custom fields can be used by putting them in the directory of execution with the following format:
   - `./fields/YourField.py`: Python Field Implementation
@@ -30,18 +29,18 @@ If for some reason, `jupyter-template` doesn't end up discoverable in your PATH,
   - `./static/img/your_image.png`: Reference in templates with `{% static 'img/your_image.png' %}`
 
 
-## Creating a Jupyter Notebook Template
+## Creating an Appyter
 
 Create a standard python jupyter notebook, make the first cell:
 ```
-#%%jupyter_template init
-from jupyter_template import magic
+#%%appyter init
+from appyter import magic
 magic.init(lambda _=globals: _())
 ```
 
 Normal cells are allowed, you also have access to jinja2-rendered cells:
 ```
-%%jupyter_template {cell_type}
+%%appyter {cell_type}
 ```
 
 Supported cell_types:
@@ -54,14 +53,14 @@ Supported cell_types:
 Consider the following notebook:
 
 ```
-%%jupyter_template markdown
+%%appyter markdown
 # {{ StringField(name='title', label='Title', default='My Title').render_value }}
 
 {{ TextField(name='description', label='Description', default='My description').render_value }}
 ```
 
 ```
-%%jupyter_template code_eval
+%%appyter code_eval
 {% set number_1 = IntField(name='number_1', label='First Number', min=0, max=10, default=5) %}
 {% set number_2 = IntField(name='number_2', label='Second Number', min=0, max=10, default=5) %}
 {% set op = ChoiceField(
@@ -83,7 +82,7 @@ This can be parsed in various ways:
 
 ```python
 # Parse variables alone
-assert parse_variables(notebook_template) == {
+assert parse_variables(appyter) == {
   'number_1': IntField(name='number_1', label='First Number', min=0, max=10, default=5),
   'number_2': IntField(name='number_2', label='Second Number', min=0, max=10, default=5),
   'operator': ChoiceField(
@@ -101,7 +100,7 @@ assert parse_variables(notebook_template) == {
 }
 
 # Render jupyter notebook with variables substituted
-assert render_jupyter(notebook_template, {
+assert render_jupyter(appyter, {
   'title': 'Test',
   'description': '',
   'number_1': 0,
@@ -117,7 +116,7 @@ answer = 0 - 5
 ''' # in valid ipynb syntax
 
 # Render web UI
-assert render_html(notebook_template) == '''
+assert render_html(appyter) == '''
 <form id="notebook">
   Title: <input type="string" name="title"></input>
   Description: <textarea name="description"></textarea>
@@ -131,14 +130,14 @@ assert render_html(notebook_template) == '''
   </select>
   <input type="submit" text="Submit"></input>
 </form>
-<script src="./jupyter_template.js"></script>
+<script src="./appyter.js"></script>
 <script>
-  document.getElementById("notebook").on('submit', jupyter_template.submit)
+  document.getElementById("notebook").on('submit', appyter.submit)
 </script>
 '''
 
 # Web UI Renderer
-assert render_html_renderer(notebook_template, {
+assert render_html_renderer(appyter, {
   'title': 'Test',
   'description': '',
   'number_1': 0,
@@ -146,10 +145,10 @@ assert render_html_renderer(notebook_template, {
   'operator': 'subtract',
 }) == '''
 <div id="notebook"></div>
-<script src="./jupyter_template.js"></script>
+<script src="./appyter.js"></script>
 <script>
   document.on('load', function() {
-    jupyter_template.render(
+    appyter.render(
       document.getElementById("notebook"),
       {
         "title": "Test",
@@ -164,4 +163,4 @@ assert render_html_renderer(notebook_template, {
 '''
 ```
 
-jupyter_template can be used to get these conversions, it can also be used to host standalone webapps using these mechanisms.
+`appyter` can be used to get these conversions, it can also be used to host standalone webapps using these mechanisms.

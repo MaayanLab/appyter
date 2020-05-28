@@ -1,0 +1,1 @@
+from appyter.magic import init

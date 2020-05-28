@@ -1,1 +1,0 @@
-from jupyter_template.magic import init
