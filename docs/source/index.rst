@@ -10,11 +10,11 @@ Welcome to Ma'ayanlab Appyter's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-
-
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. mdinclude:: ../../README.md

@@ -1,0 +1,3 @@
+recommonmark
+sphinx
+m2r
