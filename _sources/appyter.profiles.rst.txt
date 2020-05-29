@@ -1,0 +1,20 @@
+appyter.profiles package
+========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   appyter.profiles.biojupies
+   appyter.profiles.bootstrap
+   appyter.profiles.default
+
+Module contents
+---------------
+
+.. automodule:: appyter.profiles
+   :members:
+   :undoc-members:
+   :show-inheritance:

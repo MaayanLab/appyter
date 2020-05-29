@@ -1,0 +1,48 @@
+appyter package
+===============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   appyter.parse
+   appyter.profiles
+   appyter.render
+
+Submodules
+----------
+
+appyter.context module
+----------------------
+
+.. automodule:: appyter.context
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.fields module
+---------------------
+
+.. automodule:: appyter.fields
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.magic module
+--------------------
+
+.. automodule:: appyter.magic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: appyter
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>appyter.parse package &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Appyter 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="appyter-parse-package">
+<h1>appyter.parse package<a class="headerlink" href="#appyter-parse-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-appyter.parse.function_call">
+<span id="appyter-parse-function-call-module"></span><h2>appyter.parse.function_call module<a class="headerlink" href="#module-appyter.parse.function_call" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.parse.function_call.FunctionCallMatcher">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.parse.function_call.</code><code class="sig-name descname">FunctionCallMatcher</code><a class="reference internal" href="_modules/appyter/parse/function_call.html#FunctionCallMatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Function call parser since regexd isn’t good at nested structures.
+Uncomment prints for debugging.</p>
+<dl class="py attribute">
+<dt id="appyter.parse.function_call.FunctionCallMatcher.controlChars">
+<code class="sig-name descname">controlChars</code><em class="property"> = {'(': ')', '[': ']', '{': '}'}</em><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher.controlChars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.parse.function_call.FunctionCallMatcher.finditer">
+<code class="sig-name descname">finditer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/function_call.html#FunctionCallMatcher.finditer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher.finditer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.parse.function_call.FunctionCallMatcher.finditer_inner">
+<code class="sig-name descname">finditer_inner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/function_call.html#FunctionCallMatcher.finditer_inner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher.finditer_inner" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.parse.function_call.FunctionCallMatcher.ignoreControlChars">
+<code class="sig-name descname">ignoreControlChars</code><em class="property"> = {'&quot;': '&quot;', '#': '\n', &quot;'&quot;: &quot;'&quot;}</em><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher.ignoreControlChars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.parse.function_call.FunctionCallMatcher.outer_pattern">
+<code class="sig-name descname">outer_pattern</code><em class="property"> = re.compile('([A-Za-z_-]+)\\(')</em><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher.outer_pattern" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-appyter.parse.nbtemplate">
+<span id="appyter-parse-nbtemplate-module"></span><h2>appyter.parse.nbtemplate module<a class="headerlink" href="#module-appyter.parse.nbtemplate" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.parse.nbtemplate.nbtemplate_from_ipynb_file">
+<code class="sig-prename descclassname">appyter.parse.nbtemplate.</code><code class="sig-name descname">nbtemplate_from_ipynb_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/nbtemplate.html#nbtemplate_from_ipynb_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.nbtemplate.nbtemplate_from_ipynb_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.parse.nbtemplate.nbtemplate_from_ipynb_string">
+<code class="sig-prename descclassname">appyter.parse.nbtemplate.</code><code class="sig-name descname">nbtemplate_from_ipynb_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ipynb</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/nbtemplate.html#nbtemplate_from_ipynb_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.nbtemplate.nbtemplate_from_ipynb_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.parse.nbtemplate.parse_fields_from_cell">
+<code class="sig-prename descclassname">appyter.parse.nbtemplate.</code><code class="sig-name descname">parse_fields_from_cell</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">cell</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/nbtemplate.html#parse_fields_from_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.nbtemplate.parse_fields_from_cell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.parse.nbtemplate.parse_fields_from_nbtemplate">
+<code class="sig-prename descclassname">appyter.parse.nbtemplate.</code><code class="sig-name descname">parse_fields_from_nbtemplate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">nb</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/nbtemplate.html#parse_fields_from_nbtemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.nbtemplate.parse_fields_from_nbtemplate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-appyter.parse">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.parse" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">appyter.parse package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-appyter.parse.function_call">appyter.parse.function_call module</a></li>
+<li><a class="reference internal" href="#module-appyter.parse.nbtemplate">appyter.parse.nbtemplate module</a></li>
+<li><a class="reference internal" href="#module-appyter.parse">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/appyter.parse.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Appyter 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.4.
+    </div>
+  </body>
+</html>

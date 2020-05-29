@@ -1,0 +1,19 @@
+appyter.profiles.default package
+================================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   appyter.profiles.default.fields
+   appyter.profiles.default.filters
+
+Module contents
+---------------
+
+.. automodule:: appyter.profiles.default
+   :members:
+   :undoc-members:
+   :show-inheritance:

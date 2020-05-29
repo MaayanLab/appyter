@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>appyter.context &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.context</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+
+<div class="viewcode-block" id="importdir"><a class="viewcode-back" href="../../appyter.html#appyter.context.importdir">[docs]</a><span class="k">def</span> <span class="nf">importdir</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">,</span> <span class="n">_package_</span><span class="p">,</span> <span class="n">_globals_</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+      <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">):</span>
+      <span class="n">modname</span> <span class="o">=</span> <span class="n">f</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">,</span> <span class="n">f</span><span class="p">)):</span>
+      <span class="n">modname</span> <span class="o">=</span> <span class="n">f</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">continue</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;.</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">modname</span><span class="p">),</span> <span class="n">_package_</span><span class="p">)</span>
+    <span class="n">_globals_</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">modname</span><span class="p">:</span> <span class="n">mod</span><span class="p">})</span></div>
+
+<div class="viewcode-block" id="importdir_deep"><a class="viewcode-back" href="../../appyter.html#appyter.context.importdir_deep">[docs]</a><span class="k">def</span> <span class="nf">importdir_deep</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">,</span> <span class="n">_package_</span><span class="p">,</span> <span class="n">_globals_</span><span class="p">,</span> <span class="n">filter_mod</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)):</span>
+  <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+      <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">):</span>
+      <span class="n">modname</span> <span class="o">=</span> <span class="n">f</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">,</span> <span class="n">f</span><span class="p">)):</span>
+      <span class="n">modname</span> <span class="o">=</span> <span class="n">f</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">continue</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;.</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">modname</span><span class="p">),</span> <span class="n">_package_</span><span class="p">)</span>
+    <span class="n">_globals_</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="p">{</span>
+      <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+      <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">filter_mod</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="p">})</span></div>
+
+<div class="viewcode-block" id="find_fields_dir_mappings"><a class="viewcode-back" href="../../appyter.html#appyter.context.find_fields_dir_mappings">[docs]</a><span class="k">def</span> <span class="nf">find_fields_dir_mappings</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">profile</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">):</span>
+  <span class="n">mappings</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">if</span> <span class="n">profile</span> <span class="o">!=</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+    <span class="n">mappings</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;profiles&#39;</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span> <span class="s1">&#39;fields&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">]</span> <span class="o">=</span> <span class="n">__package__</span> <span class="o">+</span> <span class="s1">&#39;.profiles.&#39;</span> <span class="o">+</span> <span class="n">profile</span> <span class="o">+</span> <span class="s1">&#39;.fields&#39;</span>
+  <span class="n">mappings</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;profiles&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;fields&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">]</span> <span class="o">=</span> <span class="n">__package__</span> <span class="o">+</span> <span class="s1">&#39;.profiles.default.fields&#39;</span>
+  <span class="n">mappings</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s1">&#39;fields&#39;</span><span class="p">))</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;fields&#39;</span>
+  <span class="k">return</span> <span class="n">mappings</span></div>
+
+<div class="viewcode-block" id="find_fields"><a class="viewcode-back" href="../../appyter.html#appyter.context.find_fields">[docs]</a><span class="k">def</span> <span class="nf">find_fields</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">profile</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">):</span>
+  <span class="kn">from</span> <span class="nn">appyter.fields</span> <span class="kn">import</span> <span class="n">Field</span>
+  <span class="n">ctx</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">for</span> <span class="n">_dirname_</span><span class="p">,</span> <span class="n">_package_</span> <span class="ow">in</span> <span class="n">find_fields_dir_mappings</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">):</span>
+      <span class="n">importdir_deep</span><span class="p">(</span>
+        <span class="n">_dirname_</span><span class="p">,</span>
+        <span class="n">_package_</span><span class="p">,</span>
+        <span class="n">ctx</span><span class="p">,</span>
+        <span class="n">filter_mod</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Field</span><span class="p">)</span>
+      <span class="p">)</span>
+  <span class="k">return</span> <span class="n">ctx</span></div>
+
+<div class="viewcode-block" id="find_filters_dir_mappings"><a class="viewcode-back" href="../../appyter.html#appyter.context.find_filters_dir_mappings">[docs]</a><span class="k">def</span> <span class="nf">find_filters_dir_mappings</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">profile</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">):</span>
+  <span class="n">mappings</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">if</span> <span class="n">profile</span> <span class="o">!=</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+    <span class="n">mappings</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;profiles&#39;</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span> <span class="s1">&#39;filters&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">]</span> <span class="o">=</span> <span class="n">__package__</span> <span class="o">+</span> <span class="s1">&#39;.profiles.&#39;</span> <span class="o">+</span> <span class="n">profile</span> <span class="o">+</span> <span class="s1">&#39;.filters&#39;</span>
+  <span class="n">mappings</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;profiles&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;filters&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">]</span> <span class="o">=</span> <span class="n">__package__</span> <span class="o">+</span> <span class="s1">&#39;.profiles.default.filters&#39;</span>
+  <span class="n">mappings</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s1">&#39;filters&#39;</span><span class="p">))</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;filters&#39;</span>
+  <span class="k">return</span> <span class="n">mappings</span></div>
+
+<div class="viewcode-block" id="find_filters"><a class="viewcode-back" href="../../appyter.html#appyter.context.find_filters">[docs]</a><span class="k">def</span> <span class="nf">find_filters</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">profile</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">):</span>
+  <span class="n">ctx</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">for</span> <span class="n">_dirname_</span><span class="p">,</span> <span class="n">_package_</span> <span class="ow">in</span> <span class="n">find_filters_dir_mappings</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">):</span>
+      <span class="n">importdir_deep</span><span class="p">(</span>
+        <span class="n">_dirname_</span><span class="p">,</span>
+        <span class="n">_package_</span><span class="p">,</span>
+        <span class="n">ctx</span><span class="p">,</span>
+        <span class="n">filter_mod</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span><span class="p">))</span>
+      <span class="p">)</span>
+  <span class="k">return</span> <span class="n">ctx</span></div>
+
+<div class="viewcode-block" id="find_templates_dir"><a class="viewcode-back" href="../../appyter.html#appyter.context.find_templates_dir">[docs]</a><span class="k">def</span> <span class="nf">find_templates_dir</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">profile</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">):</span>
+  <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">,</span> <span class="p">[</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">))</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;profiles&#39;</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;profiles&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span>
+  <span class="p">]))</span></div>
+
+<div class="viewcode-block" id="get_extra_files"><a class="viewcode-back" href="../../appyter.html#appyter.context.get_extra_files">[docs]</a><span class="k">def</span> <span class="nf">get_extra_files</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+  <span class="n">args</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="n">get_sys_env</span><span class="p">()</span>
+  <span class="n">cwd</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cwd&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+  <span class="n">profile</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;profile&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
+  <span class="n">dirs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="o">*</span><span class="n">find_templates_dir</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">),</span>
+    <span class="o">*</span><span class="n">find_filters_dir_mappings</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
+    <span class="o">*</span><span class="n">find_fields_dir_mappings</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
+  <span class="p">]</span>
+  <span class="n">paths</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dirs</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">({</span>
+      <span class="n">d</span><span class="p">,</span>
+      <span class="c1"># all files recursively in these directories</span>
+      <span class="o">*</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;**&#39;</span><span class="p">),</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="p">}</span> <span class="o">-</span> <span class="p">({</span>
+      <span class="c1"># exclude directories or files that begin with _</span>
+      <span class="o">*</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;_**&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">),</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+      <span class="o">*</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;**&#39;</span><span class="p">,</span> <span class="s1">&#39;_*&#39;</span><span class="p">),</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="p">}))</span>
+  <span class="p">}</span>
+  <span class="n">paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+  <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_jinja2_env"><a class="viewcode-back" href="../../appyter.html#appyter.context.get_jinja2_env">[docs]</a><span class="k">def</span> <span class="nf">get_jinja2_env</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="p">{},</span> <span class="n">cwd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+  <span class="n">args</span><span class="p">,</span> <span class="n">kargs</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="n">get_sys_env</span><span class="p">()</span>
+  <span class="k">if</span> <span class="n">cwd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">cwd</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cwd&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+  <span class="k">if</span> <span class="n">profile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;profile&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;prefix&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+  <span class="kn">import</span> <span class="nn">sys</span>
+  <span class="kn">from</span> <span class="nn">appyter.fields</span> <span class="kn">import</span> <span class="n">build_fields</span>
+  <span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">ChoiceLoader</span><span class="p">,</span> <span class="n">FileSystemLoader</span>
+  <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cwd</span><span class="p">)</span>
+  <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span>
+    <span class="n">extensions</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;jinja2.ext.do&#39;</span><span class="p">],</span>
+    <span class="n">loader</span><span class="o">=</span><span class="n">ChoiceLoader</span><span class="p">([</span>
+      <span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">find_templates_dir</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">)</span>
+    <span class="p">]),</span>
+  <span class="p">)</span>
+  <span class="n">env</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">find_filters</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">))</span>
+  <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">find_filters</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">))</span>
+  <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="n">_prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+    <span class="n">_debug</span><span class="o">=</span><span class="n">debug</span><span class="p">,</span>
+    <span class="n">_args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+    <span class="n">_kargs</span><span class="o">=</span><span class="n">kargs</span><span class="p">,</span>
+    <span class="n">_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+  <span class="p">)</span>
+  <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">build_fields</span><span class="p">(</span><span class="n">find_fields</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">),</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">env</span></div>
+
+<div class="viewcode-block" id="get_sys_env"><a class="viewcode-back" href="../../appyter.html#appyter.context.get_sys_env">[docs]</a><span class="k">def</span> <span class="nf">get_sys_env</span><span class="p">():</span>
+  <span class="kn">import</span> <span class="nn">sys</span>
+  <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+  <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">kargs</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+  <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+    <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;--&#39;</span><span class="p">):</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">arg</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">except</span><span class="p">:</span>
+        <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">arg</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span> <span class="kc">True</span>
+      <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">elif</span> <span class="n">arg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">):</span>
+      <span class="n">kargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">arg</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span> <span class="mi">1</span><span class="p">})</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">kargs</span><span class="p">,</span> <span class="n">kwargs</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.4.
+    </div>
+  </body>
+</html>

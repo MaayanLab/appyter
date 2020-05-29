@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Welcome to Ma’ayanlab Appyter’s documentation! &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Appyter 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-ma-ayanlab-appyter-s-documentation">
+<h1>Welcome to Ma’ayanlab Appyter’s documentation!<a class="headerlink" href="#welcome-to-ma-ayanlab-appyter-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="appyter">
+<h1>Appyter<a class="headerlink" href="#appyter" title="Permalink to this headline">¶</a></h1>
+<p>This module enables you to turn your jupyter notebook into a jinja2 template-driven web application. Or just parse for other purposes.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install package from github repository master</span>
+pip3 install --user --upgrade git+git://github.com/Maayanlab/appyter.git
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Appyter enables you to serve that notebook on an executable webapp.</p>
+<p><code class="docutils literal notranslate"><span class="pre">appyter</span> <span class="pre">jupyter_notebook.ipynb</span></code></p>
+<p>If for some reason, <code class="docutils literal notranslate"><span class="pre">appyter</span></code> doesn’t end up discoverable in your PATH, you can use <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">appyter</span></code> instead.</p>
+<ul class="simple">
+<li><p>A dotenv file (<code class="docutils literal notranslate"><span class="pre">.env</span></code>) or environment variables can be use to configure HOST, PORT, and PREFIX of the webserver.</p></li>
+<li><p>Some pre-configured profiles can be used for styling the form (<code class="docutils literal notranslate"><span class="pre">--profile=profile_name</span></code>) see <code class="docutils literal notranslate"><span class="pre">appyter/profiles</span></code></p></li>
+<li><p>In debug mode (<code class="docutils literal notranslate"><span class="pre">--debug</span></code>), changes to the notebook will automatically update the webapp.</p></li>
+<li><p>Custom fields can be used by putting them in the directory of execution with the following format:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">./fields/YourField.py</span></code>: Python Field Implementation</p></li>
+</ul>
+</li>
+<li><p>The templates used natively by the application can be modified to provide your own look and feel:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">./templates/head.jinja2</span></code>: Custom head (title, CSS, scripts)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">./templates/form.jinja2</span></code>: Custom form handling</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">./templates/fields/StringField.jinja2</span></code>: Override field style</p></li>
+</ul>
+</li>
+<li><p>Custom jinja2 filters can be added if necessary</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">./filters/your_filter.py</span></code>: Python jinja2 filter (function)</p></li>
+</ul>
+</li>
+<li><p>Custom externally-referenced resources (i.e. images) can be put under the static directory</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">./static/img/your_image.png</span></code>: Reference in templates with <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">static</span> <span class="pre">'img/your_image.png'</span> <span class="pre">%}</span></code></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="creating-an-appyter">
+<h2>Creating an Appyter<a class="headerlink" href="#creating-an-appyter" title="Permalink to this headline">¶</a></h2>
+<p>Create a standard python jupyter notebook, make the first cell:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#%%appyter init</span>
+<span class="kn">from</span> <span class="nn">appyter</span> <span class="kn">import</span> <span class="n">magic</span>
+<span class="n">magic</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="o">=</span><span class="nb">globals</span><span class="p">:</span> <span class="n">_</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Normal cells are allowed, you also have access to jinja2-rendered cells:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">appyter</span> <span class="p">{</span><span class="n">cell_type</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Supported cell_types:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">markdown</span></code>: Substitute jinja2 template variables, render as a markdown cell</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hide</span></code>: Substitute jinja2 template variables, show it rendered in your notebook with the default values, but when executing publicly, don’t show/execute the cell.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">code_exec</span></code>: Substitute jinja2 template variables, render as python, show it rendered in your notebook with the default values and execute it</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">code_eval</span></code>: Substitute jinja2 template variables, render as python, show it rendered in your notebook with the default values and execute it, “eval” the last line of the cell and display the result.</p></li>
+</ul>
+</div>
+<div class="section" id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Permalink to this headline">¶</a></h2>
+<p>Consider the following notebook:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">appyter</span> <span class="n">markdown</span>
+<span class="c1"># {{ StringField(name=&#39;title&#39;, label=&#39;Title&#39;, default=&#39;My Title&#39;).render_value }}</span>
+
+<span class="p">{{</span> <span class="n">TextField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;My description&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">render_value</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">appyter</span> <span class="n">code_eval</span>
+<span class="p">{</span><span class="o">%</span> <span class="nb">set</span> <span class="n">number_1</span> <span class="o">=</span> <span class="n">IntField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;number_1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;First Number&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="nb">set</span> <span class="n">number_2</span> <span class="o">=</span> <span class="n">IntField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;number_2&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Second Number&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="nb">set</span> <span class="n">op</span> <span class="o">=</span> <span class="n">ChoiceField</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;operator&#39;</span><span class="p">,</span>
+  <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Operator&#39;</span><span class="p">,</span>
+  <span class="n">choices</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;add&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;subtract&#39;</span><span class="p">:</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;multiply&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;divide&#39;</span><span class="p">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;power&#39;</span><span class="p">:</span> <span class="s1">&#39;**&#39;</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="n">default</span><span class="o">=</span><span class="s1">&#39;add&#39;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">%</span><span class="p">}</span>
+<span class="n">answer</span> <span class="o">=</span> <span class="p">{{</span> <span class="n">number_1</span> <span class="p">}}</span> <span class="p">{{</span> <span class="n">op</span> <span class="p">}}</span> <span class="p">{{</span> <span class="n">number_2</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p>This can be parsed in various ways:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Parse variables alone</span>
+<span class="k">assert</span> <span class="n">parse_variables</span><span class="p">(</span><span class="n">appyter</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+  <span class="s1">&#39;number_1&#39;</span><span class="p">:</span> <span class="n">IntField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;number_1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;First Number&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">),</span>
+  <span class="s1">&#39;number_2&#39;</span><span class="p">:</span> <span class="n">IntField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;number_2&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Second Number&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">),</span>
+  <span class="s1">&#39;operator&#39;</span><span class="p">:</span> <span class="n">ChoiceField</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;operator&#39;</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Operator&#39;</span><span class="p">,</span>
+    <span class="n">choices</span><span class="o">=</span><span class="p">{</span>
+      <span class="s1">&#39;add&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;subtract&#39;</span><span class="p">:</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;multiply&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;divide&#39;</span><span class="p">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;power&#39;</span><span class="p">:</span> <span class="s1">&#39;**&#39;</span>
+    <span class="p">},</span>
+    <span class="n">default</span><span class="o">=</span><span class="s1">&#39;add&#39;</span>
+  <span class="p">),</span>
+<span class="p">}</span>
+
+<span class="c1"># Render jupyter notebook with variables substituted</span>
+<span class="k">assert</span> <span class="n">render_jupyter</span><span class="p">(</span><span class="n">appyter</span><span class="p">,</span> <span class="p">{</span>
+  <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Test&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;number_1&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="s1">&#39;number_2&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+  <span class="s1">&#39;operator&#39;</span><span class="p">:</span> <span class="s1">&#39;subtract&#39;</span><span class="p">,</span>
+<span class="p">})</span> <span class="o">==</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">---</span>
+<span class="s1"># Test</span>
+
+<span class="s1">---</span>
+<span class="s1">answer = 0 - 5</span>
+<span class="s1">---</span>
+<span class="s1">&#39;&#39;&#39;</span> <span class="c1"># in valid ipynb syntax</span>
+
+<span class="c1"># Render web UI</span>
+<span class="k">assert</span> <span class="n">render_html</span><span class="p">(</span><span class="n">appyter</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">&lt;form id=&quot;notebook&quot;&gt;</span>
+<span class="s1">  Title: &lt;input type=&quot;string&quot; name=&quot;title&quot;&gt;&lt;/input&gt;</span>
+<span class="s1">  Description: &lt;textarea name=&quot;description&quot;&gt;&lt;/textarea&gt;</span>
+<span class="s1">  First Number: &lt;input type=&quot;number&quot; name=&quot;number_1&quot; min=0 max=10&gt;&lt;/input&gt;</span>
+<span class="s1">  Second Number: &lt;input type=&quot;number&quot; name=&quot;number_2&quot; min=0 max=10&gt;&lt;/input&gt;</span>
+<span class="s1">  Operator: &lt;select name=&quot;operator&quot;&gt;</span>
+<span class="s1">    &lt;option value=&quot;add&quot;&gt;add&lt;/option&gt;</span>
+<span class="s1">    &lt;option value=&quot;subtract&quot;&gt;subtract&lt;/option&gt;</span>
+<span class="s1">    &lt;option value=&quot;divide&quot;&gt;divide&lt;/option&gt;</span>
+<span class="s1">    &lt;option value=&quot;power&quot;&gt;power&lt;/option&gt;</span>
+<span class="s1">  &lt;/select&gt;</span>
+<span class="s1">  &lt;input type=&quot;submit&quot; text=&quot;Submit&quot;&gt;&lt;/input&gt;</span>
+<span class="s1">&lt;/form&gt;</span>
+<span class="s1">&lt;script src=&quot;./appyter.js&quot;&gt;&lt;/script&gt;</span>
+<span class="s1">&lt;script&gt;</span>
+<span class="s1">  document.getElementById(&quot;notebook&quot;).on(&#39;submit&#39;, appyter.submit)</span>
+<span class="s1">&lt;/script&gt;</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+<span class="c1"># Web UI Renderer</span>
+<span class="k">assert</span> <span class="n">render_html_renderer</span><span class="p">(</span><span class="n">appyter</span><span class="p">,</span> <span class="p">{</span>
+  <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Test&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;number_1&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="s1">&#39;number_2&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+  <span class="s1">&#39;operator&#39;</span><span class="p">:</span> <span class="s1">&#39;subtract&#39;</span><span class="p">,</span>
+<span class="p">})</span> <span class="o">==</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">&lt;div id=&quot;notebook&quot;&gt;&lt;/div&gt;</span>
+<span class="s1">&lt;script src=&quot;./appyter.js&quot;&gt;&lt;/script&gt;</span>
+<span class="s1">&lt;script&gt;</span>
+<span class="s1">  document.on(&#39;load&#39;, function() {</span>
+<span class="s1">    appyter.render(</span>
+<span class="s1">      document.getElementById(&quot;notebook&quot;),</span>
+<span class="s1">      {</span>
+<span class="s1">        &quot;title&quot;: &quot;Test&quot;,</span>
+<span class="s1">        &quot;description&quot;: &quot;&quot;,</span>
+<span class="s1">        &quot;number_1&quot;: 0,</span>
+<span class="s1">        &quot;number_2&quot;: 5,</span>
+<span class="s1">        &quot;operator&quot;: &quot;subtract&quot;,</span>
+<span class="s1">      }</span>
+<span class="s1">    )</span>
+<span class="s1">  })</span>
+<span class="s1">&lt;/script&gt;</span>
+<span class="s1">&#39;&#39;&#39;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">appyter</span></code> can be used to get these conversions, it can also be used to host standalone webapps using these mechanisms.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to Ma’ayanlab Appyter’s documentation!</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#appyter">Appyter</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#creating-an-appyter">Creating an Appyter</a></li>
+<li><a class="reference internal" href="#discussion">Discussion</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Appyter 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.4.
+    </div>
+  </body>
+</html>

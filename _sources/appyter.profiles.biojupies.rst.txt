@@ -1,0 +1,10 @@
+appyter.profiles.biojupies package
+==================================
+
+Module contents
+---------------
+
+.. automodule:: appyter.profiles.biojupies
+   :members:
+   :undoc-members:
+   :show-inheritance:
