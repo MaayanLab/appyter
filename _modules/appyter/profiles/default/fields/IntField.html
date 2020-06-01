@@ -38,7 +38,15 @@
 <span></span><span class="kn">from</span> <span class="nn">appyter.fields</span> <span class="kn">import</span> <span class="n">Field</span>
 
 <div class="viewcode-block" id="IntField"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.IntField.IntField">[docs]</a><span class="k">class</span> <span class="nc">IntField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Representing a field that accepts an integer</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    :param min: (required) the minimum valid value that the field can take on</span>
+<span class="sd">    :param max: (required) the maximum valid value that the field can take on</span>
+<span class="sd">    :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`&#39;s constructor.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="nb">super</span><span class="p">(</span><span class="n">IntField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
       <span class="nb">min</span><span class="o">=</span><span class="nb">min</span><span class="p">,</span>
       <span class="nb">max</span><span class="o">=</span><span class="nb">max</span><span class="p">,</span>

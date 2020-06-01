@@ -35,54 +35,62 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.magic</h1><div class="highlight"><pre>
-<span></span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">IPython magic for making templating easy~. This basically</span>
-<span class="sd"> just allows our jinja-type language to be executed in place</span>
-<span class="sd"> injecting the defaults into the environment so we can easily</span>
-<span class="sd"> debug the notebook at the same time as building the appyter.</span>
+<span></span><span class="sd">&#39;&#39;&#39; IPython magic for making templating easy~. This basically</span>
+<span class="sd">just allows our jinja-type language to be executed in place</span>
+<span class="sd">injecting the defaults into the environment so we can easily</span>
+<span class="sd">debug the notebook at the same time as building the appyter.</span>
 
 <span class="sd">The same call structure is used during preprocess and at runtime</span>
-<span class="sd"> but performing different tasks--this way setting up a notebook is</span>
-<span class="sd"> as simple as running it with different nbtemplate&#39;s being provided</span>
-<span class="sd"> for import.</span>
+<span class="sd">but performing different tasks--this way setting up a notebook is</span>
+<span class="sd">as simple as running it with different nbtemplate&#39;s being provided</span>
+<span class="sd">for import.</span>
 
 <span class="sd">Usage (put the following in the first cell):</span>
 
+<span class="sd">```python</span>
 <span class="sd">#%%appyter init</span>
 <span class="sd">from appyter import magic</span>
 <span class="sd">magic.init(lambda _=globals: _())</span>
+<span class="sd">```</span>
 <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Setup given globals</span>
 <span class="sd">&#39;&#39;&#39;</span>
 <div class="viewcode-block" id="init"><a class="viewcode-back" href="../../appyter.html#appyter.magic.init">[docs]</a><span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">_globals</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">  Jinja environment for jinja templates</span>
+  <span class="sd">&#39;&#39;&#39; Initialize appyter magic.</span>
+
+<span class="sd">  Sets up a jinj2 environment and injects %%appyter magic into your environment.</span>
+<span class="sd">  </span>
+<span class="sd">  :param _globals: A callable with your globals for the purpose of injection, basically just: `lambda _=globals: _()`</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_jinja2_env</span>
   <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">()</span>
+  <span class="kn">from</span> <span class="nn">IPython.core.magic</span> <span class="kn">import</span> <span class="n">register_cell_magic</span>
+  <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">Markdown</span>
+
   <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">  IPython cell magic allows function to execute an entire cell.</span>
+<span class="sd">  register_cell_magic allows function to execute an entire cell with the following call structure:</span>
+<span class="sd">  ```python</span>
 <span class="sd">  %%my_magic whatever</span>
 <span class="sd">  all</span>
 <span class="sd">  my</span>
 <span class="sd">  data</span>
-
+<span class="sd">  ```</span>
 <span class="sd">  Results in a call:</span>
+<span class="sd">  ```python</span>
 <span class="sd">  my_magic(</span>
-<span class="sd">  &quot;whatever&quot;,</span>
-<span class="sd">  &quot;&quot;&quot;all</span>
+<span class="sd">    &quot;whatever&quot;,</span>
+<span class="sd">    &quot;&quot;&quot;all</span>
 <span class="sd">    my</span>
-<span class="sd">    data&quot;&quot;&quot;)</span>
+<span class="sd">    data&quot;&quot;&quot;</span>
+<span class="sd">  )</span>
+<span class="sd">  ```</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="kn">from</span> <span class="nn">IPython.core.magic</span> <span class="kn">import</span> <span class="n">register_cell_magic</span>
-  <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">Markdown</span>
 
   <span class="nd">@register_cell_magic</span>
   <span class="k">def</span> <span class="nf">appyter</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">cell</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Appyter Magic: See Steps for more information.</span>
+    <span class="sd">&#39;&#39;&#39; Appyter Cell Magic: See Steps for more information.</span>
 <span class="sd">    Compile jinja2 into source code, and then evaluate that</span>
 <span class="sd">    source code.</span>
 <span class="sd">    &#39;&#39;&#39;</span>

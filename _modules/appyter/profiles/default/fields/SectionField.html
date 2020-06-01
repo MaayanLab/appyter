@@ -38,7 +38,18 @@
 <span></span><span class="kn">from</span> <span class="nn">appyter.fields</span> <span class="kn">import</span> <span class="n">Field</span>
 
 <div class="viewcode-block" id="SectionField"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.SectionField.SectionField">[docs]</a><span class="k">class</span> <span class="nc">SectionField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Representing section header which other fields can be a part of</span>
+<span class="sd">  ```python</span>
+<span class="sd">  %%appyter hide_code</span>
+<span class="sd">  {% do SectionField(name=&#39;section1&#39;, label=&#39;My Section&#39;) %}</span>
+<span class="sd">  {% set x = IntField(name=&#39;int1&#39;, label=&#39;My Int&#39;, section=&#39;section1&#39;) %}</span>
+<span class="sd">  ```</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`&#39;s constructor.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;section&#39;</span></div>
 </pre></div>

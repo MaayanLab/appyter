@@ -35,7 +35,12 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.fields</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="sd">&#39;&#39;&#39; ```eval_rst</span>
+<span class="sd">This module contains :class:`appyter.fields.Field`, the base class for all fields</span>
+<span class="sd">defined in :mod:`appyter.profiles.default.fields`.</span>
+<span class="sd">``` &#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
@@ -43,7 +48,7 @@
 <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_jinja2_env</span>
 
 <div class="viewcode-block" id="build_fields"><a class="viewcode-back" href="../../appyter.html#appyter.fields.build_fields">[docs]</a><span class="k">def</span> <span class="nf">build_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{}):</span>
-  <span class="sd">&#39;&#39;&#39; Build a dictionary of Field instances</span>
+  <span class="sd">&#39;&#39;&#39; INTERNAL: Build a dictionary of Field instances</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">return</span> <span class="p">{</span>
     <span class="n">field_name</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span> <span class="n">_context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">_field</span><span class="p">(</span>
@@ -56,19 +61,36 @@
   <span class="p">}</span></div>
 
 <div class="viewcode-block" id="Field"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field">[docs]</a><span class="k">class</span> <span class="nc">Field</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; ```eval_rst</span>
+<span class="sd">  Base class for all Field objects representing a value that will later be provided via a front-end form.</span>
+<span class="sd">  See :mod:`appyter.profiles.default.fields` for the actual fields.</span>
+<span class="sd">  ``` &#39;&#39;&#39;</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
       <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
       <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-      <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+      <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
       <span class="n">choices</span><span class="o">=</span><span class="p">[],</span>
       <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+      <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+      <span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
       <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.</span>
+<span class="sd">    :param label: (str) A human readable label for the field for the HTML form</span>
+<span class="sd">    :param description: (Optional[str]) A long human readable description for the field for the HTML form</span>
+<span class="sd">    :param choices: (Optional[Union[List[str], Set[str], Dict[str, str]]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</span>
+<span class="sd">    :param default: (Any) A default value as an example and for use during prototyping</span>
+<span class="sd">    :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</span>
+<span class="sd">    :param value: (INTERNAL Any) The raw value of the field (from the form for instance)</span>
+<span class="sd">    :param \**kwargs: Additional keyword arguments used by other fields</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
       <span class="n">args</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
         <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
         <span class="n">choices</span><span class="o">=</span><span class="n">choices</span><span class="p">,</span>
         <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span>
+        <span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="p">,</span>
         <span class="n">value</span><span class="o">=</span><span class="n">value</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">default</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
       <span class="p">)</span>
@@ -77,15 +99,20 @@
   
   <span class="nd">@property</span>
   <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Get the raw args, the values used to initialize this field</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Field.constraint"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.constraint">[docs]</a>  <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Return true if args.value satisfies constraints.</span>
+    <span class="sd">&#39;&#39;&#39; Return true if the received args.value satisfies constraints.</span>
+<span class="sd">    Should be overridden by subclasses.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span></div>
 
 <div class="viewcode-block" id="Field.render"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.render">[docs]</a>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Return a rendered version of the field (form)</span>
+
+<span class="sd">    :param \**kwargs: The instance values of the form e.g. `Field.render(**field.args)`</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="n">Markup</span><span class="p">(</span>
       <span class="n">get_jinja2_env</span><span class="p">()</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span>
@@ -117,13 +144,14 @@
 
   <span class="nd">@property</span>
   <span class="k">def</span> <span class="nf">raw_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Raw value of the field</span>
+    <span class="sd">&#39;&#39;&#39; (UNSAFE) Raw value of the field</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
 
   <span class="nd">@property</span>
   <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Effective value of the field when used</span>
+    <span class="sd">&#39;&#39;&#39; (SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.</span>
+<span class="sd">    When instantiating code, you should use safe_value.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">choices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;choices&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">choices</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
@@ -136,17 +164,19 @@
 
   <span class="nd">@property</span>
   <span class="k">def</span> <span class="nf">safe_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Effective value of the field when used</span>
+    <span class="sd">&#39;&#39;&#39; (SAFE) Effective safe value for use in code, we use `repr` to escape values as necessary</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
   <span class="nd">@property</span>
   <span class="k">def</span> <span class="nf">render_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Effective value ready to be displayed</span>
+    <span class="sd">&#39;&#39;&#39; (SAFE) Effective safe value ready to be displayed, specifically for Markdown output.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="n">Markup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; (SAFE) The default str(Field) is just safe_value</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">safe_value</span></div>
 </pre></div>
 
