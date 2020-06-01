@@ -20,17 +20,20 @@ magic.init(lambda _=globals: _())
 '''
 Setup given globals
 '''
-def init(_globals):
+def init(_globals, verbose=False):
   ''' Initialize appyter magic.
 
   Sets up a jinj2 environment and injects %%appyter magic into your environment.
   
-  :param _globals: A callable with your globals for the purpose of injection, basically just: `lambda _=globals: _()`
+  :param _globals: (Dict[str, Any]) A callable with your globals for the purpose of injection, basically just: `lambda _=globals: _()`
+  :param verbose: (Optional[bool]) Expand exception reporting to be more verbose
   '''
+  import jinja2
+  import jinja2.meta
   from appyter.context import get_jinja2_env
   env = get_jinja2_env()
   from IPython.core.magic import register_cell_magic
-  from IPython.display import display, Markdown
+  from IPython.display import display, Markdown, HTML
 
   '''
   register_cell_magic allows function to execute an entire cell with the following call structure:
@@ -65,24 +68,54 @@ def init(_globals):
     '''
     global_internal = _globals()
     cell_type = line.split('_')
-    template = env.from_string(cell)
-    rendered_template_lines = list(filter(None, map(str.rstrip, template.render().splitlines())))
-    if len(rendered_template_lines) > 0:
-      rendered = '\n'.join(rendered_template_lines[:-1])
-      rendered_last = rendered_template_lines[-1]
-      if cell_type == ['markdown']:
-        display(Markdown('\n'.join((rendered, rendered_last))))
-      elif 'code' in cell_type:
-        display(Markdown('```python\n%s\n```' % ('\n'.join((rendered, rendered_last)))))
-
-        if 'eval' in cell_type:
-          exec(rendered, global_internal)
-          display(eval(rendered_last, global_internal))
-        elif 'exec' in cell_type:
-          exec('\n'.join((rendered, rendered_last)), global_internal)
-      else:
-        raise Exception('Unrecognized cell_type')
-
+    try:
+      cell_lines = cell.splitlines()
+      try:
+        undeclared = jinja2.meta.find_undeclared_variables(env.parse(cell))
+        if undeclared:
+          for lineno, cell_line in enumerate(cell_lines):
+            if any(v in cell_line for v in undeclared):
+              display(HTML(f"<div style='color: red'>{lineno}: {cell_line}</div>"))
+          raise Exception(f"undeclared variable(s) {undeclared}")
+        template = env.from_string(cell)
+        template_rendered = template.render()
+      except Exception as e:
+        if getattr(e, 'lineno', None) is not None:
+          display(HTML(f"<div style='color: red'>{e.lineno}: {cell_lines[e.lineno-1]}</div>"))
+        raise e
+      #
+      rendered_template_lines = list(filter(None, map(str.rstrip, template_rendered.splitlines())))
+      try:
+        if len(rendered_template_lines) > 0:
+          rendered = '\n'.join(rendered_template_lines[:-1])
+          rendered_last = rendered_template_lines[-1]
+          if cell_type == ['markdown']:
+            display(Markdown('\n'.join((rendered, rendered_last))))
+          elif 'code' in cell_type:
+            display(Markdown('```python\n%s\n```' % ('\n'.join((rendered, rendered_last)))))
+            #
+            if 'eval' in cell_type:
+              exec(rendered, global_internal)
+              #
+              try:
+                display(eval(rendered_last, global_internal))
+              except Exception as e:
+                setattr(e, 'lineno', len(rendered_template_lines))
+                raise e
+            elif 'exec' in cell_type:
+              exec('\n'.join((rendered, rendered_last)), global_internal)
+          else:
+            raise Exception('Unrecognized appyter cell_type')
+        #
+      except Exception as e:
+        if getattr(e, 'lineno', None) is not None:
+          display(HTML(f"<div style='color: red'>{e.lineno}: {rendered_template_lines[e.lineno-1]}</div>"))
+        raise e
+    except Exception as e:
+      display(HTML(f"<div style='color: red'>Error: {e}</div>"))
+      if verbose:
+        traceback.print_exc()
+      return
     '''
     Step 2. Check for new variables in the internal global
     and pass them to the python global scope. Check for
