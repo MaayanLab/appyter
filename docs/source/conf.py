@@ -18,6 +18,7 @@ import sphinx
 import commonmark
 from m2r import MdInclude
 from recommonmark.transform import AutoStructify
+from textwrap import dedent
 
 # -- Project information -----------------------------------------------------
 
@@ -65,10 +66,23 @@ html_static_path = ['_static']
 
 autosectionlabel_prefix_document = True
 
+class CustomReStructuredTextRenderer(commonmark.ReStructuredTextRenderer):
+    def code_block(self, node, entering):
+        language_name = None
+
+        info_words = node.info.split() if node.info else []
+        if len(info_words) > 0 and len(info_words[0]) > 0:
+            language_name = info_words[0]
+
+        if language_name == 'eval_rst':
+            self.out(dedent(node.literal))
+        else:
+            super().code_block(node, entering)
+
 def docstring(app, what, name, obj, options, lines):
     md  = '\n'.join(lines)
     ast = commonmark.Parser().parse(md)
-    rst = commonmark.ReStructuredTextRenderer().render(ast)
+    rst = CustomReStructuredTextRenderer().render(ast)
     lines.clear()
     lines += rst.splitlines()
 
