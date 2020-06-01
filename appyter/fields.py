@@ -1,3 +1,8 @@
+''' ```eval_rst
+This module contains :class:`appyter.fields.Field`, the base class for all fields
+defined in :mod:`appyter.profiles.default.fields`.
+``` '''
+
 import os
 import re
 import json
@@ -6,7 +11,7 @@ from flask import Markup
 from appyter.context import get_jinja2_env
 
 def build_fields(fields, context={}):
-  ''' Build a dictionary of Field instances
+  ''' INTERNAL: Build a dictionary of Field instances
   '''
   return {
     field_name: lambda name=None, _field=field, _context=context, **kwargs: _field(
@@ -19,19 +24,36 @@ def build_fields(fields, context={}):
   }
 
 class Field(dict):
+  ''' ```eval_rst
+  Base class for all Field objects representing a value that will later be provided via a front-end form.
+  See :mod:`appyter.profiles.default.fields` for the actual fields.
+  ``` '''
   def __init__(self,
       name=None,
       label=None,
-      value=None,
+      description=None,
       choices=[],
       default=None,
+      value=None,
+      section=None,
       **kwargs):
+    '''
+    :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
+    :param label: (str) A human readable label for the field for the HTML form
+    :param description: (Optional[str]) A long human readable description for the field for the HTML form
+    :param choices: (Optional[Union[List[str], Set[str], Dict[str, str]]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value
+    :param default: (Any) A default value as an example and for use during prototyping
+    :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
+    :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
+    :param \**kwargs: Additional keyword arguments used by other fields
+    '''
     super().__init__(
       args=dict(
         name=name,
         choices=choices,
         label=label,
         default=default,
+        section=section,
         value=value if value is not None else default,
         **kwargs,
       )
@@ -40,15 +62,20 @@ class Field(dict):
   
   @property
   def args(self):
+    ''' Get the raw args, the values used to initialize this field
+    '''
     return self['args']
 
   def constraint(self):
-    ''' Return true if args.value satisfies constraints.
+    ''' Return true if the received args.value satisfies constraints.
+    Should be overridden by subclasses.
     '''
     return self.raw_value in self.choices
 
   def render(self, **kwargs):
     ''' Return a rendered version of the field (form)
+
+    :param \**kwargs: The instance values of the form e.g. `Field.render(**field.args)`
     '''
     return Markup(
       get_jinja2_env().get_template(
@@ -80,13 +107,14 @@ class Field(dict):
 
   @property
   def raw_value(self):
-    ''' Raw value of the field
+    ''' (UNSAFE) Raw value of the field
     '''
     return self.args['value']
 
   @property
   def value(self):
-    ''' Effective value of the field when used
+    ''' (SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
+    When instantiating code, you should use safe_value.
     '''
     choices = self.args.get('choices')
     if type(choices) == dict:
@@ -99,15 +127,17 @@ class Field(dict):
 
   @property
   def safe_value(self):
-    ''' Effective value of the field when used
+    ''' (SAFE) Effective safe value for use in code, we use `repr` to escape values as necessary
     '''
     return repr(self.value)
 
   @property
   def render_value(self):
-    ''' Effective value ready to be displayed
+    ''' (SAFE) Effective safe value ready to be displayed, specifically for Markdown output.
     '''
     return Markup(self.value)
 
   def __str__(self):
+    ''' (SAFE) The default str(Field) is just safe_value
+    '''
     return self.safe_value

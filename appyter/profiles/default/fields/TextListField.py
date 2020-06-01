@@ -2,7 +2,21 @@ import re
 from appyter.fields import Field
 
 class TextListField(Field):
+  ''' Representing a field that accepts a set of strings separated by newlines
+
+  Be careful with this field, consider defining a constraint regex.
+  ```eval_rst
+  Unlike :class:`appyter.profiles.default.fields.TextField`, this class will return
+   a list and potentially render differently.
+  ```
+  '''
+
   def __init__(self, constraint=r'[^\n]*', hint=None, **kwargs):
+    '''
+    :param constraint: A regular expression for validating the file name.
+    :param hint: A hint to put in the field prior to content.
+    :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
+    '''
     super(TextListField, self).__init__(
       constraint=constraint,
       hint=hint,

@@ -1,6 +1,10 @@
 from appyter.fields import Field
 
 class MultiChoiceField(Field):
+  ''' Represing a multi-selectable combo box.
+  The resulting selection is represented with a list of strings that were chosen.
+  '''
+
   @property
   def raw_value(self):
     if type(self.args['value']) == str:

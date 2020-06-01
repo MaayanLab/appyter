@@ -2,6 +2,8 @@ import json
 from appyter.fields import Field
 
 class BoolField(Field):
+  ''' Represing a true or false value with a checkbox.
+  '''
   @property
   def raw_value(self):
     if self.args['value'] in {'on', 'checked', 'yes', 'true', 'True', True}:

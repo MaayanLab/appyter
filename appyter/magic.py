@@ -1,51 +1,59 @@
-'''
-IPython magic for making templating easy~. This basically
- just allows our jinja-type language to be executed in place
- injecting the defaults into the environment so we can easily
- debug the notebook at the same time as building the appyter.
+''' IPython magic for making templating easy~. This basically
+just allows our jinja-type language to be executed in place
+injecting the defaults into the environment so we can easily
+debug the notebook at the same time as building the appyter.
 
 The same call structure is used during preprocess and at runtime
- but performing different tasks--this way setting up a notebook is
- as simple as running it with different nbtemplate's being provided
- for import.
+but performing different tasks--this way setting up a notebook is
+as simple as running it with different nbtemplate's being provided
+for import.
 
 Usage (put the following in the first cell):
 
+```python
 #%%appyter init
 from appyter import magic
 magic.init(lambda _=globals: _())
+```
 '''
 
 '''
 Setup given globals
 '''
 def init(_globals):
-  '''
-  Jinja environment for jinja templates
+  ''' Initialize appyter magic.
+
+  Sets up a jinj2 environment and injects %%appyter magic into your environment.
+  
+  :param _globals: A callable with your globals for the purpose of injection, basically just: `lambda _=globals: _()`
   '''
   from appyter.context import get_jinja2_env
   env = get_jinja2_env()
+  from IPython.core.magic import register_cell_magic
+  from IPython.display import display, Markdown
+
   '''
-  IPython cell magic allows function to execute an entire cell.
+  register_cell_magic allows function to execute an entire cell with the following call structure:
+  ```python
   %%my_magic whatever
   all
   my
   data
-
+  ```
   Results in a call:
+  ```python
   my_magic(
-  "whatever",
-  """all
+    "whatever",
+    """all
     my
-    data""")
+    data"""
+  )
+  ```
   '''
-  from IPython.core.magic import register_cell_magic
-  from IPython.display import display, Markdown
 
   @register_cell_magic
   def appyter(line, cell):
-    '''
-    Appyter Magic: See Steps for more information.
+    ''' Appyter Cell Magic: See Steps for more information.
     Compile jinja2 into source code, and then evaluate that
     source code.
     '''
