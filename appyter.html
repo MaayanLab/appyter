@@ -254,12 +254,15 @@ for import.</p>
 </div>
 <dl class="py function">
 <dt id="appyter.magic.init">
-<code class="sig-prename descclassname">appyter.magic.</code><code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_globals</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/magic.html#init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.magic.init" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">appyter.magic.</code><code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_globals</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/magic.html#init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.magic.init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize appyter magic.</p>
 <p>Sets up a jinj2 environment and injects %%appyter magic into your environment.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>_globals</strong> – A callable with your globals for the purpose of injection, basically just: <code class="docutils literal notranslate"><span class="pre">lambda</span> <span class="pre">_=globals:</span> <span class="pre">_()</span></code></p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_globals</strong> – (Dict[str, Any]) A callable with your globals for the purpose of injection, basically just: <code class="docutils literal notranslate"><span class="pre">lambda</span> <span class="pre">_=globals:</span> <span class="pre">_()</span></code></p></li>
+<li><p><strong>verbose</strong> – (Optional[bool]) Expand exception reporting to be more verbose</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
