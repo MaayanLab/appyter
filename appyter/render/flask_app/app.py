@@ -5,9 +5,9 @@ import shutil
 import nbformat as nbf
 from functools import partial
 from queue import Queue
-from flask import Flask, request, abort, copy_current_request_context, send_from_directory
+from flask import Flask, Blueprint, request, abort, copy_current_request_context, send_from_directory
 from flask_socketio import SocketIO, emit
-from appyter.context import get_sys_env, get_jinja2_env, get_extra_files
+from appyter.context import get_sys_env, get_jinja2_env, get_extra_files, find_blueprints
 from appyter.parse.nbtemplate import nbtemplate_from_ipynb_file
 from appyter.render.form import render_form_from_nbtemplate
 from appyter.render.nbviewer import render_nbviewer_from_nb
@@ -42,6 +42,8 @@ STATIC_PREFIX = join_routes(PREFIX, 'static')
 
 # Prepare app
 app = Flask(__name__, static_url_path=STATIC_PREFIX, static_folder=STATIC_DIR)
+core = Blueprint('__main__', __name__)
+
 app.config['SECRET_KEY'] = SECRET_KEY
 socketio = SocketIO(app,
   path=f"{PREFIX}socket.io",
@@ -199,7 +201,7 @@ def prepare_formdata(req):
     data[fname] = filename
   return data
 
-@route_join_with_or_without_slash(app, PREFIX, methods=['GET'])
+@route_join_with_or_without_slash(core, methods=['GET'])
 def get_index():
   mimetype = request.accept_mimetypes.best_match([
     'text/html',
@@ -216,11 +218,11 @@ def get_index():
     return get_index_json()
   abort(404)
 
-@route_join_with_or_without_slash(app, PREFIX, 'favicon.ico', methods=['GET'])
+@route_join_with_or_without_slash(core, 'favicon.ico', methods=['GET'])
 def favicon():
   return send_from_directory(STATIC_DIR, 'favicon.ico')
 
-@route_join_with_or_without_slash(app, PREFIX, '<string:session>', methods=['GET', 'POST'])
+@route_join_with_or_without_slash(core, '<string:session>', methods=['GET', 'POST'])
 def post_index(session):
   try:
     session_id = sanitize_uuid(session)
@@ -249,7 +251,7 @@ def post_index(session):
         return post_index_json_static(request.form.to_dict())
     abort(404)
 
-@route_join_with_or_without_slash(app, PREFIX, '<string:session>', '<path:path>', methods=['GET'])
+@route_join_with_or_without_slash(core, '<string:session>', '<path:path>', methods=['GET'])
 def send_session_directory(session, path):
   session_id = sanitize_uuid(session)
   session_path = os.path.realpath(os.path.join(DATA_DIR, session_id))
@@ -359,6 +361,14 @@ def main():
   if SHOW_HELP:
     do_help()
   else:
+    # env preparation
+    get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG)
+
+    # register additional blueprints
+    app.register_blueprint(core, url_prefix=PREFIX)
+    for blueprint_name, blueprint in find_blueprints(cwd=CWD).items():
+      app.register_blueprint(blueprint, url_prefix=join_routes(PREFIX, blueprint_name))
+
     return socketio.run(
         app,
         host=HOST,

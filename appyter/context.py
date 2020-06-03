@@ -73,6 +73,27 @@ def find_filters(cwd=os.getcwd(), profile='default'):
       )
   return ctx
 
+def find_blueprints_dir_mappings(cwd=os.getcwd(), profile='default'):
+  mappings = {}
+  if profile != 'default':
+    mappings[os.path.join(os.path.dirname(__file__), 'profiles', profile, 'blueprints') + os.path.sep] = __package__ + '.profiles.' + profile + '.blueprints'
+  mappings[os.path.join(os.path.dirname(__file__), 'profiles', 'default', 'blueprints') + os.path.sep] = __package__ + '.profiles.default.blueprints'
+  mappings[os.path.abspath(os.path.join(cwd, 'blueprints')) + os.path.sep] = 'blueprints'
+  return mappings
+
+def find_blueprints(cwd=os.getcwd(), profile='default'):
+  from flask import Blueprint
+  ctx = {}
+  for _dirname_, _package_ in find_blueprints_dir_mappings(cwd=cwd, profile=profile).items():
+    if os.path.isdir(_dirname_):
+      importdir_deep(
+        _dirname_,
+        _package_,
+        ctx,
+        filter_mod=lambda k, v: not k.startswith('_') and isinstance(v, Blueprint)
+      )
+  return ctx
+
 def find_templates_dir(cwd=os.getcwd(), profile='default'):
   return list(filter(os.path.isdir, [
     os.path.abspath(os.path.join(cwd, 'templates')) + os.path.sep,

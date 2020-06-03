@@ -27,6 +27,8 @@ If for some reason, `appyter` doesn't end up discoverable in your PATH, you can 
   - `./filters/your_filter.py`: Python jinja2 filter (function)
 - Custom externally-referenced resources (i.e. images) can be put under the static directory
   - `./static/img/your_image.png`: Reference in templates with `{% static 'img/your_image.png' %}`
+- Custom blueprints to additionally mount with flask
+  - `./blueprints/your_app/__init__.py`: `your_app = Blueprint('your_app', __name__)`
 
 
 ## Creating an Appyter
