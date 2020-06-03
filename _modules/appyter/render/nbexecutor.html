@@ -35,7 +35,8 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.render.nbexecutor</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">appyter.render.nbviewer</span> <span class="kn">import</span> <span class="n">render_nbviewer_from_nb</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">appyter.render.nbviewer</span> <span class="kn">import</span> <span class="n">render_nbviewer_from_nb</span>
 <span class="kn">from</span> <span class="nn">appyter.render.nbexecutor.yielding_preprocessor</span> <span class="kn">import</span> <span class="n">YieldingExecutePreprocessor</span>
 
 <div class="viewcode-block" id="cell_is_code"><a class="viewcode-back" href="../../../appyter.render.nbexecutor.html#appyter.render.nbexecutor.cell_is_code">[docs]</a><span class="k">def</span> <span class="nf">cell_is_code</span><span class="p">(</span><span class="n">cell</span><span class="p">):</span>
@@ -56,6 +57,10 @@
         <span class="n">allow_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">kernel_name</span><span class="o">=</span><span class="s1">&#39;python3&#39;</span><span class="p">,</span>
+        <span class="n">env</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+          <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">),</span>
+          <span class="n">PATH</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PATH&#39;</span><span class="p">],</span>
+        <span class="p">),</span>
       <span class="p">)</span>
       <span class="n">resources</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;metadata&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">session_dir</span><span class="p">}</span> <span class="p">}</span>
       <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
