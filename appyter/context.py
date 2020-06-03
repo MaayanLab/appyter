@@ -117,7 +117,10 @@ def get_jinja2_env(context={}, cwd=None, profile=None, prefix=None, debug=True):
   import sys
   from appyter.fields import build_fields
   from jinja2 import Environment, ChoiceLoader, FileSystemLoader
-  sys.path.insert(0, cwd)
+  if os.path.abspath(cwd) not in sys.path:
+    sys.path.insert(0, os.path.abspath(cwd))
+  if os.path.abspath(cwd) not in os.environ['PATH'].split(':'):
+    os.environ['PATH'] = os.path.abspath(cwd) + ':' + os.environ['PATH']
   env = Environment(
     extensions=['jinja2.ext.do'],
     loader=ChoiceLoader([
