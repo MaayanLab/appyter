@@ -16,6 +16,11 @@ from appyter.render.json import render_nbtemplate_json_from_nbtemplate
 from appyter.render.nbexecutor import render_nbexecutor_from_nb
 from werkzeug.utils import secure_filename
 
+def join_routes(*routes):
+  ''' Utility function for joining routes while striping extraneous slashes
+  '''
+  return '/' + '/'.join([route.strip('/') for route in routes if route.strip('/')])
+
 # Prepare environment
 from dotenv import load_dotenv
 load_dotenv()
@@ -33,7 +38,7 @@ DEBUG = json.loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
 STATIC_DIR = kwargs.get('static-dir', os.path.abspath(os.path.join(CWD, 'static')))
 IPYNB = args[0] if len(args) > 0 else os.environ.get('APP', 'app.ipynb')
 SHOW_HELP = 'h' in kargs or 'help' in kwargs or args == []
-STATIC_PREFIX = '/' + '/'.join(filter(None, [*PREFIX.split('/'), 'static']))
+STATIC_PREFIX = join_routes(PREFIX, 'static')
 
 # Prepare app
 app = Flask(__name__, static_url_path=STATIC_PREFIX, static_folder=STATIC_DIR)
@@ -73,14 +78,14 @@ def init_app():
 def sanitize_uuid(val):
   return str(uuid.UUID(val))
 
-def route_join_with_or_without_slash(app, *routes, **kwargs):
+def route_join_with_or_without_slash(blueprint, *routes, **kwargs):
   ''' Like @app.route but doesn't care about trailing slash or not
   '''
   def wrapper(func):
-    routes_stripped = '/'.join([route.strip('/') for route in routes if route.strip('/')])
+    routes_stripped = join_routes(*routes)
     if routes_stripped:
-      app.route('/' + routes_stripped, **kwargs)(func)
-    app.route('/' + routes_stripped + '/', **kwargs)(func)
+      blueprint.route(routes_stripped, **kwargs)(func)
+    blueprint.route(routes_stripped + '/', **kwargs)(func)
     return func
   return wrapper
 
