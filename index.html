@@ -87,6 +87,11 @@ pip3 install --user --upgrade git+git://github.com/Maayanlab/appyter.git
 <li><p><code class="docutils literal notranslate"><span class="pre">./static/img/your_image.png</span></code>: Reference in templates with <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">static</span> <span class="pre">'img/your_image.png'</span> <span class="pre">%}</span></code></p></li>
 </ul>
 </li>
+<li><p>Custom blueprints to additionally mount with flask</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">./blueprints/your_app/__init__.py</span></code>: <code class="docutils literal notranslate"><span class="pre">your_app</span> <span class="pre">=</span> <span class="pre">Blueprint('your_app',</span> <span class="pre">__name__)</span></code></p></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="creating-an-appyter">

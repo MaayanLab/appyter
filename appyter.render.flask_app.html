@@ -104,6 +104,12 @@
 <dd></dd></dl>
 
 <dl class="py function">
+<dt id="appyter.render.flask_app.app.join_routes">
+<code class="sig-prename descclassname">appyter.render.flask_app.app.</code><code class="sig-name descname">join_routes</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">routes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/app.html#join_routes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.app.join_routes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function for joining routes while striping extraneous slashes</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="appyter.render.flask_app.app.main">
 <code class="sig-prename descclassname">appyter.render.flask_app.app.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/app.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.app.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -144,7 +150,7 @@
 
 <dl class="py function">
 <dt id="appyter.render.flask_app.app.route_join_with_or_without_slash">
-<code class="sig-prename descclassname">appyter.render.flask_app.app.</code><code class="sig-name descname">route_join_with_or_without_slash</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">routes</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/app.html#route_join_with_or_without_slash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.app.route_join_with_or_without_slash" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">appyter.render.flask_app.app.</code><code class="sig-name descname">route_join_with_or_without_slash</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">blueprint</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">routes</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/app.html#route_join_with_or_without_slash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.app.route_join_with_or_without_slash" title="Permalink to this definition">¶</a></dt>
 <dd><p>Like &#64;app.route but doesn’t care about trailing slash or not</p>
 </dd></dl>
 
