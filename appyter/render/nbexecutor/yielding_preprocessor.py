@@ -5,6 +5,10 @@ import os
 from nbconvert.preprocessors import ExecutePreprocessor, CellExecutionError
 
 class YieldingExecutePreprocessor(ExecutePreprocessor):
+  def __init__(self, *args, env=os.environ, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.env = env
+
   def setup_preprocess(self, nb, resources):
     path = resources.get('metadata', {}).get('path', '')
     if path == '':
@@ -19,7 +23,7 @@ class YieldingExecutePreprocessor(ExecutePreprocessor):
 
     def start_new_kernel(startup_timeout=None, kernel_name='python', **kwargs):
       km = self.kernel_manager_class(kernel_name=kernel_name)
-      km.start_kernel(**kwargs)
+      km.start_kernel(env=self.env, **kwargs)
       kc = km.client()
       kc.start_channels()
       try:

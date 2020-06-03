@@ -1,3 +1,4 @@
+import os, sys
 from appyter.render.nbviewer import render_nbviewer_from_nb
 from appyter.render.nbexecutor.yielding_preprocessor import YieldingExecutePreprocessor
 
@@ -19,6 +20,10 @@ def render_nbexecutor_from_nb(env, nb):
         allow_errors=True,
         timeout=None,
         kernel_name='python3',
+        env=dict(
+          PYTHONPATH=':'.join(sys.path),
+          PATH=os.environ['PATH'],
+        ),
       )
       resources = {'metadata': {'path': session_dir} }
       index = 0
