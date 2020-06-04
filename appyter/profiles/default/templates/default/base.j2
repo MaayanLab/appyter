@@ -67,7 +67,8 @@
     <script>
       require(['socket'], function (socket) {
         socket.on('connect', function () {
-        socket.emit('session', { _session: '{{ _session }}' })
+          socket.emit('session', { _session: '{{ _session }}' })
+        })
       })
     </script>
     {% endif %}
