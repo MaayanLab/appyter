@@ -149,7 +149,7 @@ assert render_html_renderer(appyter, {
 <div id="notebook"></div>
 <script src="./appyter.js"></script>
 <script>
-  document.on('load', function() {
+  document.on('load', function () {
     appyter.render(
       document.getElementById("notebook"),
       {

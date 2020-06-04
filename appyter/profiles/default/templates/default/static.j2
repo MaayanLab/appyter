@@ -18,9 +18,3 @@
   </div>
 </div>
 {% endblock %}
-
-{% block script %}
-{{ super() }}
-{# Several extensions (i.e. plotly) rely on the presence RequireJS, so we'll just include it here #}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
-{% endblock %}

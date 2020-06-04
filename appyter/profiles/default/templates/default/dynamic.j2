@@ -14,132 +14,134 @@
 {% block script %}
 {{ super() }}
 <script type="text/javascript" charset="utf-8">
-var $nbviewer, $status, $downloadNotebook, current_index, current_code_cell, started, scroll, md
+  require(['jquery', 'socket'], function ($, socket) {
+    var $nbviewer, $status, $downloadNotebook, current_index, current_code_cell, started, scroll, md
 
-function find_or_create(root, classes) {
-  var $el = root.find(classes.map(function (cls) { return `.cls` }).join(' '))
-  if ($el[0] === undefined) {
-    var $el = $('<div></div>')
-    for (var cls of classes) {
-      $el.addClass(cls)
+    function find_or_create(root, classes) {
+      var $el = root.find(classes.map(function (cls) { return `.cls` }).join(' '))
+      if ($el[0] === undefined) {
+        var $el = $('<div></div>')
+        for (var cls of classes) {
+          $el.addClass(cls)
+        }
+        $el.appendTo(root)
+      }
+      return $el
     }
-    $el.appendTo(root)
-  }
-  return $el
-}
 
-socket.on('connect', function() {
-  $nbviewer = $('#nbviewer')
-  $status = $('#status')
-  $downloadNotebook = $('#download-notebook')
-  current_index = undefined
-  current_code_cell = 1
-  started = false
-  scroll = false
+    socket.on('connect', function () {
+      $nbviewer = $('#nbviewer')
+      $status = $('#status')
+      $downloadNotebook = $('#download-notebook')
+      current_index = undefined
+      current_code_cell = 1
+      started = false
+      scroll = false
 
-  socket.emit('init', {{ _data }})
-})
-socket.on('status', function(value) {
-  $("#status").text(value)
-})
-socket.on('redirect', function(value) {
-  console.log('redirect')
-  window.location.replace(value)
-})
-socket.on('error', function(value) {
-  $status.text(`Error: ${value}`)
-})
-socket.on('progress', function (value) {
-  var cell = $($('#nbviewer').find('.cell')[value])
-  var input_prompt =  $(cell.find('.input_prompt'))
-  if (input_prompt.closest('.cell').hasClass('code_cell')) {
-    input_prompt.text('In [*]:')
-  }
-  var cell_output_status = $(cell.find('.output-status')[0])
-  cell_output_status.removeClass('pending')
-  cell_output_status.addClass('loading')
+      socket.emit('init', {{ _data }})
+    })
+    socket.on('status', function (value) {
+      $("#status").text(value)
+    })
+    socket.on('redirect', function (value) {
+      console.log('redirect')
+      window.location.replace(value)
+    })
+    socket.on('error', function (value) {
+      $status.text(`Error: ${value}`)
+    })
+    socket.on('progress', function (value) {
+      var cell = $($('#nbviewer').find('.cell')[value])
+      var input_prompt =  $(cell.find('.input_prompt'))
+      if (input_prompt.closest('.cell').hasClass('code_cell')) {
+        input_prompt.text('In [*]:')
+      }
+      var cell_output_status = $(cell.find('.output-status')[0])
+      cell_output_status.removeClass('pending')
+      cell_output_status.addClass('loading')
 
-  current_index = value // save the current index
-})
-socket.on('cell', function (value) {
-  console.debug(value)
-  if (value.cell_type == 'code') {
-    var cell = $($('#nbviewer').find('.cell')[current_index])
-    var cell_output_wrapper = find_or_create(cell, ['output_wrapper'])
-    var cell_output = find_or_create(cell_output_wrapper, ['output'])
-    var cell_output_area = find_or_create(cell_output, ['output_area'])
-    var cell_output_prompt = find_or_create(cell_output_area, ['prompt'])
-    var cell_output_subarea = find_or_create(cell_output_area, ['output_subarea'])
-    cell_output_subarea.empty()
-    value.outputs.forEach(function (ele) {
-      console.debug(ele)
-      if (ele.output_type == 'stream') {
-        var cell_output_container = $('<div class="output_stream output_' + ele.name + ' output_text">')
-        var cell_output_text = $('<pre>').text(ele.text)
-        cell_output_container.append(cell_output_text)
-        cell_output_subarea.append(cell_output_container)
-      } else if (ele.output_type == 'execute_result') {
-        var cell_output_container = $('<div class="output_html rendered_html output_execute_result">')
-        var cell_output_html = ele.data['text/html']
-        if (cell_output_html === undefined) {
-          cell_output_html = $('<div></div>').text(ele.data['text/plain'])
-        }
-        cell_output_container.append(cell_output_html)
-        cell_output_subarea.append(cell_output_container)
-      } else if (ele.output_type == 'display_data') {
-        if (ele.data['image/png'] !== undefined) {
-          var cell_output_container = $('<div class="output_png">')
-          var cell_output_image = new Image()
-          cell_output_image.src = 'data:img/png;base64,' + ele.data['image/png']
-          cell_output_container.append(cell_output_image)
-          cell_output_subarea.append(cell_output_container)
-        } else if (ele.data['text/html'] !== undefined) {
-          var cell_output_container = $('<div class="output_html rendered_html output_execute_result">')
-          var cell_output_html = ele.data['text/html']
-          cell_output_container.append(cell_output_html)
-          cell_output_subarea.append(cell_output_container)
-        } else if (ele.data['text/markdown'] !== undefined) {
-          var cell_output_container = $('<div class="output_stream output_' + ele.name + ' output_markdown">')
-          requirejs(["https://cdnjs.cloudflare.com/ajax/libs/markdown-it/10.0.0/markdown-it.min.js"], function (MarkdownIt) {
-            if (md === undefined) {
-              md = new MarkdownIt()
-            }
-            var cell_output_markdown = md.render(ele.data['text/markdown'])
-            cell_output_container.append(cell_output_markdown)
+      current_index = value // save the current index
+    })
+    socket.on('cell', function (value) {
+      console.debug(value)
+      if (value.cell_type == 'code') {
+        var cell = $($('#nbviewer').find('.cell')[current_index])
+        var cell_output_wrapper = find_or_create(cell, ['output_wrapper'])
+        var cell_output = find_or_create(cell_output_wrapper, ['output'])
+        var cell_output_area = find_or_create(cell_output, ['output_area'])
+        var cell_output_prompt = find_or_create(cell_output_area, ['prompt'])
+        var cell_output_subarea = find_or_create(cell_output_area, ['output_subarea'])
+        cell_output_subarea.empty()
+        value.outputs.forEach(function (ele) {
+          console.debug(ele)
+          if (ele.output_type == 'stream') {
+            var cell_output_container = $('<div class="output_stream output_' + ele.name + ' output_text">')
+            var cell_output_text = $('<pre>').text(ele.text)
+            cell_output_container.append(cell_output_text)
             cell_output_subarea.append(cell_output_container)
-          })
-        } else if (ele.data['text/plain'] !== undefined) {
-          var cell_output_container = $('<div class="output_stream output_' + ele.name + ' output_text">')
-          var cell_output_text = $('<pre>').text(ele.data['text/plain'])
-          cell_output_container.append(cell_output_text)
-          cell_output_subarea.append(cell_output_container)
-        } else {
-          console.warn("Unrecognized output type "+ele.output_type)
+          } else if (ele.output_type == 'execute_result') {
+            var cell_output_container = $('<div class="output_html rendered_html output_execute_result">')
+            var cell_output_html = ele.data['text/html']
+            if (cell_output_html === undefined) {
+              cell_output_html = $('<div></div>').text(ele.data['text/plain'])
+            }
+            cell_output_container.append(cell_output_html)
+            cell_output_subarea.append(cell_output_container)
+          } else if (ele.output_type == 'display_data') {
+            if (ele.data['image/png'] !== undefined) {
+              var cell_output_container = $('<div class="output_png">')
+              var cell_output_image = new Image()
+              cell_output_image.src = 'data:img/png;base64,' + ele.data['image/png']
+              cell_output_container.append(cell_output_image)
+              cell_output_subarea.append(cell_output_container)
+            } else if (ele.data['text/html'] !== undefined) {
+              var cell_output_container = $('<div class="output_html rendered_html output_execute_result">')
+              var cell_output_html = ele.data['text/html']
+              cell_output_container.append(cell_output_html)
+              cell_output_subarea.append(cell_output_container)
+            } else if (ele.data['text/markdown'] !== undefined) {
+              var cell_output_container = $('<div class="output_stream output_' + ele.name + ' output_markdown">')
+              requirejs(["https://cdnjs.cloudflare.com/ajax/libs/markdown-it/10.0.0/markdown-it.min.js"], function (MarkdownIt) {
+                if (md === undefined) {
+                  md = new MarkdownIt()
+                }
+                var cell_output_markdown = md.render(ele.data['text/markdown'])
+                cell_output_container.append(cell_output_markdown)
+                cell_output_subarea.append(cell_output_container)
+              })
+            } else if (ele.data['text/plain'] !== undefined) {
+              var cell_output_container = $('<div class="output_stream output_' + ele.name + ' output_text">')
+              var cell_output_text = $('<pre>').text(ele.data['text/plain'])
+              cell_output_container.append(cell_output_text)
+              cell_output_subarea.append(cell_output_container)
+            } else {
+              console.warn("Unrecognized output type "+ele.output_type)
+            }
+          } else if (ele.output_type == 'error') {
+            var cell_output_container = $('<div class="output_subarea output_test output_error">')
+            var cell_output_text = $('<pre>').text(ele.ename+': '+ele.evalue+'\n'+ele.traceback)
+            cell_output_container.append(cell_output_text)
+            cell_output_subarea.append(cell_output_container)
+          } else {
+            console.warn("Unrecognized output type "+ele.output_type)
+          }
+        })
+        var cell_output_status = $(cell.find('.output-status')[0])
+        cell_output_status.removeClass('loading')
+        cell_output_status.addClass('ready')
+
+        var current_cell_ele = cell.find('.input_prompt')
+        current_cell_ele.text('In ['+(current_code_cell++)+']:')
+        if (scroll) {
+          $('html, body').animate({
+            scrollTop: current_cell_ele.offset().top
+          }, 2500)
         }
-      } else if (ele.output_type == 'error') {
-        var cell_output_container = $('<div class="output_subarea output_test output_error">')
-        var cell_output_text = $('<pre>').text(ele.ename+': '+ele.evalue+'\n'+ele.traceback)
-        cell_output_container.append(cell_output_text)
-        cell_output_subarea.append(cell_output_container)
+      } else if (value.cell_type == 'markdown') {
       } else {
-        console.warn("Unrecognized output type "+ele.output_type)
+        console.warn("Unrecognized cell type")
       }
     })
-    var cell_output_status = $(cell.find('.output-status')[0])
-    cell_output_status.removeClass('loading')
-    cell_output_status.addClass('ready')
-
-    var current_cell_ele = cell.find('.input_prompt')
-    current_cell_ele.text('In ['+(current_code_cell++)+']:')
-    if (scroll) {
-      $('html, body').animate({
-        scrollTop: current_cell_ele.offset().top
-      }, 2500)
-    }
-  } else if (value.cell_type == 'markdown') {
-  } else {
-    console.warn("Unrecognized cell type")
-  }
-})
-</script>
+  })
+  </script>
 {% endblock %}

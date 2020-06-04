@@ -21,30 +21,52 @@
   }
   </style>
   {% endblock %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
 </head>
 <body>
   {% block body %}{% endblock %}
   {% block script %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js" integrity="sha256-Dul4c09cdrWKXVtallPxF558lwxMwCC8dXJdZ0PVW54=" crossorigin="anonymous"></script>
+    <script>
+      require.config({
+        paths: {
+          'jquery': 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min',
+          'socketio': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim',
+          'socketio-file-upload': 'https://cdn.jsdelivr.net/npm/socketio-file-upload@0.7.0/client.min',
+        },
+        shim: {
+          'socketio': {
+            exports: 'io'
+          },
+          'socketio-file-upload': {
+            exports: 'SocketIOFileUpload'
+          },
+        }
+      })
+    </script>
+    <script>
+      define('socket', ['socketio'], function (io) {
+        return io({ path: '{{ _prefix }}socket.io' })
+      })
+    </script>
     {% if _debug %}
     <script>
-      var socket = io({ path: '{{ _prefix }}socket.io' })
-      var first_connect = true
-      socket.on('connect', function() {
-        if (first_connect === true) {
-          console.debug('connected')
-          socket.emit('session', { _session: '{{ _session }}' })
-          first_connect = false
-        } else {
-          window.location.reload()
-        }
+      require(['socket'], function (socket) {
+        var first_connect = true
+        socket.on('connect', function () {
+          if (first_connect === true) {
+            console.debug('connected')
+            socket.emit('session', { _session: '{{ _session }}' })
+            first_connect = false
+          } else {
+            window.location.reload()
+          }
+        })
       })
     </script>
     {% else %}
     <script>
-      var socket = io({ path: '{{ _prefix }}socket.io' })
-      socket.on('connect', function() {
+      require(['socket'], function (socket) {
+        socket.on('connect', function () {
         socket.emit('session', { _session: '{{ _session }}' })
       })
     </script>

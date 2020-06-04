@@ -1,1 +1,14 @@
 {% extends "default/form.j2" %}
+
+{% block script %}
+{{ super() }}
+<script>
+require(['jquery', 'bootstrap', 'select2'], function ($) {
+  $(document).ready(function () {
+    $('.collapse').collapse({ toggle: false })
+    $('[data-toggle="tooltip"]').tooltip()
+    $('.select2').select2()
+  })
+})
+</script>
+{% endblock %}
