@@ -15,7 +15,7 @@ def importdir(_dirname_, _package_, _globals_):
     mod = importlib.import_module('.{}'.format(modname), _package_)
     _globals_.update(**{modname: mod})
 
-def importdir_deep(_dirname_, _package_, _globals_, filter_mod=lambda k, v: not k.startswith('_')):
+def importdir_deep(_dirname_, _package_, _globals_, filter_mod=lambda m, k, v: not k.startswith('_')):
   for f in os.listdir(_dirname_):
     if f.startswith('_'):
       continue
@@ -29,7 +29,7 @@ def importdir_deep(_dirname_, _package_, _globals_, filter_mod=lambda k, v: not 
     _globals_.update(**{
       k: v
       for k, v in mod.__dict__.items()
-      if filter_mod(k, v)
+      if filter_mod(mod, k, v)
     })
 
 def find_fields_dir_mappings(cwd=os.getcwd(), profile='default'):
@@ -49,7 +49,7 @@ def find_fields(cwd=os.getcwd(), profile='default'):
         _dirname_,
         _package_,
         ctx,
-        filter_mod=lambda k, v: not k.startswith('_') and isinstance(v, type) and issubclass(v, Field)
+        filter_mod=lambda m, k, v: not k.startswith('_') and isinstance(v, type) and issubclass(v, Field)
       )
   return ctx
 
@@ -69,7 +69,7 @@ def find_filters(cwd=os.getcwd(), profile='default'):
         _dirname_,
         _package_,
         ctx,
-        filter_mod=lambda k, v: not k.startswith('_') and isinstance(v, type(lambda: None))
+        filter_mod=lambda m, k, v: not k.startswith('_') and isinstance(v, type(lambda: None))
       )
   return ctx
 
@@ -81,8 +81,16 @@ def find_blueprints_dir_mappings(cwd=os.getcwd(), profile='default'):
   mappings[os.path.abspath(os.path.join(cwd, 'blueprints')) + os.path.sep] = 'blueprints'
   return mappings
 
-def find_blueprints(cwd=os.getcwd(), profile='default'):
+def filter_blueprints(m, k, v):
   from flask import Blueprint
+  if isinstance(v, Blueprint):
+    return True
+  elif callable(v):
+    if m.__name__.startswith('blueprints') and 'blueprints.' + k == m.__name__:
+      return True
+  return False
+
+def find_blueprints(cwd=os.getcwd(), profile='default'):
   ctx = {}
   for _dirname_, _package_ in find_blueprints_dir_mappings(cwd=cwd, profile=profile).items():
     if os.path.isdir(_dirname_):
@@ -90,7 +98,7 @@ def find_blueprints(cwd=os.getcwd(), profile='default'):
         _dirname_,
         _package_,
         ctx,
-        filter_mod=lambda k, v: not k.startswith('_') and isinstance(v, Blueprint)
+        filter_mod=filter_blueprints,
       )
   return ctx
 

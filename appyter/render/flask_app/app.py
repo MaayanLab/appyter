@@ -367,7 +367,12 @@ def main():
     # register additional blueprints
     app.register_blueprint(core, url_prefix=PREFIX)
     for blueprint_name, blueprint in find_blueprints(cwd=CWD).items():
-      app.register_blueprint(blueprint, url_prefix=join_routes(PREFIX, blueprint_name))
+      if isinstance(blueprint, Blueprint):
+        app.register_blueprint(blueprint, url_prefix=join_routes(PREFIX, blueprint_name))
+      elif callable(blueprint):
+        blueprint(app, url_prefix=join_routes(PREFIX, blueprint_name))
+      else:
+        raise Exception('Unrecognized blueprint type: ' + blueprint_name)
 
     return socketio.run(
         app,
