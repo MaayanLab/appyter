@@ -26,7 +26,13 @@ class TextListField(Field):
   @property
   def raw_value(self):
     if type(self.args['value']) == str:
-      return self.args['value'].split('\n')
+      return list(
+        filter(None,
+          map(str.strip,
+            self.args['value'].splitlines()
+          )
+        )
+      )
     elif type(self.args['value']) == list:
       return self.args['value']
     elif self.args['value'] is None:
@@ -45,4 +51,7 @@ class TextListField(Field):
       return self.raw_value
 
   def constraint(self):
-    return self.raw_value is not None and re.match(self.args['constraint'], self.raw_value)
+    return all([self.raw_value is not None] + [
+      re.match(self.args['constraint'], val) is not None
+      for val in self.raw_value
+    ])
