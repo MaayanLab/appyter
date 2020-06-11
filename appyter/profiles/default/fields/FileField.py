@@ -10,19 +10,22 @@ class FileField(Field):
   ```
   '''
 
-  def __init__(self, constraint=r'[^/]*', **kwargs):
+  def __init__(self, constraint=r'[^/]*', examples={}, **kwargs):
     '''
     :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
     :param label: (str) A human readable label for the field for the HTML form
     :param description: (Optional[str]) A long human readable description for the field for the HTML form
     :param constraint: A regular expression for validating the file name.
-    :param default: (Any) A default value as an example and for use during prototyping
+    :param default: (str) A default value as an example and for use during prototyping
+    :param examples: (Optional[Dict[str, str]]) Named url paths to example files to upload
+      paths can be relative i.e. `{ "my_file.txt": url_for('static', filename='my_file.txt') }`, or a remote url.
     :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
     :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
     :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
     '''
     super(FileField, self).__init__(
       constraint=constraint,
+      examples=examples,
       **kwargs,
     )
 

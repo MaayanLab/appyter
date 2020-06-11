@@ -81,4 +81,78 @@ require(['jquery'], function ($) {
   })
 })
 </script>
+<script>
+require(['jquery', 'socket'], function ($, socket) {
+  $(document).ready(function () {
+    $('[type="file"]').each(function () {
+      var $self = $(this)
+      var progressBarContainer
+      var progressBar
+
+      socket.on('download_queued', function (evt) {
+        if (evt.name !== $self.attr('id')) return
+        $(`.custom-file-label[for="${$self.attr('id')}"]`).text(evt.filename+'')
+
+        if (progressBar === undefined) {
+          var progressBarContainer = $('<div></div>')
+            .addClass('progress')
+          progressBar = $('<div></div>')
+            .addClass('progress-bar')
+            .attr('role', 'progressbar')
+            .attr('aria-valuemin', '0')
+            .attr('aria-valuemax', '100')
+            .appendTo(progressBarContainer)
+          $self.parent().append(progressBarContainer)
+        }
+        progressBar
+          .removeClass('bg-success')
+          .addClass('progress-bar-striped')
+          .css('width', '0%')
+          .attr('aria-valuenow', '0')
+      })
+      socket.on('download_start', function (evt) {
+        if (evt.name !== $self.attr('id')) return
+        progressBar
+          .addClass('progress-bar-animated')
+      })
+      socket.on('download_progress', function (evt) {
+        if (evt.name !== $self.attr('id')) return
+        var perc = (((evt.chunk * evt.chunk_size) / evt.total_size) * 100).toPrecision(3)
+        progressBar
+          .css('width', `${perc}%`)
+          .attr('aria-valuenow', perc)
+      })
+      socket.on('download_complete', function (evt) {
+        if (evt.name !== $self.attr('id')) return
+        progressBar
+          .css('width', '100%')
+          .attr('aria-valuenow', '100')
+          .addClass('bg-success')
+          .removeClass('progress-bar-striped')
+          .removeClass('progress-bar-animated')
+        $self.attr('value', evt.filename)
+      })
+      socket.on('download_error', function (evt) {
+        if (evt.name !== $self.attr('id')) return
+        console.error(evt)
+        progressBar
+          .addClass('bg-danger')
+      })
+    })
+  })
+})
+
+function load_file(name, url, file) {
+  if (url.indexOf('://') === -1) {
+    url = new URL(url, document.baseURI).href
+  }
+  require(['socket'], function (socket) {
+    socket.emit('download_start', {
+      name: name,
+      url: new URL(url).href,
+      file: file,
+    })
+  })
+}
+</script>
 {% endblock %}

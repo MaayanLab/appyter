@@ -3,6 +3,8 @@ import uuid
 import json
 import shutil
 import nbformat as nbf
+import traceback
+import urllib.request, urllib.parse
 from functools import partial
 from queue import Queue
 from flask import Flask, Blueprint, request, abort, copy_current_request_context, send_from_directory
@@ -83,6 +85,11 @@ def init_app():
 # Util
 def sanitize_uuid(val):
   return str(uuid.UUID(val))
+
+def secure_url(url):
+  parsed = urllib.parse.urlparse(url)
+  assert parsed.scheme in {'https', 'http', 'ftp'}, 'Invalid scheme'
+  return url
 
 def route_join_with_or_without_slash(blueprint, *routes, **kwargs):
   ''' Like @app.route but doesn't care about trailing slash or not
@@ -303,6 +310,54 @@ def init(data):
         cleanup=partial(cleanup, session_id),
       ),
     ))
+
+
+@socketio.on('download_start')
+def download(data):
+  print('file download start')
+  global session
+  session_id = session[request.sid]['_session']
+  session_dir = os.path.join(DATA_DIR, session_id)
+  os.makedirs(DATA_DIR, exist_ok=True)
+  os.makedirs(session_dir, exist_ok=True)
+  name = data.get('name')
+  url = secure_url(data.get('url'))
+  filename = secure_filename(data.get('file'))
+  # TODO: worry about files that are too big/long
+  @copy_current_request_context
+  def download_with_progress(name, url, path, filename, emit):
+    emit('download_start', dict(name=name, filename=filename))
+    try:
+      urllib.request.urlretrieve(
+        url, filename=path,
+        reporthook=lambda chunk, chunk_size, total_size: emit(
+          'download_progress', dict(
+            name=name,
+            chunk=chunk,
+            chunk_size=chunk_size,
+            total_size=total_size
+          )
+        ),
+      )
+    except Exception as e:
+      print('download error')
+      traceback.print_exc()
+      emit('download_error', dict(name=name, filename=filename, error=str(e)))
+    else:
+      emit('download_complete', dict(name=name, filename=filename))
+  #
+  execution_queue.put((
+    download_with_progress,
+    dict(
+      name=name,
+      url=url,
+      path=os.path.join(session_dir, filename),
+      filename=filename,
+      emit=emit,
+    )
+  ))
+  emit('download_queued', dict(name=name, filename=filename))
+
 
 @socketio.on("siofu_start")
 def siofu_start(data):
