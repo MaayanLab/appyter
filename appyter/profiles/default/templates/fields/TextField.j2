@@ -4,6 +4,8 @@
         <label for="{{ this.args.name }}">
             {{ this.args.label }}
         </label>
-        <textarea name="{{ this.args.name }}" class="form-control">{{ this.args.default }}</textarea>
+        <textarea placeholder="{{ this.args.hint }}" name="{{ this.args.name }}" class="form-control">
+            {{ this.args.default }}
+        </textarea>
     </div>
 </div>
