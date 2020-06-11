@@ -47,6 +47,20 @@
 <em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.BoolField.</code><code class="sig-name descname">BoolField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/BoolField.html#BoolField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Represing a true or false value with a checkbox.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>default</strong> – (bool) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
+<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
+<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.BoolField.BoolField.choices">
 <em class="property">property </em><code class="sig-name descname">choices</code><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField.choices" title="Permalink to this definition">¶</a></dt>
@@ -69,6 +83,21 @@
 <em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.ChoiceField.</code><code class="sig-name descname">ChoiceField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/ChoiceField.html#ChoiceField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Represing a choice of string values with a combo box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
+<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
+<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.ChoiceField.ChoiceField.constraint">
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/ChoiceField.html#ChoiceField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField.constraint" title="Permalink to this definition">¶</a></dt>
@@ -97,6 +126,22 @@ The field ends up being a string of the file path, for example:</p>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">({{</span> <span class="n">FileField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;my-csv&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;My CSV&#39;</span><span class="p">)</span> <span class="p">}})</span>
 </pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>constraint</strong> – A regular expression for validating the file name.</p></li>
+<li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>examples</strong> – (Optional[Dict[str, str]]) Named url paths to example files to upload</p></li>
+</ul>
+</dd>
+</dl>
+<p>paths can be relative i.e. <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">&quot;my_file.txt&quot;:</span> <span class="pre">url_for('static',</span> <span class="pre">filename='my_file.txt')</span> <span class="pre">}</span></code>, or a remote url.
+:param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
+:param value: (INTERNAL Any) The raw value of the field (from the form for instance)
+:param <a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.FileField.FileField.constraint">
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.constraint" title="Permalink to this definition">¶</a></dt>
@@ -114,6 +159,20 @@ Should be overridden by subclasses.</p>
 <em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.FloatField.</code><code class="sig-name descname">FloatField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FloatField.html#FloatField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Representing a field that accepts a floating point value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
+<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
+<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.FloatField.FloatField.constraint">
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FloatField.html#FloatField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField.constraint" title="Permalink to this definition">¶</a></dt>
@@ -137,6 +196,23 @@ Should be overridden by subclasses.</p>
 <em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.IntField.</code><code class="sig-name descname">IntField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">min</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/IntField.html#IntField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Representing a field that accepts an integer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>min</strong> – (Optional[int]) the minimum valid value that the field can take on</p></li>
+<li><p><strong>max</strong> – (Optional[int]) the maximum valid value that the field can take on</p></li>
+<li><p><strong>step</strong> – (Optional[int]) the interval for which values are incremented or decremented</p></li>
+<li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
+<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
+<li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.IntField.IntField.choices">
 <em class="property">property </em><code class="sig-name descname">choices</code><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.choices" title="Permalink to this definition">¶</a></dt>
@@ -167,6 +243,21 @@ Should be overridden by subclasses.</p>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Represing a multi-selectable combo box.
 The resulting selection is represented with a list of strings that were chosen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
+<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
+<li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.constraint">
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.constraint" title="Permalink to this definition">¶</a></dt>
@@ -202,6 +293,18 @@ When instantiating code, you should use safe_value.</p>
 <span class="p">{</span><span class="o">%</span> <span class="nb">set</span> <span class="n">x</span> <span class="o">=</span> <span class="n">IntField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;int1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;My Int&#39;</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s1">&#39;section1&#39;</span><span class="p">)</span> <span class="o">%</span><span class="p">}</span>
 </pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>title</strong> – (str) A human readable title for the section</p></li>
+<li><p><strong>subtitle</strong> – (str) A human readable subtitle for the section</p></li>
+<li><p><strong>img</strong> – (str) The path to an image used in the field relative to the static folder</p></li>
+<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -213,6 +316,23 @@ When instantiating code, you should use safe_value.</p>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Representing a field that accepts a string</p>
 <p>Be careful with this field, consider defining a constraint regex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>constraint</strong> – A regular expression for validating the file name.</p></li>
+<li><p><strong>hint</strong> – A hint to put in the field prior to content.</p></li>
+<li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
+<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
+<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.StringField.StringField.constraint">
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/StringField.html#StringField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.StringField.StringField.constraint" title="Permalink to this definition">¶</a></dt>
@@ -231,6 +351,22 @@ Should be overridden by subclasses.</p>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Representing a field that accepts a multi-line string</p>
 <p>Be careful with this field, consider defining a constraint regex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>constraint</strong> – A regular expression for validating the file name.</p></li>
+<li><p><strong>hint</strong> – A hint to put in the field prior to content.</p></li>
+<li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
+<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
+<li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.TextField.TextField.constraint">
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextField.html#TextField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextField.TextField.constraint" title="Permalink to this definition">¶</a></dt>
@@ -259,6 +395,23 @@ Unlike <a class="reference internal" href="#module-appyter.profiles.default.fiel
 <blockquote>
 <div><p>a list and potentially render differently.</p>
 </div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>constraint</strong> – A regular expression for validating the file name.</p></li>
+<li><p><strong>hint</strong> – A hint to put in the field prior to content.</p></li>
+<li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
+<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
+<li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.TextListField.TextListField.constraint">
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.constraint" title="Permalink to this definition">¶</a></dt>

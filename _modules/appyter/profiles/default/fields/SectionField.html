@@ -46,16 +46,14 @@
 <span class="sd">  {% do SectionField(name=&#39;section1&#39;, title=&#39;My Section&#39;, subtitle=&#39;is awesome&#39;) %}</span>
 <span class="sd">  {% set x = IntField(name=&#39;int1&#39;, label=&#39;My Int&#39;, section=&#39;section1&#39;) %}</span>
 <span class="sd">  ```</span>
-<span class="sd">  &#39;&#39;&#39;</span>
 
+<span class="sd">  :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.</span>
+<span class="sd">  :param title: (str) A human readable title for the section</span>
+<span class="sd">  :param subtitle: (str) A human readable subtitle for the section</span>
+<span class="sd">  :param img: (str) The path to an image used in the field relative to the static folder</span>
+<span class="sd">  :param \**kwargs: Additional keyword arguments used by other fields</span>
+<span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.</span>
-<span class="sd">    :param title: (str) A human readable title for the section</span>
-<span class="sd">    :param subtitle: (str) A human readable subtitle for the section</span>
-<span class="sd">    :param img: (str) The path to an image used in the field relative to the static folder</span>
-<span class="sd">    :param \**kwargs: Additional keyword arguments used by other fields</span>
-<span class="sd">    &#39;&#39;&#39;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;section&#39;</span></div>
 </pre></div>
