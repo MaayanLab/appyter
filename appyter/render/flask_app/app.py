@@ -146,6 +146,7 @@ def post_index_html_dynamic(data):
   ''' Return dynamic nbviewer
   '''
   env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG, context=data)
+  env.globals['_session'] = data.get('_session')
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return env.get_template(
@@ -154,13 +155,13 @@ def post_index_html_dynamic(data):
     _nb=os.path.basename(IPYNB),
     _nbviewer=render_nbviewer_from_nb(env, nb),
     _data=json.dumps(data),
-    _session=data['_session'], # NOTE: this should not be necessary..
   )
 
 def post_index_html_static(data):
   ''' Return static nbviewer
   '''
   env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG, context=data)
+  env.globals['_session'] = data.get('_session')
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return env.get_template(
@@ -168,13 +169,13 @@ def post_index_html_static(data):
   ).render(
     _nbviewer=render_nbviewer_from_nb(env, nb),
     _data=json.dumps(data),
-    _session=data['_session'], # NOTE: this should not be necessary..
   )
 
 def post_index_json_static(data):
   ''' Return rendered json
   '''
   env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG, context=data)
+  env.globals['_session'] = data.get('_session')
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nbtemplate_json_from_nbtemplate(env, nb)
@@ -183,6 +184,7 @@ def post_index_ipynb_static(data):
   ''' Return rendered ipynb
   '''
   env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG, context=data)
+  env.globals['_session'] = data.get('_session')
   nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nb_from_nbtemplate(env, nb)
@@ -296,6 +298,7 @@ def init(data):
     emit('redirect', f"")
   else:
     env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG, context=data)
+    env.globals['_session'] = session_id
     nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
     nb = render_nb_from_nbtemplate(env, nbtemplate)
     os.makedirs(session_dir, exist_ok=True)
