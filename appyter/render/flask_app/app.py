@@ -429,7 +429,7 @@ def main():
       if isinstance(blueprint, Blueprint):
         app.register_blueprint(blueprint, url_prefix=join_routes(PREFIX, blueprint_name))
       elif callable(blueprint):
-        blueprint(app, url_prefix=join_routes(PREFIX, blueprint_name))
+        blueprint(app, url_prefix=join_routes(PREFIX, blueprint_name), DATA_DIR=DATA_DIR)
       else:
         raise Exception('Unrecognized blueprint type: ' + blueprint_name)
 
