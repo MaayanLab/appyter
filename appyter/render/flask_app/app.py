@@ -66,7 +66,11 @@ def worker(n, execution_queue):
   while True:
     fn, kwargs = execution_queue.get()
     print(f"worker {n}: {fn}({kwargs})")
-    socketio.start_background_task(fn, **kwargs)
+    try:
+      fn(**kwargs)
+    except Exception as e:
+      print(f"worker {n} error")
+      traceback.print_exc()
     execution_queue.task_done()
 
 @app.before_first_request
