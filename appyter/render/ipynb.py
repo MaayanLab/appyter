@@ -20,9 +20,10 @@ def render_cell(env, cell):
       return None
 
     template = env.from_string(cell_source)
-    rendered = '\n'.join(
+    rendered = template.render()
+    trimmed = '\n'.join(
       line
-      for line in template.render().splitlines()
+      for line in rendered.splitlines()
       if line.strip() != ''
     )
 
@@ -35,10 +36,10 @@ def render_cell(env, cell):
     # Alter cell render based on cell_type
     if cell_type == ['markdown']:
       cell = nbf.v4.new_markdown_cell(rendered)
-    elif 'hide' in cell_type or rendered.strip() == '':
+    elif 'hide' in cell_type or not trimmed:
       cell = None
     else:
-      cell = nbf.v4.new_code_cell(rendered)
+      cell = nbf.v4.new_code_cell(trimmed)
 
   return cell
 

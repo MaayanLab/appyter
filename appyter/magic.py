@@ -89,11 +89,11 @@ def init(_globals, verbose=False):
       rendered_template_lines = list(filter(None, map(str.rstrip, template_rendered.splitlines())))
       try:
         if len(rendered_template_lines) > 0:
-          rendered = '\n'.join(rendered_template_lines[:-1])
-          rendered_last = rendered_template_lines[-1]
           if cell_type == ['markdown']:
-            display(Markdown('\n'.join((rendered, rendered_last))))
+            display(Markdown(template_rendered))
           elif 'code' in cell_type:
+            rendered = '\n'.join(rendered_template_lines[:-1])
+            rendered_last = rendered_template_lines[-1]
             display(Markdown('```python\n%s\n```' % ('\n'.join((rendered, rendered_last)))))
             #
             if 'eval' in cell_type:
