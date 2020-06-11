@@ -4,7 +4,12 @@
         <label for="{{ this.args.name }}">
             {{ this.args.label }}
         </label>
-        <div class="input-group spinner" min={{ this.args.min }} max={{ this.args.max }}>
+        <div
+            class="input-group spinner"
+            {% if this.args.min %}min={{ this.args.min }}{% endif %}
+            {% if this.args.max %}max={{ this.args.max }}{% endif %}
+            {% if this.args.step %}step={{ this.args.step }}{% endif %}
+        >
             <input type="text" name="{{ this.args.name }}" class="form-control" value="{{ this.args.default }}">
             <div class="input-group-btn-vertical">
                 <button class="btn btn-default" type="button">
