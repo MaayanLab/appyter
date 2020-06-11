@@ -68,12 +68,14 @@
         var cell = $($('#nbviewer').find('.cell')[current_index])
         var cell_output_wrapper = find_or_create(cell, ['output_wrapper'])
         var cell_output = find_or_create(cell_output_wrapper, ['output'])
-        var cell_output_area = find_or_create(cell_output, ['output_area'])
-        var cell_output_prompt = find_or_create(cell_output_area, ['prompt'])
-        var cell_output_subarea = find_or_create(cell_output_area, ['output_subarea'])
-        cell_output_subarea.empty()
+        cell_output.empty()
         value.outputs.forEach(function (ele) {
           console.debug(ele)
+          var cell_output_area = $('<div class="output_area"></div>')
+          var cell_output_prompt = $('<div class="prompt"></div>')
+          var cell_output_subarea = $('<div class="output_subarea"></div>')
+          cell_output_area.append(cell_output_prompt)
+          cell_output_area.append(cell_output_subarea)
           if (ele.output_type == 'stream') {
             var cell_output_container = $('<div class="output_stream output_' + ele.name + ' output_text">')
             var cell_output_text = $('<pre>').text(ele.text)
@@ -125,6 +127,7 @@
           } else {
             console.warn("Unrecognized output type "+ele.output_type)
           }
+          cell_output.append(cell_output_area)
         })
         var cell_output_status = $(cell.find('.output-status')[0])
         cell_output_status.removeClass('loading')
