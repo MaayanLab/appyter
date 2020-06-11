@@ -1,4 +1,4 @@
-def testdash(app, url_prefix='/testdash'):
+def testdash(app, url_prefix='/testdash', DATA_DIR=''):
   import pandas as pd
   import dash
   from dash.dependencies import Input, Output
