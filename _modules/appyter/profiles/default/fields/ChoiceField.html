@@ -42,6 +42,18 @@
 <div class="viewcode-block" id="ChoiceField"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.ChoiceField.ChoiceField">[docs]</a><span class="k">class</span> <span class="nc">ChoiceField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Represing a choice of string values with a combo box.</span>
 <span class="sd">  &#39;&#39;&#39;</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.</span>
+<span class="sd">    :param label: (str) A human readable label for the field for the HTML form</span>
+<span class="sd">    :param description: (Optional[str]) A long human readable description for the field for the HTML form</span>
+<span class="sd">    :param choices: (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</span>
+<span class="sd">    :param default: (str) A default value as an example and for use during prototyping</span>
+<span class="sd">    :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</span>
+<span class="sd">    :param value: (INTERNAL Any) The raw value of the field (from the form for instance)</span>
+<span class="sd">    :param \**kwargs: Additional keyword arguments used by other fields</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">ChoiceField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ChoiceField.constraint"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.ChoiceField.ChoiceField.constraint">[docs]</a>  <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span></div>

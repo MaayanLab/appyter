@@ -43,15 +43,23 @@
   <span class="sd">&#39;&#39;&#39; Representing a field that accepts an integer</span>
 <span class="sd">  &#39;&#39;&#39;</span>
 
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    :param min: (required) the minimum valid value that the field can take on</span>
-<span class="sd">    :param max: (required) the maximum valid value that the field can take on</span>
+<span class="sd">    :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.</span>
+<span class="sd">    :param label: (str) A human readable label for the field for the HTML form</span>
+<span class="sd">    :param description: (Optional[str]) A long human readable description for the field for the HTML form</span>
+<span class="sd">    :param min: (Optional[int]) the minimum valid value that the field can take on</span>
+<span class="sd">    :param max: (Optional[int]) the maximum valid value that the field can take on</span>
+<span class="sd">    :param step: (Optional[int]) the interval for which values are incremented or decremented</span>
+<span class="sd">    :param default: (float) A default value as an example and for use during prototyping</span>
+<span class="sd">    :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</span>
+<span class="sd">    :param value: (INTERNAL Any) The raw value of the field (from the form for instance)</span>
 <span class="sd">    :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`&#39;s constructor.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="nb">super</span><span class="p">(</span><span class="n">IntField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
       <span class="nb">min</span><span class="o">=</span><span class="nb">min</span><span class="p">,</span>
       <span class="nb">max</span><span class="o">=</span><span class="nb">max</span><span class="p">,</span>
+      <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span>
       <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -61,10 +69,16 @@
 
   <span class="nd">@property</span>
   <span class="k">def</span> <span class="nf">choices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]))</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="IntField.constraint"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.IntField.IntField.constraint">[docs]</a>  <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span></div></div>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
