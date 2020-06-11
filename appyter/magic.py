@@ -28,10 +28,12 @@ def init(_globals, verbose=False):
   :param _globals: (Dict[str, Any]) A callable with your globals for the purpose of injection, basically just: `lambda _=globals: _()`
   :param verbose: (Optional[bool]) Expand exception reporting to be more verbose
   '''
+  import os
   import jinja2
   import jinja2.meta
   from appyter.context import get_jinja2_env
   env = get_jinja2_env()
+  env.globals['url_for'] = lambda dir, filename='': os.path.join(dir, filename)
   from IPython.core.magic import register_cell_magic
   from IPython.display import display, Markdown, HTML
 
