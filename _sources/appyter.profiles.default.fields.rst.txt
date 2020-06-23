@@ -44,6 +44,14 @@ appyter.profiles.default.fields.IntField module
    :undoc-members:
    :show-inheritance:
 
+appyter.profiles.default.fields.MultiCheckboxField module
+---------------------------------------------------------
+
+.. automodule:: appyter.profiles.default.fields.MultiCheckboxField
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.profiles.default.fields.MultiChoiceField module
 -------------------------------------------------------
 

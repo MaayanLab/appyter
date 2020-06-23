@@ -20,6 +20,14 @@ appyter.profiles.default.filters.jq module
    :undoc-members:
    :show-inheritance:
 
+appyter.profiles.default.filters.jsonify module
+-----------------------------------------------
+
+.. automodule:: appyter.profiles.default.filters.jsonify
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.profiles.default.filters.url\_for module
 ------------------------------------------------
 

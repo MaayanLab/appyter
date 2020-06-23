@@ -235,6 +235,55 @@ Should be overridden by subclasses.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-appyter.profiles.default.fields.MultiCheckboxField">
+<span id="appyter-profiles-default-fields-multicheckboxfield-module"></span><h2>appyter.profiles.default.fields.MultiCheckboxField module<a class="headerlink" href="#module-appyter.profiles.default.fields.MultiCheckboxField" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.MultiCheckboxField.</code><code class="sig-name descname">MultiCheckboxField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<p>Represing a set of independently selectable check boxes.
+Like <a class="reference internal" href="#module-appyter.profiles.default.fields.MultiChoiceField" title="appyter.profiles.default.fields.MultiChoiceField"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.profiles.default.fields.MultiChoiceField</span></code></a>, but with</p>
+<blockquote>
+<div><p>a different rendering (check boxes instead of select)</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
+<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
+<li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.constraint">
+<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if the received args.value satisfies constraints.
+Should be overridden by subclasses.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.raw_value">
+<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>(UNSAFE) Raw value of the field</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.value">
+<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
+When instantiating code, you should use safe_value.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-appyter.profiles.default.fields.MultiChoiceField">
 <span id="appyter-profiles-default-fields-multichoicefield-module"></span><h2>appyter.profiles.default.fields.MultiChoiceField module<a class="headerlink" href="#module-appyter.profiles.default.fields.MultiChoiceField" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -462,6 +511,7 @@ can be used to extend or override those definitions.</p>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.FileField">appyter.profiles.default.fields.FileField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.FloatField">appyter.profiles.default.fields.FloatField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.IntField">appyter.profiles.default.fields.IntField module</a></li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.MultiCheckboxField">appyter.profiles.default.fields.MultiCheckboxField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.MultiChoiceField">appyter.profiles.default.fields.MultiChoiceField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.SectionField">appyter.profiles.default.fields.SectionField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.StringField">appyter.profiles.default.fields.StringField module</a></li>
