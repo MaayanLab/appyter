@@ -406,9 +406,11 @@ Should be overridden by subclasses.</p>
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
-<li><p><strong>constraint</strong> – A regular expression for validating the file name.</p></li>
-<li><p><strong>hint</strong> – A hint to put in the field prior to content.</p></li>
+<li><p><strong>constraint</strong> – (Regex[str]) A regular expression for validating the file name.</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>hint</strong> – (Optional[str]) A hint to put in the field prior to content.</p></li>
+<li><p><strong>rows</strong> – (Optional[int]) The number of rows (lines) in the textarea</p></li>
+<li><p><strong>cols</strong> – (Optional[int]) The number of cols (horizontal characters) in the textarea</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
 <li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
@@ -451,9 +453,11 @@ Unlike <a class="reference internal" href="#module-appyter.profiles.default.fiel
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
 <li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
-<li><p><strong>constraint</strong> – A regular expression for validating the file name.</p></li>
-<li><p><strong>hint</strong> – A hint to put in the field prior to content.</p></li>
+<li><p><strong>constraint</strong> – (Regex[str]) A regular expression for validating the file name.</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>hint</strong> – (Optional[str]) A hint to put in the field prior to content.</p></li>
+<li><p><strong>rows</strong> – (Optional[int]) The number of rows (lines) in the textarea</p></li>
+<li><p><strong>cols</strong> – (Optional[int]) The number of cols (horizontal characters) in the textarea</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
 <li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
