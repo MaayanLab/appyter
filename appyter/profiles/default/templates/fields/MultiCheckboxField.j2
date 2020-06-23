@@ -6,10 +6,23 @@
     <label for="{{ this.args.name }}">
       {{ this.args.label }}
     </label>
-    <ul class="list-group" name="{{ this.args.name }}">
-    {% for choice in this.args.choices %}
-      <li class="list-group-item"><input type="checkbox"{% if choice in this.args.default %}checked{% endif %} />{{ choice }}</li>
-    {% endfor %}
+    <ul class="list-group multi-checkbox-field" data-target="#{{ this.args.name }}">
+      {% for choice in this.args.choices %}
+        <li class="list-group-item">
+          <input
+            type="checkbox"
+            {% if choice in this.args.default %}checked{% endif %}
+          />
+          {{ choice }}
+        </li>
+      {% endfor %}
     </ul>
+    <input
+      id="{{ this.args.name }}"
+      name="{{ this.args.name }}"
+      style="display: none;"
+      type="text"
+      value=''
+    />
   </div>
 </div>

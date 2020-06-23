@@ -75,6 +75,17 @@ require(['jquery'], function ($) {
       $('form [type="file"]').each(function () {
         $(this).attr('type', 'text')
       })
+      // Handle multi-checkbox-fields
+      $('.multi-checkbox-field').each(function (e) {
+        var self = $(this)
+        var target = $(self.attr('data-target'))
+        var value = self.find('input[type="checkbox"]').filter(function () {
+          return this.checked
+        }).map(function () {
+          return this.parentNode.innerText.trim()
+        })
+        target.val(JSON.stringify(Array.from(value)))
+      })
       // Submit form
       this.submit()
     })

@@ -1,4 +1,4 @@
-import re
+import json
 from appyter.fields import Field
 
 class MultiCheckboxField(Field):
@@ -24,11 +24,7 @@ class MultiCheckboxField(Field):
   @property
   def raw_value(self):
     if type(self.args['value']) == str:
-      return [self.args['value']]
-    elif type(self.args['value']) == list:
-      return self.args['value']
-    elif self.args['value'] is None:
-      return []
+      return json.loads(self.args['value'])
     else:
       return None
 
@@ -43,4 +39,4 @@ class MultiCheckboxField(Field):
       return self.raw_value
 
   def constraint(self):
-    return self.raw_value is not None and all(v in self.choices for v in self.raw_value)
+    return self.raw_value is not None and type(self.raw_value) == list and all(v in self.choices for v in self.raw_value)
