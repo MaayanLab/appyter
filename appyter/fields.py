@@ -50,11 +50,12 @@ class Field(dict):
     super().__init__(
       args=dict(
         name=name,
-        choices=choices,
         label=label,
+        description=description,
+        choices=choices,
         default=default,
-        section=section,
         value=value if value is not None else default,
+        section=section,
         **kwargs,
       )
     )
