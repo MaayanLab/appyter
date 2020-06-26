@@ -116,8 +116,12 @@
               var cell_output_text = $('<pre>').text(ele.data['text/plain'])
               cell_output_container.append(cell_output_text)
               cell_output_subarea.append(cell_output_container)
+            } else if (ele.data['application/javascript'] !== undefined) {
+              var script = document.createElement("script")
+              script.innerHTML = ele.data['application/javascript']
+              cell_output_subarea.append(script)
             } else {
-              console.warn("Unrecognized output type "+ele.output_type)
+              console.warn("Unrecognized output type in display_data: " + JSON.stringify(Object.keys(ele.data)))
             }
           } else if (ele.output_type == 'error') {
             var cell_output_container = $('<div class="output_subarea output_test output_error">')
