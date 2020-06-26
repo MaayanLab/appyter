@@ -40,6 +40,7 @@
 <span></span><span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">nbformat</span> <span class="k">as</span> <span class="nn">nbf</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">appyter.fields</span> <span class="kn">import</span> <span class="n">Field</span>
 <span class="kn">from</span> <span class="nn">appyter.parse.function_call</span> <span class="kn">import</span> <span class="n">FunctionCallMatcher</span>
 
 <span class="n">cell_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(# *)?</span><span class="si">%%</span><span class="s1">appyter(?P&lt;type&gt;.*?\n)(?P&lt;source&gt;.+)$&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
@@ -53,7 +54,9 @@
     <span class="k">for</span> <span class="n">template_m</span> <span class="ow">in</span> <span class="n">template_match</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">cell_source</span><span class="p">):</span>
       <span class="k">for</span> <span class="n">field_m</span> <span class="ow">in</span> <span class="n">field_match</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">template_m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;inner&#39;</span><span class="p">)):</span>
         <span class="k">try</span><span class="p">:</span>
-          <span class="k">yield</span> <span class="nb">eval</span><span class="p">(</span><span class="n">field_m</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="p">)</span>
+          <span class="n">result</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">field_m</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="p">)</span>
+          <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">result</span>
         <span class="k">except</span><span class="p">:</span>
           <span class="k">pass</span></div>
 
