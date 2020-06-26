@@ -1,6 +1,7 @@
 import re
 import nbformat as nbf
 from copy import deepcopy
+from appyter.fields import Field
 from appyter.parse.function_call import FunctionCallMatcher
 
 cell_match = re.compile(r'^(# *)?%%appyter(?P<type>.*?\n)(?P<source>.+)$', re.MULTILINE | re.DOTALL)
@@ -14,7 +15,9 @@ def parse_fields_from_cell(env, cell):
     for template_m in template_match.finditer(cell_source):
       for field_m in field_match.finditer(template_m.group('inner')):
         try:
-          yield eval(field_m, env.globals)
+          result = eval(field_m, env.globals)
+          if isinstance(result, Field):
+            yield result
         except:
           pass
 
