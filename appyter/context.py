@@ -32,7 +32,11 @@ def importdir_deep(_dirname_, _package_, _globals_, filter_mod=lambda m, k, v: n
       if filter_mod(mod, k, v)
     })
 
-def find_fields_dir_mappings(cwd=os.getcwd(), profile='default'):
+def find_fields_dir_mappings(config=None):
+  if config is None:
+    config = get_env()
+  cwd = config['CWD']
+  profile = config['PROFILE']
   mappings = {}
   if profile != 'default':
     mappings[os.path.join(os.path.dirname(__file__), 'profiles', profile, 'fields') + os.path.sep] = __package__ + '.profiles.' + profile + '.fields'
@@ -40,10 +44,14 @@ def find_fields_dir_mappings(cwd=os.getcwd(), profile='default'):
   mappings[os.path.abspath(os.path.join(cwd, 'fields')) + os.path.sep] = 'fields'
   return mappings
 
-def find_fields(cwd=os.getcwd(), profile='default'):
+def find_fields(config=None):
+  if config is None:
+    config = get_env()
+  cwd = config['CWD']
+  profile = config['PROFILE']
   from appyter.fields import Field
   ctx = {}
-  for _dirname_, _package_ in find_fields_dir_mappings(cwd=cwd, profile=profile).items():
+  for _dirname_, _package_ in find_fields_dir_mappings(config=config).items():
     if os.path.isdir(_dirname_):
       importdir_deep(
         _dirname_,
@@ -53,7 +61,11 @@ def find_fields(cwd=os.getcwd(), profile='default'):
       )
   return ctx
 
-def find_filters_dir_mappings(cwd=os.getcwd(), profile='default'):
+def find_filters_dir_mappings(config=None):
+  if config is None:
+    config = get_env()
+  cwd = config['CWD']
+  profile = config['PROFILE']
   mappings = {}
   if profile != 'default':
     mappings[os.path.join(os.path.dirname(__file__), 'profiles', profile, 'filters') + os.path.sep] = __package__ + '.profiles.' + profile + '.filters'
@@ -61,9 +73,13 @@ def find_filters_dir_mappings(cwd=os.getcwd(), profile='default'):
   mappings[os.path.abspath(os.path.join(cwd, 'filters')) + os.path.sep] = 'filters'
   return mappings
 
-def find_filters(cwd=os.getcwd(), profile='default'):
+def find_filters(config=None):
+  if config is None:
+    config = get_env()
+  cwd = config['CWD']
+  profile = config['PROFILE']
   ctx = {}
-  for _dirname_, _package_ in find_filters_dir_mappings(cwd=cwd, profile=profile).items():
+  for _dirname_, _package_ in find_filters_dir_mappings(config=config).items():
     if os.path.isdir(_dirname_):
       importdir_deep(
         _dirname_,
@@ -73,7 +89,11 @@ def find_filters(cwd=os.getcwd(), profile='default'):
       )
   return ctx
 
-def find_blueprints_dir_mappings(cwd=os.getcwd(), profile='default'):
+def find_blueprints_dir_mappings(config=None):
+  if config is None:
+    config = get_env()
+  cwd = config['CWD']
+  profile = config['PROFILE']
   mappings = {}
   if profile != 'default':
     mappings[os.path.join(os.path.dirname(__file__), 'profiles', profile, 'blueprints') + os.path.sep] = __package__ + '.profiles.' + profile + '.blueprints'
@@ -90,9 +110,13 @@ def filter_blueprints(m, k, v):
       return True
   return False
 
-def find_blueprints(cwd=os.getcwd(), profile='default'):
+def find_blueprints(config=None):
+  if config is None:
+    config = get_env()
+  cwd = config['CWD']
+  profile = config['PROFILE']
   ctx = {}
-  for _dirname_, _package_ in find_blueprints_dir_mappings(cwd=cwd, profile=profile).items():
+  for _dirname_, _package_ in find_blueprints_dir_mappings(config=config).items():
     if os.path.isdir(_dirname_):
       importdir_deep(
         _dirname_,
@@ -102,21 +126,27 @@ def find_blueprints(cwd=os.getcwd(), profile='default'):
       )
   return ctx
 
-def find_templates_dir(cwd=os.getcwd(), profile='default'):
+def find_templates_dir(config=None):
+  if config is None:
+    config = get_env()
+  cwd = config['CWD']
+  profile = config['PROFILE']
   return list(filter(os.path.isdir, [
     os.path.abspath(os.path.join(cwd, 'templates')) + os.path.sep,
     os.path.join(os.path.dirname(__file__), 'profiles', profile, 'templates') + os.path.sep,
     os.path.join(os.path.dirname(__file__), 'profiles', 'default', 'templates') + os.path.sep,
   ]))
 
-def get_extra_files(cwd=None, profile=None):
-  args, _, kwargs = get_sys_env()
-  cwd = kwargs.get('cwd', os.getcwd())
-  profile = kwargs.get('profile', 'default')
+def get_extra_files(config=None):
+  if config is None:
+    config = get_env()
+  cwd = config['CWD']
+  profile = config['PROFILE']
+  args = config['ARGS']
   dirs = [
-    *find_templates_dir(cwd=cwd, profile=profile),
-    *find_filters_dir_mappings(cwd=cwd, profile=profile).keys(),
-    *find_fields_dir_mappings(cwd=cwd, profile=profile).keys(),
+    *find_templates_dir(config=config),
+    *find_filters_dir_mappings(config=config).keys(),
+    *find_fields_dir_mappings(config=config).keys(),
   ]
   paths = {
     os.path.abspath(f) + (os.path.sep if os.path.isdir(f) else '')
@@ -131,18 +161,14 @@ def get_extra_files(cwd=None, profile=None):
       *glob.glob(os.path.join(d, '**', '_*'), recursive=True),
     }))
   }
-  paths.add(os.path.abspath(args[0]))
+  paths.add(os.path.abspath(os.path.join(cwd, args[0])))
   return list(paths)
 
-def get_jinja2_env(context={}, cwd=None, profile=None, prefix=None, debug=True):
-  args, kargs, kwargs = get_sys_env()
-  if cwd is None:
-    cwd = kwargs.get('cwd', os.getcwd())
-  if profile is None:
-    profile = kwargs.get('profile', 'default')
-  if prefix is None:
-    prefix = kwargs.get('prefix', '/')
-
+def get_jinja2_env(context={}, config=None):
+  if config is None:
+    config = get_env()
+  cwd = config['CWD']
+  #
   import sys
   from appyter.fields import build_fields
   from jinja2 import Environment, ChoiceLoader, FileSystemLoader
@@ -154,19 +180,13 @@ def get_jinja2_env(context={}, cwd=None, profile=None, prefix=None, debug=True):
     extensions=['jinja2.ext.do'],
     loader=ChoiceLoader([
       FileSystemLoader(d)
-      for d in find_templates_dir(cwd=cwd, profile=profile)
+      for d in find_templates_dir(config=config)
     ]),
   )
-  env.filters.update(**find_filters(cwd=cwd, profile=profile))
-  env.globals.update(**find_filters(cwd=cwd, profile=profile))
-  env.globals.update(
-    _prefix=prefix,
-    _debug=debug,
-    _args=args,
-    _kargs=kargs,
-    _kwargs=kwargs,
-  )
-  env.globals.update(**build_fields(find_fields(cwd=cwd, profile=profile), context=context))
+  env.filters.update(**find_filters(config=config))
+  env.globals.update(**find_filters(config=config))
+  env.globals.update(_config=config)
+  env.globals.update(**build_fields(find_fields(config=config), context=context))
   return env
 
 def get_sys_env():
@@ -187,3 +207,46 @@ def get_sys_env():
     else:
       args.append(arg)
   return args, kargs, kwargs
+
+def get_env():
+  import json
+  import uuid
+  from appyter.util import join_routes
+  from dotenv import load_dotenv
+  load_dotenv()
+  ARGS, KARGS, KWARGS = get_sys_env()
+  PREFIX = KWARGS.get('prefix', os.environ.get('PREFIX', '/'))
+  PROFILE = KWARGS.get('profile', os.environ.get('PROFILE', 'default'))
+  HOST = KWARGS.get('host', os.environ.get('HOST', '127.0.0.1'))
+  PORT = json.loads(KWARGS.get('port', os.environ.get('PORT', '5000')))
+  PROXY = json.loads(KWARGS.get('proxy', os.environ.get('PROXY', 'false')))
+  CWD = os.path.realpath(KWARGS.get('cwd', os.environ.get('CWD', os.getcwd())))
+  print(CWD)
+  DATA_DIR = KWARGS.get('data-dir', os.environ.get('DATA_DIR', 'data'))
+  MAX_THREADS = json.loads(KWARGS.get('max-threads', os.environ.get('MAX_THREADS', '10')))
+  SECRET_KEY = KWARGS.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
+  DEBUG = json.loads(KWARGS.get('debug', os.environ.get('DEBUG', 'true')))
+  STATIC_DIR = KWARGS.get('static-dir', os.path.abspath(os.path.join(CWD, 'static')))
+  IPYNB = ARGS[0] if len(ARGS) > 0 else os.environ.get('APP', 'app.ipynb')
+  SHOW_HELP = 'h' in KARGS or 'help' in KWARGS or ARGS == []
+  STATIC_PREFIX = join_routes(PREFIX, 'static')
+  #
+  return dict(
+    ARGS=ARGS,
+    KARGS=KARGS,
+    KWARGS=KWARGS,
+    PREFIX=PREFIX,
+    PROFILE=PROFILE,
+    HOST=HOST,
+    PORT=PORT,
+    PROXY=PROXY,
+    CWD=CWD,
+    DATA_DIR=DATA_DIR,
+    MAX_THREADS=MAX_THREADS,
+    SECRET_KEY=SECRET_KEY,
+    DEBUG=DEBUG,
+    STATIC_DIR=STATIC_DIR,
+    IPYNB=IPYNB,
+    SHOW_HELP=SHOW_HELP,
+    STATIC_PREFIX=STATIC_PREFIX,
+  )

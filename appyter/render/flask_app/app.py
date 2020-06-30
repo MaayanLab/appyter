@@ -9,52 +9,34 @@ from functools import partial
 from queue import Queue
 from flask import Flask, Blueprint, request, abort, copy_current_request_context, send_from_directory
 from flask_socketio import SocketIO, emit
-from appyter.context import get_sys_env, get_jinja2_env, get_extra_files, find_blueprints
+from appyter.context import get_env, get_jinja2_env, get_extra_files, find_blueprints
 from appyter.parse.nbtemplate import nbtemplate_from_ipynb_file
 from appyter.render.form import render_form_from_nbtemplate
 from appyter.render.nbviewer import render_nbviewer_from_nb
 from appyter.render.ipynb import render_nb_from_nbtemplate
 from appyter.render.json import render_nbtemplate_json_from_nbtemplate
 from appyter.render.nbexecutor import render_nbexecutor_from_nb
+from appyter.util import join_routes
 from werkzeug.utils import secure_filename
 
-def join_routes(*routes):
-  ''' Utility function for joining routes while striping extraneous slashes
-  '''
-  return '/' + '/'.join([route.strip('/') for route in routes if route.strip('/')])
-
 # Prepare environment
-from dotenv import load_dotenv
-load_dotenv()
-args, kargs, kwargs = get_sys_env()
+config = get_env()
 
-PREFIX = kwargs.get('prefix', os.environ.get('PREFIX', '/'))
-HOST = kwargs.get('host', os.environ.get('HOST', '127.0.0.1'))
-PORT = json.loads(kwargs.get('port', os.environ.get('PORT', '5000')))
-PROXY = json.loads(kwargs.get('proxy', os.environ.get('PROXY', 'false')))
-CWD = kwargs.get('cwd', os.environ.get('CWD', os.curdir))
-DATA_DIR = kwargs.get('data-dir', os.environ.get('DATA_DIR', 'data'))
-MAX_THREADS = json.loads(kwargs.get('max-threads', os.environ.get('MAX_THREADS', '10')))
-SECRET_KEY = kwargs.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
-DEBUG = json.loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
-STATIC_DIR = kwargs.get('static-dir', os.path.abspath(os.path.join(CWD, 'static')))
-IPYNB = args[0] if len(args) > 0 else os.environ.get('APP', 'app.ipynb')
-SHOW_HELP = 'h' in kargs or 'help' in kwargs or args == []
-STATIC_PREFIX = join_routes(PREFIX, 'static')
+# https://github.com/pallets/flask/issues/3209#issuecomment-494008394
+os.environ['FLASK_SKIP_DOTENV'] = '1'
 
 # Prepare app
-app = Flask(__name__, static_url_path=STATIC_PREFIX, static_folder=STATIC_DIR)
+app = Flask(__name__, static_url_path=config['STATIC_PREFIX'], static_folder=config['STATIC_DIR'])
 core = Blueprint('__main__', __name__)
-
-app.config['SECRET_KEY'] = SECRET_KEY
+app.config.update(config)
 socketio = SocketIO(app,
-  path=f"{PREFIX}socket.io",
+  path=f"{config['PREFIX']}socket.io",
   async_mode='threading',
-  logger=DEBUG,
-  engineio_logger=DEBUG,
+  logger=config['DEBUG'],
+  engineio_logger=config['DEBUG'],
   cors_allowed_origins='*',
 )
-if PROXY:
+if app.config['PROXY']:
   from werkzeug.middleware.proxy_fix import ProxyFix
   app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
@@ -77,7 +59,7 @@ def worker(n, execution_queue):
 
 @app.before_first_request
 def init_app():
-  os.makedirs(DATA_DIR, exist_ok=True)
+  os.makedirs(app.config['DATA_DIR'], exist_ok=True)
   print('Spawning workers...')
   for n in range(n_workers):
     socketio.start_background_task(worker, n=n, execution_queue=execution_queue)
@@ -105,29 +87,33 @@ def route_join_with_or_without_slash(blueprint, *routes, **kwargs):
 def get_index_html():
   ''' Return options as form
   '''
-  env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG)
+  env = get_jinja2_env(app.config)
   env.globals.update(
-    _session=str('00000000-0000-0000-0000-000000000000' if DEBUG else uuid.uuid4())
+    _session=str('00000000-0000-0000-0000-000000000000' if app.config['DEBUG'] else uuid.uuid4())
   )
-  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
+  nbtemplate = nbtemplate_from_ipynb_file(
+    os.path.join(app.config['CWD'], app.config['ARGS'][0])
+  )
   return render_form_from_nbtemplate(env, nbtemplate)
 
 def get_index_json():
   ''' Return options as json
   '''
-  env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG)
-  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
+  env = get_jinja2_env(app.config)
+  nbtemplate = nbtemplate_from_ipynb_file(
+    os.path.join(app.config['CWD'], app.config['ARGS'][0])
+  )
   return render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
 
 def get_session_html_static(session_id):
-  nbfile = os.path.join(DATA_DIR, session_id, os.path.basename(IPYNB))
+  nbfile = os.path.join(app.config['DATA_DIR'], session_id, os.path.basename(app.config['IPYNB']))
   if os.path.exists(nbfile):
     nb = nbf.read(open(nbfile, 'r'), as_version=4)
-    env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG)
+    env = get_jinja2_env(config=app.config)
     return env.get_template(
       'static.j2',
     ).render(
-      _nb=os.path.basename(IPYNB),
+      _nb=os.path.basename(app.config['IPYNB']),
       _nbviewer=render_nbviewer_from_nb(env, nb),
       _session=session_id, # NOTE: this should not be necessary..
     )
@@ -136,23 +122,25 @@ def get_session_html_static(session_id):
 
 def get_session_ipynb_static(session_id):
   # TODO: if still executing, flush current state
-  nbfile = os.path.join(DATA_DIR, session_id, os.path.basename(IPYNB))
+  nbfile = os.path.join(app.config['DATA_DIR'], session_id, os.path.basename(app.config['IPYNB']))
   if os.path.exists(nbfile):
-    return send_from_directory(os.path.join(DATA_DIR, session_id), os.path.basename(IPYNB))
+    return send_from_directory(os.path.join(app.config['DATA_DIR'], session_id), os.path.basename(app.config['IPYNB']))
   else:
     abort(404)
 
 def post_index_html_dynamic(data):
   ''' Return dynamic nbviewer
   '''
-  env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG, context=data)
+  env = get_jinja2_env(config=app.config, context=data)
   env.globals['_session'] = data.get('_session')
-  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
+  nbtemplate = nbtemplate_from_ipynb_file(
+    os.path.join(app.config['CWD'], app.config['ARGS'][0])
+  )
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return env.get_template(
     'dynamic.j2',
   ).render(
-    _nb=os.path.basename(IPYNB),
+    _nb=os.path.basename(app.config['IPYNB']),
     _nbviewer=render_nbviewer_from_nb(env, nb),
     _data=json.dumps(data),
   )
@@ -160,9 +148,11 @@ def post_index_html_dynamic(data):
 def post_index_html_static(data):
   ''' Return static nbviewer
   '''
-  env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG, context=data)
+  env = get_jinja2_env(config=app.config, context=data)
   env.globals['_session'] = data.get('_session')
-  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
+  nbtemplate = nbtemplate_from_ipynb_file(
+    os.path.join(app.config['CWD'], app.config['ARGS'][0])
+  )
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return env.get_template(
     'static.j2',
@@ -174,18 +164,22 @@ def post_index_html_static(data):
 def post_index_json_static(data):
   ''' Return rendered json
   '''
-  env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG, context=data)
+  env = get_jinja2_env(config=app.config, context=data)
   env.globals['_session'] = data.get('_session')
-  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
+  nbtemplate = nbtemplate_from_ipynb_file(
+    os.path.join(app.config['CWD'], app.config['ARGS'][0])
+  )
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nbtemplate_json_from_nbtemplate(env, nb)
 
 def post_index_ipynb_static(data):
   ''' Return rendered ipynb
   '''
-  env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG, context=data)
+  env = get_jinja2_env(config=app.config, context=data)
   env.globals['_session'] = data.get('_session')
-  nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
+  nbtemplate = nbtemplate_from_ipynb_file(
+    os.path.join(app.config['CWD'], app.config['ARGS'][0])
+  )
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   return render_nb_from_nbtemplate(env, nb)
 
@@ -202,12 +196,12 @@ def prepare_formdata(req):
     for k, V in req.form.lists()
   }
   session_id = sanitize_uuid(data.get('_session'))
-  session_dir = os.path.join(DATA_DIR, session_id)
+  session_dir = os.path.join(app.config['DATA_DIR'], session_id)
   # Process upload files
   for fname, fh in req.files.items():
     # Save files to datadir for session
     filename = secure_filename(fh.filename)
-    os.makedirs(DATA_DIR, exist_ok=True)
+    os.makedirs(app.config['DATA_DIR'], exist_ok=True)
     os.makedirs(session_dir, exist_ok=True)
     if filename != '':
       fh.save(os.path.join(session_dir, filename))
@@ -224,8 +218,10 @@ def get_index():
   if mimetype in {'text/html'}:
     return get_index_html()
   elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
-    env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG)
-    nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
+    env = get_jinja2_env(config=app.config)
+    nbtemplate = nbtemplate_from_ipynb_file(
+      os.path.join(app.config['CWD'], app.config['ARGS'][0])
+    )
     return nbtemplate
   elif mimetype in {'application/json'}:
     return get_index_json()
@@ -233,7 +229,7 @@ def get_index():
 
 @route_join_with_or_without_slash(core, 'favicon.ico', methods=['GET'])
 def favicon():
-  return send_from_directory(STATIC_DIR, 'favicon.ico')
+  return send_from_directory(app.config['STATIC_DIR'], 'favicon.ico')
 
 @route_join_with_or_without_slash(core, '<string:session>', methods=['GET', 'POST'])
 def post_index(session):
@@ -267,13 +263,13 @@ def post_index(session):
 @route_join_with_or_without_slash(core, '<string:session>', '<path:path>', methods=['GET'])
 def send_session_directory(session, path):
   session_id = sanitize_uuid(session)
-  session_path = os.path.realpath(os.path.join(DATA_DIR, session_id))
+  session_path = os.path.realpath(os.path.join(app.config['DATA_DIR'], session_id))
   return send_from_directory(session_path, path)
 
 def cleanup(session, nb):
   ''' Write notebook
   '''
-  nbf.write(nb, open(os.path.join(DATA_DIR, session, os.path.basename(IPYNB)), 'w'))
+  nbf.write(nb, open(os.path.join(app.config['DATA_DIR'], session, os.path.basename(app.config['IPYNB'])), 'w'))
 
 @socketio.on('session')
 def _(data):
@@ -291,18 +287,20 @@ def _():
 def init(data):
   print('init')
   session_id = sanitize_uuid(data.get('_session'))
-  session_dir = os.path.join(DATA_DIR, session_id)
-  if os.path.exists(os.path.join(session_dir, os.path.basename(IPYNB))) and not DEBUG:
+  session_dir = os.path.join(app.config['DATA_DIR'], session_id)
+  if os.path.exists(os.path.join(session_dir, os.path.basename(app.config['IPYNB']))) and not DEBUG:
     print('exists')
     emit('error', 'Notebook already exists')
     emit('redirect', f"")
   else:
-    env = get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG, context=data)
+    env = get_jinja2_env(config=app.config, context=data)
     env.globals['_session'] = session_id
-    nbtemplate = nbtemplate_from_ipynb_file(env.globals['_args'][0])
+    nbtemplate = nbtemplate_from_ipynb_file(
+      os.path.join(app.config['CWD'], app.config['ARGS'][0])
+    )
     nb = render_nb_from_nbtemplate(env, nbtemplate)
     os.makedirs(session_dir, exist_ok=True)
-    nbf.write(nb, open(os.path.join(session_dir, os.path.basename(IPYNB)), 'w'))
+    nbf.write(nb, open(os.path.join(session_dir, os.path.basename(app.config['IPYNB'])), 'w'))
     emit('status', 'Notebook created, queuing execution')
     nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
     execution_queue.put((
@@ -320,8 +318,8 @@ def download(data):
   print('file download start')
   global session
   session_id = session[request.sid]['_session']
-  session_dir = os.path.join(DATA_DIR, session_id)
-  os.makedirs(DATA_DIR, exist_ok=True)
+  session_dir = os.path.join(app.config['DATA_DIR'], session_id)
+  os.makedirs(app.config['DATA_DIR'], exist_ok=True)
   os.makedirs(session_dir, exist_ok=True)
   name = data.get('name')
   url = secure_url(data.get('url'))
@@ -367,9 +365,9 @@ def siofu_start(data):
   print('file upload start')
   global session
   session_id = session[request.sid]['_session']
-  session_dir = os.path.join(DATA_DIR, session_id)
+  session_dir = os.path.join(app.config['DATA_DIR'], session_id)
   filename = secure_filename(data.get('name'))
-  os.makedirs(DATA_DIR, exist_ok=True)
+  os.makedirs(app.config['DATA_DIR'], exist_ok=True)
   os.makedirs(session_dir, exist_ok=True)
   if filename != '':
     session[request.sid] = dict(session[request.sid], **{
@@ -420,29 +418,29 @@ def do_help():
   print('  default  Bare profile with no styling')
 
 def main():
-  if SHOW_HELP:
+  if app.config['SHOW_HELP']:
     do_help()
   else:
     # env preparation
-    get_jinja2_env(cwd=CWD, prefix=PREFIX, debug=DEBUG)
+    get_jinja2_env(config=app.config)
 
     # register additional blueprints
-    app.register_blueprint(core, url_prefix=PREFIX)
-    for blueprint_name, blueprint in find_blueprints(cwd=CWD).items():
+    app.register_blueprint(core, url_prefix=app.config['PREFIX'])
+    for blueprint_name, blueprint in find_blueprints(config=app.config).items():
       if isinstance(blueprint, Blueprint):
-        app.register_blueprint(blueprint, url_prefix=join_routes(PREFIX, blueprint_name))
+        app.register_blueprint(blueprint, url_prefix=join_routes(app.config['PREFIX'], blueprint_name))
       elif callable(blueprint):
-        blueprint(app, url_prefix=join_routes(PREFIX, blueprint_name), DATA_DIR=DATA_DIR)
+        blueprint(app, url_prefix=join_routes(app.config['PREFIX'], blueprint_name), DATA_DIR=app.config['DATA_DIR'])
       else:
         raise Exception('Unrecognized blueprint type: ' + blueprint_name)
 
     return socketio.run(
         app,
-        host=HOST,
-        port=PORT,
-        debug=DEBUG,
-        use_reloader=DEBUG,
-        extra_files=get_extra_files(),
+        host=app.config['HOST'],
+        port=app.config['PORT'],
+        debug=app.config['DEBUG'],
+        use_reloader=app.config['DEBUG'],
+        extra_files=get_extra_files(config=app.config),
     )
 
 if __name__ == '__main__':

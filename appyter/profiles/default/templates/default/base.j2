@@ -45,10 +45,10 @@
     </script>
     <script>
       define('socket', ['socketio'], function (io) {
-        return io({ path: '{{ _prefix }}socket.io' })
+        return io({ path: '{{ _config.PREFIX }}socket.io' })
       })
     </script>
-    {% if _debug %}
+    {% if _config.DEBUG %}
     <script>
       require(['socket'], function (socket) {
         var first_connect = true
