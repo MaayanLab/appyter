@@ -1,3 +1,8 @@
-from appyter.render.flask_app.app import main
 if __name__ == '__main__':
-  main()
+  # load dotenv if present
+  from dotenv import load_dotenv
+  load_dotenv()
+  # 
+  from appyter.cli import cli
+  from appyter.render.flask_app import app
+  cli()

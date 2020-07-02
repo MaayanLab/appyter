@@ -1,4 +1,5 @@
 bs4
+click
 flask
 flask-socketio
 ipython
