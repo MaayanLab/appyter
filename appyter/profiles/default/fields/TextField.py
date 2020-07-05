@@ -19,7 +19,7 @@ class TextField(Field):
   :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
   def __init__(self, constraint=r'.*', hint=None, **kwargs):
-    super(TextField, self).__init__(
+    super().__init__(
       constraint=constraint,
       hint=hint,
       **kwargs,

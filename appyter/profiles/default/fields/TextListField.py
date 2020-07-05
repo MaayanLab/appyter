@@ -24,7 +24,7 @@ class TextListField(Field):
   :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
   def __init__(self, constraint=r'[^\n]*', hint=None, **kwargs):
-    super(TextListField, self).__init__(
+    super().__init__(
       constraint=constraint,
       hint=hint,
       **kwargs,

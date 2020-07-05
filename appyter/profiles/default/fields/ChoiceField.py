@@ -13,7 +13,7 @@ class ChoiceField(Field):
   :param \**kwargs: Additional keyword arguments used by other fields
   '''
   def __init__(self, **kwargs):
-    super(ChoiceField, self).__init__(**kwargs)
+    super().__init__(**kwargs)
 
   def constraint(self):
     return self.raw_value is not None and self.raw_value in self.choices

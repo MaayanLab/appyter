@@ -2,7 +2,7 @@ from appyter.fields import Field
 
 class EmailField(Field):
   def __init__(self, **kwargs):
-    super(EmailField, self).__init__(**kwargs)
+    super().__init__(**kwargs)
 
   def constraint(self):
     import re

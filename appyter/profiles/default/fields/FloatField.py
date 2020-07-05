@@ -12,7 +12,7 @@ class FloatField(Field):
   :param \**kwargs: Additional keyword arguments used by other fields
   '''
   def __init__(self, **kwargs):
-    super(FloatField, self).__init__(**kwargs)
+    super().__init__(**kwargs)
 
   @property
   def raw_value(self):

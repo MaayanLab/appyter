@@ -15,7 +15,7 @@ class IntField(Field):
   :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
   def __init__(self, min=None, max=None, step=None, **kwargs):
-    super(IntField, self).__init__(
+    super().__init__(
       min=min,
       max=max,
       step=step,

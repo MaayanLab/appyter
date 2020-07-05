@@ -19,12 +19,14 @@ class MultiCheckboxField(Field):
   :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
   def __init__(self, **kwargs):
-    super(MultiCheckboxField, self).__init__(**kwargs)
+    super().__init__(**kwargs)
 
   @property
   def raw_value(self):
     if type(self.args['value']) == str:
       return json.loads(self.args['value'])
+    elif type(self.args['value']) == list:
+      return self.args['value']
     else:
       return None
 
