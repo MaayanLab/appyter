@@ -198,16 +198,17 @@ def get_env_from_kwargs(**kwargs):
   PREFIX = kwargs.get('prefix', os.environ.get('PREFIX', '/'))
   PROFILE = kwargs.get('profile', os.environ.get('PROFILE', 'default'))
   HOST = kwargs.get('host', os.environ.get('HOST', '127.0.0.1'))
-  PORT = try_json_loads(kwargs.get('port', os.environ.get('PORT', '5000')))
-  PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('PROXY', 'false')))
+  PORT = try_json_loads(kwargs.get('port', os.environ.get('PORT', 5000)))
+  PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('PROXY', False)))
   CWD = os.path.realpath(kwargs.get('cwd', os.environ.get('CWD', os.getcwd())))
   DATA_DIR = kwargs.get('data-dir', os.environ.get('DATA_DIR', 'data'))
-  MAX_THREADS = try_json_loads(kwargs.get('max-threads', os.environ.get('MAX_THREADS', '10')))
+  MAX_THREADS = try_json_loads(kwargs.get('max-threads', os.environ.get('MAX_THREADS', 10)))
   SECRET_KEY = kwargs.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
   DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
   STATIC_DIR = kwargs.get('static-dir', os.path.abspath(os.path.join(CWD, 'static')))
-  IPYNB = kwargs.get('ipynb', os.environ.get('IPYNB', 'app.ipynb'))
   STATIC_PREFIX = join_routes(PREFIX, 'static')
+  IPYNB = kwargs.get('ipynb', os.environ.get('IPYNB'))
+  assert IPYNB != None, 'ipynb was not found'
   #
   if os.path.abspath(CWD) not in sys.path:
     sys.path.insert(0, os.path.abspath(CWD))
@@ -253,13 +254,16 @@ def get_env_from_flask():
   from flask import current_app
   return current_app.config
 
+config = {}
+
 def get_env(**kwargs):
   ''' Try various methods to grab the application config
   (different based on whether we're in a flask thread/somewhere else)
   '''
   #
   try:
-    get_env_from_kwargs(**kwargs)
+    global config
+    config = get_env_from_kwargs(**kwargs)
   except AssertionError:
     pass
   #
@@ -270,7 +274,9 @@ def get_env(**kwargs):
   #
   try:
     return get_env_from_click()
+  except RuntimeError as e:
+    pass
   except AssertionError as e:
     pass
   #
-  print('WARNING: Could not resolve env')
+  return config

@@ -31,8 +31,8 @@ def init(_globals, verbose=False):
   import os
   import jinja2
   import jinja2.meta
-  from appyter.context import get_jinja2_env
-  env = get_jinja2_env()
+  from appyter.context import get_env, get_jinja2_env
+  env = get_jinja2_env(get_env(ipynb='app.ipynb'))
   env.globals['url_for'] = lambda dir, filename='': os.path.join(dir, filename)
   from IPython.core.magic import register_cell_magic
   from IPython.display import display, Markdown, HTML
