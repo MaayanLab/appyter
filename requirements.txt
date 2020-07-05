@@ -8,6 +8,7 @@ jq
 jupyter
 jupyter_client
 lxml
+nbclient
 nbconvert
 nbformat
 python-dotenv
