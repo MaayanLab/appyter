@@ -184,6 +184,7 @@ def get_jinja2_env(context={}, config=None):
   return env
 
 def try_json_loads(v):
+  import json
   try:
     return json.loads(v)
   except:
