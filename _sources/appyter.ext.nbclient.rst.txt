@@ -1,0 +1,10 @@
+appyter.ext.nbclient package
+============================
+
+Module contents
+---------------
+
+.. automodule:: appyter.ext.nbclient
+   :members:
+   :undoc-members:
+   :show-inheritance:

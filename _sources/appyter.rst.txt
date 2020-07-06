@@ -7,12 +7,21 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   appyter.ext
    appyter.parse
    appyter.profiles
    appyter.render
 
 Submodules
 ----------
+
+appyter.cli module
+------------------
+
+.. automodule:: appyter.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 appyter.context module
 ----------------------

@@ -37,48 +37,6 @@
             
   <div class="section" id="appyter-render-nbexecutor-package">
 <h1>appyter.render.nbexecutor package<a class="headerlink" href="#appyter-render-nbexecutor-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-appyter.render.nbexecutor.yielding_preprocessor">
-<span id="appyter-render-nbexecutor-yielding-preprocessor-module"></span><h2>appyter.render.nbexecutor.yielding_preprocessor module<a class="headerlink" href="#module-appyter.render.nbexecutor.yielding_preprocessor" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="appyter.render.nbexecutor.yielding_preprocessor.YieldingExecutePreprocessor">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.render.nbexecutor.yielding_preprocessor.</code><code class="sig-name descname">YieldingExecutePreprocessor</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecutor/yielding_preprocessor.html#YieldingExecutePreprocessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecutor.yielding_preprocessor.YieldingExecutePreprocessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">nbconvert.preprocessors.execute.ExecutePreprocessor</span></code></p>
-<dl class="py method">
-<dt id="appyter.render.nbexecutor.yielding_preprocessor.YieldingExecutePreprocessor.destroy_preprocess">
-<code class="sig-name descname">destroy_preprocess</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecutor/yielding_preprocessor.html#YieldingExecutePreprocessor.destroy_preprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecutor.yielding_preprocessor.YieldingExecutePreprocessor.destroy_preprocess" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="appyter.render.nbexecutor.yielding_preprocessor.YieldingExecutePreprocessor.preprocess">
-<code class="sig-name descname">preprocess</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb</span></em>, <em class="sig-param"><span class="n">resources</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecutor/yielding_preprocessor.html#YieldingExecutePreprocessor.preprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecutor.yielding_preprocessor.YieldingExecutePreprocessor.preprocess" title="Permalink to this definition">¶</a></dt>
-<dd><p>Preprocess notebook executing each code cell.</p>
-<p>The input argument <code class="docutils literal notranslate"><span class="pre">nb</span></code> is modified in-place.</p>
-<p>nb : NotebookNode
-Notebook being executed.
-resources : dictionary (optional)
-Additional resources used in the conversion process. For example,
-passing <code class="docutils literal notranslate"><span class="pre">{'metadata':</span> <span class="pre">{'path':</span> <span class="pre">run_path}}</span></code> sets the
-execution path to <code class="docutils literal notranslate"><span class="pre">run_path</span></code>.
-km: KernelManager (optional)
-Optional kernel manager. If none is provided, a kernel manager will
-be created.</p>
-<p>nb : NotebookNode
-The executed notebook.
-resources : dictionary
-Additional resources used in the conversion process.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="appyter.render.nbexecutor.yielding_preprocessor.YieldingExecutePreprocessor.setup_preprocess">
-<code class="sig-name descname">setup_preprocess</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb</span></em>, <em class="sig-param"><span class="n">resources</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecutor/yielding_preprocessor.html#YieldingExecutePreprocessor.setup_preprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecutor.yielding_preprocessor.YieldingExecutePreprocessor.setup_preprocess" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="module-appyter.render.nbexecutor">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.render.nbexecutor" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
@@ -92,8 +50,13 @@ Additional resources used in the conversion process.</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.nbexecutor.render_nbexecutor_from_nb">
-<code class="sig-prename descclassname">appyter.render.nbexecutor.</code><code class="sig-name descname">render_nbexecutor_from_nb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">nb</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecutor.html#render_nbexecutor_from_nb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecutor.render_nbexecutor_from_nb" title="Permalink to this definition">¶</a></dt>
+<dt id="appyter.render.nbexecutor.iopub_hook_factory">
+<code class="sig-prename descclassname">appyter.render.nbexecutor.</code><code class="sig-name descname">iopub_hook_factory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb</span></em>, <em class="sig-param"><span class="n">emit</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecutor.html#iopub_hook_factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecutor.iopub_hook_factory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.render.nbexecutor.json_emitter">
+<code class="sig-prename descclassname">appyter.render.nbexecutor.</code><code class="sig-name descname">json_emitter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecutor.html#json_emitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecutor.json_emitter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -109,8 +72,6 @@ Additional resources used in the conversion process.</p>
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">appyter.render.nbexecutor package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-appyter.render.nbexecutor.yielding_preprocessor">appyter.render.nbexecutor.yielding_preprocessor module</a></li>
 <li><a class="reference internal" href="#module-appyter.render.nbexecutor">Module contents</a></li>
 </ul>
 </li>
@@ -152,7 +113,7 @@ Additional resources used in the conversion process.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

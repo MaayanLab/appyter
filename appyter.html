@@ -41,6 +41,17 @@
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="appyter.ext.html">appyter.ext package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="appyter.ext.nbclient.html">appyter.ext.nbclient package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.nbclient.html#module-appyter.ext.nbclient">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="appyter.parse.html">appyter.parse package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="appyter.parse.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.parse.html#module-appyter.parse.function_call">appyter.parse.function_call module</a></li>
@@ -73,12 +84,15 @@
 <li class="toctree-l3"><a class="reference internal" href="appyter.render.flask_app.html">appyter.render.flask_app package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.app">appyter.render.flask_app.app module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.core">appyter.render.flask_app.core module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.download">appyter.render.flask_app.download module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.execution">appyter.render.flask_app.execution module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.socketio">appyter.render.flask_app.socketio module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.util">appyter.render.flask_app.util module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="appyter.render.nbexecutor.html">appyter.render.nbexecutor package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="appyter.render.nbexecutor.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="appyter.render.nbexecutor.html#module-appyter.render.nbexecutor.yielding_preprocessor">appyter.render.nbexecutor.yielding_preprocessor module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.nbexecutor.html#module-appyter.render.nbexecutor">Module contents</a></li>
 </ul>
 </li>
@@ -97,6 +111,9 @@
 </div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-appyter.cli">
+<span id="appyter-cli-module"></span><h2>appyter.cli module<a class="headerlink" href="#module-appyter.cli" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-appyter.context">
 <span id="appyter-context-module"></span><h2>appyter.context module<a class="headerlink" href="#module-appyter.context" title="Permalink to this headline">¶</a></h2>
@@ -142,7 +159,26 @@
 
 <dl class="py function">
 <dt id="appyter.context.get_env">
-<code class="sig-prename descclassname">appyter.context.</code><code class="sig-name descname">get_env</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/context.html#get_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.context.get_env" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">appyter.context.</code><code class="sig-name descname">get_env</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/context.html#get_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.context.get_env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try various methods to grab the application config
+(different based on whether we’re in a flask thread/somewhere else)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="appyter.context.get_env_from_click">
+<code class="sig-prename descclassname">appyter.context.</code><code class="sig-name descname">get_env_from_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/context.html#get_env_from_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.context.get_env_from_click" title="Permalink to this definition">¶</a></dt>
+<dd><p>Traverse click context and use params for get_env_from_kwargs</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="appyter.context.get_env_from_flask">
+<code class="sig-prename descclassname">appyter.context.</code><code class="sig-name descname">get_env_from_flask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/context.html#get_env_from_flask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.context.get_env_from_flask" title="Permalink to this definition">¶</a></dt>
+<dd><p>If we’re running in flask, current_app.config should be available</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="appyter.context.get_env_from_kwargs">
+<code class="sig-prename descclassname">appyter.context.</code><code class="sig-name descname">get_env_from_kwargs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/context.html#get_env_from_kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.context.get_env_from_kwargs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -156,11 +192,6 @@
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.context.get_sys_env">
-<code class="sig-prename descclassname">appyter.context.</code><code class="sig-name descname">get_sys_env</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/context.html#get_sys_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.context.get_sys_env" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt id="appyter.context.importdir">
 <code class="sig-prename descclassname">appyter.context.</code><code class="sig-name descname">importdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_dirname_</span></em>, <em class="sig-param"><span class="n">_package_</span></em>, <em class="sig-param"><span class="n">_globals_</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/context.html#importdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.context.importdir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -168,6 +199,11 @@
 <dl class="py function">
 <dt id="appyter.context.importdir_deep">
 <code class="sig-prename descclassname">appyter.context.</code><code class="sig-name descname">importdir_deep</code><span class="sig-paren">(</span><em class="sig-param">_dirname_</em>, <em class="sig-param">_package_</em>, <em class="sig-param">_globals_</em>, <em class="sig-param">filter_mod=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/context.html#importdir_deep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.context.importdir_deep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.context.try_json_loads">
+<code class="sig-prename descclassname">appyter.context.</code><code class="sig-name descname">try_json_loads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/context.html#try_json_loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.context.try_json_loads" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -276,7 +312,7 @@ for import.</p>
 </div>
 <dl class="py function">
 <dt id="appyter.magic.init">
-<code class="sig-prename descclassname">appyter.magic.</code><code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_globals</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/magic.html#init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.magic.init" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">appyter.magic.</code><code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_globals</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/magic.html#init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.magic.init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize appyter magic.</p>
 <p>Sets up a jinj2 environment and injects %%appyter magic into your environment.</p>
 <dl class="field-list simple">
@@ -317,6 +353,7 @@ for import.</p>
 <li><a class="reference internal" href="#">appyter package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-appyter.cli">appyter.cli module</a></li>
 <li><a class="reference internal" href="#module-appyter.context">appyter.context module</a></li>
 <li><a class="reference internal" href="#module-appyter.fields">appyter.fields module</a></li>
 <li><a class="reference internal" href="#module-appyter.magic">appyter.magic module</a></li>
@@ -362,7 +399,7 @@ for import.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
     </div>
   </body>
 </html>

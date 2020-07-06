@@ -1,0 +1,18 @@
+appyter.ext package
+===================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   appyter.ext.nbclient
+
+Module contents
+---------------
+
+.. automodule:: appyter.ext
+   :members:
+   :undoc-members:
+   :show-inheritance:
