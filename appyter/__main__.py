@@ -1,4 +1,4 @@
-if __name__ == '__main__':
+def main():
   # load dotenv if present
   from dotenv import load_dotenv
   load_dotenv()
@@ -8,3 +8,6 @@ if __name__ == '__main__':
   import appyter.render.flask_app.app
   import appyter.render.nbexecutor
   cli()
+
+if __name__ == '__main__':
+  main()
