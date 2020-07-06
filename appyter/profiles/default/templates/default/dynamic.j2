@@ -144,7 +144,7 @@
         cell_output_status.removeClass('loading')
         cell_output_status.addClass('ready')
 
-        if (value.execution_count !== undefined) {
+        if (value.execution_count !== undefined && value.execution_count !== null) {
           var current_cell_ele = cell.find('.input_prompt')
           current_cell_ele.text('In ['+(value.execution_count)+']:')
         }
