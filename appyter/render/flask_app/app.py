@@ -73,6 +73,11 @@ def flask_app(ctx, *args, **kwargs):
 
 @flask_app.command()
 def run(*args, **kwargs):
+  if not kwargs.get('debug'):
+    print('Patching...')
+    import eventlet
+    eventlet.monkey_patch()
+  #
   app = create_app(**kwargs)
   return socketio.run(
     app,

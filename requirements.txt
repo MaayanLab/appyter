@@ -1,5 +1,6 @@
 bs4
 click
+eventlet
 flask
 flask-socketio
 ipython
