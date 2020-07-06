@@ -2,6 +2,8 @@ import os
 import traceback
 import functools
 import nbformat as nbf
+import sys
+from subprocess import Popen, PIPE
 from flask import current_app, request, copy_current_request_context, session
 from flask_socketio import emit
 
@@ -11,14 +13,8 @@ from appyter.render.flask_app.util import sanitize_uuid
 
 from appyter.context import get_jinja2_env
 from appyter.parse.nbtemplate import nbtemplate_from_ipynb_file
-from appyter.render.nbexecutor import render_nbexecutor_from_nb
 from appyter.render.ipynb import render_nb_from_nbtemplate
 
-
-def cleanup(session, nb):
-  ''' Write notebook
-  '''
-  nbf.write(nb, open(os.path.join(current_app.config['DATA_DIR'], session, os.path.basename(current_app.config['IPYNB'])), 'w'))
 
 @socketio.on('session')
 def _(data):
@@ -45,6 +41,7 @@ def init(data):
   else:
     env = get_jinja2_env(config=current_app.config, context=data)
     env.globals['_session'] = session_id
+    # TODO: move this to nbexecutor?
     nbtemplate = nbtemplate_from_ipynb_file(
       os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
     )
@@ -52,10 +49,33 @@ def init(data):
     os.makedirs(session_dir, exist_ok=True)
     nbf.write(nb, open(os.path.join(session_dir, os.path.basename(current_app.config['IPYNB'])), 'w'))
     emit('status', 'Notebook created, queuing execution')
-    nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
     socketio.start_background_task(
-      nbexecutor,
+      copy_current_request_context(nbexecutor),
+      cwd=session_dir,
+      ipynb=current_app.config['IPYNB'],
       emit=emit,
-      session_dir=session_dir,
-      cleanup=functools.partial(cleanup, session_id),
     )
+
+def nbexecutor(cwd='', ipynb='', emit=print):
+  import json
+  proc = Popen(
+    [
+      sys.executable,
+      '-u',
+      sys.argv[0], # TODO: maybe this has to be appyter
+      'nbexecutor',
+      '--cwd='+cwd,
+      ipynb,
+    ],
+    env=dict(
+      PYTHONPATH=':'.join(sys.path),
+      PATH=os.environ['PATH'],
+    ),
+    stdout=PIPE,
+  )
+  packet = proc.stdout.readline()
+  while packet:
+    msg = json.loads(packet)
+    emit(msg['type'], msg['data'])
+    socketio.sleep(0)
+    packet = proc.stdout.readline()

@@ -5,4 +5,5 @@ if __name__ == '__main__':
   # 
   from appyter.cli import cli
   from appyter.render.flask_app import app
+  from appyter.render import nbexecutor
   cli()
