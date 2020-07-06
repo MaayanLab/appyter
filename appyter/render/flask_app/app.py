@@ -1,8 +1,7 @@
 import os
-import click
 import uuid
+import click
 from flask import Flask, Blueprint, current_app
-from flask.cli import with_appcontext, run_command
 
 from appyter.render.flask_app.socketio import socketio, emit
 from appyter.render.flask_app.core import core
@@ -53,7 +52,7 @@ def create_app(**kwargs):
   return app
 
 # register flask_app with CLI
-@cli.group(invoke_without_command=True)
+@cli.command(help='Run a flask web application based on an appyter-enabled jupyter notebook')
 @click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click.option('--prefix', envvar='PREFIX', default='/', help='Specify the prefix for which to mount the webserver onto')
 @click.option('--profile', envvar='PROFILE', default='default', help='Specify the profile to use for rendering')
@@ -66,13 +65,7 @@ def create_app(**kwargs):
 @click.option('--debug', envvar='DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
 @click.option('--static-dir', envvar='STATIC_DIR', default='static', help='The folder whether staticfiles are located')
 @click.argument('ipynb', envvar='IPYNB')
-@click.pass_context
-def flask_app(ctx, *args, **kwargs):
-  if ctx.invoked_subcommand is None:
-    return ctx.forward(run, *args, **kwargs)
-
-@flask_app.command()
-def run(*args, **kwargs):
+def flask_app(*args, **kwargs):
   if not kwargs.get('debug'):
     print('Patching...')
     import eventlet

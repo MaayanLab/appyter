@@ -23,22 +23,14 @@ def iopub_hook_factory(nb, emit):
     emit({ 'type': 'cell', 'data': [cell, cell_index] })
   return iopub_hook
 
-@cli.group(
-  invoke_without_command=True,
-)
-@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
-@click.argument('ipynb', envvar='IPYNB')
-@click.pass_context
-def nbexecutor(ctx, *args, **kwargs):
-  if ctx.invoked_subcommand is None:
-    return ctx.forward(run)
-
 def json_emitter(obj):
   import json
   print(json.dumps(obj))
 
-@nbexecutor.command()
-def run(ipynb='', emit=json_emitter, cwd=''):
+@cli.command(help='Execute a jupyter notebook on the command line asynchronously')
+@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click.argument('ipynb', envvar='IPYNB')
+def nbexecutor(ipynb='', emit=json_emitter, cwd=''):
   assert callable(emit), 'Emit must be callable'
   with open(os.path.join(cwd, ipynb), 'r') as fr:
     nb = nbf.read(fr, as_version=4)
