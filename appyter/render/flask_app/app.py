@@ -10,15 +10,13 @@ import appyter.render.flask_app.download
 import appyter.render.flask_app.execution
 
 from appyter.cli import cli
-from appyter.ext.flask.cli import FlaskGroup
 from appyter.context import get_env, get_extra_files, find_blueprints
 from appyter.util import join_routes
 
-
-def create_app():
+def create_app(**kwargs):
   ''' Completely initialize the flask application
   '''
-  config = get_env()
+  config = get_env(**kwargs)
   #
   print('Initializing flask...')
   app = Flask(__name__, static_url_path=config['STATIC_PREFIX'], static_folder=config['STATIC_DIR'])
@@ -46,6 +44,7 @@ def create_app():
   print('Initializing socketio...')
   socketio.init_app(app, 
     path=f"{app.config['PREFIX']}socket.io",
+    async_mode='threading' if app.config['DEBUG'] else 'eventlet',
     logger=bool(app.config['DEBUG']),
     engineio_logger=bool(app.config['DEBUG']),
     cors_allowed_origins='*',
@@ -54,13 +53,7 @@ def create_app():
   return app
 
 # register flask_app with CLI
-@cli.group(
-  cls=FlaskGroup,
-  create_app=create_app,
-  load_dotenv=False,
-  set_debug_flag=False,
-  invoke_without_command=True,
-)
+@cli.group(invoke_without_command=True)
 @click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click.option('--prefix', envvar='PREFIX', default='/', help='Specify the prefix for which to mount the webserver onto')
 @click.option('--profile', envvar='PROFILE', default='default', help='Specify the profile to use for rendering')
@@ -73,17 +66,19 @@ def create_app():
 @click.option('--debug', envvar='DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
 @click.option('--static-dir', envvar='STATIC_DIR', default='static', help='The folder whether staticfiles are located')
 @click.argument('ipynb', envvar='IPYNB')
-@with_appcontext
 @click.pass_context
 def flask_app(ctx, *args, **kwargs):
   if ctx.invoked_subcommand is None:
-    ctx.invoke(
-      run_command,
-      host=kwargs.get('host'),
-      port=kwargs.get('port'),
-      reload=kwargs.get('reload'),
-      debugger=kwargs.get('debugger'),
-      eager_loading=kwargs.get('eager_loading'),
-      with_threads=kwargs.get('with_threads', True),
-      extra_files=get_extra_files(current_app.config),
-    )
+    return ctx.forward(run, *args, **kwargs)
+
+@flask_app.command()
+def run(*args, **kwargs):
+  app = create_app(**kwargs)
+  return socketio.run(
+    app,
+    host=app.config['HOST'],
+    port=app.config['PORT'],
+    debug=app.config['DEBUG'],
+    use_reloader=app.config['DEBUG'],
+    extra_files=get_extra_files(config=app.config),
+  )
