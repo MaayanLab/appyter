@@ -34,27 +34,13 @@ def init(data):
   print('init')
   session_id = sanitize_uuid(data.get('_session'))
   session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
-  if os.path.exists(os.path.join(session_dir, os.path.basename(current_app.config['IPYNB']))) and not current_app.config['DEBUG']:
-    print('exists')
-    emit('error', 'Notebook already exists')
-    emit('redirect', f"")
-  else:
-    env = get_jinja2_env(config=current_app.config, context=data)
-    env.globals['_session'] = session_id
-    # TODO: move this to nbexecutor?
-    nbtemplate = nbtemplate_from_ipynb_file(
-      os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
-    )
-    nb = render_nb_from_nbtemplate(env, nbtemplate)
-    os.makedirs(session_dir, exist_ok=True)
-    nbf.write(nb, open(os.path.join(session_dir, os.path.basename(current_app.config['IPYNB'])), 'w'))
-    emit('status', 'Notebook created, queuing execution')
-    socketio.start_background_task(
-      copy_current_request_context(nbexecutor),
-      cwd=session_dir,
-      ipynb=current_app.config['IPYNB'],
-      emit=emit,
-    )
+  emit('status', 'Notebook created, queuing execution')
+  socketio.start_background_task(
+    copy_current_request_context(nbexecutor),
+    cwd=session_dir,
+    ipynb=current_app.config['IPYNB'],
+    emit=emit,
+  )
 
 def nbexecutor(cwd='', ipynb='', emit=print):
   import json

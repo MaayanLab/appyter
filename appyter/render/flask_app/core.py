@@ -1,8 +1,9 @@
 import os
 import uuid
 import json
+import shutil
 import nbformat as nbf
-from flask import Blueprint, request, abort, send_from_directory, current_app
+from flask import Blueprint, request, redirect, abort, send_from_directory, url_for, current_app
 
 from appyter.context import get_jinja2_env
 from appyter.parse.nbtemplate import nbtemplate_from_ipynb_file
@@ -81,11 +82,29 @@ def post_index_html_dynamic(data):
   ''' Return dynamic nbviewer
   '''
   env = get_jinja2_env(config=current_app.config, context=data)
-  env.globals['_session'] = data.get('_session')
-  nbtemplate = nbtemplate_from_ipynb_file(
-    os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
-  )
+  session_id = data.get('_session')
+  env.globals['_session'] = session_id
+  session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
+  nbtemplate = nbtemplate_from_ipynb_file(os.path.join(current_app.config['CWD'], current_app.config['IPYNB']))
   nb = render_nb_from_nbtemplate(env, nbtemplate)
+  nbfile = os.path.join(session_dir, os.path.basename(current_app.config['IPYNB']))
+  if not os.path.exists(nbfile) or current_app.config['DEBUG']:
+    os.makedirs(session_dir, exist_ok=True)
+    nbf.write(nb, open(nbfile, 'w'))
+  else:
+    # TODO: don't do this if it's a duplicate
+    # copy the current session info to a new one
+    new_session_id = str(uuid.uuid4())
+    env.globals['_session'] = new_session_id
+    new_session_dir = os.path.join(current_app.config['DATA_DIR'], new_session_id)
+    new_nbfile = os.path.join(new_session_dir, os.path.basename(current_app.config['IPYNB']))
+    # TODO: only copy relevant things, i.e. not leftover files
+    shutil.copytree(session_dir, new_session_dir)
+    # remove nbfile so it can be recreated after redirect
+    os.remove(new_nbfile)
+    # redirect client to new session
+    return redirect(url_for('__main__.post_index', session=new_session_id), 307)
+  #
   return env.get_template(
     'dynamic.j2',
   ).render(
@@ -176,13 +195,13 @@ def post_index(session):
     elif request.method == 'POST':
       if mimetype in {'text/html'}:
         if request.args.get('static') is not None:
-          return post_index_html_static(prepare_formdata(request))
+          return post_index_html_static(dict(prepare_formdata(request), _session=session))
         else:
-          return post_index_html_dynamic(prepare_formdata(request))
+          return post_index_html_dynamic(dict(prepare_formdata(request), _session=session))
       elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
-        return post_index_ipynb_static(request.form.to_dict())
+        return post_index_ipynb_static(dict(request.form.to_dict(), _session=session))
       elif mimetype in {'application/json'}:
-        return post_index_json_static(request.form.to_dict())
+        return post_index_json_static(dict(request.form.to_dict(), _session=session))
     abort(404)
 
 @route_join_with_or_without_slash(core, '<string:session>', '<path:path>', methods=['GET'])
