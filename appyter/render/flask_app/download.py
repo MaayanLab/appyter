@@ -1,11 +1,10 @@
 import os
 import traceback
 import urllib.request
-from flask import request, copy_current_request_context, current_app
+from flask import request, copy_current_request_context, current_app, session
 from flask_socketio import emit
 
 from appyter.render.flask_app.socketio import socketio
-from appyter.render.flask_app.core import session, execution_queue
 
 from appyter.render.flask_app.util import secure_filename, secure_url
 
@@ -14,7 +13,6 @@ from appyter.render.flask_app.util import secure_filename, secure_url
 @socketio.on('download_start')
 def download(data):
   print('file download start')
-  global session
   session_id = session[request.sid]['_session']
   session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
   os.makedirs(current_app.config['DATA_DIR'], exist_ok=True)
@@ -45,24 +43,21 @@ def download(data):
     else:
       emit('download_complete', dict(name=name, filename=filename))
   #
-  execution_queue.put((
-    download_with_progress,
-    dict(
-      name=name,
-      url=url,
-      path=os.path.join(session_dir, filename),
-      filename=filename,
-      emit=emit,
-    )
-  ))
   emit('download_queued', dict(name=name, filename=filename))
+  socketio.start_background_task(
+    download_with_progress,
+    name=name,
+    url=url,
+    path=os.path.join(session_dir, filename),
+    filename=filename,
+    emit=emit,
+  )
 
 
 # upload from client
 @socketio.on("siofu_start")
 def siofu_start(data):
   print('file upload start')
-  global session
   session_id = session[request.sid]['_session']
   session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
   filename = secure_filename(data.get('name'))
@@ -76,7 +71,6 @@ def siofu_start(data):
         fh=open(os.path.join(session_dir, filename), 'wb'),
       ),
     })
-
     emit('siofu_ready', {
       'id': data.get('id'),
       'name': None,
@@ -86,7 +80,6 @@ def siofu_start(data):
 
 @socketio.on("siofu_progress")
 def siofu_progress(data):
-  global session
   session[request.sid]['file_%d' % (data['id'])]['fh'].write(data['content'])
   emit("siofu_chunk", {
     'id': data['id'],
@@ -95,7 +88,6 @@ def siofu_progress(data):
 @socketio.on("siofu_done")
 def siofu_done(data):
   print('file upload complete')
-  global session
   session[request.sid]['file_%d' % (data['id'])]['fh'].close()
   del session[request.sid]['file_%d' % (data['id'])]
   emit('siofu_complete', {

@@ -2,7 +2,6 @@ import os
 import uuid
 import json
 import nbformat as nbf
-from queue import Queue
 from flask import Blueprint, request, abort, send_from_directory, current_app
 
 from appyter.context import get_jinja2_env
@@ -13,12 +12,7 @@ from appyter.render.ipynb import render_nb_from_nbtemplate
 from appyter.render.json import render_nbtemplate_json_from_nbtemplate
 from appyter.render.flask_app.util import sanitize_uuid, route_join_with_or_without_slash, collapse
 
-
 core = Blueprint('__main__', __name__)
-
-session = {}
-execution_queue = Queue()
-
 
 def prepare_formdata(req):
   # Get form variables

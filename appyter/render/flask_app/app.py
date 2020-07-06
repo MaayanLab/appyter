@@ -46,7 +46,6 @@ def create_app():
   print('Initializing socketio...')
   socketio.init_app(app, 
     path=f"{app.config['PREFIX']}socket.io",
-    async_mode='threading',
     logger=bool(app.config['DEBUG']),
     engineio_logger=bool(app.config['DEBUG']),
     cors_allowed_origins='*',
@@ -85,6 +84,6 @@ def flask_app(ctx, *args, **kwargs):
       reload=kwargs.get('reload'),
       debugger=kwargs.get('debugger'),
       eager_loading=kwargs.get('eager_loading'),
-      with_threads=kwargs.get('with_threads'),
+      with_threads=kwargs.get('with_threads', True),
       extra_files=get_extra_files(current_app.config),
     )

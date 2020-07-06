@@ -2,35 +2,17 @@ import os
 import traceback
 import functools
 import nbformat as nbf
-from flask import current_app, request, copy_current_request_context
+from flask import current_app, request, copy_current_request_context, session
 from flask_socketio import emit
 
 from appyter.render.flask_app.app import socketio
-from appyter.render.flask_app.core import core, session, execution_queue
+from appyter.render.flask_app.core import core
 from appyter.render.flask_app.util import sanitize_uuid
 
 from appyter.context import get_jinja2_env
 from appyter.parse.nbtemplate import nbtemplate_from_ipynb_file
 from appyter.render.nbexecutor import render_nbexecutor_from_nb
 from appyter.render.ipynb import render_nb_from_nbtemplate
-
-
-def worker(n, execution_queue):
-  while True:
-    fn, kwargs = execution_queue.get()
-    print(f"worker {n}: {fn}({kwargs})")
-    try:
-      fn(**kwargs)
-    except Exception as e:
-      print(f"worker {n} error")
-      traceback.print_exc()
-    execution_queue.task_done()
-
-@core.before_app_first_request
-def init_core():
-  print('Spawning workers...')
-  for n in range(current_app.config['MAX_THREADS']):
-    socketio.start_background_task(worker, n=n, execution_queue=execution_queue)
 
 
 def cleanup(session, nb):
@@ -40,15 +22,16 @@ def cleanup(session, nb):
 
 @socketio.on('session')
 def _(data):
-  print('session', data)
-  global session
+  print('session', data, request.sid)
   session[request.sid] = dict(session.get(request.sid, {}), _session=sanitize_uuid(data['_session']))
+  print(session)
 
 @socketio.on('disconnect')
 def _():
-  global session
+  print('disconnect', request.sid)
   if request.sid in session:
     del session[request.sid]
+  print(session)
 
 @socketio.on('init')
 def init(data):
@@ -70,12 +53,9 @@ def init(data):
     nbf.write(nb, open(os.path.join(session_dir, os.path.basename(current_app.config['IPYNB'])), 'w'))
     emit('status', 'Notebook created, queuing execution')
     nbexecutor = copy_current_request_context(render_nbexecutor_from_nb(env, nb))
-    execution_queue.put((
+    socketio.start_background_task(
       nbexecutor,
-      dict(
-        emit=emit,
-        session_dir=session_dir,
-        cleanup=functools.partial(cleanup, session_id),
-      ),
-    ))
-
+      emit=emit,
+      session_dir=session_dir,
+      cleanup=functools.partial(cleanup, session_id),
+    )
