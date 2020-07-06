@@ -18,7 +18,7 @@ class StringField(Field):
   :param \**kwargs: Additional keyword arguments used by other fields
   '''
   def __init__(self, constraint=r'.*', hint=None, **kwargs):
-    super(StringField, self).__init__(
+    super().__init__(
       constraint=constraint,
       hint=hint,
       **kwargs,

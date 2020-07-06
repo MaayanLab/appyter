@@ -21,7 +21,7 @@ class FileField(Field):
   :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
   def __init__(self, constraint=r'[^/]*', examples={}, **kwargs):
-    super(FileField, self).__init__(
+    super().__init__(
       constraint=constraint,
       examples=examples,
       **kwargs,

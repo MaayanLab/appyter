@@ -14,7 +14,7 @@ class MultiChoiceField(Field):
   :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
   def __init__(self, **kwargs):
-    super(MultiChoiceField, self).__init__(**kwargs)
+    super().__init__(**kwargs)
 
   @property
   def raw_value(self):

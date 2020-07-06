@@ -15,10 +15,10 @@
 {{ super() }}
 <script type="text/javascript" charset="utf-8">
   require(['jquery', 'socket'], function ($, socket) {
-    var $nbviewer, $status, $downloadNotebook, current_index, current_code_cell, started, scroll, md
+    var $nbviewer, $status, $downloadNotebook, current_code_cell, started, scroll, md
 
     function find_or_create(root, classes) {
-      var $el = root.find(classes.map(function (cls) { return `.cls` }).join(' '))
+      var $el = root.find(classes.map(function (cls) { return `.${cls}` }).join(' '))
       if ($el[0] === undefined) {
         var $el = $('<div></div>')
         for (var cls of classes) {
@@ -59,10 +59,10 @@
       var cell_output_status = $(cell.find('.output-status')[0])
       cell_output_status.removeClass('pending')
       cell_output_status.addClass('loading')
-
-      current_index = value // save the current index
     })
-    socket.on('cell', function (value) {
+    socket.on('cell', function (value_index) {
+      var value = value_index[0]
+      var current_index = value_index[1]
       console.debug(value)
       if (value.cell_type == 'code') {
         var cell = $($('#nbviewer').find('.cell')[current_index])
@@ -77,6 +77,13 @@
           cell_output_area.append(cell_output_prompt)
           cell_output_area.append(cell_output_subarea)
           if (ele.output_type == 'stream') {
+            if (ele.text.startsWith('\r')) {
+              var output_areas = cell_output.find('.output_area')
+              if (output_areas[output_areas.length-1] !== undefined) {
+                console.log(output_areas[output_areas.length-1])
+                output_areas[output_areas.length-1].remove()
+              }
+            }
             var cell_output_container = $('<div class="output_stream output_' + ele.name + ' output_text">')
             var cell_output_text = $('<pre>').text(ele.text)
             cell_output_container.append(cell_output_text)
@@ -137,8 +144,10 @@
         cell_output_status.removeClass('loading')
         cell_output_status.addClass('ready')
 
-        var current_cell_ele = cell.find('.input_prompt')
-        current_cell_ele.text('In ['+(current_code_cell++)+']:')
+        if (value.execution_count !== undefined && value.execution_count !== null) {
+          var current_cell_ele = cell.find('.input_prompt')
+          current_cell_ele.text('In ['+(value.execution_count)+']:')
+        }
         if (scroll) {
           $('html, body').animate({
             scrollTop: current_cell_ele.offset().top

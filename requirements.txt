@@ -1,4 +1,7 @@
 bs4
+click
+click-default-group
+eventlet
 flask
 flask-socketio
 ipython
@@ -7,6 +10,7 @@ jq
 jupyter
 jupyter_client
 lxml
+nbclient
 nbconvert
 nbformat
 python-dotenv

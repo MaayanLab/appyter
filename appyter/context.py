@@ -142,7 +142,6 @@ def get_extra_files(config=None):
     config = get_env()
   cwd = config['CWD']
   profile = config['PROFILE']
-  args = config['ARGS']
   dirs = [
     *find_templates_dir(config=config),
     *find_filters_dir_mappings(config=config).keys(),
@@ -161,21 +160,16 @@ def get_extra_files(config=None):
       *glob.glob(os.path.join(d, '**', '_*'), recursive=True),
     }))
   }
-  paths.add(os.path.abspath(os.path.join(cwd, args[0])))
+  paths.add(os.path.abspath(os.path.join(cwd, config['IPYNB'])))
   return list(paths)
 
 def get_jinja2_env(context={}, config=None):
   if config is None:
     config = get_env()
-  cwd = config['CWD']
   #
   import sys
   from appyter.fields import build_fields
   from jinja2 import Environment, ChoiceLoader, FileSystemLoader
-  if os.path.abspath(cwd) not in sys.path:
-    sys.path.insert(0, os.path.abspath(cwd))
-  if os.path.abspath(cwd) not in os.environ['PATH'].split(':'):
-    os.environ['PATH'] = os.path.abspath(cwd) + ':' + os.environ['PATH']
   env = Environment(
     extensions=['jinja2.ext.do'],
     loader=ChoiceLoader([
@@ -189,52 +183,39 @@ def get_jinja2_env(context={}, config=None):
   env.globals.update(**build_fields(find_fields(config=config), context=context))
   return env
 
-def get_sys_env():
-  import sys
-  from collections import Counter
-  args = []
-  kargs = Counter()
-  kwargs = {}
-  for arg in sys.argv[1:]:
-    if arg.startswith('--'):
-      try:
-        k, v = arg[2:].split('=', maxsplit=1)
-      except:
-        k, v = arg[2:], True
-      kwargs[k] = v
-    elif arg.startswith('-'):
-      kargs.update({arg[1:]: 1})
-    else:
-      args.append(arg)
-  return args, kargs, kwargs
-
-def get_env():
+def try_json_loads(v):
   import json
+  try:
+    return json.loads(v)
+  except:
+    return v
+
+def get_env_from_kwargs(**kwargs):
+  import sys
   import uuid
   from appyter.util import join_routes
-  from dotenv import load_dotenv
-  load_dotenv()
-  ARGS, KARGS, KWARGS = get_sys_env()
-  PREFIX = KWARGS.get('prefix', os.environ.get('PREFIX', '/'))
-  PROFILE = KWARGS.get('profile', os.environ.get('PROFILE', 'default'))
-  HOST = KWARGS.get('host', os.environ.get('HOST', '127.0.0.1'))
-  PORT = json.loads(KWARGS.get('port', os.environ.get('PORT', '5000')))
-  PROXY = json.loads(KWARGS.get('proxy', os.environ.get('PROXY', 'false')))
-  CWD = os.path.realpath(KWARGS.get('cwd', os.environ.get('CWD', os.getcwd())))
-  print(CWD)
-  DATA_DIR = KWARGS.get('data-dir', os.environ.get('DATA_DIR', 'data'))
-  MAX_THREADS = json.loads(KWARGS.get('max-threads', os.environ.get('MAX_THREADS', '10')))
-  SECRET_KEY = KWARGS.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
-  DEBUG = json.loads(KWARGS.get('debug', os.environ.get('DEBUG', 'true')))
-  STATIC_DIR = KWARGS.get('static-dir', os.path.abspath(os.path.join(CWD, 'static')))
-  IPYNB = ARGS[0] if len(ARGS) > 0 else os.environ.get('APP', 'app.ipynb')
-  SHOW_HELP = 'h' in KARGS or 'help' in KWARGS or ARGS == []
+  assert kwargs != {}
+  PREFIX = kwargs.get('prefix', os.environ.get('PREFIX', '/'))
+  PROFILE = kwargs.get('profile', os.environ.get('PROFILE', 'default'))
+  HOST = kwargs.get('host', os.environ.get('HOST', '127.0.0.1'))
+  PORT = try_json_loads(kwargs.get('port', os.environ.get('PORT', 5000)))
+  PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('PROXY', False)))
+  CWD = os.path.realpath(kwargs.get('cwd', os.environ.get('CWD', os.getcwd())))
+  DATA_DIR = kwargs.get('data-dir', os.environ.get('DATA_DIR', 'data'))
+  MAX_THREADS = try_json_loads(kwargs.get('max-threads', os.environ.get('MAX_THREADS', 10)))
+  SECRET_KEY = kwargs.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
+  DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
+  STATIC_DIR = kwargs.get('static-dir', os.path.abspath(os.path.join(CWD, 'static')))
   STATIC_PREFIX = join_routes(PREFIX, 'static')
+  IPYNB = kwargs.get('ipynb', os.environ.get('IPYNB'))
+  assert IPYNB != None, 'ipynb was not found'
+  #
+  if os.path.abspath(CWD) not in sys.path:
+    sys.path.insert(0, os.path.abspath(CWD))
+  if os.path.abspath(CWD) not in os.environ['PATH'].split(':'):
+    os.environ['PATH'] = os.path.abspath(CWD) + ':' + os.environ['PATH']
   #
   return dict(
-    ARGS=ARGS,
-    KARGS=KARGS,
-    KWARGS=KWARGS,
     PREFIX=PREFIX,
     PROFILE=PROFILE,
     HOST=HOST,
@@ -247,6 +228,55 @@ def get_env():
     DEBUG=DEBUG,
     STATIC_DIR=STATIC_DIR,
     IPYNB=IPYNB,
-    SHOW_HELP=SHOW_HELP,
     STATIC_PREFIX=STATIC_PREFIX,
   )
+
+def get_env_from_click():
+  ''' Traverse click context and use params for get_env_from_kwargs
+  '''
+  import click
+  click_ctx = click.get_current_context()
+  # aggregate all params from all parents
+  params = {}
+  while click_ctx:
+    # preserve leaf-values in the case of conflicts
+    params = {
+      k: params.get(k, click_ctx.params.get(k))
+      for k in (click_ctx.params.keys() | params.keys())
+    }
+    click_ctx = click_ctx.parent
+  # use aggregated params to get env
+  return get_env_from_kwargs(**params)
+
+def get_env_from_flask():
+  ''' If we're running in flask, current_app.config should be available
+  '''
+  from flask import current_app
+  return current_app.config
+
+config = {}
+
+def get_env(**kwargs):
+  ''' Try various methods to grab the application config
+  (different based on whether we're in a flask thread/somewhere else)
+  '''
+  #
+  try:
+    global config
+    config = get_env_from_kwargs(**kwargs)
+  except AssertionError:
+    pass
+  #
+  try:
+    return get_env_from_flask()
+  except Exception:
+    pass
+  #
+  try:
+    return get_env_from_click()
+  except RuntimeError as e:
+    pass
+  except AssertionError as e:
+    pass
+  #
+  return config
