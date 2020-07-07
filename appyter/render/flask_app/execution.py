@@ -7,7 +7,7 @@ from subprocess import Popen, PIPE
 from flask import current_app, request, copy_current_request_context, session
 from flask_socketio import emit
 
-from appyter.render.flask_app.app import socketio
+from appyter.render.flask_app import socketio
 from appyter.render.flask_app.core import core
 from appyter.render.flask_app.util import sanitize_uuid
 
