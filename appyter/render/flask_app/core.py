@@ -53,7 +53,7 @@ def get_index_json():
   nbtemplate = nbtemplate_from_ipynb_file(
     os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
   )
-  return render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
+  return json.dumps(render_nbtemplate_json_from_nbtemplate(env, nbtemplate))
 
 def get_session_html_static(session_id):
   nbfile = os.path.join(current_app.config['DATA_DIR'], session_id, os.path.basename(current_app.config['IPYNB']))
@@ -138,7 +138,7 @@ def post_index_json_static(data):
     os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
   )
   nb = render_nb_from_nbtemplate(env, nbtemplate)
-  return render_nbtemplate_json_from_nbtemplate(env, nb)
+  return json.dumps(render_nbtemplate_json_from_nbtemplate(env, nb))
 
 def post_index_ipynb_static(data):
   ''' Return rendered ipynb
