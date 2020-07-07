@@ -36,20 +36,20 @@ def init(data):
   session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
   emit('status', 'Notebook created, queuing execution')
   socketio.start_background_task(
-    copy_current_request_context(nbexecutor),
+    copy_current_request_context(nbexecute),
     cwd=session_dir,
     ipynb=current_app.config['IPYNB'],
     emit=emit,
   )
 
-def nbexecutor(cwd='', ipynb='', emit=print):
+def nbexecute(cwd='', ipynb='', emit=print):
   import json
   proc = Popen(
     [
       sys.executable,
       '-u',
       '-m', 'appyter',
-      'nbexecutor',
+      'nbexecute',
       '--cwd='+cwd,
       ipynb,
     ],

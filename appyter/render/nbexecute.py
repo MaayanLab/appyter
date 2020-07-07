@@ -30,7 +30,7 @@ def json_emitter(obj):
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')
 @click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click.argument('ipynb', envvar='IPYNB')
-def nbexecutor(ipynb='', emit=json_emitter, cwd=''):
+def nbexecute(ipynb='', emit=json_emitter, cwd=''):
   assert callable(emit), 'Emit must be callable'
   with open(os.path.join(cwd, ipynb), 'r') as fr:
     nb = nbf.read(fr, as_version=4)
