@@ -24,7 +24,8 @@ def build_fields(fields, context={}):
   }
 
 class Field(dict):
-  ''' ```eval_rst
+  ''' Base field for which all fields derive
+  ```eval_rst
   Base class for all Field objects representing a value that will later be provided via a front-end form.
   See :mod:`appyter.profiles.default.fields` for the actual fields.
   ``` '''

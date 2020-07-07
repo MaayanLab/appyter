@@ -1,5 +1,7 @@
 import os
 import glob
+import click
+from appyter.cli import cli
 from appyter.util import importdir_deep
 
 def find_fields_dir_mappings(config=None):
@@ -30,6 +32,33 @@ def find_fields(config=None):
         filter_mod=lambda m, k, v: not k.startswith('_') and isinstance(v, type) and issubclass(v, Field)
       )
   return ctx
+
+@cli.command(help='List the available fields')
+@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+def list_fields(**kwargs):
+  fields = find_fields(get_env(ipynb='app.ipynb', **kwargs))
+  field_name_max_size = max(map(len, fields.keys()))
+  for field, mod in fields.items():
+    doc_lines = [
+      *(mod.__doc__.strip().splitlines() if mod.__doc__ else []),
+      *(mod.__init__.__doc__.strip().splitlines() if mod.__init__.__doc__ else []),
+    ]
+    doc_first_line = doc_lines[0].strip() if doc_lines else ''
+    print(field.ljust(field_name_max_size+1), doc_first_line)
+
+@cli.command(help='Describe a field using its docstring')
+@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click.argument('field', envvar='FIELD', type=str)
+def describe_field(field, **kwargs):
+  fields = find_fields(get_env(ipynb='app.ipynb', **kwargs))
+  assert field in fields, 'Please choose a valid field name, see list-fields for options'
+  mod = fields[field]
+  doc_lines = [
+    *(mod.__doc__.strip().splitlines() if mod.__doc__ else []),
+    *(mod.__init__.__doc__.strip().splitlines() if mod.__init__.__doc__ else []),
+  ]
+  print(*doc_lines, sep='\n')
+
 
 def find_filters_dir_mappings(config=None):
   if config is None:
