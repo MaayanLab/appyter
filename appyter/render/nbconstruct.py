@@ -1,6 +1,13 @@
+import os
+import json
+import click
 import nbformat as nbf
 from copy import deepcopy
+
+from appyter.cli import cli
+from appyter.context import get_env, get_jinja2_env
 from appyter.parse.nbtemplate import cell_match
+
 
 def render_cell(env, cell):
   ''' Render a single cell, calling jinja2 templates when necessary
@@ -56,3 +63,18 @@ def render_nb_from_nbtemplate(env, nb):
     for cell in nb.cells
   ]))
   return nb
+
+@cli.command(help='Construct jupyter notebook from appyter and arguments')
+@click.option('--context', envvar='CONTEXT', default='-', type=click.File('r'), help='JSON serialized context mapping field names to values')
+@click.option('--output', envvar='OUTPUT', default='-', type=click.File('w'), help='The output location of the serialized jupyter notebook')
+@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click.argument('ipynb', envvar='IPYNB')
+def nbconstruct(cwd, ipynb, context, output, **kwargs):
+  context = json.load(context)
+  env = get_jinja2_env(
+    config=get_env(cwd=cwd, ipynb=ipynb, **kwargs),
+    context=context,
+  )
+  nbtemplate = nbf.read(open(os.path.join(cwd, ipynb), 'r'), as_version=4)
+  nb = render_nb_from_nbtemplate(env, nbtemplate)
+  nbf.write(nb, output)
