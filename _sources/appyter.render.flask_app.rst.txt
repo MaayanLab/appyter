@@ -4,14 +4,6 @@ appyter.render.flask\_app package
 Submodules
 ----------
 
-appyter.render.flask\_app.app module
-------------------------------------
-
-.. automodule:: appyter.render.flask_app.app
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 appyter.render.flask\_app.core module
 -------------------------------------
 

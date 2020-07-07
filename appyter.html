@@ -83,7 +83,6 @@
 <li class="toctree-l2"><a class="reference internal" href="appyter.render.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="appyter.render.flask_app.html">appyter.render.flask_app package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.app">appyter.render.flask_app.app module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.core">appyter.render.flask_app.core module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.download">appyter.render.flask_app.download module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.execution">appyter.render.flask_app.execution module</a></li>
@@ -100,8 +99,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.render.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.render.html#module-appyter.render.form">appyter.render.form module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.render.html#module-appyter.render.ipynb">appyter.render.ipynb module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.render.html#module-appyter.render.json">appyter.render.json module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.render.html#module-appyter.render.nbconstruct">appyter.render.nbconstruct module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.render.html#module-appyter.render.nbinspect">appyter.render.nbinspect module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.render.html#module-appyter.render.nbviewer">appyter.render.nbviewer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.render.html#module-appyter.render">Module contents</a></li>
 </ul>
@@ -192,16 +191,6 @@
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.context.importdir">
-<code class="sig-prename descclassname">appyter.context.</code><code class="sig-name descname">importdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_dirname_</span></em>, <em class="sig-param"><span class="n">_package_</span></em>, <em class="sig-param"><span class="n">_globals_</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/context.html#importdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.context.importdir" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="appyter.context.importdir_deep">
-<code class="sig-prename descclassname">appyter.context.</code><code class="sig-name descname">importdir_deep</code><span class="sig-paren">(</span><em class="sig-param">_dirname_</em>, <em class="sig-param">_package_</em>, <em class="sig-param">_globals_</em>, <em class="sig-param">filter_mod=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/context.html#importdir_deep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.context.importdir_deep" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt id="appyter.context.try_json_loads">
 <code class="sig-prename descclassname">appyter.context.</code><code class="sig-name descname">try_json_loads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/context.html#try_json_loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.context.try_json_loads" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -215,7 +204,8 @@ defined in <a class="reference internal" href="appyter.profiles.default.fields.h
 <dt id="appyter.fields.Field">
 <em class="property">class </em><code class="sig-prename descclassname">appyter.fields.</code><code class="sig-name descname">Field</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/fields.html#Field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.fields.Field" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
-<p>Base class for all Field objects representing a value that will later be provided via a front-end form.
+<p>Base field for which all fields derive
+Base class for all Field objects representing a value that will later be provided via a front-end form.
 See <a class="reference internal" href="appyter.profiles.default.fields.html#module-appyter.profiles.default.fields" title="appyter.profiles.default.fields"><code class="xref py py-mod docutils literal notranslate"><span class="pre">appyter.profiles.default.fields</span></code></a> for the actual fields.</p>
 <dl class="py method">
 <dt id="appyter.fields.Field.args">
@@ -328,6 +318,16 @@ for import.</p>
 </div>
 <div class="section" id="module-appyter.util">
 <span id="appyter-util-module"></span><h2>appyter.util module<a class="headerlink" href="#module-appyter.util" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.util.importdir">
+<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">importdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_dirname_</span></em>, <em class="sig-param"><span class="n">_package_</span></em>, <em class="sig-param"><span class="n">_globals_</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#importdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.importdir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.util.importdir_deep">
+<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">importdir_deep</code><span class="sig-paren">(</span><em class="sig-param">_dirname_</em>, <em class="sig-param">_package_</em>, <em class="sig-param">_globals_</em>, <em class="sig-param">filter_mod=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#importdir_deep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.importdir_deep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt id="appyter.util.join_routes">
 <code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">join_routes</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">routes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#join_routes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.join_routes" title="Permalink to this definition">¶</a></dt>

@@ -42,6 +42,38 @@
   <span class="sd">&#39;&#39;&#39; Utility function for joining routes while striping extraneous slashes</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">return</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">route</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">routes</span> <span class="k">if</span> <span class="n">route</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)])</span></div>
+
+<div class="viewcode-block" id="importdir"><a class="viewcode-back" href="../../appyter.html#appyter.util.importdir">[docs]</a><span class="k">def</span> <span class="nf">importdir</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">,</span> <span class="n">_package_</span><span class="p">,</span> <span class="n">_globals_</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">importlib</span>
+  <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+      <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">):</span>
+      <span class="n">modname</span> <span class="o">=</span> <span class="n">f</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">,</span> <span class="n">f</span><span class="p">)):</span>
+      <span class="n">modname</span> <span class="o">=</span> <span class="n">f</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">continue</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;.</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">modname</span><span class="p">),</span> <span class="n">_package_</span><span class="p">)</span>
+    <span class="n">_globals_</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">modname</span><span class="p">:</span> <span class="n">mod</span><span class="p">})</span></div>
+
+<div class="viewcode-block" id="importdir_deep"><a class="viewcode-back" href="../../appyter.html#appyter.util.importdir_deep">[docs]</a><span class="k">def</span> <span class="nf">importdir_deep</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">,</span> <span class="n">_package_</span><span class="p">,</span> <span class="n">_globals_</span><span class="p">,</span> <span class="n">filter_mod</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)):</span>
+  <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">importlib</span>
+  <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+      <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">):</span>
+      <span class="n">modname</span> <span class="o">=</span> <span class="n">f</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">,</span> <span class="n">f</span><span class="p">)):</span>
+      <span class="n">modname</span> <span class="o">=</span> <span class="n">f</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">continue</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;.</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">modname</span><span class="p">),</span> <span class="n">_package_</span><span class="p">)</span>
+    <span class="n">_globals_</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="p">{</span>
+      <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+      <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">filter_mod</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="p">})</span></div>
 </pre></div>
 
             <div class="clearer"></div>

@@ -43,7 +43,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="appyter.render.flask_app.html">appyter.render.flask_app package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="appyter.render.flask_app.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.app">appyter.render.flask_app.app module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.core">appyter.render.flask_app.core module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.download">appyter.render.flask_app.download module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.execution">appyter.render.flask_app.execution module</a></li>
@@ -72,28 +71,28 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-appyter.render.ipynb">
-<span id="appyter-render-ipynb-module"></span><h2>appyter.render.ipynb module<a class="headerlink" href="#module-appyter.render.ipynb" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-appyter.render.nbconstruct">
+<span id="appyter-render-nbconstruct-module"></span><h2>appyter.render.nbconstruct module<a class="headerlink" href="#module-appyter.render.nbconstruct" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.render.ipynb.render_cell">
-<code class="sig-prename descclassname">appyter.render.ipynb.</code><code class="sig-name descname">render_cell</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">cell</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/ipynb.html#render_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.ipynb.render_cell" title="Permalink to this definition">¶</a></dt>
+<dt id="appyter.render.nbconstruct.render_cell">
+<code class="sig-prename descclassname">appyter.render.nbconstruct.</code><code class="sig-name descname">render_cell</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">cell</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbconstruct.html#render_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbconstruct.render_cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render a single cell, calling jinja2 templates when necessary
 (only on %%appyter -matched cells) and converting cells
 to markdown / removing them as necessary.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.ipynb.render_nb_from_nbtemplate">
-<code class="sig-prename descclassname">appyter.render.ipynb.</code><code class="sig-name descname">render_nb_from_nbtemplate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">nb</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/ipynb.html#render_nb_from_nbtemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.ipynb.render_nb_from_nbtemplate" title="Permalink to this definition">¶</a></dt>
+<dt id="appyter.render.nbconstruct.render_nb_from_nbtemplate">
+<code class="sig-prename descclassname">appyter.render.nbconstruct.</code><code class="sig-name descname">render_nb_from_nbtemplate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">nb</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbconstruct.html#render_nb_from_nbtemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbconstruct.render_nb_from_nbtemplate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render the notebook by rendering the jinja2 templates using the context in env.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-appyter.render.json">
-<span id="appyter-render-json-module"></span><h2>appyter.render.json module<a class="headerlink" href="#module-appyter.render.json" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-appyter.render.nbinspect">
+<span id="appyter-render-nbinspect-module"></span><h2>appyter.render.nbinspect module<a class="headerlink" href="#module-appyter.render.nbinspect" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.render.json.render_nbtemplate_json_from_nbtemplate">
-<code class="sig-prename descclassname">appyter.render.json.</code><code class="sig-name descname">render_nbtemplate_json_from_nbtemplate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">nb</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/json.html#render_nbtemplate_json_from_nbtemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.json.render_nbtemplate_json_from_nbtemplate" title="Permalink to this definition">¶</a></dt>
+<dt id="appyter.render.nbinspect.render_nbtemplate_json_from_nbtemplate">
+<code class="sig-prename descclassname">appyter.render.nbinspect.</code><code class="sig-name descname">render_nbtemplate_json_from_nbtemplate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">nb</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbinspect.html#render_nbtemplate_json_from_nbtemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbinspect.render_nbtemplate_json_from_nbtemplate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render a json representing the relevant Fields throughout the notebook.</p>
 </dd></dl>
 
@@ -126,8 +125,8 @@ to markdown / removing them as necessary.</p>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-appyter.render.form">appyter.render.form module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.ipynb">appyter.render.ipynb module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.json">appyter.render.json module</a></li>
+<li><a class="reference internal" href="#module-appyter.render.nbconstruct">appyter.render.nbconstruct module</a></li>
+<li><a class="reference internal" href="#module-appyter.render.nbinspect">appyter.render.nbinspect module</a></li>
 <li><a class="reference internal" href="#module-appyter.render.nbviewer">appyter.render.nbviewer module</a></li>
 <li><a class="reference internal" href="#module-appyter.render">Module contents</a></li>
 </ul>

@@ -26,7 +26,8 @@
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" accesskey="U">appyter.render.flask_app</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.execution</a></li> 
       </ul>
     </div>  
@@ -46,13 +47,13 @@
 <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">copy_current_request_context</span><span class="p">,</span> <span class="n">session</span>
 <span class="kn">from</span> <span class="nn">flask_socketio</span> <span class="kn">import</span> <span class="n">emit</span>
 
-<span class="kn">from</span> <span class="nn">appyter.render.flask_app.app</span> <span class="kn">import</span> <span class="n">socketio</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app</span> <span class="kn">import</span> <span class="n">socketio</span>
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app.core</span> <span class="kn">import</span> <span class="n">core</span>
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app.util</span> <span class="kn">import</span> <span class="n">sanitize_uuid</span>
 
 <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_jinja2_env</span>
 <span class="kn">from</span> <span class="nn">appyter.parse.nbtemplate</span> <span class="kn">import</span> <span class="n">nbtemplate_from_ipynb_file</span>
-<span class="kn">from</span> <span class="nn">appyter.render.ipynb</span> <span class="kn">import</span> <span class="n">render_nb_from_nbtemplate</span>
+<span class="kn">from</span> <span class="nn">appyter.render.nbconstruct</span> <span class="kn">import</span> <span class="n">render_nb_from_nbtemplate</span>
 
 
 <span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;session&#39;</span><span class="p">)</span>
@@ -87,7 +88,7 @@
     <span class="p">[</span>
       <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span>
       <span class="s1">&#39;-u&#39;</span><span class="p">,</span>
-      <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="c1"># TODO: maybe this has to be appyter</span>
+      <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;appyter&#39;</span><span class="p">,</span>
       <span class="s1">&#39;nbexecutor&#39;</span><span class="p">,</span>
       <span class="s1">&#39;--cwd=&#39;</span><span class="o">+</span><span class="n">cwd</span><span class="p">,</span>
       <span class="n">ipynb</span><span class="p">,</span>
@@ -137,6 +138,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" >appyter.render.flask_app</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.execution</a></li> 
       </ul>
     </div>

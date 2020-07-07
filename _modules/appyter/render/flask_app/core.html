@@ -26,7 +26,8 @@
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" accesskey="U">appyter.render.flask_app</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.core</a></li> 
       </ul>
     </div>  
@@ -48,8 +49,8 @@
 <span class="kn">from</span> <span class="nn">appyter.parse.nbtemplate</span> <span class="kn">import</span> <span class="n">nbtemplate_from_ipynb_file</span>
 <span class="kn">from</span> <span class="nn">appyter.render.form</span> <span class="kn">import</span> <span class="n">render_form_from_nbtemplate</span>
 <span class="kn">from</span> <span class="nn">appyter.render.nbviewer</span> <span class="kn">import</span> <span class="n">render_nbviewer_from_nb</span>
-<span class="kn">from</span> <span class="nn">appyter.render.ipynb</span> <span class="kn">import</span> <span class="n">render_nb_from_nbtemplate</span>
-<span class="kn">from</span> <span class="nn">appyter.render.json</span> <span class="kn">import</span> <span class="n">render_nbtemplate_json_from_nbtemplate</span>
+<span class="kn">from</span> <span class="nn">appyter.render.nbconstruct</span> <span class="kn">import</span> <span class="n">render_nb_from_nbtemplate</span>
+<span class="kn">from</span> <span class="nn">appyter.render.nbinspect</span> <span class="kn">import</span> <span class="n">render_nbtemplate_json_from_nbtemplate</span>
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app.util</span> <span class="kn">import</span> <span class="n">sanitize_uuid</span><span class="p">,</span> <span class="n">route_join_with_or_without_slash</span><span class="p">,</span> <span class="n">collapse</span>
 
 <span class="n">core</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;__main__&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">)</span>
@@ -281,6 +282,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" >appyter.render.flask_app</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.core</a></li> 
       </ul>
     </div>

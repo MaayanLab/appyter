@@ -21,18 +21,18 @@ appyter.render.form module
    :undoc-members:
    :show-inheritance:
 
-appyter.render.ipynb module
----------------------------
+appyter.render.nbconstruct module
+---------------------------------
 
-.. automodule:: appyter.render.ipynb
+.. automodule:: appyter.render.nbconstruct
    :members:
    :undoc-members:
    :show-inheritance:
 
-appyter.render.json module
---------------------------
+appyter.render.nbinspect module
+-------------------------------
 
-.. automodule:: appyter.render.json
+.. automodule:: appyter.render.nbinspect
    :members:
    :undoc-members:
    :show-inheritance:
