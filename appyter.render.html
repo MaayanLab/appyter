@@ -51,10 +51,6 @@
 <li class="toctree-l2"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="appyter.render.nbexecutor.html">appyter.render.nbexecutor package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appyter.render.nbexecutor.html#module-appyter.render.nbexecutor">Module contents</a></li>
-</ul>
-</li>
 </ul>
 </div>
 </div>
@@ -86,6 +82,29 @@ to markdown / removing them as necessary.</p>
 <code class="sig-prename descclassname">appyter.render.nbconstruct.</code><code class="sig-name descname">render_nb_from_nbtemplate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">nb</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbconstruct.html#render_nb_from_nbtemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbconstruct.render_nb_from_nbtemplate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render the notebook by rendering the jinja2 templates using the context in env.</p>
 </dd></dl>
+
+</div>
+<div class="section" id="module-appyter.render.nbexecute">
+<span id="appyter-render-nbexecute-module"></span><h2>appyter.render.nbexecute module<a class="headerlink" href="#module-appyter.render.nbexecute" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.render.nbexecute.cell_has_error">
+<code class="sig-prename descclassname">appyter.render.nbexecute.</code><code class="sig-name descname">cell_has_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cell</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecute.html#cell_has_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecute.cell_has_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.render.nbexecute.cell_is_code">
+<code class="sig-prename descclassname">appyter.render.nbexecute.</code><code class="sig-name descname">cell_is_code</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cell</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecute.html#cell_is_code"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecute.cell_is_code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.render.nbexecute.iopub_hook_factory">
+<code class="sig-prename descclassname">appyter.render.nbexecute.</code><code class="sig-name descname">iopub_hook_factory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb</span></em>, <em class="sig-param"><span class="n">emit</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecute.html#iopub_hook_factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecute.iopub_hook_factory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.render.nbexecute.json_emitter">
+<code class="sig-prename descclassname">appyter.render.nbexecute.</code><code class="sig-name descname">json_emitter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecute.html#json_emitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecute.json_emitter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="module-appyter.render.nbinspect">
@@ -126,6 +145,7 @@ to markdown / removing them as necessary.</p>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-appyter.render.form">appyter.render.form module</a></li>
 <li><a class="reference internal" href="#module-appyter.render.nbconstruct">appyter.render.nbconstruct module</a></li>
+<li><a class="reference internal" href="#module-appyter.render.nbexecute">appyter.render.nbexecute module</a></li>
 <li><a class="reference internal" href="#module-appyter.render.nbinspect">appyter.render.nbinspect module</a></li>
 <li><a class="reference internal" href="#module-appyter.render.nbviewer">appyter.render.nbviewer module</a></li>
 <li><a class="reference internal" href="#module-appyter.render">Module contents</a></li>

@@ -49,10 +49,10 @@
 <div class="viewcode-block" id="render_nbtemplate_json_from_nbtemplate"><a class="viewcode-back" href="../../../appyter.render.html#appyter.render.nbinspect.render_nbtemplate_json_from_nbtemplate">[docs]</a><span class="k">def</span> <span class="nf">render_nbtemplate_json_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nb</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Render a json representing the relevant Fields throughout the notebook.</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span>
+  <span class="k">return</span> <span class="p">[</span>
     <span class="p">{</span> <span class="s1">&#39;field&#39;</span><span class="p">:</span> <span class="n">field</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="n">field</span><span class="o">.</span><span class="n">args</span> <span class="p">}</span>
     <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">parse_fields_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nb</span><span class="p">)</span>
-  <span class="p">])</span></div>
+  <span class="p">]</span></div>
 
 <span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s1">&#39;Inspect appyter for arguments (fields)&#39;</span><span class="p">)</span>
 <span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--output&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;OUTPUT&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">),</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The output location of the inspection json&#39;</span><span class="p">)</span>
