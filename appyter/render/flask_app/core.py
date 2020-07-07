@@ -10,7 +10,7 @@ from appyter.parse.nbtemplate import nbtemplate_from_ipynb_file
 from appyter.render.form import render_form_from_nbtemplate
 from appyter.render.nbviewer import render_nbviewer_from_nb
 from appyter.render.ipynb import render_nb_from_nbtemplate
-from appyter.render.json import render_nbtemplate_json_from_nbtemplate
+from appyter.render.nbinspect import render_nbtemplate_json_from_nbtemplate
 from appyter.render.flask_app.util import sanitize_uuid, route_join_with_or_without_slash, collapse
 
 core = Blueprint('__main__', __name__)
