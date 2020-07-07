@@ -48,7 +48,7 @@ def nbexecutor(cwd='', ipynb='', emit=print):
     [
       sys.executable,
       '-u',
-      sys.argv[0], # TODO: maybe this has to be appyter
+      '-m', 'appyter',
       'nbexecutor',
       '--cwd='+cwd,
       ipynb,
