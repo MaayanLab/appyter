@@ -1,36 +1,6 @@
+import os
 import glob
-import os, os.path
-import importlib
-
-def importdir(_dirname_, _package_, _globals_):
-  for f in os.listdir(_dirname_):
-    if f.startswith('_'):
-      continue
-    if f.endswith('.py'):
-      modname = f[:-len('.py')]
-    elif os.path.isdir(os.path.join(_dirname_, f)):
-      modname = f
-    else:
-      continue
-    mod = importlib.import_module('.{}'.format(modname), _package_)
-    _globals_.update(**{modname: mod})
-
-def importdir_deep(_dirname_, _package_, _globals_, filter_mod=lambda m, k, v: not k.startswith('_')):
-  for f in os.listdir(_dirname_):
-    if f.startswith('_'):
-      continue
-    if f.endswith('.py'):
-      modname = f[:-len('.py')]
-    elif os.path.isdir(os.path.join(_dirname_, f)):
-      modname = f
-    else:
-      continue
-    mod = importlib.import_module('.{}'.format(modname), _package_)
-    _globals_.update(**{
-      k: v
-      for k, v in mod.__dict__.items()
-      if filter_mod(mod, k, v)
-    })
+from appyter.util import importdir_deep
 
 def find_fields_dir_mappings(config=None):
   if config is None:
