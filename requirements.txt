@@ -1,9 +1,9 @@
 bs4
 click
 click-default-group
-eventlet
 flask
 flask-socketio
+git+git://github.com/eventlet/eventlet.git@c74e867cf99bb7b9708b33a294656c4abbc0edec
 ipython
 jinja2
 jq
