@@ -97,29 +97,32 @@ require(['jquery', 'socket'], function ($, socket) {
   $(document).ready(function () {
     $('[type="file"]').each(function () {
       var $self = $(this)
-      var progressBarContainer
+      var progressContainer
       var progressBar
 
       socket.on('download_queued', function (evt) {
         if (evt.name !== $self.attr('id')) return
         $(`.custom-file-label[for="${$self.attr('id')}"]`).text(evt.filename+'')
 
-        if (progressBar === undefined) {
-          var progressBarContainer = $('<div></div>')
-            .addClass('progress')
-          progressBar = $('<div></div>')
-            .addClass('progress-bar')
-            .attr('role', 'progressbar')
-            .attr('aria-valuemin', '0')
-            .attr('aria-valuemax', '100')
-            .appendTo(progressBarContainer)
-          $self.parent().append(progressBarContainer)
+        if (progressContainer === undefined) {
+          progressContainer = $('<div></div>')
+            .appendTo($self.parent().parent())
+        } else {
+          progressContainer.empty()
         }
-        progressBar
-          .removeClass('bg-success')
+
+        var progressBarContainer = $('<div></div>')
+          .addClass('progress')
+          .appendTo(progressContainer)
+        progressBar = $('<div></div>')
+          .addClass('progress-bar')
+          .attr('role', 'progressbar')
+          .attr('aria-valuemin', '0')
+          .attr('aria-valuemax', '100')
           .addClass('progress-bar-striped')
           .css('width', '0%')
           .attr('aria-valuenow', '0')
+          .appendTo(progressBarContainer)
       })
       socket.on('download_start', function (evt) {
         if (evt.name !== $self.attr('id')) return
@@ -146,8 +149,29 @@ require(['jquery', 'socket'], function ($, socket) {
       socket.on('download_error', function (evt) {
         if (evt.name !== $self.attr('id')) return
         console.error(evt)
-        progressBar
-          .addClass('bg-danger')
+        if (evt.error === 'HTTP Error 404: Not Found') {
+          var error = $('<div></div>')
+            .addClass('alert')
+            .addClass('alert-danger')
+            .text(`Error downloading file: ${evt.error}`)
+            .appendTo(progressContainer)
+          progressBar
+            .addClass('bg-danger')
+            .removeClass('progress-bar-striped')
+            .css('width', '100%')
+            .attr('aria-valuenow', '100')
+        } else {
+          var error = $('<div></div>')
+            .addClass('alert')
+            .addClass('alert-warning')
+            .html(`Error downloading file: ${evt.error}<br /><b>It may require user engagement, please visit <a href="${evt.url}" target=_blank>${evt.url}</a> to download the example file for upload.`)
+            .appendTo(progressContainer)
+          progressBar
+            .addClass('bg-warning')
+            .removeClass('progress-bar-striped')
+            .css('width', '100%')
+            .attr('aria-valuenow', '100')
+        }
       })
     })
   })

@@ -39,7 +39,7 @@ def download(data):
     except Exception as e:
       print('download error')
       traceback.print_exc()
-      emit('download_error', dict(name=name, filename=filename, error=str(e)))
+      emit('download_error', dict(name=name, filename=filename, url=url, error=str(e)))
     else:
       emit('download_complete', dict(name=name, filename=filename))
   #
