@@ -10,7 +10,7 @@ import appyter.render.flask_app.execution
 
 from appyter.cli import cli
 from appyter.context import get_env, get_extra_files, find_blueprints
-from appyter.util import join_routes
+from appyter.util import join_routes, dict_filter_none
 
 def create_app(**kwargs):
   ''' Completely initialize the flask application
@@ -68,19 +68,26 @@ def create_app(**kwargs):
 @click.option('--certfile', envvar='CERTFILE', default=None, help='The SSL certificate public key for wss support')
 @click.argument('ipynb', envvar='IPYNB')
 def flask_app(*args, **kwargs):
+  run_args = dict()
   if not kwargs.get('debug'):
     print('Patching...')
     import eventlet
     eventlet.monkey_patch()
+    run_args.update(
+      keyfile=kwargs.get('keyfile'),
+      certfile=kwargs.get('certfile'),
+    )
   #
   app = create_app(**kwargs)
-  return socketio.run(
-    app,
+  run_args.update(
     host=app.config['HOST'],
     port=app.config['PORT'],
     debug=app.config['DEBUG'],
     use_reloader=app.config['DEBUG'],
-    extra_files=get_extra_files(config=app.config),
-    keyfile=kwargs.get('keyfile'),
-    certfile=kwargs.get('certfile'),
   )
+  if kwargs.get('debug'):
+    run_args.update(
+      extra_files=get_extra_files(config=app.config),
+    )
+  #
+  return socketio.run(app, **dict_filter_none(run_args))
