@@ -1,5 +1,6 @@
 import re
 from appyter.fields import Field
+from appyter.util import secure_filename
 
 class FileField(Field):
   ''' Represing a uploadable File and facilitating that file upload.
@@ -26,6 +27,13 @@ class FileField(Field):
       examples=examples,
       **kwargs,
     )
+
+  @property
+  def raw_value(self):
+    if type(self.args['value']) == str:
+      return secure_filename(self.args['value'])
+    else:
+      return None
 
   def constraint(self):
     return self.raw_value is not None and re.match(self.args['constraint'], self.raw_value)

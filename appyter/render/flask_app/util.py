@@ -1,9 +1,7 @@
 import uuid
 import urllib.parse
-from werkzeug.utils import secure_filename
 
-from appyter.util import join_routes
-
+from appyter.util import join_routes, secure_filename
 
 def sanitize_uuid(val):
   return str(uuid.UUID(val))
