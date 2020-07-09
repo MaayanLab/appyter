@@ -64,6 +64,8 @@ def create_app(**kwargs):
 @click.option('--secret-key', envvar='SECRET_KEY', default=str(uuid.uuid4()), help='A secret key for flask')
 @click.option('--debug', envvar='DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
 @click.option('--static-dir', envvar='STATIC_DIR', default='static', help='The folder whether staticfiles are located')
+@click.option('--keyfile', envvar='KEYFILE', default=None, help='The SSL certificate private key for wss support')
+@click.option('--certfile', envvar='CERTFILE', default=None, help='The SSL certificate public key for wss support')
 @click.argument('ipynb', envvar='IPYNB')
 def flask_app(*args, **kwargs):
   if not kwargs.get('debug'):
@@ -79,4 +81,6 @@ def flask_app(*args, **kwargs):
     debug=app.config['DEBUG'],
     use_reloader=app.config['DEBUG'],
     extra_files=get_extra_files(config=app.config),
+    keyfile=kwargs.get('keyfile'),
+    certfile=kwargs.get('certfile'),
   )
