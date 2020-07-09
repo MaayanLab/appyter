@@ -1,5 +1,6 @@
 import json
 from appyter.fields import Field
+from appyter.util import try_json_loads
 
 class MultiCheckboxField(Field):
   ''' Represing a set of independently selectable check boxes.
@@ -23,12 +24,15 @@ class MultiCheckboxField(Field):
 
   @property
   def raw_value(self):
-    if type(self.args['value']) == str:
-      return json.loads(self.args['value'])
-    elif type(self.args['value']) == list:
-      return self.args['value']
+    value = try_json_loads(self.args['value'])
+    if value is None:
+      return []
+    elif type(value) == list:
+      return value
+    elif type(value) == str:
+      return [value]
     else:
-      return None
+      return [self.args['value']]
 
   @property
   def value(self):

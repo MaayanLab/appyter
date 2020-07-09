@@ -1,4 +1,5 @@
 from appyter.fields import Field
+from appyter.util import try_json_loads
 
 class MultiChoiceField(Field):
   ''' Represing a multi-selectable combo box.
@@ -18,14 +19,15 @@ class MultiChoiceField(Field):
 
   @property
   def raw_value(self):
-    if type(self.args['value']) == str:
-      return [self.args['value']]
-    elif type(self.args['value']) == list:
-      return self.args['value']
-    elif self.args['value'] is None:
+    value = try_json_loads(self.args['value'])
+    if value is None:
       return []
+    elif type(value) == list:
+      return value
+    elif type(value) == str:
+      return [value]
     else:
-      return None
+      return [self.args['value']]
 
   @property
   def value(self):

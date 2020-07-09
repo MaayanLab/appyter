@@ -2,7 +2,7 @@ import os
 import glob
 import click
 from appyter.cli import cli
-from appyter.util import importdir_deep
+from appyter.util import importdir_deep, try_json_loads
 
 def find_fields_dir_mappings(config=None):
   if config is None:
@@ -181,13 +181,6 @@ def get_jinja2_env(context={}, config=None):
   env.globals.update(_config=config)
   env.globals.update(**build_fields(find_fields(config=config), context=context))
   return env
-
-def try_json_loads(v):
-  import json
-  try:
-    return json.loads(v)
-  except:
-    return v
 
 def get_env_from_kwargs(**kwargs):
   import sys

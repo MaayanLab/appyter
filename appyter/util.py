@@ -1,4 +1,11 @@
 
+def try_json_loads(v):
+  import json
+  try:
+    return json.loads(v)
+  except:
+    return v
+
 def join_routes(*routes):
   ''' Utility function for joining routes while striping extraneous slashes
   '''
