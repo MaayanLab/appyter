@@ -37,13 +37,17 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.util</h1><div class="highlight"><pre>
-<span></span>
+<span></span><span class="kn">from</span> <span class="nn">werkzeug.utils</span> <span class="kn">import</span> <span class="n">secure_filename</span>
+
 <div class="viewcode-block" id="try_json_loads"><a class="viewcode-back" href="../../appyter.html#appyter.util.try_json_loads">[docs]</a><span class="k">def</span> <span class="nf">try_json_loads</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
   <span class="kn">import</span> <span class="nn">json</span>
   <span class="k">try</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
   <span class="k">except</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">v</span></div>
+
+<div class="viewcode-block" id="dict_filter_none"><a class="viewcode-back" href="../../appyter.html#appyter.util.dict_filter_none">[docs]</a><span class="k">def</span> <span class="nf">dict_filter_none</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+  <span class="k">return</span> <span class="p">{</span> <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="p">}</span></div>
 
 <div class="viewcode-block" id="join_routes"><a class="viewcode-back" href="../../appyter.html#appyter.util.join_routes">[docs]</a><span class="k">def</span> <span class="nf">join_routes</span><span class="p">(</span><span class="o">*</span><span class="n">routes</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Utility function for joining routes while striping extraneous slashes</span>
