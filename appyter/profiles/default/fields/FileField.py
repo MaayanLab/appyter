@@ -1,6 +1,6 @@
 import re
 from appyter.fields import Field
-from appyter.util import secure_filename
+from appyter.util import secure_filename, join_routes
 
 class FileField(Field):
   ''' Represing a uploadable File and facilitating that file upload.
@@ -37,3 +37,13 @@ class FileField(Field):
 
   def constraint(self):
     return self.raw_value is not None and re.match(self.args['constraint'], self.raw_value)
+
+  @property
+  def public_url(self):
+    try:
+      from flask import request
+      return join_routes(request.base_url, self.value)[1:]
+    except:
+      from appyter.context import get_env
+      config = get_env()
+      return join_routes(config.get('PUBLIC_URL', 'file:///' + config.get('CWD')), self.value)[1:]

@@ -7,6 +7,9 @@ def try_json_loads(v):
   except:
     return v
 
+def dict_filter_none(d):
+  return { k: v for k, v in d.items() if v }
+
 def join_routes(*routes):
   ''' Utility function for joining routes while striping extraneous slashes
   '''
