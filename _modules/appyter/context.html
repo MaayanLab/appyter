@@ -41,7 +41,7 @@
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">click</span>
 <span class="kn">from</span> <span class="nn">appyter.cli</span> <span class="kn">import</span> <span class="n">cli</span>
-<span class="kn">from</span> <span class="nn">appyter.util</span> <span class="kn">import</span> <span class="n">importdir_deep</span>
+<span class="kn">from</span> <span class="nn">appyter.util</span> <span class="kn">import</span> <span class="n">importdir_deep</span><span class="p">,</span> <span class="n">try_json_loads</span>
 
 <div class="viewcode-block" id="find_fields_dir_mappings"><a class="viewcode-back" href="../../appyter.html#appyter.context.find_fields_dir_mappings">[docs]</a><span class="k">def</span> <span class="nf">find_fields_dir_mappings</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
   <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -220,13 +220,6 @@
   <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
   <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">build_fields</span><span class="p">(</span><span class="n">find_fields</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">),</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">env</span></div>
-
-<div class="viewcode-block" id="try_json_loads"><a class="viewcode-back" href="../../appyter.html#appyter.context.try_json_loads">[docs]</a><span class="k">def</span> <span class="nf">try_json_loads</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-  <span class="kn">import</span> <span class="nn">json</span>
-  <span class="k">try</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-  <span class="k">except</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">v</span></div>
 
 <div class="viewcode-block" id="get_env_from_kwargs"><a class="viewcode-back" href="../../appyter.html#appyter.context.get_env_from_kwargs">[docs]</a><span class="k">def</span> <span class="nf">get_env_from_kwargs</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
   <span class="kn">import</span> <span class="nn">sys</span>
