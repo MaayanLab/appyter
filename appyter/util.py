@@ -7,6 +7,17 @@ def try_json_loads(v):
   except:
     return v
 
+def try_load_list(v):
+  v = try_json_loads(v)
+  if type(v) in [list, tuple, set, frozenset]:
+    return list(v)
+  elif type(v) == str:
+    return v.split(',')
+  elif v is None:
+    return []
+  else:
+    raise Exception(f"Unrecognized type for list ({type(v)})")
+
 def dict_filter_none(d):
   return { k: v for k, v in d.items() if v }
 

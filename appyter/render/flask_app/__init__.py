@@ -56,6 +56,7 @@ def create_app(**kwargs):
 @click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click.option('--prefix', envvar='PREFIX', default='/', help='Specify the prefix for which to mount the webserver onto')
 @click.option('--profile', envvar='PROFILE', default='default', help='Specify the profile to use for rendering')
+@click.option('--extras', envvar='EXTRAS', default=[], type=str, multiple=True, help='Specify extras flags')
 @click.option('--host', envvar='HOST', default='127.0.0.1', help='The host the flask server should run on')
 @click.option('--port', envvar='PORT', type=int, default=5000, help='The port this flask server should run on')
 @click.option('--proxy', envvar='PROXY', type=bool, default=False, help='Whether this is running behind a proxy and the IP should be fixed for CORS')

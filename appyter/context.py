@@ -2,7 +2,7 @@ import os
 import glob
 import click
 from appyter.cli import cli
-from appyter.util import importdir_deep, try_json_loads
+from appyter.util import importdir_deep, join_routes, try_json_loads, try_load_list
 
 def find_fields_dir_mappings(config=None):
   if config is None:
@@ -185,10 +185,10 @@ def get_jinja2_env(context={}, config=None):
 def get_env_from_kwargs(**kwargs):
   import sys
   import uuid
-  from appyter.util import join_routes
   assert kwargs != {}
   PREFIX = kwargs.get('prefix', os.environ.get('PREFIX', '/'))
   PROFILE = kwargs.get('profile', os.environ.get('PROFILE', 'default'))
+  EXTRAS = set(try_load_list(kwargs.get('extras', os.environ.get('EXTRAS', ''))))
   HOST = kwargs.get('host', os.environ.get('HOST', '127.0.0.1'))
   PORT = try_json_loads(kwargs.get('port', os.environ.get('PORT', 5000)))
   PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('PROXY', False)))
@@ -210,6 +210,7 @@ def get_env_from_kwargs(**kwargs):
   return dict(
     PREFIX=PREFIX,
     PROFILE=PROFILE,
+    EXTRAS=EXTRAS,
     HOST=HOST,
     PORT=PORT,
     PROXY=PROXY,
