@@ -18,7 +18,7 @@ def join_routes(*routes):
 def importdir(_dirname_, _package_, _globals_):
   import os, importlib
   for f in os.listdir(_dirname_):
-    if f.startswith('_'):
+    if f.startswith('_') or f.startswith('.'):
       continue
     if f.endswith('.py'):
       modname = f[:-len('.py')]
@@ -32,7 +32,7 @@ def importdir(_dirname_, _package_, _globals_):
 def importdir_deep(_dirname_, _package_, _globals_, filter_mod=lambda m, k, v: not k.startswith('_')):
   import os, importlib
   for f in os.listdir(_dirname_):
-    if f.startswith('_'):
+    if f.startswith('_') or f.startswith('.'):
       continue
     if f.endswith('.py'):
       modname = f[:-len('.py')]
