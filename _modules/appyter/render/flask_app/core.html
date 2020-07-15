@@ -55,13 +55,16 @@
 
 <span class="n">core</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;__main__&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">)</span>
 
-<div class="viewcode-block" id="prepare_formdata"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.prepare_formdata">[docs]</a><span class="k">def</span> <span class="nf">prepare_formdata</span><span class="p">(</span><span class="n">req</span><span class="p">):</span>
+<div class="viewcode-block" id="prepare_formdata"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.prepare_formdata">[docs]</a><span class="k">def</span> <span class="nf">prepare_formdata</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
   <span class="c1"># Get form variables</span>
-  <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({</span>
     <span class="n">k</span><span class="p">:</span> <span class="n">collapse</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">V</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">lists</span><span class="p">()</span>
-  <span class="p">}</span>
+  <span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
   <span class="n">session_id</span> <span class="o">=</span> <span class="n">sanitize_uuid</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_session&#39;</span><span class="p">))</span>
+  <span class="k">if</span> <span class="n">session_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+    <span class="k">return</span>
   <span class="n">session_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">session_id</span><span class="p">)</span>
   <span class="c1"># Process upload files</span>
   <span class="k">for</span> <span class="n">fname</span><span class="p">,</span> <span class="n">fh</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -217,10 +220,10 @@
 
 <div class="viewcode-block" id="post_index"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.post_index">[docs]</a><span class="nd">@route_join_with_or_without_slash</span><span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="s1">&#39;&lt;string:session&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">post_index</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
-  <span class="k">try</span><span class="p">:</span>
-    <span class="n">session_id</span> <span class="o">=</span> <span class="n">sanitize_uuid</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
-  <span class="k">except</span><span class="p">:</span>
+  <span class="n">session_id</span> <span class="o">=</span> <span class="n">sanitize_uuid</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">session_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+    <span class="k">return</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">mimetype</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">accept_mimetypes</span><span class="o">.</span><span class="n">best_match</span><span class="p">([</span>
       <span class="s1">&#39;text/html&#39;</span><span class="p">,</span>
@@ -235,18 +238,21 @@
     <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
       <span class="k">if</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;text/html&#39;</span><span class="p">}:</span>
         <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;static&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-          <span class="k">return</span> <span class="n">post_index_html_static</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">prepare_formdata</span><span class="p">(</span><span class="n">request</span><span class="p">),</span> <span class="n">_session</span><span class="o">=</span><span class="n">session</span><span class="p">))</span>
+          <span class="k">return</span> <span class="n">post_index_html_static</span><span class="p">(</span><span class="n">prepare_formdata</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">_session</span><span class="o">=</span><span class="n">session_id</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-          <span class="k">return</span> <span class="n">post_index_html_dynamic</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">prepare_formdata</span><span class="p">(</span><span class="n">request</span><span class="p">),</span> <span class="n">_session</span><span class="o">=</span><span class="n">session</span><span class="p">))</span>
+          <span class="k">return</span> <span class="n">post_index_html_dynamic</span><span class="p">(</span><span class="n">prepare_formdata</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">_session</span><span class="o">=</span><span class="n">session_id</span><span class="p">))</span>
       <span class="k">elif</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;application/vnd.jupyter&#39;</span><span class="p">,</span> <span class="s1">&#39;application/vnd.jupyter.cells&#39;</span><span class="p">,</span> <span class="s1">&#39;application/x-ipynb+json&#39;</span><span class="p">}:</span>
-        <span class="k">return</span> <span class="n">post_index_ipynb_static</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">_session</span><span class="o">=</span><span class="n">session</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">post_index_ipynb_static</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">_session</span><span class="o">=</span><span class="n">session_id</span><span class="p">))</span>
       <span class="k">elif</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;application/json&#39;</span><span class="p">}:</span>
-        <span class="k">return</span> <span class="n">post_index_json_static</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">_session</span><span class="o">=</span><span class="n">session</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">post_index_json_static</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">_session</span><span class="o">=</span><span class="n">session_id</span><span class="p">))</span>
     <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="send_session_directory"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.send_session_directory">[docs]</a><span class="nd">@route_join_with_or_without_slash</span><span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="s1">&#39;&lt;string:session&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;path:path&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">send_session_directory</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
   <span class="n">session_id</span> <span class="o">=</span> <span class="n">sanitize_uuid</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">session_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+    <span class="k">return</span>
   <span class="n">session_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">session_id</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="n">session_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 </pre></div>

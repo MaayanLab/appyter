@@ -44,7 +44,7 @@
 <span class="kn">import</span> <span class="nn">nbformat</span> <span class="k">as</span> <span class="nn">nbf</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
-<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">copy_current_request_context</span><span class="p">,</span> <span class="n">session</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">copy_current_request_context</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">abort</span>
 <span class="kn">from</span> <span class="nn">flask_socketio</span> <span class="kn">import</span> <span class="n">emit</span>
 
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app</span> <span class="kn">import</span> <span class="n">socketio</span>
@@ -73,16 +73,22 @@
 <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
   <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;init&#39;</span><span class="p">)</span>
   <span class="n">session_id</span> <span class="o">=</span> <span class="n">sanitize_uuid</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_session&#39;</span><span class="p">))</span>
+  <span class="k">if</span> <span class="n">session_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+    <span class="k">return</span>
   <span class="n">session_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">session_id</span><span class="p">)</span>
   <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;Notebook created, queuing execution&#39;</span><span class="p">)</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">]:</span>
+    <span class="kn">from</span> <span class="nn">eventlet.green.subprocess</span> <span class="kn">import</span> <span class="n">Popen</span>
   <span class="n">socketio</span><span class="o">.</span><span class="n">start_background_task</span><span class="p">(</span>
     <span class="n">copy_current_request_context</span><span class="p">(</span><span class="n">nbexecute</span><span class="p">),</span>
     <span class="n">cwd</span><span class="o">=</span><span class="n">session_dir</span><span class="p">,</span>
     <span class="n">ipynb</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">],</span>
     <span class="n">emit</span><span class="o">=</span><span class="n">emit</span><span class="p">,</span>
+    <span class="n">Popen</span><span class="o">=</span><span class="n">Popen</span><span class="p">,</span>
   <span class="p">)</span></div>
 
-<div class="viewcode-block" id="nbexecute"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.execution.nbexecute">[docs]</a><span class="k">def</span> <span class="nf">nbexecute</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">ipynb</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">emit</span><span class="o">=</span><span class="nb">print</span><span class="p">):</span>
+<div class="viewcode-block" id="nbexecute"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.execution.nbexecute">[docs]</a><span class="k">def</span> <span class="nf">nbexecute</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">ipynb</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">emit</span><span class="o">=</span><span class="nb">print</span><span class="p">,</span> <span class="n">Popen</span><span class="o">=</span><span class="n">Popen</span><span class="p">):</span>
   <span class="kn">import</span> <span class="nn">json</span>
   <span class="n">proc</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span>
     <span class="p">[</span>
