@@ -4,7 +4,10 @@ import urllib.parse
 from appyter.util import join_routes, secure_filename
 
 def sanitize_uuid(val):
-  return str(uuid.UUID(val))
+  try:
+    return str(uuid.UUID(val))
+  except:
+    return None
 
 def collapse(L):
   if len(L) == 1:

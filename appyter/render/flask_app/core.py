@@ -15,13 +15,16 @@ from appyter.render.flask_app.util import sanitize_uuid, route_join_with_or_with
 
 core = Blueprint('__main__', __name__)
 
-def prepare_formdata(req):
+def prepare_formdata(req, **kwargs):
   # Get form variables
-  data = {
+  data = dict({
     k: collapse(V)
     for k, V in req.form.lists()
-  }
+  }, **kwargs)
   session_id = sanitize_uuid(data.get('_session'))
+  if session_id is None:
+    abort(404)
+    return
   session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
   # Process upload files
   for fname, fh in req.files.items():
@@ -177,10 +180,10 @@ def favicon():
 
 @route_join_with_or_without_slash(core, '<string:session>', methods=['GET', 'POST'])
 def post_index(session):
-  try:
-    session_id = sanitize_uuid(session)
-  except:
+  session_id = sanitize_uuid(session)
+  if session_id is None:
     abort(404)
+    return
   else:
     mimetype = request.accept_mimetypes.best_match([
       'text/html',
@@ -195,17 +198,20 @@ def post_index(session):
     elif request.method == 'POST':
       if mimetype in {'text/html'}:
         if request.args.get('static') is not None:
-          return post_index_html_static(dict(prepare_formdata(request), _session=session))
+          return post_index_html_static(prepare_formdata(request, _session=session_id))
         else:
-          return post_index_html_dynamic(dict(prepare_formdata(request), _session=session))
+          return post_index_html_dynamic(prepare_formdata(request, _session=session_id))
       elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
-        return post_index_ipynb_static(dict(request.form.to_dict(), _session=session))
+        return post_index_ipynb_static(dict(request.form.to_dict(), _session=session_id))
       elif mimetype in {'application/json'}:
-        return post_index_json_static(dict(request.form.to_dict(), _session=session))
+        return post_index_json_static(dict(request.form.to_dict(), _session=session_id))
     abort(404)
 
 @route_join_with_or_without_slash(core, '<string:session>', '<path:path>', methods=['GET'])
 def send_session_directory(session, path):
   session_id = sanitize_uuid(session)
+  if session_id is None:
+    abort(404)
+    return
   session_path = os.path.realpath(os.path.join(current_app.config['DATA_DIR'], session_id))
   return send_from_directory(session_path, path)

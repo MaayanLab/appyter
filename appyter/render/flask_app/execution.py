@@ -33,6 +33,9 @@ def _():
 def init(data):
   print('init')
   session_id = sanitize_uuid(data.get('_session'))
+  if session_id is None:
+    abort(404)
+    return
   session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
   emit('status', 'Notebook created, queuing execution')
   socketio.start_background_task(
