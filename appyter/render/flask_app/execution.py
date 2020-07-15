@@ -4,7 +4,7 @@ import functools
 import nbformat as nbf
 import sys
 from subprocess import Popen, PIPE
-from flask import current_app, request, copy_current_request_context, session
+from flask import current_app, request, copy_current_request_context, session, abort
 from flask_socketio import emit
 
 from appyter.render.flask_app import socketio
@@ -38,14 +38,17 @@ def init(data):
     return
   session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
   emit('status', 'Notebook created, queuing execution')
+  if not current_app.config['DEBUG']:
+    from eventlet.green.subprocess import Popen
   socketio.start_background_task(
     copy_current_request_context(nbexecute),
     cwd=session_dir,
     ipynb=current_app.config['IPYNB'],
     emit=emit,
+    Popen=Popen,
   )
 
-def nbexecute(cwd='', ipynb='', emit=print):
+def nbexecute(cwd='', ipynb='', emit=print, Popen=Popen):
   import json
   proc = Popen(
     [
