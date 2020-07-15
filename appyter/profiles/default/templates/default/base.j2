@@ -20,6 +20,34 @@
     background-color: green;
   }
   </style>
+  {% if 'toc' in _config.EXTRAS %}
+  <style>
+  #_toc h1 {
+    font-size: 150%;
+    text-indent: 0em;
+  }
+  #_toc h2 {
+    font-size: 140%;
+    text-indent: 1em;
+  }
+  #_toc h3 {
+    font-size: 130%;
+    text-indent: 1.5em;
+  }
+  #_toc h4 {
+    font-size: 120%;
+    text-indent: 1.75em;
+  }
+  #_toc h5 {
+    font-size: 110%;
+    text-indent: 1.85em;
+  }
+  #_toc h6 {
+    font-size: 100%;
+    text-indent: 2em;
+  }
+  </style>
+  {% endif %}
   {% endblock %}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
 </head>

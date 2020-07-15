@@ -11,10 +11,44 @@
       href="{{ _nb }}"
     >Download Notebook</a>
   </div>
-</div>
-<div class="row">
-  <div class="col-sm-12">
-    <div id="nbviewer">{{ _nbviewer }}</div>
+  {%- if 'toc' in _config.EXTRAS %}
+    <div class="col-sm-12 col-md-3 col-xl-2">
+      <div class="row sticky-top">
+        <div class="offset-sm-2 col-sm-8 col-md-12">
+          <div id="_toc" class="mt-5">
+            <legend>Table Of Contents</legend>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="nbviewer" class="col-sm-12 col-md-9 col-xl-10">
+      {{ _nbviewer }}
+    </div>
+  {% else %}
+    <div id="nbviewer" class="col-sm-12">{{ _nbviewer }}</div>
+  {%- endif %}
   </div>
 </div>
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+{%- if 'toc' in _config.EXTRAS %}
+<script>
+  require(['jquery'], function ($) {
+    $(document).ready(function () {
+      var $toc = $('#_toc')
+      var $nb = $('#nbviewer')
+      $nb.find('h1,h2,h3,h4,h5,h6').each(function () {
+        var $self = $(this)
+        var a = $('<a></a>')
+          .attr('href', '#' + $self.attr('id'))
+          .text($self.text().slice(0, -1))
+        var h = $(`<${this.tagName}></${this.tagName}>`).append(a)
+        $toc.append(h)
+      })
+    })
+  })
+</script>
+{%- endif %}
 {% endblock %}

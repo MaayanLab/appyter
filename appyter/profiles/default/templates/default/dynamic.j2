@@ -1,16 +1,20 @@
 {% extends "static.j2" %}
 
 {% block body %}
-<div class="row">
-  <div class="col-sm-8 offset-sm-2">
-    <div id="status" class="alert alert-primary" role="alert">
-      Loading...
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8 offset-sm-2">
+      <div id="status" class="alert alert-primary" role="alert">
+        Loading...
+      </div>
     </div>
   </div>
+  <div class="row">
+    {{ super() }}
+  </div>
 </div>
-{{ super() }}
 {% endblock %}
-
+ 
 {% block script %}
 {{ super() }}
 <script type="text/javascript" charset="utf-8">
@@ -159,5 +163,5 @@
       }
     })
   })
-  </script>
+</script>
 {% endblock %}
