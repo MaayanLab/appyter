@@ -13,5 +13,6 @@ cd ${BASE_PATH} && python3 -m appyter \
   --host=0.0.0.0 \
   --port=5000 \
   --profile=biojupies \
+  --extras=toc \
   --cwd=${BASE_PATH}/example \
   example.ipynb
