@@ -2,7 +2,7 @@ import os
 import traceback
 import functools
 import sys
-from subprocess import Popen, PIPE
+from subprocess import PIPE
 from flask import current_app, request, copy_current_request_context, session, abort
 from flask_socketio import emit
 
@@ -38,6 +38,8 @@ def init(data):
   emit('status', 'Notebook created, queuing execution')
   if not current_app.config['DEBUG']:
     from eventlet.green.subprocess import Popen
+  else:
+    from subprocess import Popen
   socketio.start_background_task(
     copy_current_request_context(nbexecute),
     cwd=session_dir,
@@ -46,9 +48,11 @@ def init(data):
     Popen=Popen,
   )
 
-def nbexecute(cwd='', ipynb='', emit=print, Popen=Popen):
+def nbexecute(cwd='', ipynb='', emit=print, Popen=None):
   import json
-  proc = Popen(
+  if Popen is None:
+    from subprocess import Popen
+  with Popen(
     [
       sys.executable,
       '-u',
@@ -62,10 +66,9 @@ def nbexecute(cwd='', ipynb='', emit=print, Popen=Popen):
       PATH=os.environ['PATH'],
     ),
     stdout=PIPE,
-  )
-  packet = proc.stdout.readline()
-  while packet:
-    msg = json.loads(packet)
-    emit(msg['type'], msg['data'])
-    socketio.sleep(0)
+  ) as proc:
     packet = proc.stdout.readline()
+    while packet:
+      msg = json.loads(packet)
+      emit(msg['type'], msg['data'])
+      packet = proc.stdout.readline()
