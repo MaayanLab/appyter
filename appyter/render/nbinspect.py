@@ -4,6 +4,7 @@ import click
 import nbformat as nbf
 
 from appyter.cli import cli
+from appyter.parse.nb import nb_from_ipynb_file
 from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
 from appyter.context import get_env, get_jinja2_env
 
@@ -21,6 +22,6 @@ def render_nbtemplate_json_from_nbtemplate(env, nb):
 @click.argument('ipynb', envvar='IPYNB')
 def nbinspect(cwd, ipynb, output, **kwargs):
   env = get_jinja2_env(get_env(cwd=cwd, ipynb=ipynb, **kwargs))
-  nbtemplate = nbf.read(open(os.path.join(cwd, ipynb), 'r'), as_version=4)
+  nbtemplate = nb_from_ipynb_file(os.path.join(cwd, ipynb))
   fields = render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
   json.dump(fields, output)

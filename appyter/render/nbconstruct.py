@@ -6,6 +6,7 @@ from copy import deepcopy
 
 from appyter.cli import cli
 from appyter.context import get_env, get_jinja2_env
+from appyter.parse.nb import nb_from_ipynb_file, nb_to_ipynb_io
 from appyter.parse.nbtemplate import cell_match
 
 
@@ -75,6 +76,6 @@ def nbconstruct(cwd, ipynb, context, output, **kwargs):
     config=get_env(cwd=cwd, ipynb=ipynb, **kwargs),
     context=context,
   )
-  nbtemplate = nbf.read(open(os.path.join(cwd, ipynb), 'r'), as_version=4)
+  nbtemplate = nb_from_ipynb_file(os.path.join(cwd, ipynb))
   nb = render_nb_from_nbtemplate(env, nbtemplate)
-  nbf.write(nb, output)
+  nb_to_ipynb_io(nb, output)

@@ -1,6 +1,4 @@
 import re
-import nbformat as nbf
-from copy import deepcopy
 from appyter.fields import Field
 from appyter.parse.function_call import FunctionCallMatcher
 
@@ -9,7 +7,7 @@ template_match = re.compile(r'\{[\{%](?P<inner>.+?)[%\}]\}', re.MULTILINE | re.D
 field_match = FunctionCallMatcher()
 
 def parse_fields_from_cell(env, cell):
-  cell_m = cell_match.match(cell)
+  cell_m = cell_match.match(cell.source)
   if cell_m:
     cell_source = cell_m.group('source')
     for template_m in template_match.finditer(cell_source):
@@ -25,13 +23,5 @@ def parse_fields_from_nbtemplate(env, nb):
   return [
     field
     for cell in nb.cells
-    for field in parse_fields_from_cell(env, cell['source'])
+    for field in parse_fields_from_cell(env, cell)
   ]
-
-def nbtemplate_from_ipynb_string(ipynb):
-  return nbf.reads(ipynb, as_version=4)
-
-
-def nbtemplate_from_ipynb_file(filename):
-  return nbf.read(open(filename, 'r'), as_version=4)
-

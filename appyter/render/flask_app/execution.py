@@ -1,7 +1,6 @@
 import os
 import traceback
 import functools
-import nbformat as nbf
 import sys
 from subprocess import Popen, PIPE
 from flask import current_app, request, copy_current_request_context, session, abort
@@ -12,7 +11,6 @@ from appyter.render.flask_app.core import core
 from appyter.render.flask_app.util import sanitize_uuid
 
 from appyter.context import get_jinja2_env
-from appyter.parse.nbtemplate import nbtemplate_from_ipynb_file
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 
 

@@ -2,11 +2,10 @@ import os
 import uuid
 import json
 import shutil
-import nbformat as nbf
 from flask import Blueprint, request, redirect, abort, send_from_directory, url_for, current_app
 
 from appyter.context import get_jinja2_env
-from appyter.parse.nbtemplate import nbtemplate_from_ipynb_file
+from appyter.parse.nb import nb_from_ipynb_file, nb_to_ipynb_file
 from appyter.render.form import render_form_from_nbtemplate
 from appyter.render.nbviewer import render_nbviewer_from_nb
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
@@ -44,7 +43,7 @@ def get_index_html():
   env.globals.update(
     _session=str('00000000-0000-0000-0000-000000000000' if current_app.config['DEBUG'] else uuid.uuid4())
   )
-  nbtemplate = nbtemplate_from_ipynb_file(
+  nbtemplate = nb_from_ipynb_file(
     os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
   )
   return render_form_from_nbtemplate(env, nbtemplate)
@@ -53,7 +52,7 @@ def get_index_json():
   ''' Return options as json
   '''
   env = get_jinja2_env(config=current_app.config)
-  nbtemplate = nbtemplate_from_ipynb_file(
+  nbtemplate = nb_from_ipynb_file(
     os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
   )
   return json.dumps(render_nbtemplate_json_from_nbtemplate(env, nbtemplate))
@@ -61,7 +60,7 @@ def get_index_json():
 def get_session_html_static(session_id):
   nbfile = os.path.join(current_app.config['DATA_DIR'], session_id, os.path.basename(current_app.config['IPYNB']))
   if os.path.exists(nbfile):
-    nb = nbf.read(open(nbfile, 'r'), as_version=4)
+    nb = nb_from_ipynb_file(nbfile)
     env = get_jinja2_env(config=current_app.config)
     return env.get_template(
       'static.j2',
@@ -88,12 +87,12 @@ def post_index_html_dynamic(data):
   session_id = data.get('_session')
   env.globals['_session'] = session_id
   session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
-  nbtemplate = nbtemplate_from_ipynb_file(os.path.join(current_app.config['CWD'], current_app.config['IPYNB']))
+  nbtemplate = nb_from_ipynb_file(os.path.join(current_app.config['CWD'], current_app.config['IPYNB']))
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   nbfile = os.path.join(session_dir, os.path.basename(current_app.config['IPYNB']))
   if not os.path.exists(nbfile) or current_app.config['DEBUG']:
     os.makedirs(session_dir, exist_ok=True)
-    nbf.write(nb, open(nbfile, 'w'))
+    nb_to_ipynb_file(nb, nbfile)
   else:
     # TODO: don't do this if it's a duplicate
     # copy the current session info to a new one
@@ -121,7 +120,7 @@ def post_index_html_static(data):
   '''
   env = get_jinja2_env(config=current_app.config, context=data)
   env.globals['_session'] = data.get('_session')
-  nbtemplate = nbtemplate_from_ipynb_file(
+  nbtemplate = nb_from_ipynb_file(
     os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
   )
   nb = render_nb_from_nbtemplate(env, nbtemplate)
@@ -137,7 +136,7 @@ def post_index_json_static(data):
   '''
   env = get_jinja2_env(config=current_app.config, context=data)
   env.globals['_session'] = data.get('_session')
-  nbtemplate = nbtemplate_from_ipynb_file(
+  nbtemplate = nb_from_ipynb_file(
     os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
   )
   nb = render_nb_from_nbtemplate(env, nbtemplate)
@@ -148,7 +147,7 @@ def post_index_ipynb_static(data):
   '''
   env = get_jinja2_env(config=current_app.config, context=data)
   env.globals['_session'] = data.get('_session')
-  nbtemplate = nbtemplate_from_ipynb_file(
+  nbtemplate = nb_from_ipynb_file(
     os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
   )
   nb = render_nb_from_nbtemplate(env, nbtemplate)
@@ -166,7 +165,7 @@ def get_index():
     return get_index_html()
   elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
     env = get_jinja2_env(config=current_app.config)
-    nbtemplate = nbtemplate_from_ipynb_file(
+    nbtemplate = nb_from_ipynb_file(
       os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
     )
     return nbtemplate

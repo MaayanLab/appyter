@@ -7,6 +7,7 @@ import functools
 from appyter.cli import cli
 from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.render.nbviewer import render_nbviewer_from_nb
+from appyter.parse.nb import nb_from_ipynb_file, nb_to_ipynb_file
 
 
 def cell_is_code(cell):
@@ -32,8 +33,7 @@ def json_emitter(obj):
 @click.argument('ipynb', envvar='IPYNB')
 def nbexecute(ipynb='', emit=json_emitter, cwd=''):
   assert callable(emit), 'Emit must be callable'
-  with open(os.path.join(cwd, ipynb), 'r') as fr:
-    nb = nbf.read(fr, as_version=4)
+  nb = nb_from_ipynb_file(os.path.join(cwd, ipynb))
   try:
     emit({ 'type': 'status', 'data': 'Starting' })
     client = NotebookClientIOPubHook(
@@ -67,5 +67,4 @@ def nbexecute(ipynb='', emit=json_emitter, cwd=''):
   except Exception as e:
     emit({ 'type': 'error', 'data': str(e) })
   #
-  with open(os.path.join(cwd, ipynb), 'w') as fw:
-    nbf.write(nb, fw)
+  nb_to_ipynb_file(nb, os.path.join(cwd, ipynb))
