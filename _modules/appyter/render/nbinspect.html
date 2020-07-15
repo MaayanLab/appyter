@@ -43,6 +43,7 @@
 <span class="kn">import</span> <span class="nn">nbformat</span> <span class="k">as</span> <span class="nn">nbf</span>
 
 <span class="kn">from</span> <span class="nn">appyter.cli</span> <span class="kn">import</span> <span class="n">cli</span>
+<span class="kn">from</span> <span class="nn">appyter.parse.nb</span> <span class="kn">import</span> <span class="n">nb_from_ipynb_file</span>
 <span class="kn">from</span> <span class="nn">appyter.parse.nbtemplate</span> <span class="kn">import</span> <span class="n">parse_fields_from_nbtemplate</span>
 <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_env</span><span class="p">,</span> <span class="n">get_jinja2_env</span>
 
@@ -60,7 +61,7 @@
 <span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;ipynb&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">nbinspect</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="n">ipynb</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
   <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">(</span><span class="n">get_env</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">ipynb</span><span class="o">=</span><span class="n">ipynb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-  <span class="n">nbtemplate</span> <span class="o">=</span> <span class="n">nbf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="n">ipynb</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">),</span> <span class="n">as_version</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+  <span class="n">nbtemplate</span> <span class="o">=</span> <span class="n">nb_from_ipynb_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="n">ipynb</span><span class="p">))</span>
   <span class="n">fields</span> <span class="o">=</span> <span class="n">render_nbtemplate_json_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nbtemplate</span><span class="p">)</span>
   <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
 </pre></div>

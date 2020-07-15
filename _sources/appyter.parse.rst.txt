@@ -12,6 +12,14 @@ appyter.parse.function\_call module
    :undoc-members:
    :show-inheritance:
 
+appyter.parse.nb module
+-----------------------
+
+.. automodule:: appyter.parse.nb
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.parse.nbtemplate module
 -------------------------------
 
