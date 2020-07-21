@@ -71,7 +71,6 @@ def create_app(**kwargs):
 def flask_app(*args, **kwargs):
   run_args = dict()
   if not kwargs.get('debug'):
-    print('Patching...')
     run_args.update(
       keyfile=kwargs.get('keyfile'),
       certfile=kwargs.get('certfile'),
