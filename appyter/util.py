@@ -1,3 +1,4 @@
+import urllib.parse
 from werkzeug.utils import secure_filename
 
 def try_json_loads(v):
@@ -25,6 +26,18 @@ def join_routes(*routes):
   ''' Utility function for joining routes while striping extraneous slashes
   '''
   return '/' + '/'.join([route.strip('/') for route in routes if route.strip('/')])
+
+def secure_url(url):
+  parsed = urllib.parse.urlparse(url)
+  assert parsed.scheme in {'https', 'http', 'ftp'}, 'Invalid scheme'
+  return url
+
+def is_remote(url):
+  try:
+    secure_url(url)
+    return True
+  except:
+    return False
 
 def importdir(_dirname_, _package_, _globals_):
   import os, importlib

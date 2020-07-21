@@ -1,7 +1,7 @@
 import uuid
 import urllib.parse
 
-from appyter.util import join_routes, secure_filename
+from appyter.util import join_routes, secure_filename, secure_url
 
 def sanitize_uuid(val):
   try:
@@ -14,11 +14,6 @@ def collapse(L):
     return L[0]
   else:
     return L
-
-def secure_url(url):
-  parsed = urllib.parse.urlparse(url)
-  assert parsed.scheme in {'https', 'http', 'ftp'}, 'Invalid scheme'
-  return url
 
 def route_join_with_or_without_slash(blueprint, *routes, **kwargs):
   ''' Like @app.route but doesn't care about trailing slash or not
