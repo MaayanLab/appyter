@@ -110,7 +110,6 @@
 <span class="k">def</span> <span class="nf">flask_app</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
   <span class="n">run_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
   <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Patching...&#39;</span><span class="p">)</span>
     <span class="n">run_args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
       <span class="n">keyfile</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;keyfile&#39;</span><span class="p">),</span>
       <span class="n">certfile</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;certfile&#39;</span><span class="p">),</span>
