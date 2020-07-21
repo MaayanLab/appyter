@@ -72,8 +72,6 @@ def flask_app(*args, **kwargs):
   run_args = dict()
   if not kwargs.get('debug'):
     print('Patching...')
-    import eventlet
-    eventlet.monkey_patch()
     run_args.update(
       keyfile=kwargs.get('keyfile'),
       certfile=kwargs.get('certfile'),
