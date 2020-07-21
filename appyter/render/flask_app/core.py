@@ -14,6 +14,9 @@ from appyter.render.flask_app.util import sanitize_uuid, route_join_with_or_with
 
 core = Blueprint('__main__', __name__)
 
+def generate_session_id():
+  return '00000000-0000-0000-0000-000000000000' if current_app.config['DEBUG'] else str(uuid.uuid4())
+
 def prepare_formdata(req, **kwargs):
   # Get form variables
   data = dict({
@@ -41,7 +44,7 @@ def get_index_html():
   '''
   env = get_jinja2_env(config=current_app.config)
   env.globals.update(
-    _session=str('00000000-0000-0000-0000-000000000000' if current_app.config['DEBUG'] else uuid.uuid4())
+    _session=generate_session_id(),
   )
   nbtemplate = nb_from_ipynb_file(
     os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
@@ -73,12 +76,11 @@ def get_session_html_static(session_id):
     abort(404)
 
 def get_session_ipynb_static(session_id):
-  # TODO: if still executing, flush current state
-  nbfile = os.path.join(current_app.config['DATA_DIR'], session_id, os.path.basename(current_app.config['IPYNB']))
-  if os.path.exists(nbfile):
-    return send_from_directory(os.path.join(current_app.config['DATA_DIR'], session_id), os.path.basename(current_app.config['IPYNB']))
-  else:
-    abort(404)
+  session_path = os.path.realpath(os.path.join(current_app.config['DATA_DIR'], session_id))
+  return send_from_directory(
+    session_path,
+    os.path.basename(current_app.config['IPYNB'])
+  )
 
 def post_index_html_dynamic(data):
   ''' Return dynamic nbviewer
@@ -96,7 +98,7 @@ def post_index_html_dynamic(data):
   else:
     # TODO: don't do this if it's a duplicate
     # copy the current session info to a new one
-    new_session_id = str(uuid.uuid4())
+    new_session_id = generate_session_id()
     env.globals['_session'] = new_session_id
     new_session_dir = os.path.join(current_app.config['DATA_DIR'], new_session_id)
     new_nbfile = os.path.join(new_session_dir, os.path.basename(current_app.config['IPYNB']))
@@ -154,23 +156,26 @@ def post_index_ipynb_static(data):
   return render_nb_from_nbtemplate(env, nb)
 
 
-@route_join_with_or_without_slash(core, methods=['GET'])
+@route_join_with_or_without_slash(core, methods=['GET', 'POST'])
 def get_index():
   mimetype = request.accept_mimetypes.best_match([
     'text/html',
     'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json',
     'application/json',
   ], 'text/html')
-  if mimetype in {'text/html'}:
-    return get_index_html()
-  elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
-    env = get_jinja2_env(config=current_app.config)
-    nbtemplate = nb_from_ipynb_file(
-      os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
-    )
-    return nbtemplate
-  elif mimetype in {'application/json'}:
-    return get_index_json()
+  if request.method == 'GET':
+    if mimetype in {'text/html'}:
+      return get_index_html()
+    elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
+      env = get_jinja2_env(config=current_app.config)
+      nbtemplate = nb_from_ipynb_file(
+        os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
+      )
+      return nbtemplate
+    elif mimetype in {'application/json'}:
+      return get_index_json()
+  elif request.method == 'POST':
+    return post_index(generate_session_id())
   abort(404)
 
 @route_join_with_or_without_slash(core, 'favicon.ico', methods=['GET'])
@@ -192,7 +197,7 @@ def post_index(session):
     if request.method == 'GET':
       if mimetype in {'text/html'}:
         return get_session_html_static(session_id)
-      elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
+      elif mimetype in {'application/json', 'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
         return get_session_ipynb_static(session_id)
     elif request.method == 'POST':
       if mimetype in {'text/html'}:

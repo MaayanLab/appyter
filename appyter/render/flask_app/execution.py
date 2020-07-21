@@ -1,21 +1,26 @@
 import os
+import sys
 import traceback
 import functools
-import sys
 from subprocess import PIPE
 from flask import current_app, request, copy_current_request_context, session, abort
 from flask_socketio import emit
 
 from appyter.render.flask_app import socketio
-from appyter.render.flask_app.core import core
+from appyter.render.flask_app.core import core, post_index_html_dynamic, generate_session_id
 from appyter.render.flask_app.util import sanitize_uuid
 
 from appyter.context import get_jinja2_env
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 
-
 @socketio.on('session')
 def _(data):
+  if not data:
+    print('creating new session')
+    data = dict(
+      _session=generate_session_id()
+    )
+    emit('session', data)
   print('session', data, request.sid)
   session[request.sid] = dict(session.get(request.sid, {}), _session=sanitize_uuid(data['_session']))
   print(session)
@@ -26,6 +31,13 @@ def _():
   if request.sid in session:
     del session[request.sid]
   print(session)
+
+@socketio.on('submit')
+def submit(data):
+  print('submit', data)
+  # WARNING: this depends on FileFields taking care of filename sanity checking
+  post_index_html_dynamic(data)
+  # TODO: deal with possible redirect
 
 @socketio.on('init')
 def init(data):

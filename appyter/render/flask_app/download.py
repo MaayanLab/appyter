@@ -1,6 +1,6 @@
 import os
+import requests
 import traceback
-import urllib.request
 from flask import request, copy_current_request_context, current_app, session
 from flask_socketio import emit
 
@@ -25,17 +25,13 @@ def download(data):
   def download_with_progress(name, url, path, filename, emit):
     emit('download_start', dict(name=name, filename=filename))
     try:
-      urllib.request.urlretrieve(
-        url, filename=path,
-        reporthook=lambda chunk, chunk_size, total_size: emit(
-          'download_progress', dict(
-            name=name,
-            chunk=chunk,
-            chunk_size=chunk_size,
-            total_size=total_size
-          )
-        ),
-      )
+      req = requests.get(url, stream=True)
+      assert req.status_code <= 299, f"Error {req.status_code}: {req.text}"
+      chunk_size = 1024*100
+      with open(path, 'wb') as fw:
+        for chunk in req.iter_content(chunk_size=chunk_size):
+          fw.write(chunk)
+          emit('download_progress', dict(name=name, chunk=chunk, chunk_size=chunk_size, total_size=req.headers['Content-Length']))
     except Exception as e:
       print('download error')
       traceback.print_exc()
@@ -53,17 +49,17 @@ def download(data):
     emit=emit,
   )
 
-
 # upload from client
 @socketio.on("siofu_start")
 def siofu_start(data):
   print('file upload start')
-  session_id = session[request.sid]['_session']
-  session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
-  filename = secure_filename(data.get('name'))
-  os.makedirs(current_app.config['DATA_DIR'], exist_ok=True)
-  os.makedirs(session_dir, exist_ok=True)
-  if filename != '':
+  try:
+    session_id = session[request.sid]['_session']
+    session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
+    filename = secure_filename(data.get('name'))
+    os.makedirs(current_app.config['DATA_DIR'], exist_ok=True)
+    os.makedirs(session_dir, exist_ok=True)
+    assert filename != '', 'Invalid Filename'
     session[request.sid] = dict(session[request.sid], **{
       'file_%d' % (data.get('id')): dict(data,
         name=filename,
@@ -75,8 +71,9 @@ def siofu_start(data):
       'id': data.get('id'),
       'name': None,
     })
-  else:
-    emit('siofu_error', 'Invalid filename')
+  except Exception as e:
+    traceback.print_exc()
+    emit('siofu_error', str(e))
 
 @socketio.on("siofu_progress")
 def siofu_progress(data):
