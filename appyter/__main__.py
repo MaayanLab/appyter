@@ -3,7 +3,7 @@ def main():
   from dotenv import load_dotenv
   load_dotenv()
   #
-  import sys
+  import os, sys
   if '--debug=false' in sys.argv or os.environ.get('DEBUG') == False:
     print('Patching...')
     import eventlet
