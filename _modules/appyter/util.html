@@ -37,7 +37,8 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.util</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">werkzeug.utils</span> <span class="kn">import</span> <span class="n">secure_filename</span>
+<span></span><span class="kn">import</span> <span class="nn">urllib.parse</span>
+<span class="kn">from</span> <span class="nn">werkzeug.utils</span> <span class="kn">import</span> <span class="n">secure_filename</span>
 
 <div class="viewcode-block" id="try_json_loads"><a class="viewcode-back" href="../../appyter.html#appyter.util.try_json_loads">[docs]</a><span class="k">def</span> <span class="nf">try_json_loads</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
   <span class="kn">import</span> <span class="nn">json</span>
@@ -64,6 +65,18 @@
   <span class="sd">&#39;&#39;&#39; Utility function for joining routes while striping extraneous slashes</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">return</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">route</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">routes</span> <span class="k">if</span> <span class="n">route</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)])</span></div>
+
+<div class="viewcode-block" id="secure_url"><a class="viewcode-back" href="../../appyter.html#appyter.util.secure_url">[docs]</a><span class="k">def</span> <span class="nf">secure_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+  <span class="n">parsed</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+  <span class="k">assert</span> <span class="n">parsed</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;https&#39;</span><span class="p">,</span> <span class="s1">&#39;http&#39;</span><span class="p">,</span> <span class="s1">&#39;ftp&#39;</span><span class="p">},</span> <span class="s1">&#39;Invalid scheme&#39;</span>
+  <span class="k">return</span> <span class="n">url</span></div>
+
+<div class="viewcode-block" id="is_remote"><a class="viewcode-back" href="../../appyter.html#appyter.util.is_remote">[docs]</a><span class="k">def</span> <span class="nf">is_remote</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">secure_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span>
+  <span class="k">except</span><span class="p">:</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="importdir"><a class="viewcode-back" href="../../appyter.html#appyter.util.importdir">[docs]</a><span class="k">def</span> <span class="nf">importdir</span><span class="p">(</span><span class="n">_dirname_</span><span class="p">,</span> <span class="n">_package_</span><span class="p">,</span> <span class="n">_globals_</span><span class="p">):</span>
   <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">importlib</span>

@@ -39,23 +39,28 @@
             
   <h1>Source code for appyter.render.flask_app.execution</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">PIPE</span>
 <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">copy_current_request_context</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">abort</span>
 <span class="kn">from</span> <span class="nn">flask_socketio</span> <span class="kn">import</span> <span class="n">emit</span>
 
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app</span> <span class="kn">import</span> <span class="n">socketio</span>
-<span class="kn">from</span> <span class="nn">appyter.render.flask_app.core</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.core</span> <span class="kn">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">post_index_html_dynamic</span><span class="p">,</span> <span class="n">generate_session_id</span>
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app.util</span> <span class="kn">import</span> <span class="n">sanitize_uuid</span>
 
 <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_jinja2_env</span>
 <span class="kn">from</span> <span class="nn">appyter.render.nbconstruct</span> <span class="kn">import</span> <span class="n">render_nb_from_nbtemplate</span>
 
-
 <span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;session&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;creating new session&#39;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+      <span class="n">_session</span><span class="o">=</span><span class="n">generate_session_id</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;session&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
   <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;session&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">)</span>
   <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">_session</span><span class="o">=</span><span class="n">sanitize_uuid</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;_session&#39;</span><span class="p">]))</span>
   <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
@@ -66,6 +71,13 @@
   <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">sid</span> <span class="ow">in</span> <span class="n">session</span><span class="p">:</span>
     <span class="k">del</span> <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">]</span>
   <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+
+<div class="viewcode-block" id="submit"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.execution.submit">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+  <span class="c1"># WARNING: this depends on FileFields taking care of filename sanity checking</span>
+  <span class="n">post_index_html_dynamic</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+  <span class="c1"># TODO: deal with possible redirect</span>
 
 <div class="viewcode-block" id="init"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.execution.init">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;init&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>

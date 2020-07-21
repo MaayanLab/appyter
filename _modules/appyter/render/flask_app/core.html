@@ -54,6 +54,9 @@
 
 <span class="n">core</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;__main__&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">)</span>
 
+<div class="viewcode-block" id="generate_session_id"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.generate_session_id">[docs]</a><span class="k">def</span> <span class="nf">generate_session_id</span><span class="p">():</span>
+  <span class="k">return</span> <span class="s1">&#39;00000000-0000-0000-0000-000000000000&#39;</span> <span class="k">if</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span></div>
+
 <div class="viewcode-block" id="prepare_formdata"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.prepare_formdata">[docs]</a><span class="k">def</span> <span class="nf">prepare_formdata</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
   <span class="c1"># Get form variables</span>
   <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({</span>
@@ -81,7 +84,7 @@
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
   <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-    <span class="n">_session</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;00000000-0000-0000-0000-000000000000&#39;</span> <span class="k">if</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+    <span class="n">_session</span><span class="o">=</span><span class="n">generate_session_id</span><span class="p">(),</span>
   <span class="p">)</span>
   <span class="n">nbtemplate</span> <span class="o">=</span> <span class="n">nb_from_ipynb_file</span><span class="p">(</span>
     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;CWD&#39;</span><span class="p">],</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">])</span>
@@ -113,12 +116,11 @@
     <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="get_session_ipynb_static"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.get_session_ipynb_static">[docs]</a><span class="k">def</span> <span class="nf">get_session_ipynb_static</span><span class="p">(</span><span class="n">session_id</span><span class="p">):</span>
-  <span class="c1"># TODO: if still executing, flush current state</span>
-  <span class="n">nbfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">session_id</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">]))</span>
-  <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">nbfile</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">session_id</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">]))</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span></div>
+  <span class="n">session_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">session_id</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span>
+    <span class="n">session_path</span><span class="p">,</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">])</span>
+  <span class="p">)</span></div>
 
 <div class="viewcode-block" id="post_index_html_dynamic"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.post_index_html_dynamic">[docs]</a><span class="k">def</span> <span class="nf">post_index_html_dynamic</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Return dynamic nbviewer</span>
@@ -136,7 +138,7 @@
   <span class="k">else</span><span class="p">:</span>
     <span class="c1"># TODO: don&#39;t do this if it&#39;s a duplicate</span>
     <span class="c1"># copy the current session info to a new one</span>
-    <span class="n">new_session_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+    <span class="n">new_session_id</span> <span class="o">=</span> <span class="n">generate_session_id</span><span class="p">()</span>
     <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="p">[</span><span class="s1">&#39;_session&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_session_id</span>
     <span class="n">new_session_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">new_session_id</span><span class="p">)</span>
     <span class="n">new_nbfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_session_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">]))</span>
@@ -194,23 +196,26 @@
   <span class="k">return</span> <span class="n">render_nb_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nb</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_index"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.get_index">[docs]</a><span class="nd">@route_join_with_or_without_slash</span><span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<div class="viewcode-block" id="get_index"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.get_index">[docs]</a><span class="nd">@route_join_with_or_without_slash</span><span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">get_index</span><span class="p">():</span>
   <span class="n">mimetype</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">accept_mimetypes</span><span class="o">.</span><span class="n">best_match</span><span class="p">([</span>
     <span class="s1">&#39;text/html&#39;</span><span class="p">,</span>
     <span class="s1">&#39;application/vnd.jupyter&#39;</span><span class="p">,</span> <span class="s1">&#39;application/vnd.jupyter.cells&#39;</span><span class="p">,</span> <span class="s1">&#39;application/x-ipynb+json&#39;</span><span class="p">,</span>
     <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
   <span class="p">],</span> <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;text/html&#39;</span><span class="p">}:</span>
-    <span class="k">return</span> <span class="n">get_index_html</span><span class="p">()</span>
-  <span class="k">elif</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;application/vnd.jupyter&#39;</span><span class="p">,</span> <span class="s1">&#39;application/vnd.jupyter.cells&#39;</span><span class="p">,</span> <span class="s1">&#39;application/x-ipynb+json&#39;</span><span class="p">}:</span>
-    <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
-    <span class="n">nbtemplate</span> <span class="o">=</span> <span class="n">nb_from_ipynb_file</span><span class="p">(</span>
-      <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;CWD&#39;</span><span class="p">],</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">])</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">nbtemplate</span>
-  <span class="k">elif</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;application/json&#39;</span><span class="p">}:</span>
-    <span class="k">return</span> <span class="n">get_index_json</span><span class="p">()</span>
+  <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;text/html&#39;</span><span class="p">}:</span>
+      <span class="k">return</span> <span class="n">get_index_html</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;application/vnd.jupyter&#39;</span><span class="p">,</span> <span class="s1">&#39;application/vnd.jupyter.cells&#39;</span><span class="p">,</span> <span class="s1">&#39;application/x-ipynb+json&#39;</span><span class="p">}:</span>
+      <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+      <span class="n">nbtemplate</span> <span class="o">=</span> <span class="n">nb_from_ipynb_file</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;CWD&#39;</span><span class="p">],</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">])</span>
+      <span class="p">)</span>
+      <span class="k">return</span> <span class="n">nbtemplate</span>
+    <span class="k">elif</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;application/json&#39;</span><span class="p">}:</span>
+      <span class="k">return</span> <span class="n">get_index_json</span><span class="p">()</span>
+  <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">post_index</span><span class="p">(</span><span class="n">generate_session_id</span><span class="p">())</span>
   <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="favicon"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.favicon">[docs]</a><span class="nd">@route_join_with_or_without_slash</span><span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="s1">&#39;favicon.ico&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
@@ -232,7 +237,7 @@
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
       <span class="k">if</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;text/html&#39;</span><span class="p">}:</span>
         <span class="k">return</span> <span class="n">get_session_html_static</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
-      <span class="k">elif</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;application/vnd.jupyter&#39;</span><span class="p">,</span> <span class="s1">&#39;application/vnd.jupyter.cells&#39;</span><span class="p">,</span> <span class="s1">&#39;application/x-ipynb+json&#39;</span><span class="p">}:</span>
+      <span class="k">elif</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span> <span class="s1">&#39;application/vnd.jupyter&#39;</span><span class="p">,</span> <span class="s1">&#39;application/vnd.jupyter.cells&#39;</span><span class="p">,</span> <span class="s1">&#39;application/x-ipynb+json&#39;</span><span class="p">}:</span>
         <span class="k">return</span> <span class="n">get_session_ipynb_static</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
       <span class="k">if</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;text/html&#39;</span><span class="p">}:</span>

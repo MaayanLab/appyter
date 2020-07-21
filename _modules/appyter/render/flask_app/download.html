@@ -39,8 +39,8 @@
             
   <h1>Source code for appyter.render.flask_app.download</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
-<span class="kn">import</span> <span class="nn">urllib.request</span>
 <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">request</span><span class="p">,</span> <span class="n">copy_current_request_context</span><span class="p">,</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">session</span>
 <span class="kn">from</span> <span class="nn">flask_socketio</span> <span class="kn">import</span> <span class="n">emit</span>
 
@@ -65,17 +65,13 @@
   <span class="k">def</span> <span class="nf">download_with_progress</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">emit</span><span class="p">):</span>
     <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;download_start&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">))</span>
     <span class="k">try</span><span class="p">:</span>
-      <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span>
-        <span class="n">url</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-        <span class="n">reporthook</span><span class="o">=</span><span class="k">lambda</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">,</span> <span class="n">total_size</span><span class="p">:</span> <span class="n">emit</span><span class="p">(</span>
-          <span class="s1">&#39;download_progress&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">chunk</span><span class="o">=</span><span class="n">chunk</span><span class="p">,</span>
-            <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">,</span>
-            <span class="n">total_size</span><span class="o">=</span><span class="n">total_size</span>
-          <span class="p">)</span>
-        <span class="p">),</span>
-      <span class="p">)</span>
+      <span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">req</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&lt;=</span> <span class="mi">299</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Error </span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span>
+      <span class="n">chunk_size</span> <span class="o">=</span> <span class="mi">1024</span><span class="o">*</span><span class="mi">100</span>
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">iter_content</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">):</span>
+          <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+          <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;download_progress&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">chunk</span><span class="o">=</span><span class="n">chunk</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">,</span> <span class="n">total_size</span><span class="o">=</span><span class="n">req</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Content-Length&#39;</span><span class="p">]))</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
       <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;download error&#39;</span><span class="p">)</span>
       <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
@@ -93,17 +89,17 @@
     <span class="n">emit</span><span class="o">=</span><span class="n">emit</span><span class="p">,</span>
   <span class="p">)</span></div>
 
-
 <span class="c1"># upload from client</span>
 <div class="viewcode-block" id="siofu_start"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.download.siofu_start">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;siofu_start&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">siofu_start</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
   <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;file upload start&#39;</span><span class="p">)</span>
-  <span class="n">session_id</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">][</span><span class="s1">&#39;_session&#39;</span><span class="p">]</span>
-  <span class="n">session_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">session_id</span><span class="p">)</span>
-  <span class="n">filename</span> <span class="o">=</span> <span class="n">secure_filename</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
-  <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-  <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">session_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">filename</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">session_id</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">][</span><span class="s1">&#39;_session&#39;</span><span class="p">]</span>
+    <span class="n">session_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">session_id</span><span class="p">)</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">secure_filename</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">session_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">filename</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;Invalid Filename&#39;</span>
     <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">],</span> <span class="o">**</span><span class="p">{</span>
       <span class="s1">&#39;file_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)):</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
@@ -115,8 +111,9 @@
       <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">),</span>
       <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">})</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;siofu_error&#39;</span><span class="p">,</span> <span class="s1">&#39;Invalid filename&#39;</span><span class="p">)</span></div>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+    <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;siofu_error&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="siofu_progress"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.download.siofu_progress">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;siofu_progress&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">siofu_progress</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
