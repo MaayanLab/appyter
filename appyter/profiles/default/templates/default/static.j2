@@ -41,6 +41,13 @@
 
 {% block script %}
 {{ super() }}
+{%- if 'hide-code' in _config.EXTRAS %}
+<script>
+  require(['jquery'], function ($) {
+    $('.code_cell > .input').hide()
+  })
+</script>
+{%- endif %}
 {%- if 'toggle-code' in _config.EXTRAS %}
 <script>
   require(['jquery'], function ($) {
