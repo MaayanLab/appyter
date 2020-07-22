@@ -10,6 +10,14 @@
       role="button"
       href="{{ _nb }}"
     >Download Notebook</a>
+    {%- if 'toggle-code' in _config.EXTRAS %}
+    <a
+      id="toggle-code"
+      class="btn btn-secondary white"
+    >
+      Toggle Code
+    </a>
+    {%- endif %}
   </div>
   {%- if 'toc' in _config.EXTRAS %}
     <div class="col-sm-12 col-md-3 col-xl-2">
@@ -33,6 +41,17 @@
 
 {% block script %}
 {{ super() }}
+{%- if 'toggle-code' in _config.EXTRAS %}
+<script>
+  require(['jquery'], function ($) {
+    $(document).ready(function () {
+      $('#toggle-code').on('click', function () {
+        $('.code_cell > .input').toggle()
+      })
+    })
+  })
+</script>
+{%- endif %}
 {%- if 'toc' in _config.EXTRAS %}
 <script>
   require(['jquery'], function ($) {

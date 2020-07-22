@@ -6,4 +6,5 @@ from appyter.cli import cli
 
 @cli.command(help='List the available extra feature flags')
 def list_extras():
-  print('toc  Add a sticky table of contents to the rendered notebook')
+  print('toc          Add a sticky table of contents to the rendered notebook')
+  print('toggle-code  Add a button for toggling code visibility')
