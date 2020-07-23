@@ -85,6 +85,9 @@ async def remote_message_producer(sio, url, input_msg_queue):
   @sio.on('progress')
   async def _(data):
     await input_msg_queue.put(dict(type='progress', data=data))
+  @sio.on('nb')
+  async def _(data):
+    await input_msg_queue.put(dict(type='nb', data=data))
   @sio.on('cell')
   async def _(data):
     await input_msg_queue.put(dict(type='cell', data=data))
