@@ -29,9 +29,10 @@ def download(data):
       assert req.status_code <= 299, f"Error {req.status_code}: {req.text}"
       chunk_size = 1024*100
       with open(path, 'wb') as fw:
+        req.raw.decode_content = True
         for chunk in req.iter_content(chunk_size=chunk_size):
           fw.write(chunk)
-          emit('download_progress', dict(name=name, chunk=chunk, chunk_size=chunk_size, total_size=req.headers['Content-Length']))
+          emit('download_progress', dict(name=name, chunk=chunk, chunk_size=chunk_size, total_size=int(req.headers.get('Content-Length', -1))))
     except Exception as e:
       print('download error')
       traceback.print_exc()

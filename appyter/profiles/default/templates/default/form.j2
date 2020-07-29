@@ -137,7 +137,16 @@ require(['jquery', 'socket'], function ($, socket) {
       })
       socket.on('download_progress', function (evt) {
         if (evt.name !== $self.attr('id')) return
-        var perc = (((evt.chunk * evt.chunk_size) / evt.total_size) * 100).toPrecision(3)
+
+        var perc
+        if (evt.total_size < 0) {
+          perc = '25'
+          progressBar.addClass('bg-warning')
+        } else if (evt.total_size === 0) {
+          perc = '100'
+        } else {
+          perc = (((evt.chunk * evt.chunk_size) / evt.total_size) * 100).toPrecision(3)
+        }
         progressBar
           .css('width', `${perc}%`)
           .attr('aria-valuenow', perc)
@@ -147,6 +156,7 @@ require(['jquery', 'socket'], function ($, socket) {
         progressBar
           .css('width', '100%')
           .attr('aria-valuenow', '100')
+          .removeClass('bg-warning')
           .addClass('bg-success')
           .removeClass('progress-bar-striped')
           .removeClass('progress-bar-animated')
