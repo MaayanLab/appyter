@@ -2,39 +2,42 @@
 
 {% block body %}
 {{ super() }}
-<div class="row">
-  <div class="col-sm-12 text-center">
-    <a
-      id="download-notebook"
-      class="btn btn-primary"
-      role="button"
-      href="{{ _nb }}"
-    >Download Notebook</a>
-    {%- if 'toggle-code' in _config.EXTRAS %}
-    <a
-      id="toggle-code"
-      class="btn btn-secondary white"
-    >
-      Toggle Code
-    </a>
-    {%- endif %}
-  </div>
-  {%- if 'toc' in _config.EXTRAS %}
-    <div class="col-sm-12 col-md-3 col-xl-2">
-      <div class="row sticky-top">
-        <div class="offset-sm-2 col-sm-8 col-md-12">
-          <div id="_toc" class="mt-5">
-            <legend>Table Of Contents</legend>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12 text-center">
+      <a
+        id="download-notebook"
+        class="btn btn-primary"
+        role="button"
+        href="{{ _nb }}"
+      >Download Notebook</a>
+      {%- if 'toggle-code' in _config.EXTRAS %}
+      <a
+        id="toggle-code"
+        class="btn btn-secondary white"
+      >
+        Toggle Code
+      </a>
+      {%- endif %}
+    </div>
+    {%- if 'toc' in _config.EXTRAS %}
+      <div class="col-sm-12 col-md-3 col-xl-2">
+        <div class="row sticky-top">
+          <div class="offset-sm-2 col-sm-8 col-md-12">
+            <div id="_toc" class="mt-5">
+              <legend>Table Of Contents</legend>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div id="nbviewer" class="col-sm-12 col-md-9 col-xl-10">
-      {{ _nbviewer }}
-    </div>
-  {% else %}
-    <div id="nbviewer" class="col-sm-12">{{ _nbviewer }}</div>
-  {%- endif %}
+      <div id="nbviewer" class="col-sm-12 col-md-9 col-xl-10">
+        {{ _nbviewer }}
+      </div>
+    {% else %}
+      <div id="nbviewer" class="col-sm-12">
+        {{ _nbviewer }}
+      </div>
+    {%- endif %}
   </div>
 </div>
 {% endblock %}

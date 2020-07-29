@@ -2,13 +2,19 @@
 
 {% block body %}
 {{ super() }}
-<form method="POST" enctype="multipart/form-data" action="./{{ _session }}/">
+<div class="container">
+  <form method="POST" enctype="multipart/form-data" action="./{{ _session }}/">
     {% for _field in _fields %}
-        {{ _field.render() }}
+      {{ _field.render() }}
     {% endfor %}
     <input name="_session" type="text" style="display: none;" value="{{ _session }}" />
-    <input type="submit" value="Submit" />
-</form>
+    <div class="row">
+      <div class="col-sm-12">
+        <input type="submit" value="Submit" />
+      </div>
+    </div>
+  </form>
+</div>
 {% endblock %}
 
 {% block script %}
