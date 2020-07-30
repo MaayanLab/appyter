@@ -1,6 +1,6 @@
 import os
-import requests
 import traceback
+import urllib.request, urllib.error
 from flask import request, copy_current_request_context, current_app, session
 from flask_socketio import emit
 
@@ -8,6 +8,10 @@ from appyter.render.flask_app.socketio import socketio
 
 from appyter.render.flask_app.util import secure_filename, secure_url
 
+# remove user agent from urllib.request requests
+_opener = urllib.request.build_opener()
+_opener.addheaders = [('Accept', '*/*')]
+urllib.request.install_opener(_opener)
 
 # download from remote
 @socketio.on('download_start')
@@ -25,14 +29,19 @@ def download(data):
   def download_with_progress(name, url, path, filename, emit):
     emit('download_start', dict(name=name, filename=filename))
     try:
-      req = requests.get(url, stream=True)
-      assert req.status_code <= 299, f"Error {req.status_code}: {req.text}"
-      chunk_size = 1024*100
-      with open(path, 'wb') as fw:
-        req.raw.decode_content = True
-        for n, chunk in enumerate(req.iter_content(chunk_size=chunk_size)):
-          fw.write(chunk)
-          emit('download_progress', dict(name=name, chunk=n, chunk_size=chunk_size, total_size=int(req.headers.get('Content-Length', -1))))
+      _, response = urllib.request.urlretrieve(
+        url, filename=path,
+        reporthook=lambda chunk, chunk_size, total_size: emit(
+          'download_progress', dict(
+            name=name,
+            chunk=chunk,
+            chunk_size=chunk_size,
+            total_size=total_size,
+          )
+        ),
+      )
+      # NOTE: this may become an issue if ever someone wants actual html
+      assert response.get_content_type() != 'text/html', 'Expected data, got html'
     except Exception as e:
       print('download error')
       traceback.print_exc()

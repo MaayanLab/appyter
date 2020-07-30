@@ -14,4 +14,3 @@ nbclient
 nbconvert
 nbformat
 python-dotenv
-requests
