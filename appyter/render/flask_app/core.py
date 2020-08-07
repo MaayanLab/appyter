@@ -6,6 +6,7 @@ from flask import Blueprint, request, redirect, abort, send_from_directory, url_
 
 from appyter.context import get_jinja2_env
 from appyter.parse.nb import nb_from_ipynb_file, nb_to_ipynb_file
+from appyter.util import secure_filename
 from appyter.render.form import render_form_from_nbtemplate
 from appyter.render.nbviewer import render_nbviewer_from_nb
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
