@@ -2,7 +2,7 @@ import os
 import uuid
 import json
 import shutil
-from flask import Blueprint, request, redirect, abort, send_from_directory, url_for, current_app
+from flask import Blueprint, request, redirect, abort, send_from_directory, url_for, current_app, jsonify
 
 from appyter.context import get_jinja2_env
 from appyter.parse.nb import nb_from_ipynb_file, nb_to_ipynb_file
@@ -134,16 +134,20 @@ def post_index_html_static(data):
     _data=json.dumps(data),
   )
 
-def post_index_json_static(data):
+def post_index_json_session(data):
   ''' Return rendered json
   '''
   env = get_jinja2_env(config=current_app.config, context=data)
-  env.globals['_session'] = data.get('_session')
-  nbtemplate = nb_from_ipynb_file(
-    os.path.join(current_app.config['CWD'], current_app.config['IPYNB'])
-  )
+  session_id = data.get('_session')
+  env.globals['_session'] = session_id
+  session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
+  nbtemplate = nb_from_ipynb_file(os.path.join(current_app.config['CWD'], current_app.config['IPYNB']))
   nb = render_nb_from_nbtemplate(env, nbtemplate)
-  return json.dumps(render_nbtemplate_json_from_nbtemplate(env, nb))
+  nbfile = os.path.join(session_dir, os.path.basename(current_app.config['IPYNB']))
+  if not os.path.exists(nbfile) or current_app.config['DEBUG']:
+    os.makedirs(session_dir, exist_ok=True)
+    nb_to_ipynb_file(nb, nbfile)
+  return jsonify({ 'session_id': session_id })
 
 def post_index_ipynb_static(data):
   ''' Return rendered ipynb
@@ -209,7 +213,7 @@ def post_index(session):
       elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
         return post_index_ipynb_static(dict(request.form.to_dict(), _session=session_id))
       elif mimetype in {'application/json'}:
-        return post_index_json_static(dict(request.form.to_dict(), _session=session_id))
+        return post_index_json_session(dict(request.form.to_dict(), _session=session_id))
     abort(404)
 
 @route_join_with_or_without_slash(core, '<string:session>', '<path:path>', methods=['GET'])
