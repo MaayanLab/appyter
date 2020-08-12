@@ -52,7 +52,6 @@ appyter.render.nbviewer module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

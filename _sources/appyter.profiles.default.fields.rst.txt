@@ -20,6 +20,14 @@ appyter.profiles.default.fields.ChoiceField module
    :undoc-members:
    :show-inheritance:
 
+appyter.profiles.default.fields.DescriptionField module
+-------------------------------------------------------
+
+.. automodule:: appyter.profiles.default.fields.DescriptionField
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.profiles.default.fields.FileField module
 ------------------------------------------------
 
@@ -76,6 +84,14 @@ appyter.profiles.default.fields.StringField module
    :undoc-members:
    :show-inheritance:
 
+appyter.profiles.default.fields.TabField module
+-----------------------------------------------
+
+.. automodule:: appyter.profiles.default.fields.TabField
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.profiles.default.fields.TextField module
 ------------------------------------------------
 
@@ -91,7 +107,6 @@ appyter.profiles.default.fields.TextListField module
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------

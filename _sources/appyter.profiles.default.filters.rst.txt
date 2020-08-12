@@ -36,7 +36,6 @@ appyter.profiles.default.filters.url\_for module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

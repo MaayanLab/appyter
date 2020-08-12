@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>appyter.profiles.default.fields.ChoiceField &#8212; Appyter 0.0.1 documentation</title>
+    <title>appyter.profiles.default.fields.TabField &#8212; Appyter 0.0.1 documentation</title>
     <link rel="stylesheet" href="../../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
@@ -27,7 +27,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">appyter.profiles.default.fields.ChoiceField</a></li> 
+        <li class="nav-item nav-item-this"><a href="">appyter.profiles.default.fields.TabField</a></li> 
       </ul>
     </div>  
 
@@ -36,30 +36,36 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for appyter.profiles.default.fields.ChoiceField</h1><div class="highlight"><pre>
+  <h1>Source code for appyter.profiles.default.fields.TabField</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">appyter.fields</span> <span class="kn">import</span> <span class="n">Field</span>
 
-<div class="viewcode-block" id="ChoiceField"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.ChoiceField.ChoiceField">[docs]</a><span class="k">class</span> <span class="nc">ChoiceField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Represing a choice of string values with a combo box.</span>
-
-<span class="sd">  :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.</span>
-<span class="sd">  :param label: (str) A human readable label for the field for the HTML form</span>
-<span class="sd">  :param description: (Optional[str]) A long human readable description for the field for the HTML form</span>
-<span class="sd">  :param choices: (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</span>
-<span class="sd">  :param default: (str) A default value as an example and for use during prototyping</span>
-<span class="sd">  :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</span>
-<span class="sd">  :param value: (INTERNAL Any) The raw value of the field (from the form for instance)</span>
-<span class="sd">  :param \**kwargs: Additional keyword arguments used by other fields</span>
+<div class="viewcode-block" id="TabField"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.TabField.TabField">[docs]</a><span class="k">class</span> <span class="nc">TabField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  Usage:</span>
+<span class="sd">    ```j2</span>
+<span class="sd">    {{ TabField(</span>
+<span class="sd">      choices={</span>
+<span class="sd">        &quot;A&quot;: [</span>
+<span class="sd">          StringField(</span>
+<span class="sd">            name=&quot;A&quot;,</span>
+<span class="sd">            default=&quot;a&quot;</span>
+<span class="sd">          ),</span>
+<span class="sd">        ],</span>
+<span class="sd">        &quot;B&quot;: [</span>
+<span class="sd">          StringField(</span>
+<span class="sd">            name=&quot;B&quot;,</span>
+<span class="sd">            default=&quot;b&quot;</span>
+<span class="sd">          )</span>
+<span class="sd">        ]</span>
+<span class="sd">      }</span>
+<span class="sd">    ) }}</span>
+<span class="sd">    ```</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">TabField</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="n">choices</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ChoiceField.constraint"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.ChoiceField.ChoiceField.constraint">[docs]</a>  <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span></div>
-
-  <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">safe_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span></div>
+<div class="viewcode-block" id="TabField.constraint"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.TabField.TabField.constraint">[docs]</a>  <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -93,7 +99,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">appyter.profiles.default.fields.ChoiceField</a></li> 
+        <li class="nav-item nav-item-this"><a href="">appyter.profiles.default.fields.TabField</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

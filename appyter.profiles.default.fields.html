@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.profiles.default.fields package &#8212; Appyter 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -114,6 +114,26 @@ Should be overridden by subclasses.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-appyter.profiles.default.fields.DescriptionField">
+<span id="appyter-profiles-default-fields-descriptionfield-module"></span><h2>appyter.profiles.default.fields.DescriptionField module<a class="headerlink" href="#module-appyter.profiles.default.fields.DescriptionField" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.profiles.default.fields.DescriptionField.DescriptionField">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.DescriptionField.</code><code class="sig-name descname">DescriptionField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/DescriptionField.html#DescriptionField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<p>Representing text between fields</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>text</strong> – (str) A human readable, HTML parsable text</p></li>
+<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="module-appyter.profiles.default.fields.FileField">
 <span id="appyter-profiles-default-fields-filefield-module"></span><h2>appyter.profiles.default.fields.FileField module<a class="headerlink" href="#module-appyter.profiles.default.fields.FileField" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -141,7 +161,7 @@ The field ends up being a string of the file path, for example:</p>
 <p>paths can be relative i.e. <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">&quot;my_file.txt&quot;:</span> <span class="pre">url_for('static',</span> <span class="pre">filename='my_file.txt')</span> <span class="pre">}</span></code>, or a remote url.
 :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
 :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-:param <a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
+:param <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs: Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.FileField.FileField.constraint">
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.constraint" title="Permalink to this definition">¶</a></dt>
@@ -403,6 +423,41 @@ Should be overridden by subclasses.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-appyter.profiles.default.fields.TabField">
+<span id="appyter-profiles-default-fields-tabfield-module"></span><h2>appyter.profiles.default.fields.TabField module<a class="headerlink" href="#module-appyter.profiles.default.fields.TabField" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.profiles.default.fields.TabField.TabField">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.TabField.</code><code class="sig-name descname">TabField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<p>Usage:</p>
+<div class="highlight-j2 notranslate"><div class="highlight"><pre><span></span>{{ TabField(
+  choices={
+    &quot;A&quot;: [
+      StringField(
+        name=&quot;A&quot;,
+        default=&quot;a&quot;
+      ),
+    ],
+    &quot;B&quot;: [
+      StringField(
+        name=&quot;B&quot;,
+        default=&quot;b&quot;
+      )
+    ]
+  }
+) }}
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.TabField.TabField.constraint">
+<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField.constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if the received args.value satisfies constraints.
+Should be overridden by subclasses.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-appyter.profiles.default.fields.TextField">
 <span id="appyter-profiles-default-fields-textfield-module"></span><h2>appyter.profiles.default.fields.TextField module<a class="headerlink" href="#module-appyter.profiles.default.fields.TextField" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -523,6 +578,7 @@ can be used to extend or override those definitions.</p>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.BoolField">appyter.profiles.default.fields.BoolField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.ChoiceField">appyter.profiles.default.fields.ChoiceField module</a></li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.DescriptionField">appyter.profiles.default.fields.DescriptionField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.FileField">appyter.profiles.default.fields.FileField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.FloatField">appyter.profiles.default.fields.FloatField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.IntField">appyter.profiles.default.fields.IntField module</a></li>
@@ -530,6 +586,7 @@ can be used to extend or override those definitions.</p>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.MultiChoiceField">appyter.profiles.default.fields.MultiChoiceField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.SectionField">appyter.profiles.default.fields.SectionField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.StringField">appyter.profiles.default.fields.StringField module</a></li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.TabField">appyter.profiles.default.fields.TabField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.TextField">appyter.profiles.default.fields.TextField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.TextListField">appyter.profiles.default.fields.TextListField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields">Module contents</a></li>
@@ -573,7 +630,7 @@ can be used to extend or override those definitions.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.0.
     </div>
   </body>
 </html>
