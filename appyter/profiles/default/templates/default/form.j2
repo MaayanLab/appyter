@@ -119,13 +119,6 @@ require(['jquery'], function ($) {
         })
         target.val(JSON.stringify(Array.from(value)))
       })
-      // Handle tab fields
-      $('[role="tablist"]').each(function () {
-        var self = $(this)
-        var target = $(this).attr('target')
-        var value = self.find('[role="tab"].active').attr('target')
-        $(target).val(value)
-      })
       // Submit form
       this.submit()
     })
