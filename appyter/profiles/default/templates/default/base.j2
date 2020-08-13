@@ -6,6 +6,11 @@
   {% endblock %}
   {% block style %}
   <style>
+  .svelte-component.loading {
+    display: none;
+  }
+  </style>
+  <style>
   .progress {
     height: 25px;
     width: 100%;
@@ -74,6 +79,24 @@
     <script>
       define('socket', ['socketio'], function (io) {
         return io({ path: '{{ _config.PREFIX }}socket.io' })
+      })
+    </script>
+    <script>
+      require(['jquery'], function ($) {
+        $(document).ready(function () {
+          $('.svelte-component').each(function () {
+            var self = this
+            var props = JSON.parse(self.children[0].innerHTML)
+            self.children[0].remove()
+            require([`{{ url_for('__main__.profile', path='js') + '/fields/${props.field}.js' }}`], function (Component) {
+              var component = new Component({
+                target: self,
+                props: props,
+              })
+              self.classList.remove('loading')
+            })
+          })
+        })
       })
     </script>
     {% if _config.DEBUG %}

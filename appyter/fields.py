@@ -49,6 +49,7 @@ class Field(dict):
     :param \**kwargs: Additional keyword arguments used by other fields
     '''
     super().__init__(
+      field=self.field,
       args=dict(
         name=name,
         label=label,
@@ -82,6 +83,13 @@ class Field(dict):
     return Markup(
       get_jinja2_env().get_template(
         self.template
+      ).render(dict(**kwargs, this=self))
+    )
+  
+  def render_svelte(self, **kwargs):
+    return Markup(
+      get_jinja2_env().get_template(
+        'svelte.j2'
       ).render(dict(**kwargs, this=self))
     )
 
