@@ -1,0 +1,33 @@
+{
+  "name": "appyter-js",
+  "version": "1.0.0",
+  "description": "Javascript helpers for appyter",
+  "scripts": {
+    "build": "gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maayanlab/appyter.git"
+  },
+  "author": "Daniel J. B. Clarke <u8sand@gmail.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/maayanlab/appyter/issues"
+  },
+  "homepage": "https://github.com/maayanlab/appyter#readme",
+  "devDependencies": {
+    "babelify": "^10.0.0",
+    "browserify": "^16.5.2",
+    "gulp": "^4.0.2",
+    "gulp-buffer": "0.0.2",
+    "gulp-cli": "^2.3.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-tap": "^2.0.0",
+    "gulplog": "^1.0.0",
+    "svelte": "^3.24.1",
+    "sveltify": "^3.0.0"
+  },
+  "dependencies": {
+    "gulp-rename": "^2.0.0"
+  }
+}
