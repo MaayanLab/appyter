@@ -1,5 +1,14 @@
 {% extends "base.j2" %}
 
+{% block style %}
+{{ super() }}
+<style>
+.svelte-component.loading {
+  display: none;
+}
+</style>
+{% endblock %}
+
 {% block body %}
 {{ super() }}
 <div class="container">
@@ -19,6 +28,24 @@
 
 {% block script %}
 {{ super() }}
+<script>
+  require(['jquery'], function ($) {
+    $(document).ready(function () {
+      $('.svelte-component').each(function () {
+        var self = this
+        var props = JSON.parse(self.children[0].innerHTML)
+        self.children[0].remove()
+        require([`{{ url_for('__main__.profile', path='js') + '/fields/${props.field}.js' }}`], function (Component) {
+          var component = new Component({
+            target: self,
+            props: props,
+          })
+          self.classList.remove('loading')
+        })
+      })
+    })
+  })
+</script>
 <script>
   require(['jquery', 'socketio-file-upload', 'socket'], function ($, SocketIOFileUpload, socket) {
     $('[type="file"]').each(function () {
