@@ -162,6 +162,9 @@ def get_extra_files(config=None):
   paths.add(os.path.abspath(os.path.join(cwd, config['IPYNB'])))
   return list(paths)
 
+def get_profile_directory(profile):
+  return os.path.join(os.path.dirname(__file__), 'profiles', profile)
+
 def get_jinja2_env(context={}, config=None):
   if config is None:
     config = get_env()

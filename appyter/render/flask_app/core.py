@@ -4,7 +4,7 @@ import json
 import shutil
 from flask import Blueprint, request, redirect, abort, send_from_directory, url_for, current_app, jsonify
 
-from appyter.context import get_jinja2_env
+from appyter.context import get_jinja2_env, get_profile_directory
 from appyter.parse.nb import nb_from_ipynb_file, nb_to_ipynb_file
 from appyter.util import secure_filename
 from appyter.render.form import render_form_from_nbtemplate
@@ -182,6 +182,10 @@ def get_index():
   elif request.method == 'POST':
     return post_index(generate_session_id())
   abort(404)
+
+@route_join_with_or_without_slash(core, 'profile', '<path:path>', methods=['GET'])
+def profile(path):
+  return send_from_directory(os.path.join(get_profile_directory('default'), 'static'), path)
 
 @route_join_with_or_without_slash(core, 'favicon.ico', methods=['GET'])
 def favicon():
