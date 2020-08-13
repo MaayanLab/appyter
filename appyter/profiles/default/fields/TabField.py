@@ -34,4 +34,4 @@ class TabField(Field):
       for tab_fields in self.args['choices'].values()
       for field in tab_fields
     }
-    return self.render_svelte(**kwargs)
+    return super().render(**kwargs)
