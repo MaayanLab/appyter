@@ -2,6 +2,7 @@ import os
 import uuid
 import click
 from flask import Flask, Blueprint, current_app
+from flask_cors import CORS
 
 from appyter.render.flask_app.socketio import socketio, emit
 from appyter.render.flask_app.core import core
@@ -19,6 +20,7 @@ def create_app(**kwargs):
   #
   print('Initializing flask...')
   app = Flask(__name__, static_url_path=config['STATIC_PREFIX'], static_folder=config['STATIC_DIR'])
+  CORS(app)
   app.config.update(config)
   app.debug = config['DEBUG']
   #
