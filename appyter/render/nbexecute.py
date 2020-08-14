@@ -7,7 +7,7 @@ import functools
 from appyter.cli import cli
 from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.render.nbviewer import render_nbviewer_from_nb
-from appyter.parse.nb import nb_from_ipynb_file, nb_to_ipynb_file
+from appyter.parse.nb import nb_from_ipynb_file, nb_to_ipynb_file, nb_to_json
 
 
 def cell_is_code(cell):
@@ -48,6 +48,7 @@ def nbexecute(ipynb='', emit=json_emitter, cwd=''):
       resources={ 'metadata': {'path': cwd} },
       iopub_hook=iopub_hook_factory(nb, emit),
     )
+    emit({ 'type': 'nb', 'data': nb_to_json(nb) })
     with client.setup_kernel():
       n_cells = len(nb.cells)
       emit({ 'type': 'status', 'data': 'Executing...' })
