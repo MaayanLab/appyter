@@ -114,7 +114,6 @@ def post_index_html_dynamic(data):
     'dynamic.j2',
   ).render(
     _nb=os.path.basename(current_app.config['IPYNB']),
-    _nbviewer=render_nbviewer_from_nb(env, nb),
     _data=json.dumps(data),
   )
 

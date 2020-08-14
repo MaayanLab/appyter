@@ -5,6 +5,11 @@
     <title>Appyter</title>
   {% endblock %}
   {% block style %}
+  <style>
+    .loading {
+      display: none;
+    }
+  </style>
   {% if 'toc' in _config.EXTRAS %}
   <style>
   #_toc h1 {
