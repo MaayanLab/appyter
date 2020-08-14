@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Javascript helpers for appyter",
   "scripts": {
-    "build": "gulp build"
+    "build": "gulp build",
+    "start": "gulp"
   },
   "repository": {
     "type": "git",

@@ -9,9 +9,14 @@ const browserify = require('browserify')
 const sveltify = require('sveltify')
 const root = path.join(__dirname, '..')
 
+const js = {
+  src: path.join(root, 'js/profiles/**/*.svelte'),
+  dest: path.join(root, 'appyter', 'profiles'),
+}
+
 gulp.task('build', function () {
   return gulp
-    .src(path.join(root, 'js/profiles/**/*.svelte'), { read: false })
+    .src(js.src, { read: false, since: gulp.lastRun('build') })
     .pipe(tap(function (file) {
       log.info('bundling ' + file.path)
       file.contents = browserify(file.path, {
@@ -27,5 +32,11 @@ gulp.task('build', function () {
     .pipe(rename(function (path) {
       path.extname = ".js"
     }))
-    .pipe(gulp.dest(path.join(root, 'appyter', 'profiles')))
+    .pipe(gulp.dest(js.dest))
 })
+
+gulp.task('watch', function () {
+  return gulp.watch(js.src, gulp.task('build'))
+})
+
+gulp.task('default', gulp.series(['build', 'watch']))
