@@ -41,6 +41,7 @@
 <span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">import</span> <span class="nn">click</span>
 <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">Blueprint</span><span class="p">,</span> <span class="n">current_app</span>
+<span class="kn">from</span> <span class="nn">flask_cors</span> <span class="kn">import</span> <span class="n">CORS</span>
 
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app.socketio</span> <span class="kn">import</span> <span class="n">socketio</span><span class="p">,</span> <span class="n">emit</span>
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app.core</span> <span class="kn">import</span> <span class="n">core</span>
@@ -58,6 +59,7 @@
   <span class="c1">#</span>
   <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Initializing flask...&#39;</span><span class="p">)</span>
   <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">static_url_path</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;STATIC_PREFIX&#39;</span><span class="p">],</span> <span class="n">static_folder</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;STATIC_DIR&#39;</span><span class="p">])</span>
+  <span class="n">CORS</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
   <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
   <span class="n">app</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">]</span>
   <span class="c1">#</span>
@@ -166,7 +168,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
     </div>
   </body>
 </html>
