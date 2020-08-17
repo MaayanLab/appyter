@@ -194,7 +194,7 @@ def get_env_from_kwargs(**kwargs):
   PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('PROXY', False)))
   CWD = os.path.realpath(kwargs.get('cwd', os.environ.get('CWD', os.getcwd())))
   DATA_DIR = kwargs.get('data-dir', os.environ.get('DATA_DIR', 'data'))
-  MAX_THREADS = try_json_loads(kwargs.get('max-threads', os.environ.get('MAX_THREADS', 10)))
+  DISPATCHER = kwargs.get('dispatcher', os.environ.get('DISPATCHER'))
   SECRET_KEY = kwargs.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
   DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
   STATIC_DIR = kwargs.get('static-dir', os.path.abspath(os.path.join(CWD, 'static')))
@@ -216,7 +216,7 @@ def get_env_from_kwargs(**kwargs):
     PROXY=PROXY,
     CWD=CWD,
     DATA_DIR=DATA_DIR,
-    MAX_THREADS=MAX_THREADS,
+    DISPATCHER=DISPATCHER,
     SECRET_KEY=SECRET_KEY,
     DEBUG=DEBUG,
     STATIC_DIR=STATIC_DIR,
