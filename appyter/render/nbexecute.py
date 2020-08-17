@@ -20,22 +20,19 @@ def cell_has_error(cell):
     return False
 
 def iopub_hook_factory(nb, emit):
-  def iopub_hook(cell, cell_index):
-    emit({ 'type': 'cell', 'data': [cell, cell_index] })
+  async def iopub_hook(cell, cell_index):
+    await emit({ 'type': 'cell', 'data': [cell, cell_index] })
   return iopub_hook
 
-def json_emitter(obj):
+async def json_emitter(obj):
   import json
   print(json.dumps(obj))
 
-@cli.command(help='Execute a jupyter notebook on the command line asynchronously')
-@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
-@click.argument('ipynb', envvar='IPYNB')
-def nbexecute(ipynb='', emit=json_emitter, cwd=''):
+async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
   assert callable(emit), 'Emit must be callable'
   nb = nb_from_ipynb_file(os.path.join(cwd, ipynb))
   try:
-    emit({ 'type': 'status', 'data': 'Starting' })
+    await emit({ 'type': 'status', 'data': 'Starting' })
     client = NotebookClientIOPubHook(
       nb,
       allow_errors=True,
@@ -48,12 +45,12 @@ def nbexecute(ipynb='', emit=json_emitter, cwd=''):
       resources={ 'metadata': {'path': cwd} },
       iopub_hook=iopub_hook_factory(nb, emit),
     )
-    with client.setup_kernel():
+    async with client.async_setup_kernel():
       n_cells = len(nb.cells)
-      emit({ 'type': 'status', 'data': 'Executing...' })
-      emit({ 'type': 'progress', 'data': 0 })
+      await emit({ 'type': 'status', 'data': 'Executing...' })
+      await emit({ 'type': 'progress', 'data': 0 })
       for index, cell in enumerate(nb.cells):
-        cell = client.execute_cell(
+        cell = await client.async_execute_cell(
           cell, index,
           execution_count=client.code_cells_executed + 1,
         )
@@ -61,10 +58,19 @@ def nbexecute(ipynb='', emit=json_emitter, cwd=''):
           if cell_has_error(cell):
             raise Exception('Cell execution error on cell %d' % (index))
         if index < n_cells-1:
-          emit({ 'type': 'progress', 'data': index+1 })
+          await emit({ 'type': 'progress', 'data': index+1 })
         else:
-          emit({ 'type': 'status', 'data': 'Success' })
+          await emit({ 'type': 'status', 'data': 'Success' })
   except Exception as e:
-    emit({ 'type': 'error', 'data': str(e) })
+    await emit({ 'type': 'error', 'data': str(e) })
   #
   nb_to_ipynb_file(nb, os.path.join(cwd, ipynb))
+
+@cli.command(help='Execute a jupyter notebook on the command line asynchronously')
+@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click.argument('ipynb', envvar='IPYNB')
+def nbexecute(ipynb, emit, cwd):
+  import asyncio
+  loop = asyncio.get_event_loop()
+  loop.run_until_complete(nbexecute_async(ipynb, emit, cwd))
+  loop.close()

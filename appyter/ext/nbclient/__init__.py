@@ -26,4 +26,4 @@ class NotebookClientIOPubHook(NotebookClient):
           return
         # Process iopub_hook
         if self.iopub_hook is not None:
-          self.iopub_hook(cell, cell_index)
+          await self.iopub_hook(cell, cell_index)
