@@ -15,3 +15,4 @@ nbclient
 nbconvert
 nbformat
 python-dotenv
+python-socketio
