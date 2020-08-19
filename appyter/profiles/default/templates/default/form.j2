@@ -1,5 +1,14 @@
 {% extends "base.j2" %}
 
+{% block style %}
+{{ super() }}
+<style>
+.svelte-component.loading {
+  display: none;
+}
+</style>
+{% endblock %}
+
 {% block body %}
 {{ super() }}
 <div class="container">
@@ -19,197 +28,22 @@
 {% block script %}
 {{ super() }}
 <script>
-  require(['jquery', 'socketio-file-upload', 'socket'], function ($, SocketIOFileUpload, socket) {
-    $('[type="file"]').each(function () {
-      var siofu = new SocketIOFileUpload(socket);
-      siofu.listenOnInput(this)
-      var $self = $(this)
-      var progressBarContainer
-      var progressBar
-
-      siofu.addEventListener('start', function (evt) {
-        $(`.custom-file-label[for="${$self.attr('id')}"]`).text(evt.file.name+'')
-
-        if (progressBar === undefined) {
-          var progressBarContainer = $('<div></div>')
-            .addClass('progress')
-          progressBar = $('<div></div>')
-            .addClass('progress-bar')
-            .attr('role', 'progressbar')
-            .attr('aria-valuemin', '0')
-            .attr('aria-valuemax', '100')
-            .appendTo(progressBarContainer)
-          $self.parent().append(progressBarContainer)
-        }
-        progressBar
-          .removeClass('bg-success')
-          .addClass('progress-bar-striped')
-          .addClass('progress-bar-animated')
-          .css('width', '0%')
-          .attr('aria-valuenow', '0')
-      })
-      siofu.addEventListener('progress', function (evt) {
-        var perc = ((evt.bytesLoaded / evt.file.size) * 100).toPrecision(3)
-        progressBar
-          .css('width', `${perc}%`)
-          .attr('aria-valuenow', perc)
-      })
-      siofu.addEventListener('complete', function (evt) {
-        progressBar
-          .css('width', '100%')
-          .attr('aria-valuenow', '100')
-          .addClass('bg-success')
-          .removeClass('progress-bar-striped')
-          .removeClass('progress-bar-animated')
-        $self.attr('value', evt.file.name)
-      })
-      siofu.addEventListener('error', function (evt) {
-        console.error(evt)
-        progressBar
-          .addClass('bg-danger')
-      })
-    })
-  })
-</script>
-<script>
-require(['jquery'], function ($) {
-  $(document).ready(function () {
-    $('form').submit(function (e) {
-      e.preventDefault();
-      // Replace files with text elements
-      $('form [type="file"]').each(function () {
-        $(this).attr('type', 'text')
-      })
-      // Handle multi-checkbox-fields
-      $('.multi-checkbox-field').each(function (e) {
-        var self = $(this)
-        var target = $(self.attr('data-target'))
-        var value = self.find('input[type="checkbox"]').filter(function () {
-          return this.checked
-        }).map(function () {
-          return this.parentNode.innerText.trim()
+  require(['jquery'], function ($) {
+    $(document).ready(function () {
+      $('.svelte-component').each(function () {
+        var self = this
+        var props = JSON.parse(self.children[0].innerHTML)
+        Object.assign(props, { requirejs: require })
+        self.children[0].remove()
+        require([`{{ url_for('__main__.profile', path='js') + '/fields/${props.field}.js' }}`], function (Component) {
+          var component = new Component({
+            target: self,
+            props: props,
+          })
+          self.classList.remove('loading')
         })
-        target.val(JSON.stringify(Array.from(value)))
-      })
-      // Handle tab fields
-      $('[role="tablist"]').each(function () {
-        var self = $(this)
-        var target = $(this).attr('target')
-        var value = self.find('[role="tab"].active').attr('target')
-        $(target).val(value)
-      })
-      // Submit form
-      this.submit()
-    })
-  })
-})
-</script>
-<script>
-require(['jquery', 'socket'], function ($, socket) {
-  $(document).ready(function () {
-    $('[type="file"]').each(function () {
-      var $self = $(this)
-      var progressContainer
-      var progressBar
-
-      socket.on('download_queued', function (evt) {
-        if (evt.name !== $self.attr('id')) return
-        $(`.custom-file-label[for="${$self.attr('id')}"]`).text(evt.filename+'')
-
-        if (progressContainer === undefined) {
-          progressContainer = $('<div></div>')
-            .appendTo($self.parent().parent())
-        } else {
-          progressContainer.empty()
-        }
-
-        var progressBarContainer = $('<div></div>')
-          .addClass('progress')
-          .appendTo(progressContainer)
-        progressBar = $('<div></div>')
-          .addClass('progress-bar')
-          .attr('role', 'progressbar')
-          .attr('aria-valuemin', '0')
-          .attr('aria-valuemax', '100')
-          .addClass('progress-bar-striped')
-          .css('width', '0%')
-          .attr('aria-valuenow', '0')
-          .appendTo(progressBarContainer)
-      })
-      socket.on('download_start', function (evt) {
-        if (evt.name !== $self.attr('id')) return
-        progressBar
-          .addClass('progress-bar-animated')
-      })
-      socket.on('download_progress', function (evt) {
-        if (evt.name !== $self.attr('id')) return
-
-        var perc
-        if (evt.total_size < 0) {
-          perc = '25'
-          progressBar.addClass('bg-warning')
-        } else if (evt.total_size === 0) {
-          perc = '100'
-        } else {
-          perc = (((evt.chunk * evt.chunk_size) / evt.total_size) * 100).toPrecision(3)
-        }
-        progressBar
-          .css('width', `${perc}%`)
-          .attr('aria-valuenow', perc)
-      })
-      socket.on('download_complete', function (evt) {
-        if (evt.name !== $self.attr('id')) return
-        progressBar
-          .css('width', '100%')
-          .attr('aria-valuenow', '100')
-          .removeClass('bg-warning')
-          .addClass('bg-success')
-          .removeClass('progress-bar-striped')
-          .removeClass('progress-bar-animated')
-        $self.attr('value', evt.filename)
-      })
-      socket.on('download_error', function (evt) {
-        if (evt.name !== $self.attr('id')) return
-        console.error(evt)
-        if (evt.error === 'HTTP Error 404: Not Found') {
-          var error = $('<div></div>')
-            .addClass('alert')
-            .addClass('alert-danger')
-            .text(`Error downloading file: ${evt.error}`)
-            .appendTo(progressContainer)
-          progressBar
-            .addClass('bg-danger')
-            .removeClass('progress-bar-striped')
-            .css('width', '100%')
-            .attr('aria-valuenow', '100')
-        } else {
-          var error = $('<div></div>')
-            .addClass('alert')
-            .addClass('alert-warning')
-            .html(`Error downloading file: ${evt.error}<br /><b>It may require user engagement, please visit <a href="${evt.url}" target=_blank>${evt.url}</a> to download the example file for upload.`)
-            .appendTo(progressContainer)
-          progressBar
-            .addClass('bg-warning')
-            .removeClass('progress-bar-striped')
-            .css('width', '100%')
-            .attr('aria-valuenow', '100')
-        }
       })
     })
   })
-})
-
-function load_file(name, url, file) {
-  if (url.indexOf('://') === -1) {
-    url = new URL(url, document.baseURI).href
-  }
-  require(['socket'], function (socket) {
-    socket.emit('download_start', {
-      name: name,
-      url: new URL(url).href,
-      file: file,
-    })
-  })
-}
 </script>
 {% endblock %}

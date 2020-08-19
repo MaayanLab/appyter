@@ -1,9 +1,9 @@
 import os
 
-def url_for(directory, filename=None):
-  assert type(filename) == str, 'Filename should be a string and is not optional'
+def url_for(directory, **kwargs):
   try:
     from flask import url_for
-    return url_for(directory, filename=filename)
+    return url_for(directory, **kwargs)
   except RuntimeError:
+    filename = kwargs['filename']
     return os.path.join(directory, filename)

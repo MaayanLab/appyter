@@ -6,19 +6,9 @@
   {% endblock %}
   {% block style %}
   <style>
-  .progress {
-    height: 25px;
-    width: 100%;
-    background-color: grey;
-  }
-  .progress-bar {
-    height: 100%;
-    background-color: blue;
-  }
-  .progress-bar.bg-success {
-    height: 100%;
-    background-color: green;
-  }
+    .loading {
+      display: none;
+    }
   </style>
   {% if 'toc' in _config.EXTRAS %}
   <style>
@@ -59,14 +49,10 @@
         paths: {
           'jquery': 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min',
           'socketio': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim',
-          'socketio-file-upload': 'https://cdn.jsdelivr.net/npm/socketio-file-upload@0.7.0/client.min',
         },
         shim: {
           'socketio': {
             exports: 'io'
-          },
-          'socketio-file-upload': {
-            exports: 'SocketIOFileUpload'
           },
         }
       })
