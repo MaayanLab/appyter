@@ -83,19 +83,10 @@
         socket.on('connect', function () {
           if (first_connect === true) {
             console.debug('connected')
-            socket.emit('session', { _session: '{{ _session }}' })
             first_connect = false
           } else {
             window.location.reload()
           }
-        })
-      })
-    </script>
-    {% else %}
-    <script>
-      require(['socket'], function (socket) {
-        socket.on('connect', function () {
-          socket.emit('session', { _session: '{{ _session }}' })
         })
       })
     </script>

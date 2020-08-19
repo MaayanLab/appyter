@@ -3,11 +3,10 @@
 {% block body %}
 {{ super() }}
 <div class="container">
-  <form method="POST" enctype="multipart/form-data" action="./{{ _session }}/">
+  <form method="POST" enctype="multipart/form-data" action="">
     {% for _field in _fields %}
       {{ _field.render() }}
     {% endfor %}
-    <input name="_session" type="text" style="display: none;" value="{{ _session }}" />
     <div class="row">
       <div class="col-sm-12">
         <input type="submit" value="Submit" />

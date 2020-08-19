@@ -2,7 +2,7 @@
 
 {% block body %}
 <div class="container">
-  <form method="POST" enctype="multipart/form-data" action="./{{ _session }}/">
+  <form method="POST" enctype="multipart/form-data" action="">
     {% with orphaned_fields = jq(_fields, '.[].args.name', '.[] | select(.type != "section" and .args.section == null)') %}
       {% if orphaned_fields %}
         {{ SectionField(
@@ -23,7 +23,6 @@
       ) }}
     {% endfor %}
     <div class="row">
-      <input name="_session" type="text" style="display: none;" value="{{ _session }}" />
       <div class="col-sm-12">
         &nbsp;
       </div>
