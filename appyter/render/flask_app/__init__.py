@@ -13,6 +13,7 @@ def create_app(**kwargs):
   #
   from appyter.render.flask_app.socketio import socketio
   from appyter.render.flask_app.core import core
+  import appyter.render.flask_app.static
   import appyter.render.flask_app.download
   import appyter.render.flask_app.execution
   #
