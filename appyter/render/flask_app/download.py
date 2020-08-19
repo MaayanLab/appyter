@@ -1,36 +1,51 @@
 import os
+import shutil
+import tempfile
 import traceback
 import urllib.request, urllib.error
 from flask import request, copy_current_request_context, current_app, session
 from flask_socketio import emit
 
 from appyter.render.flask_app.socketio import socketio
-
-from appyter.render.flask_app.util import secure_filename, secure_url
+from appyter.render.flask_app.util import secure_filename, secure_url, sha1sum_file, generate_uuid
 
 # remove user agent from urllib.request requests
 _opener = urllib.request.build_opener()
 _opener.addheaders = [('Accept', '*/*')]
 urllib.request.install_opener(_opener)
 
+
+# organize file by content hash
+def organize_file_content(path):
+  content_hash = sha1sum_file(path)
+  content_path = os.path.join(current_app.config['DATA_DIR'], 'input', content_hash)
+  if not os.path.exists(content_path):
+    os.makedirs(os.path.dirname(content_path), exist_ok=True)
+    shutil.move(path, content_path)
+    os.chmod(content_path, 400)
+  else:
+    os.remove(path)
+  return content_hash
+
+
 # download from remote
 @socketio.on('download_start')
 def download(data):
-  print('file download start')
-  session_id = session[request.sid]['_session']
-  session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
-  os.makedirs(current_app.config['DATA_DIR'], exist_ok=True)
+  session_dir = os.path.join(current_app.config['DATA_DIR'], 'tmp', secure_filename(request.sid))
   os.makedirs(session_dir, exist_ok=True)
   name = data.get('name')
+  # TODO: hash based on url?
+  # TODO: s3 bypass
   url = secure_url(data.get('url'))
   filename = secure_filename(data.get('file'))
   # TODO: worry about files that are too big/long
   @copy_current_request_context
-  def download_with_progress(name, url, path, filename, emit):
+  def download_with_progress_and_hash(name, url, path, filename, emit):
     emit('download_start', dict(name=name, filename=filename))
     try:
       _, response = urllib.request.urlretrieve(
-        url, filename=path,
+        url,
+        filename=path,
         reporthook=lambda chunk, chunk_size, total_size: emit(
           'download_progress', dict(
             name=name,
@@ -47,34 +62,36 @@ def download(data):
       traceback.print_exc()
       emit('download_error', dict(name=name, filename=filename, url=url, error=str(e)))
     else:
-      emit('download_complete', dict(name=name, filename=filename))
+      emit('download_complete', dict(
+        name=name, filename=filename,
+        content_hash=organize_file_content(path),
+      ))
   #
   emit('download_queued', dict(name=name, filename=filename))
   socketio.start_background_task(
-    download_with_progress,
+    download_with_progress_and_hash,
     name=name,
     url=url,
-    path=os.path.join(session_dir, filename),
+    path=os.path.join(session_dir, generate_uuid()),
     filename=filename,
     emit=emit,
   )
 
+
 # upload from client
 @socketio.on("siofu_start")
 def siofu_start(data):
-  print('file upload start')
   try:
-    session_id = session[request.sid]['_session']
-    session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
+    session_dir = os.path.join(current_app.config['DATA_DIR'], 'tmp', secure_filename(request.sid))
     filename = secure_filename(data.get('name'))
-    os.makedirs(current_app.config['DATA_DIR'], exist_ok=True)
+    path = os.path.join(session_dir, generate_uuid())
     os.makedirs(session_dir, exist_ok=True)
-    assert filename != '', 'Invalid Filename'
     session[request.sid] = dict(session[request.sid], **{
       'file_%d' % (data.get('id')): dict(data,
+        path=path,
         name=filename,
         bytesLoaded=0,
-        fh=open(os.path.join(session_dir, filename), 'wb'),
+        fh=open(path, 'wb'),
       ),
     })
     emit('siofu_ready', {
@@ -94,9 +111,24 @@ def siofu_progress(data):
 
 @socketio.on("siofu_done")
 def siofu_done(data):
-  print('file upload complete')
   session[request.sid]['file_%d' % (data['id'])]['fh'].close()
+  path = session[request.sid]['file_%d' % (data['id'])]['path']
   del session[request.sid]['file_%d' % (data['id'])]
-  emit('siofu_complete', {
-    'id': data['id'],
-  })
+  emit('siofu_complete', dict(
+    id=data['id'],
+    content_hash=organize_file_content(path),
+  ))
+
+
+# upload from client with POST
+def upload_from_request(req, fnames):
+  data = dict()
+  for fname in fnames:
+    fh = req.files.get(fname)
+    if fh:
+      filename = secure_filename(fh.filename)
+      with tempfile.TemporaryDirectory(dir=s.path.join(current_app.config['DATA_DIR'], 'tmp')) as tmpdir:
+        path = os.path.join(tmpdir, filename)
+        fh.save(path)
+        data[fname] = dict(filename=filename, content_hash=organize_file_content(path))
+  return data
