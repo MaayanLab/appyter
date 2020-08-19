@@ -37,19 +37,13 @@ def collapse(L):
   else:
     return L
 
-def route_join_with_or_without_slash(blueprint, *routes, redirect_slash=False, **kwargs):
+def route_join_with_or_without_slash(blueprint, *routes, **kwargs):
   ''' Like @app.route but doesn't care about trailing slash or not
   '''
   def wrapper(func):
     routes_stripped = join_routes(*routes)
-    routed_func = blueprint.route(routes_stripped + '/', **kwargs)(func)
     if routes_stripped:
-      if redirect_slash:
-        @blueprint.route(routes_stripped, **kwargs)
-        def _():
-          from flask import redirect, url_for
-          return redirect(url_for(routed_func))
-      else:
-        return blueprint.route(routes_stripped, **kwargs)(routed_func)
-    return routed_func
+      blueprint.route(routes_stripped, **kwargs)(func)
+    blueprint.route(routes_stripped + '/', **kwargs)(func)
+    return func
   return wrapper

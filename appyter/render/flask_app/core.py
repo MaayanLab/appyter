@@ -11,7 +11,7 @@ from appyter.render.nbviewer import render_nbviewer_from_nb
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.render.nbinspect import render_nbtemplate_json_from_nbtemplate
 from appyter.render.flask_app.download import upload_from_request
-from appyter.render.flask_app.util import sanitize_uuid, route_join_with_or_without_slash, collapse, sha1sum_file, sha1sum_dict
+from appyter.render.flask_app.util import sanitize_sha1sum, sanitize_uuid, route_join_with_or_without_slash, collapse, sha1sum_file, sha1sum_dict
 
 
 core = Blueprint('__main__', __name__)
@@ -86,6 +86,7 @@ def prepare_results(data):
   results_hash = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data=data))
   results_path = os.path.join(current_app.config['DATA_DIR'], 'output', results_hash)
   if not os.path.exists(results_path):
+    os.makedirs(results_path, exist_ok=True)
     fields = get_fields()
     file_fields = {
       field['args']['name']
@@ -95,11 +96,14 @@ def prepare_results(data):
     # link all input files into output directory
     for file_field in file_fields:
       if fdata := data.get(file_field):
+        content_hash, filename = fdata.split('/', maxsplit=1)
+        content_hash = sanitize_sha1sum(content_hash)
+        filename = secure_filename(filename)
         os.link(
-          os.path.join(current_app.config['DATA_DIR'], 'input', fdata['content_hash']),
-          os.path.join(results_path, secure_filename(fdata['filename']))
+          os.path.join(current_app.config['DATA_DIR'], 'input', content_hash),
+          os.path.join(results_path, filename)
         )
-        fdata = secure_filename(fdata['filename'])
+        fdata = filename
     # construct/write landing page
     os.link(
       os.path.join(current_app.config['DATA_DIR'], 'landing.html'),
@@ -123,7 +127,7 @@ def post_index():
     'application/json',
   ], 'text/html')
   if mimetype in {'text/html'}:
-    return redirect(url_for('static_data', path=result_hash))
+    return redirect(url_for('__main__.data_files', path=result_hash + '/'), 303)
   elif mimetype in {'application/json'}:
     return jsonify(dict(session_id=result_hash))
   else:

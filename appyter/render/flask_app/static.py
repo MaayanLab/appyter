@@ -5,6 +5,7 @@ from flask import request, current_app, send_file, send_from_directory, abort
 
 from appyter.render.flask_app.core import core
 from appyter.render.flask_app.util import route_join_with_or_without_slash
+from appyter.context import get_profile_directory
 
 
 @route_join_with_or_without_slash(core, methods=['GET'])
@@ -31,6 +32,12 @@ def favicon():
 def static_files(path):
   return send_from_directory(current_app.config['STATIC_DIR'], path)
 
+@route_join_with_or_without_slash(core, 'profile', '<path:path>', methods=['GET'])
+def profile(path):
+  return send_from_directory(os.path.join(get_profile_directory('default'), 'static'), path)
+
 @route_join_with_or_without_slash(core, '<path:path>', methods=['GET'])
 def data_files(path):
-  return send_from_directory(current_app.config['DATA_DIR'], path)
+  if path.endswith('/'):
+    path = '/'.join((path[:-1], 'index.html'))
+  return send_from_directory(os.path.join(current_app.config['DATA_DIR'], 'output'), path)

@@ -40,11 +40,11 @@
   // field state
   let state
   let filename
+  let full_filename
 
   // setup example downloading event handlers
   async function setup_download() {
     socket.on('download_queued', function (evt) {
-      console.log('download_queued')
       if (evt.name !== args.name) return
       state = {
         striped: true,
@@ -88,10 +88,10 @@
         progress: 100,
       }
       filename = evt.filename
+      full_filename = evt.full_filename
     })
     socket.on('download_error', function (evt) {
       if (evt.name !== args.name) return
-      console.error(evt)
       if (evt.error === 'HTTP Error 404: Not Found') {
         state = {
           progress: 100,
@@ -133,6 +133,7 @@
         bg: 'success',
       }
       filename = evt.file.name
+      full_filename = evt.detail.full_filename
     })
     siofu.addEventListener('error', function (evt) {
       console.error(evt)
@@ -146,7 +147,6 @@
 
   // trigger example download
   async function load_file(name, url, file) {
-    console.log(`load_file(${name}, ${url}, ${file})`)
     if (url.indexOf('://') === -1) {
       url = new URL(url, document.baseURI).href
     }
@@ -195,13 +195,12 @@
         type="file"
         class="custom-file-input"
         id={args.name}
-        bind:value={filename}
       />
       <input
         type="text"
         class="hidden"
         name={args.name}
-        bind:value={filename}
+        bind:value={full_filename}
       />
       <label class="custom-file-label" for={args.name}>{filename || 'Choose file'}</label>
     </div>

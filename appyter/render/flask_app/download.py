@@ -64,7 +64,7 @@ def download(data):
     else:
       emit('download_complete', dict(
         name=name, filename=filename,
-        content_hash=organize_file_content(path),
+        full_filename='/'.join((organize_file_content(path), filename)),
       ))
   #
   emit('download_queued', dict(name=name, filename=filename))
@@ -83,10 +83,10 @@ def download(data):
 def siofu_start(data):
   try:
     session_dir = os.path.join(current_app.config['DATA_DIR'], 'tmp', secure_filename(request.sid))
-    filename = secure_filename(data.get('name'))
     path = os.path.join(session_dir, generate_uuid())
+    filename = secure_filename(data.get('name'))
     os.makedirs(session_dir, exist_ok=True)
-    session[request.sid] = dict(session[request.sid], **{
+    session[request.sid] = dict(session.get(request.sid, {}), **{
       'file_%d' % (data.get('id')): dict(data,
         path=path,
         name=filename,
@@ -103,20 +103,24 @@ def siofu_start(data):
     emit('siofu_error', str(e))
 
 @socketio.on("siofu_progress")
-def siofu_progress(data):
-  session[request.sid]['file_%d' % (data['id'])]['fh'].write(data['content'])
-  emit("siofu_chunk", {
-    'id': data['id'],
-  })
+def siofu_progress(evt):
+  session[request.sid]['file_%d' % (evt['id'])]['fh'].write(evt['content'])
+  print('progress', evt)
+  emit("siofu_chunk", dict(
+    id=evt['id'],
+  ))
 
 @socketio.on("siofu_done")
-def siofu_done(data):
-  session[request.sid]['file_%d' % (data['id'])]['fh'].close()
-  path = session[request.sid]['file_%d' % (data['id'])]['path']
-  del session[request.sid]['file_%d' % (data['id'])]
+def siofu_done(evt):
+  session[request.sid]['file_%d' % (evt['id'])]['fh'].close()
+  path = session[request.sid]['file_%d' % (evt['id'])]['path']
+  filename = session[request.sid]['file_%d' % (evt['id'])]['name']
+  del session[request.sid]['file_%d' % (evt['id'])]
   emit('siofu_complete', dict(
-    id=data['id'],
-    content_hash=organize_file_content(path),
+    id=evt['id'],
+    detail=dict(
+      full_filename='/'.join((organize_file_content(path), filename)),
+    )
   ))
 
 
@@ -127,8 +131,8 @@ def upload_from_request(req, fnames):
     fh = req.files.get(fname)
     if fh:
       filename = secure_filename(fh.filename)
-      with tempfile.TemporaryDirectory(dir=s.path.join(current_app.config['DATA_DIR'], 'tmp')) as tmpdir:
+      with tempfile.TemporaryDirectory(dir=os.path.join(current_app.config['DATA_DIR'], 'tmp')) as tmpdir:
         path = os.path.join(tmpdir, filename)
         fh.save(path)
-        data[fname] = dict(filename=filename, content_hash=organize_file_content(path))
+        data[fname] = '/'.join((organize_file_content(path), filename))
   return data
