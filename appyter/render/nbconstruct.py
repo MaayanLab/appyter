@@ -5,8 +5,9 @@ import nbformat as nbf
 from copy import deepcopy
 
 from appyter.cli import cli
+from appyter.ext.fs import Filesystem
 from appyter.context import get_env, get_jinja2_env
-from appyter.parse.nb import nb_from_ipynb_file, nb_to_ipynb_io
+from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.parse.nbtemplate import cell_match
 
 
@@ -76,6 +77,6 @@ def nbconstruct(cwd, ipynb, context, output, **kwargs):
     config=get_env(cwd=cwd, ipynb=ipynb, **kwargs),
     context=context,
   )
-  nbtemplate = nb_from_ipynb_file(os.path.join(cwd, ipynb))
+  nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   nb_to_ipynb_io(nb, output)

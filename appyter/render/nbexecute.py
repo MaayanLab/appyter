@@ -5,9 +5,10 @@ import nbformat as nbf
 import functools
 
 from appyter.cli import cli
+from appyter.ext.fs import Filesystem
 from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.render.nbviewer import render_nbviewer_from_nb
-from appyter.parse.nb import nb_from_ipynb_file, nb_to_ipynb_file, nb_to_json
+from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io, nb_to_json
 
 
 def cell_is_code(cell):
@@ -30,7 +31,9 @@ async def json_emitter(obj):
 
 async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
   assert callable(emit), 'Emit must be callable'
-  nb = nb_from_ipynb_file(os.path.join(cwd, ipynb))
+  fs = Filesystem(cwd)
+  with fs.open(ipynb, 'r') as fr:
+    nb = nb_from_ipynb_io(fr)
   try:
     await emit({ 'type': 'status', 'data': 'Starting' })
     client = NotebookClientIOPubHook(
@@ -49,6 +52,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
     async with client.async_setup_kernel():
       await emit({ 'type': 'status', 'data': 'Executing...' })
       await emit({ 'type': 'progress', 'data': 0 })
+      n_cells = len(nb.cells)
       for index, cell in enumerate(nb.cells):
         cell = await client.async_execute_cell(
           cell, index,
@@ -64,7 +68,8 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
   except Exception as e:
     await emit({ 'type': 'error', 'data': str(e) })
   #
-  nb_to_ipynb_file(nb, os.path.join(cwd, ipynb))
+  with fs.open(ipynb, 'w') as fw:
+    nb_to_ipynb_io(nb, fw)
 
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')
 @click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')

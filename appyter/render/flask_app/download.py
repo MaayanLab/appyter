@@ -6,8 +6,9 @@ import urllib.request, urllib.error
 from flask import request, copy_current_request_context, current_app, session
 from flask_socketio import emit
 
+from appyter.ext.fs import Filesystem
 from appyter.render.flask_app.socketio import socketio
-from appyter.render.flask_app.util import secure_filename, secure_url, sha1sum_file, generate_uuid
+from appyter.render.flask_app.util import secure_filename, secure_url, sha1sum_io, generate_uuid
 
 # remove user agent from urllib.request requests
 _opener = urllib.request.build_opener()
@@ -16,23 +17,23 @@ urllib.request.install_opener(_opener)
 
 
 # organize file by content hash
-def organize_file_content(path):
-  content_hash = sha1sum_file(path)
-  content_path = os.path.join(current_app.config['DATA_DIR'], 'input', content_hash)
-  if not os.path.exists(content_path):
-    os.makedirs(os.path.dirname(content_path), exist_ok=True)
-    shutil.move(path, content_path)
-    os.chmod(content_path, 400)
+def organize_file_content(tmp_fs, path):
+  content_hash = sha1sum_io(tmp_fs.open(path, 'rb'))
+  data_fs = Filesystem(Filesystem.join(current_app.config['DATA_DIR'], 'input'))
+  if not data_fs.exists(content_hash):
+    Filesystem.mv(src_fs=tmp_fs, src_path=path, dst_fs=data_fs, dst_path=content_hash)
+    data_fs.chmod_ro(content_hash)
   else:
-    os.remove(path)
+    tmp_fs.rm(path)
   return content_hash
 
 
 # download from remote
 @socketio.on('download_start')
 def download(data):
-  session_dir = os.path.join(current_app.config['DATA_DIR'], 'tmp', secure_filename(request.sid))
-  os.makedirs(session_dir, exist_ok=True)
+  tmp_fs = Filesystem('tmpfs://')
+  session_dir = secure_filename(request.sid)
+  tmp_fs.makedirs(session_dir, exist_ok=True)
   name = data.get('name')
   # TODO: hash based on url?
   # TODO: s3 bypass
@@ -43,20 +44,22 @@ def download(data):
   def download_with_progress_and_hash(name, url, path, filename, emit):
     emit('download_start', dict(name=name, filename=filename))
     try:
-      _, response = urllib.request.urlretrieve(
-        url,
-        filename=path,
-        reporthook=lambda chunk, chunk_size, total_size: emit(
-          'download_progress', dict(
-            name=name,
-            chunk=chunk,
-            chunk_size=chunk_size,
-            total_size=total_size,
-          )
-        ),
-      )
+      req = urllib.request.urlopen(url)
+      headers = req.info()
       # NOTE: this may become an issue if ever someone wants actual html
-      assert response.get_content_type() != 'text/html', 'Expected data, got html'
+      assert headers.get('Content-Type') != 'text/html', 'Expected data, got html'
+      chunk = 0
+      chunk_size = 1024*8
+      total_size = headers.get('Content-Length', -1)
+      reporthook = lambda chunk, name=name, chunk_size=chunk_size, total_size=total_size: emit(
+        'download_progress', dict(name=name, chunk=chunk, chunk_size=chunk_size, total_size=total_size)
+      )
+      with tmp_fs.open(path, 'wb') as fw:
+        reporthook(chunk)
+        while buf := req.read(chunk_size):
+          fw.write(buf)
+          chunk += 1
+          reporthook(chunk)
     except Exception as e:
       print('download error')
       traceback.print_exc()
@@ -64,7 +67,7 @@ def download(data):
     else:
       emit('download_complete', dict(
         name=name, filename=filename,
-        full_filename='/'.join((organize_file_content(path), filename)),
+        full_filename='/'.join((organize_file_content(tmp_fs, path), filename)),
       ))
   #
   emit('download_queued', dict(name=name, filename=filename))
@@ -72,7 +75,7 @@ def download(data):
     download_with_progress_and_hash,
     name=name,
     url=url,
-    path=os.path.join(session_dir, generate_uuid()),
+    path=Filesystem.join(session_dir, generate_uuid()),
     filename=filename,
     emit=emit,
   )
@@ -82,16 +85,17 @@ def download(data):
 @socketio.on("siofu_start")
 def siofu_start(data):
   try:
-    session_dir = os.path.join(current_app.config['DATA_DIR'], 'tmp', secure_filename(request.sid))
-    path = os.path.join(session_dir, generate_uuid())
+    tmp_fs = Filesystem('tmpfs://')
+    session_dir = secure_filename(request.sid)
+    path = Filesystem.join(session_dir, generate_uuid())
     filename = secure_filename(data.get('name'))
-    os.makedirs(session_dir, exist_ok=True)
+    tmp_fs.makedirs(session_dir, exist_ok=True)
     session[request.sid] = dict(session.get(request.sid, {}), **{
       'file_%d' % (data.get('id')): dict(data,
         path=path,
         name=filename,
         bytesLoaded=0,
-        fh=open(path, 'wb'),
+        fh=tmp_fs.open(path, 'wb'),
       ),
     })
     emit('siofu_ready', {
@@ -112,6 +116,7 @@ def siofu_progress(evt):
 
 @socketio.on("siofu_done")
 def siofu_done(evt):
+  tmp_fs = Filesystem('tmpfs://')
   session[request.sid]['file_%d' % (evt['id'])]['fh'].close()
   path = session[request.sid]['file_%d' % (evt['id'])]['path']
   filename = session[request.sid]['file_%d' % (evt['id'])]['name']
@@ -119,7 +124,7 @@ def siofu_done(evt):
   emit('siofu_complete', dict(
     id=evt['id'],
     detail=dict(
-      full_filename='/'.join((organize_file_content(path), filename)),
+      full_filename='/'.join((organize_file_content(tmp_fs, path), filename)),
     )
   ))
 
@@ -131,8 +136,8 @@ def upload_from_request(req, fnames):
     fh = req.files.get(fname)
     if fh:
       filename = secure_filename(fh.filename)
-      with tempfile.TemporaryDirectory(dir=os.path.join(current_app.config['DATA_DIR'], 'tmp')) as tmpdir:
-        path = os.path.join(tmpdir, filename)
-        fh.save(path)
-        data[fname] = '/'.join((organize_file_content(path), filename))
+      path = generate_uuid()
+      tmp_fs = Filesystem('tmpfs://')
+      fh.save(tmp_fs.open(path, 'w'))
+      data[fname] = '/'.join((organize_file_content(tmp_fs, path), filename))
   return data

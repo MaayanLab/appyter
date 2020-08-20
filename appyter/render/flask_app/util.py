@@ -3,12 +3,11 @@ import urllib.parse
 
 from appyter.util import join_routes, secure_filename, secure_url
 
-def sha1sum_file(filename, chunk_size=65536):
+def sha1sum_io(io, chunk_size=65536):
   import hashlib
   sha1 = hashlib.sha1()
-  with open(filename, 'rb') as fr:
-    while buf := fr.read(chunk_size):
-      sha1.update(buf)
+  while buf := io.read(chunk_size):
+    sha1.update(buf)
   return sha1.hexdigest()
 
 def sha1sum_dict(obj):

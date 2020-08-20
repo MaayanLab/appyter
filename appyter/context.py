@@ -202,7 +202,7 @@ def get_env_from_kwargs(**kwargs):
   DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
   STATIC_DIR = os.path.realpath(kwargs.get('static-dir', os.path.abspath(os.path.join(CWD, 'static'))))
   STATIC_PREFIX = join_routes(PREFIX, 'static')
-  IPYNB = os.path.realpath(kwargs.get('ipynb', os.environ.get('IPYNB')))
+  IPYNB = os.path.relpath(kwargs.get('ipynb', os.environ.get('IPYNB')), CWD)
   assert IPYNB != None, 'ipynb was not found'
   #
   if os.path.abspath(CWD) not in sys.path:

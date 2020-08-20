@@ -25,9 +25,6 @@ def _():
 @socketio.on('disconnect')
 def _():
   print('disconnect', request.sid)
-  session_dir = os.path.join(current_app.config['DATA_DIR'], 'tmp', secure_filename(request.sid))
-  if os.path.exists(session_dir):
-    shutil.rmtree(session_dir)
 
 # construct/join a notebook
 @socketio.on('submit')

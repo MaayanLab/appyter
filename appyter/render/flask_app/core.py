@@ -4,14 +4,15 @@ import json
 from flask import Blueprint, request, redirect, abort, send_file, send_from_directory, url_for, current_app, jsonify
 
 from appyter.context import get_jinja2_env, get_profile_directory
-from appyter.parse.nb import nb_from_ipynb_file, nb_to_ipynb_file
+from appyter.ext.fs import Filesystem
+from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.util import secure_filename
 from appyter.render.form import render_form_from_nbtemplate
 from appyter.render.nbviewer import render_nbviewer_from_nb
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.render.nbinspect import render_nbtemplate_json_from_nbtemplate
 from appyter.render.flask_app.download import upload_from_request
-from appyter.render.flask_app.util import sanitize_sha1sum, sanitize_uuid, route_join_with_or_without_slash, collapse, sha1sum_file, sha1sum_dict
+from appyter.render.flask_app.util import sanitize_sha1sum, sanitize_uuid, route_join_with_or_without_slash, collapse, sha1sum_io, sha1sum_dict
 
 
 core = Blueprint('__main__', __name__)
@@ -21,18 +22,23 @@ def prerender():
   ''' Pre-render certain pages for quicker access / direct access via nginx in production
   '''
   env = get_jinja2_env(config=current_app.config)
-  nbtemplate = nb_from_ipynb_file(current_app.config['IPYNB'])
-  with open(os.path.join(current_app.config['DATA_DIR'], 'index.html'), 'w') as fw:
+  fs = Filesystem(current_app.config['CWD'])
+  with fs.open(current_app.config['IPYNB']) as fr:
+    nbtemplate = nb_from_ipynb_io(fr)
+  #
+  data_fs = Filesystem(current_app.config['DATA_DIR'])
+  with data_fs.open('index.html', 'w') as fw:
     fw.write(render_form_from_nbtemplate(env, nbtemplate))
-  with open(os.path.join(current_app.config['DATA_DIR'], 'index.json'), 'w') as fw:
+  with data_fs.open('index.json', 'w') as fw:
     json.dump(render_nbtemplate_json_from_nbtemplate(env, nbtemplate), fw)
-  env.get_template(
-    'landing.j2',
-  ).stream(
-    _nb=os.path.basename(current_app.config['IPYNB']),
-  ).dump(
-    os.path.join(current_app.config['DATA_DIR'], 'landing.html')
-  )
+  with data_fs.open('landing.html', 'w') as fw:
+    env.get_template(
+      'landing.j2',
+    ).stream(
+      _nb=os.path.basename(current_app.config['IPYNB']),
+    ).dump(
+      fw
+    )
 
 _fields = None
 def get_fields():
@@ -40,7 +46,8 @@ def get_fields():
   '''
   global _fields
   if not _fields:
-    with open(os.path.join(current_app.config['DATA_DIR'], 'index.json'), 'r') as fr:
+    fs = Filesystem(current_app.config['DATA_DIR'])
+    with fs.open('index.json', 'r') as fr:
       _fields = json.load(fr)
   return _fields
 
@@ -48,7 +55,8 @@ _ipynb_hash = None
 def get_ipynb_hash():
   global _ipynb_hash
   if not _ipynb_hash:
-    _ipynb_hash = sha1sum_file(os.path.join(current_app.config['CWD'], current_app.config['IPYNB']))
+    fs = Filesystem(current_app.config['CWD'])
+    _ipynb_hash = sha1sum_io(fs.open(current_app.config['IPYNB'], 'rb'))
   return _ipynb_hash
 
 def prepare_data(data):
@@ -84,9 +92,10 @@ def prepare_formdata(req):
 
 def prepare_results(data):
   results_hash = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data=data))
-  results_path = os.path.join(current_app.config['DATA_DIR'], 'output', results_hash)
-  if not os.path.exists(results_path):
-    os.makedirs(results_path, exist_ok=True)
+  data_fs = Filesystem(current_app.config['DATA_DIR'])
+  results_path = Filesystem.join('output', results_hash)
+  if not data_fs.exists(results_path):
+    data_fs.makedirs(results_path, exist_ok=True)
     fields = get_fields()
     file_fields = {
       field['args']['name']
@@ -99,22 +108,25 @@ def prepare_results(data):
         content_hash, filename = fdata.split('/', maxsplit=1)
         content_hash = sanitize_sha1sum(content_hash)
         filename = secure_filename(filename)
-        os.link(
-          os.path.join(current_app.config['DATA_DIR'], 'input', content_hash),
-          os.path.join(results_path, filename)
+        data_fs.link(
+          Filesystem.join('input', content_hash),
+          Filesystem.join(results_path, filename)
         )
         fdata = filename
     # construct/write landing page
-    os.link(
-      os.path.join(current_app.config['DATA_DIR'], 'landing.html'),
-      os.path.join(results_path, 'index.html')
+    data_fs.link(
+      Filesystem.join('landing.html'),
+      Filesystem.join(results_path, 'index.html')
     )
     # construct/write notebook
     env = get_jinja2_env(config=current_app.config, context=data)
-    nbtemplate = nb_from_ipynb_file(os.path.join(current_app.config['CWD'], current_app.config['IPYNB']))
+    fs = Filesystem(current_app.config['CWD'])
+    with fs.open(current_app.config['IPYNB'], 'r') as fr:
+      nbtemplate = nb_from_ipynb_io(fr)
     nb = render_nb_from_nbtemplate(env, nbtemplate)
-    nbfile = os.path.join(results_path, os.path.basename(current_app.config['IPYNB']))
-    nb_to_ipynb_file(nb, nbfile)
+    nbfile = Filesystem.join(results_path, os.path.basename(current_app.config['IPYNB']))
+    with data_fs.open(nbfile, 'w') as fw:
+      nb_to_ipynb_io(nb, fw)
   #
   return results_hash
 
