@@ -32,9 +32,6 @@ def create_app(**kwargs):
     from werkzeug.middleware.proxy_fix import ProxyFix
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
   #
-  print('Preparing data directory...')
-  os.makedirs(app.config['DATA_DIR'], exist_ok=True)
-  #
   print('Registering blueprints...')
   app.register_blueprint(core, url_prefix=app.config['PREFIX'])
   for blueprint_name, blueprint in find_blueprints(config=app.config).items():
