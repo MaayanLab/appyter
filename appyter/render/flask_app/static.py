@@ -19,11 +19,11 @@ def get_index():
     'application/json',
   ], 'text/html')
   if mimetype in {'text/html'}:
-    return send_file(data_fs.open('index.html', 'rb'), mimetype=mimetype)
+    return send_file(data_fs.open('index.html', 'rb'), attachment_filename='index.html', mimetype=mimetype)
   elif mimetype in {'application/json'}:
-    return send_file(data_fs.open('index.json', 'rb'), mimetype=mimetype)
+    return send_file(data_fs.open('index.json', 'rb'), attachment_filename='index.json', mimetype=mimetype)
   elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
-    return send_file(fs.open(current_app.config['IPYNB'], 'rb'), mimetype=mimetype)
+    return send_file(fs.open(current_app.config['IPYNB'], 'rb'), attachment_filename=current_app.config['IPYNB'], mimetype=mimetype)
   else:
     abort(404)
 
