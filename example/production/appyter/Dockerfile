@@ -20,4 +20,6 @@ RUN set -x \
   && echo "Installing appyter..." \
   && pip3 install -Iv ${appyter_version}
 
+ENV DEBUG=false
+
 CMD [ "appyter" ]

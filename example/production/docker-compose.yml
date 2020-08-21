@@ -4,12 +4,12 @@ services:
   ingress:
     image: maayanlab/proxy:latest
     environment:
-      - nginx_proxy_00="/example/? http://appyter-example:5000$$1"
+      - nginx_proxy_00=/(example/?) http://appyter-example:5000/$$1
       # TODO write static/profile files to s3?
-      - nginx_proxy_01="(/example/static/.*) http://appyter-example:5000$$1"
-      - nginx_proxy_02="(/example/profile/.*) http://appyter-example:5000$$1"
-      - nginx_proxy_03="(/example/socket.io/.*) http://appyter-example:5000$$1"
-      - nginx_proxy_99="(.*) http://s3:9000/storage$$1"
+      - nginx_proxy_01=/(example/static/.*) http://appyter-example:5000/$$1
+      - nginx_proxy_02=/(example/profile/.*) http://appyter-example:5000/$$1
+      - nginx_proxy_03=/(example/socket.io/.*) http://appyter-example:5000/$$1
+      - nginx_proxy_99=/(.*) http://s3:9000$$1
       - SERVER_NAME=${SERVER_NAME}
       - BACKEND=http://appyter-example:5000
     ports:
@@ -26,7 +26,6 @@ services:
     image: maayanlab/appyter-example:latest
     environment:
       - PREFIX=/example
-      - HOST=${SERVER_NAME}
       - DATA_DIR=s3://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@s3:9000/storage/example/
       - DISPATCHER=http://appyter-orchestrator:5000
   # the parallel execution orchestrator
@@ -37,9 +36,8 @@ services:
         appyter_version: git+git://github.com/Maayanlab/appyter.git@svelte-orchestration
     image: maayanlab/appyter:latest
     environment:
-      - HOST=appyter-orchestrator
       - JOBS=${JOBS}
-      - dispatch=native
+      - DISPATCH=native
     command:
       - appyter
       - orchestration
@@ -58,3 +56,5 @@ services:
     environment:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    ports:
+      - 9000:9000
