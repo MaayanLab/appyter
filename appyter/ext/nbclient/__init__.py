@@ -8,6 +8,7 @@ class NotebookClientIOPubHook(NotebookClient):
   def __init__(self, *args, iopub_hook=None, **kwargs):
     super().__init__(*args, **kwargs)
     self.iopub_hook = iopub_hook
+    self.kc = None
 
   async def _async_poll_output_msg(
     self,
