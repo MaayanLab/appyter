@@ -5,6 +5,7 @@ class Filesystem:
   def __init__(self, uri):
     self._uri = uri
     self._config = {}
+    #
     if self._uri.username and self._uri.password:
       self._config['key'] = self._uri.username
       self._config['secret'] = self._uri.password
@@ -12,10 +13,10 @@ class Filesystem:
       self._config['token'] = self._uri.username
     else:
       self._config.update(dict(urllib.parse.parse_qsl(self._uri.query)))
+    self._config['client_kwargs'] = dict(endpoint_url=f"{'https' if self._config.get('use_ssl') else 'http'}://{self._uri.netloc}")
+    self._config['config_kwargs'] = dict(signature_version='s3v4')
     #
-    (self._bucket, *prefix) = self._uri.path[1:].split('/', maxsplit=1)
-    self._prefix = '/'.join(prefix)
-    #
+    self._prefix = self._uri.path.lstrip('/').rstrip('/') + '/'
     self._fs = s3fs.S3FileSystem(**self._config)
   #
   def open(self, path, mode='r'):
@@ -29,7 +30,7 @@ class Filesystem:
   #
   def link(self, src, dst):
     print('WARNING: s3 does not support links, copying')
-    return self._fs.copy(src, dst, recursive=True)
+    return self._fs.copy(self._prefix + src, self._prefix + dst, recursive=True)
   #
   def rm(self, path, recursive=False):
     return self._fs.rm(self._prefix + path, recursive=recursive)
