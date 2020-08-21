@@ -14,7 +14,7 @@ class Filesystem:
     return open(os.path.join(self._prefix, path), mode=mode)
   #
   def exists(self, path):
-    return os.path.exists(os.path.join(self._prefix, path))
+    return os.path.isfile(os.path.join(self._prefix, path)) or os.path.islink(os.path.join(self._prefix, path))
   #
   def makedirs(self, path, exist_ok=False):
     return os.makedirs(os.path.join(self._prefix, path), exist_ok=exist_ok)
