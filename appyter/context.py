@@ -196,11 +196,11 @@ def get_env_from_kwargs(**kwargs):
   PORT = try_json_loads(kwargs.get('port', os.environ.get('PORT', 5000)))
   PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('PROXY', False)))
   CWD = os.path.realpath(kwargs.get('cwd', os.environ.get('CWD', os.getcwd())))
-  DATA_DIR = os.path.realpath(kwargs.get('data-dir', os.environ.get('DATA_DIR', 'data')))
+  DATA_DIR = kwargs.get('data-dir', os.environ.get('DATA_DIR', os.path.abspath('data')))
   DISPATCHER = kwargs.get('dispatcher', os.environ.get('DISPATCHER'))
   SECRET_KEY = kwargs.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
   DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
-  STATIC_DIR = os.path.realpath(kwargs.get('static-dir', os.path.abspath(os.path.join(CWD, 'static'))))
+  STATIC_DIR = kwargs.get('static-dir', os.environ.get('STATIC_DIR', os.path.abspath('static')))
   STATIC_PREFIX = join_routes(PREFIX, 'static')
   IPYNB = os.path.relpath(kwargs.get('ipynb', os.environ.get('IPYNB')), CWD)
   assert IPYNB != None, 'ipynb was not found'

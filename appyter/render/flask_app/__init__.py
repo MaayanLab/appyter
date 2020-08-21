@@ -22,7 +22,7 @@ def create_app(**kwargs):
   config = get_env(**kwargs)
   #
   print('Initializing flask...')
-  app = Flask(__name__, static_url_path=config['STATIC_PREFIX'], static_folder=config['STATIC_DIR'])
+  app = Flask(__name__, static_url_path=None, static_folder=None)
   CORS(app)
   app.config.update(config)
   app.debug = config['DEBUG']
