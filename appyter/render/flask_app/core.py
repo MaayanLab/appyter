@@ -117,7 +117,7 @@ def prepare_results(data):
           Filesystem.join('input', content_hash),
           Filesystem.join(results_path, filename)
         )
-        fdata = filename
+        data[file_field] = filename
     # construct/write notebook
     env = get_jinja2_env(config=current_app.config, context=data)
     fs = Filesystem(current_app.config['CWD'])
