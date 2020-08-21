@@ -19,6 +19,9 @@ class Filesystem:
     self._prefix = self._uri.path.lstrip('/').rstrip('/') + '/'
     self._fs = s3fs.S3FileSystem(**self._config)
   #
+  def path(self):
+    return None
+  #
   def open(self, path, mode='r'):
     return self._fs.open(self._prefix + path, mode=mode)
   #
@@ -27,6 +30,9 @@ class Filesystem:
   #
   def makedirs(self, path, exist_ok=False):
     return self._fs.makedirs(self._prefix + path, exist_ok=exist_ok)
+  #
+  def cp(self, src, dst):
+    return self._fs.copy(self._prefix + src, self._prefix + dst, recursive=True)
   #
   def link(self, src, dst):
     print('WARNING: s3 does not support links, copying')

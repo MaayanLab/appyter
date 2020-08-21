@@ -10,6 +10,9 @@ class Filesystem:
   def __enter__(self):
     return self
   #
+  def path(self):
+    return self._prefix
+  #
   def open(self, path, mode='r'):
     return open(os.path.join(self._prefix, path), mode=mode)
   #
@@ -18,6 +21,9 @@ class Filesystem:
   #
   def makedirs(self, path, exist_ok=False):
     return os.makedirs(os.path.join(self._prefix, path), exist_ok=exist_ok)
+  #
+  def cp(self, src, dst):
+    return shutil.copy(os.path.join(self._prefix, src), os.path.join(self._prefix, dst))
   #
   def link(self, src, dst):
     return os.link(os.path.join(self._prefix, src), os.path.join(self._prefix, dst))

@@ -23,6 +23,9 @@ class Filesystem:
   def __enter__(self):
     return self._fs.__enter__()
   #
+  def path(self):
+    return self._fs.path()
+  #
   def open(self, path, mode='r'):
     return self._fs.open(path, mode=mode)
   #
@@ -31,6 +34,9 @@ class Filesystem:
   #
   def makedirs(self, path, exist_ok=False):
     return self._fs.makedirs(path, exist_ok=exist_ok)
+  #
+  def cp(self, src, dst):
+    return self._fs.cp(path, src, dst)
   #
   def link(self, src, dst):
     return self._fs.link(src, dst)
@@ -49,12 +55,19 @@ class Filesystem:
     return os.path.join(*args)
   #
   @staticmethod
-  def mv(src_fs=None, src_path=None, dst_fs=None, dst_path=None):
+  def cp(src_fs=None, src_path=None, dst_fs=None, dst_path=None):
     if src_fs == dst_fs:
-      src_fs.mv(src_path, dst_path)
+      src_fs.cp(src_path, dst_path)
     else:
       with src_fs.open(src_path, 'rb') as fr:
         with dst_fs.open(dst_path, 'wb') as fw:
           shutil.copyfileobj(fr, fw)
+  #
+  @staticmethod
+  def mv(src_fs=None, src_path=None, dst_fs=None, dst_path=None):
+    if src_fs == dst_fs:
+      src_fs.mv(src_path, dst_path)
+    else:
+      Filesystem.cp(src_fs=src_fs, src_path=src_path, dst_fs=dst_fs, dst_path=dst_path)
       src_fs.rm(src_path)
   #
