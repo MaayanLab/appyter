@@ -1,6 +1,7 @@
 import os
 import sys
 import click
+import asyncio
 import nbformat as nbf
 import functools
 
@@ -30,10 +31,12 @@ async def json_emitter(obj):
   print(json.dumps(obj))
 
 async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
+  # TODO: worry about leaking s3 credentials
   assert callable(emit), 'Emit must be callable'
   fs = Filesystem(cwd)
   with fs.open(ipynb, 'r') as fr:
     nb = nb_from_ipynb_io(fr)
+  tmp_fs = Filesystem('tmpfs://')
   try:
     await emit({ 'type': 'status', 'data': 'Starting' })
     client = NotebookClientIOPubHook(
@@ -45,11 +48,17 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
         PYTHONPATH=':'.join(sys.path),
         PATH=os.environ['PATH'],
       ),
-      resources={ 'metadata': {'path': cwd} },
+      resources={ 'metadata': {'path': tmp_fs.path()} },
       iopub_hook=iopub_hook_factory(nb, emit),
     )
     await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
     async with client.async_setup_kernel():
+      await emit({ 'type': 'status', 'data': 'Initializing...' })
+      # monkey-patch open so that writes go to s3
+      client.kc.execute(''.join([
+        'from appyter.ext.fs import Filesystem as _Filesystem\n',
+        'open = _Filesystem({cwd}).open',
+      ]))
       await emit({ 'type': 'status', 'data': 'Executing...' })
       await emit({ 'type': 'progress', 'data': 0 })
       n_cells = len(nb.cells)
