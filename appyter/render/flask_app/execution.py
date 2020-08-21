@@ -14,7 +14,7 @@ from appyter.render.flask_app.core import core, prepare_data, prepare_results
 from appyter.render.flask_app.socketio import socketio, join_room, leave_room
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.render.flask_app.util import sanitize_sha1sum, generate_uuid, secure_filename
-
+from appyter.ext.fs import Filesystem
 from appyter.context import get_jinja2_env
 from appyter.util import join_routes
 
@@ -40,14 +40,15 @@ def submit(data):
   #
   # TODO: submit job iff it hasn't already been executed
   join_room(result_hash)
-  emit('status', 'Notebook created, queuing execution', room=result_hash)
-  # TODO: worry about inaccessible dispatcher
+  emit('status', 'Queuing execution', room=result_hash)
   job = dict(
     url=join_routes(request.base_url, current_app.config['PREFIX'], 'socket.io')[1:], # TODO: use public_url env
-    ipynb=current_app.config['IPYNB'],
+    cwd=Filesystem.join(current_app.config['DATA_DIR'], 'output', result_hash),
+    ipynb=os.path.basename(current_app.config['IPYNB']),
     session=result_hash,
     job=generate_uuid(),
   )
+  # TODO: worry about inaccessible dispatcher
   if current_app.config['DISPATCHER']:
     queue_size = int(urllib.request.urlopen(
       urllib.request.Request(
@@ -60,7 +61,7 @@ def submit(data):
       data=json.dumps(job).encode(),
     ).read().decode())
     # TODO: keep track of queue position?
-    emit('status', f"Queued successfully, you are at position {queue_size} in the queue", room=session_id)
+    emit('status', f"Queued successfully, you are at position {queue_size} in the queue", room=result_hash)
   else:
     from appyter.orchestration.dispatch.native import dispatch
     if current_app.config['DEBUG']:
