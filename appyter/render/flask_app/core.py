@@ -94,7 +94,12 @@ def prepare_results(data):
   results_hash = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data=data))
   data_fs = Filesystem(current_app.config['DATA_DIR'])
   results_path = Filesystem.join('output', results_hash)
-  if not data_fs.exists(results_path):
+  if not data_fs.exists(Filesystem.join(results_path, 'index.html')):
+    # construct/write landing page
+    data_fs.link(
+      Filesystem.join('landing.html'),
+      Filesystem.join(results_path, 'index.html')
+    )
     data_fs.makedirs(results_path, exist_ok=True)
     fields = get_fields()
     file_fields = {
@@ -113,11 +118,6 @@ def prepare_results(data):
           Filesystem.join(results_path, filename)
         )
         fdata = filename
-    # construct/write landing page
-    data_fs.link(
-      Filesystem.join('landing.html'),
-      Filesystem.join(results_path, 'index.html')
-    )
     # construct/write notebook
     env = get_jinja2_env(config=current_app.config, context=data)
     fs = Filesystem(current_app.config['CWD'])
