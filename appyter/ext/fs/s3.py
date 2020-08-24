@@ -27,6 +27,15 @@ class Filesystem:
   def path(self):
     return None
   #
+  def __enter__(self):
+    return self
+  #
+  def __exit__(self, *args):
+    pass
+  #
+  def close(self):
+    pass
+  #
   def open(self, path, mode='r'):
     try:
       assert path
@@ -84,6 +93,3 @@ class Filesystem:
   #
   def chmod_ro(self, path):
     print('WARNING: s3 does not support chmod')
-  #
-  def __exit__(self, *args):
-    pass

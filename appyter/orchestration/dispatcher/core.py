@@ -33,10 +33,7 @@ def dispatcher(Q=None, dispatch=None):
 @core.before_app_first_request
 def init_disaptcher():
   print('Initializing dispatch...')
-  if not current_app.config['DEBUG']:
-    from eventlet.green.subprocess import Popen
-  else:
-    from subprocess import Popen
+  from subprocess import Popen
   #
   dispatch = functools.partial(
     importlib.import_module(

@@ -14,12 +14,15 @@ class Filesystem:
   def path(self):
     return self._prefix
   #
+  def close(self):
+    pass
+  #
   def open(self, path, mode='r'):
     try:
       assert path
       return open(FS.join(self._prefix, path), mode=mode)
     except FileNotFoundError:
-      raise Exception('No such file or directory: {path}')
+      raise Exception(f"No such file or directory: {path}")
     except Exception:
       import traceback
       traceback.print_exc()

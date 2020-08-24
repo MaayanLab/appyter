@@ -27,6 +27,9 @@ class Filesystem:
   def path(self):
     return self._fs.path()
   #
+  def close(self):
+    return self._fs.close()
+  #
   def open(self, path, mode='r'):
     return self._fs.open(path, mode=mode)
   #
