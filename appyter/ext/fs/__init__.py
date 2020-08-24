@@ -2,7 +2,7 @@ import os
 import shutil
 import importlib
 import urllib.parse
-from werkzeug.utils import safe_join
+from werkzeug.security import safe_join
 
 class Filesystem:
   def __init__(self, uri):
