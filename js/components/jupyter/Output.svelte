@@ -1,5 +1,6 @@
 <script>
   import * as Markdown from './Markdown.svelte'
+  import collapse from '../../utils/collapse.js'
 
   export let data
 </script>
@@ -10,14 +11,14 @@
   <div class="output_subarea">
     {#if data.output_type === 'stream'}
       <div class="output_stream output_{data.name} output_text">
-        {data.text}
+        {collapse(data.text)}
       </div>
     {:else if data.output_type === 'execute_result'}
       <div class="output_html rendered_html output_execute_result">
         {#if data.data['text/html']}
-          {@html data.data['text/html']}
+          {@html collapse(data.data['text/html'])}
         {:else}
-          {data.data['text/plain']}
+          {collapse(data.data['text/plain'])}
         {/if}
       </div>
     {:else if data.output_type === 'display_data'}
@@ -25,23 +26,23 @@
         <div class="output_png">
           <img
             class="img-fluid"
-            src="data:img/png;base64,{data.data['image/png']}"
+            src="data:img/png;base64,{collapse(data.data['image/png'])}"
           />
         </div>
       {:else if data.data['text/html']}
         <div class="output_html rendered_html output_execute_result">
-          {@html data.data['text/html']}
+          {@html collapse(data.data['text/html'])}
         </div>
       {:else if data.data['text/markdown']}
         <div class="output_stream output_{data.name} output_markdown">
-          <Markdown data={data.data['text/markdown']} />
+          <Markdown data={collapse(data.data['text/markdown'])} />
         </div>
       {:else if data.data['text/plain']}
         <div class="output_stream output_{data.name} output_text">
-          <pre>{data.data['text/plain']}</pre>
+          <pre>{collapse(data.data['text/plain'])}</pre>
         </div>
       {:else if data.data['application/javascript']}
-        {@html '<script>'+data.data['application/javascript']+'</script>'}
+        {@html '<script>'+collapse(data.data['application/javascript'])+'</script>'}
       {:else}
         {JSON.stringify(data)}
       {/if}

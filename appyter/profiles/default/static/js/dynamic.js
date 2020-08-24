@@ -372,7 +372,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (55:4) {:else}
+// (63:4) {:else}
 function create_else_block_2(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[0]) + "";
 	let t;
@@ -395,7 +395,7 @@ function create_else_block_2(ctx) {
 	};
 }
 
-// (48:43) 
+// (56:43) 
 function create_if_block_10(ctx) {
 	let div;
 	let pre;
@@ -444,7 +444,7 @@ function create_if_block_10(ctx) {
 	};
 }
 
-// (23:50) 
+// (31:50) 
 function create_if_block_4(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -525,7 +525,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (15:52) 
+// (23:52) 
 function create_if_block_2(ctx) {
 	let div;
 
@@ -569,10 +569,10 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (11:4) {#if data.output_type === 'stream'}
+// (19:4) {#if data.output_type === 'stream'}
 function create_if_block_1(ctx) {
 	let div;
-	let t_value = /*data*/ ctx[0].text + "";
+	let t_value = collapse(/*data*/ ctx[0].text) + "";
 	let t;
 	let div_class_value;
 
@@ -587,7 +587,7 @@ function create_if_block_1(ctx) {
 			append(div, t);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && t_value !== (t_value = /*data*/ ctx[0].text + "")) set_data(t, t_value);
+			if (dirty & /*data*/ 1 && t_value !== (t_value = collapse(/*data*/ ctx[0].text) + "")) set_data(t, t_value);
 
 			if (dirty & /*data*/ 1 && div_class_value !== (div_class_value = "output_stream output_" + /*data*/ ctx[0].name + " output_text")) {
 				attr(div, "class", div_class_value);
@@ -601,7 +601,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (45:6) {:else}
+// (53:6) {:else}
 function create_else_block_1(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[0]) + "";
 	let t;
@@ -624,10 +624,10 @@ function create_else_block_1(ctx) {
 	};
 }
 
-// (43:52) 
+// (51:52) 
 function create_if_block_9(ctx) {
 	let html_tag;
-	let raw_value = "<script>" + /*data*/ ctx[0].data["application/javascript"] + "</script>" + "";
+	let raw_value = "<script>" + collapse(/*data*/ ctx[0].data["application/javascript"]) + "</script>" + "";
 	let html_anchor;
 
 	return {
@@ -640,7 +640,7 @@ function create_if_block_9(ctx) {
 			insert(target, html_anchor, anchor);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && raw_value !== (raw_value = "<script>" + /*data*/ ctx[0].data["application/javascript"] + "</script>" + "")) html_tag.p(raw_value);
+			if (dirty & /*data*/ 1 && raw_value !== (raw_value = "<script>" + collapse(/*data*/ ctx[0].data["application/javascript"]) + "</script>" + "")) html_tag.p(raw_value);
 		},
 		i: noop,
 		o: noop,
@@ -651,11 +651,11 @@ function create_if_block_9(ctx) {
 	};
 }
 
-// (39:40) 
+// (47:40) 
 function create_if_block_8(ctx) {
 	let div;
 	let pre;
-	let t_value = /*data*/ ctx[0].data["text/plain"] + "";
+	let t_value = collapse(/*data*/ ctx[0].data["text/plain"]) + "";
 	let t;
 	let div_class_value;
 
@@ -672,7 +672,7 @@ function create_if_block_8(ctx) {
 			append(pre, t);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && t_value !== (t_value = /*data*/ ctx[0].data["text/plain"] + "")) set_data(t, t_value);
+			if (dirty & /*data*/ 1 && t_value !== (t_value = collapse(/*data*/ ctx[0].data["text/plain"]) + "")) set_data(t, t_value);
 
 			if (dirty & /*data*/ 1 && div_class_value !== (div_class_value = "output_stream output_" + /*data*/ ctx[0].name + " output_text")) {
 				attr(div, "class", div_class_value);
@@ -686,7 +686,7 @@ function create_if_block_8(ctx) {
 	};
 }
 
-// (35:43) 
+// (43:43) 
 function create_if_block_7(ctx) {
 	let div;
 	let markdown;
@@ -695,7 +695,7 @@ function create_if_block_7(ctx) {
 
 	markdown = new Markdown({
 			props: {
-				data: /*data*/ ctx[0].data["text/markdown"]
+				data: collapse(/*data*/ ctx[0].data["text/markdown"])
 			}
 		});
 
@@ -712,7 +712,7 @@ function create_if_block_7(ctx) {
 		},
 		p(ctx, dirty) {
 			const markdown_changes = {};
-			if (dirty & /*data*/ 1) markdown_changes.data = /*data*/ ctx[0].data["text/markdown"];
+			if (dirty & /*data*/ 1) markdown_changes.data = collapse(/*data*/ ctx[0].data["text/markdown"]);
 			markdown.$set(markdown_changes);
 
 			if (!current || dirty & /*data*/ 1 && div_class_value !== (div_class_value = "output_stream output_" + /*data*/ ctx[0].name + " output_markdown")) {
@@ -735,10 +735,10 @@ function create_if_block_7(ctx) {
 	};
 }
 
-// (31:39) 
+// (39:39) 
 function create_if_block_6(ctx) {
 	let div;
-	let raw_value = /*data*/ ctx[0].data["text/html"] + "";
+	let raw_value = collapse(/*data*/ ctx[0].data["text/html"]) + "";
 
 	return {
 		c() {
@@ -750,7 +750,7 @@ function create_if_block_6(ctx) {
 			div.innerHTML = raw_value;
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && raw_value !== (raw_value = /*data*/ ctx[0].data["text/html"] + "")) div.innerHTML = raw_value;;
+			if (dirty & /*data*/ 1 && raw_value !== (raw_value = collapse(/*data*/ ctx[0].data["text/html"]) + "")) div.innerHTML = raw_value;;
 		},
 		i: noop,
 		o: noop,
@@ -760,7 +760,7 @@ function create_if_block_6(ctx) {
 	};
 }
 
-// (24:6) {#if data.data['image/png']}
+// (32:6) {#if data.data['image/png']}
 function create_if_block_5(ctx) {
 	let div;
 	let img;
@@ -771,7 +771,7 @@ function create_if_block_5(ctx) {
 			div = element("div");
 			img = element("img");
 			attr(img, "class", "img-fluid");
-			if (img.src !== (img_src_value = "data:img/png;base64," + /*data*/ ctx[0].data["image/png"])) attr(img, "src", img_src_value);
+			if (img.src !== (img_src_value = "data:img/png;base64," + collapse(/*data*/ ctx[0].data["image/png"]))) attr(img, "src", img_src_value);
 			attr(div, "class", "output_png");
 		},
 		m(target, anchor) {
@@ -779,7 +779,7 @@ function create_if_block_5(ctx) {
 			append(div, img);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && img.src !== (img_src_value = "data:img/png;base64," + /*data*/ ctx[0].data["image/png"])) {
+			if (dirty & /*data*/ 1 && img.src !== (img_src_value = "data:img/png;base64," + collapse(/*data*/ ctx[0].data["image/png"]))) {
 				attr(img, "src", img_src_value);
 			}
 		},
@@ -791,9 +791,9 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (19:8) {:else}
+// (27:8) {:else}
 function create_else_block(ctx) {
-	let t_value = /*data*/ ctx[0].data["text/plain"] + "";
+	let t_value = collapse(/*data*/ ctx[0].data["text/plain"]) + "";
 	let t;
 
 	return {
@@ -804,7 +804,7 @@ function create_else_block(ctx) {
 			insert(target, t, anchor);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && t_value !== (t_value = /*data*/ ctx[0].data["text/plain"] + "")) set_data(t, t_value);
+			if (dirty & /*data*/ 1 && t_value !== (t_value = collapse(/*data*/ ctx[0].data["text/plain"]) + "")) set_data(t, t_value);
 		},
 		d(detaching) {
 			if (detaching) detach(t);
@@ -812,10 +812,10 @@ function create_else_block(ctx) {
 	};
 }
 
-// (17:8) {#if data.data['text/html']}
+// (25:8) {#if data.data['text/html']}
 function create_if_block_3(ctx) {
 	let html_tag;
-	let raw_value = /*data*/ ctx[0].data["text/html"] + "";
+	let raw_value = collapse(/*data*/ ctx[0].data["text/html"]) + "";
 	let html_anchor;
 
 	return {
@@ -828,7 +828,7 @@ function create_if_block_3(ctx) {
 			insert(target, html_anchor, anchor);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && raw_value !== (raw_value = /*data*/ ctx[0].data["text/html"] + "")) html_tag.p(raw_value);
+			if (dirty & /*data*/ 1 && raw_value !== (raw_value = collapse(/*data*/ ctx[0].data["text/html"]) + "")) html_tag.p(raw_value);
 		},
 		d(detaching) {
 			if (detaching) detach(html_anchor);
@@ -898,6 +898,14 @@ function create_fragment(ctx) {
 			if (if_block) if_block.d();
 		}
 	};
+}
+
+function collapse(text) {
+	if (Array.isArray(text)) {
+		return text.join("");
+	} else {
+		return text;
+	}
 }
 
 function instance($$self, $$props, $$invalidate) {

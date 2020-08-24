@@ -8,7 +8,8 @@
   import * as Outputs from '../../../../components/jupyter/Outputs.svelte'
   import * as Output from '../../../../components/jupyter/Output.svelte'
   import * as Markdown from '../../../../components/jupyter/Markdown.svelte'
-
+  import collapse from '../../../../utils/collapse'
+  import any from '../../../../utils/any'
 
   export let requirejs
   export let nbdownload
@@ -44,44 +45,21 @@
   let md
   let nb
 
-  function *reduce_output_streams(outputs) {
-    let streams = {}
-    for (const output of outputs) {
-      if (output.output_type === 'stream') {
-        if (streams[output.name] === undefined) {
-          streams[output.name] = output
-        } else {
-          if (output.text.startsWith('\r')) streams[output.name].text = output.text
-          else streams[output.name].text += output.text
-        }
-      } else {
-        yield output
-      }
-    }
-    for (const stream in streams) {
-      yield streams[stream]
-    }
-  }
-
   async function setup_async_exec() {
-    current_code_cell = 1
     socket.on('status', async (value) => {
       await tick()
       status = value
       statusBg = 'primary'
     })
-    socket.on('redirect', async (value) => {
-      window.location.replace(value)
-    })
     socket.on('error', async (value) => {
       await tick()
+      current_code_cell = undefined
       status = `Error: ${value}`
       statusBg = 'danger'
     })
     socket.on('nb', async (value) => {
       await tick()
-      value.cells = value.cells.map(({ source, ...cell}, index) => ({...cell, source: source.join(''), index}))
-      nb = value
+      nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
     })
     socket.on('progress', async (value) => {
       await tick()
@@ -92,7 +70,7 @@
       let cell_index = value_index[1]
       let { execution_count, outputs } = value
       await tick()
-      nb.cells[cell_index] = {...nb.cells[cell_index], execution_count, outputs: [...reduce_output_streams(outputs)] }
+      nb.cells[cell_index] = {...nb.cells[cell_index], ...value}
     })
   }
 
@@ -105,15 +83,8 @@
 
   onMount(async () => {
     const req = await fetch(nbdownload)
-    const res = await req.json()
-    let i = 0, j = 0
-    for (const cell in res.cells) {
-      res.cells[cell].index = i++
-      if (res.cells[cell].cell_type === 'code') {
-        res.cells[cell].execution_count = j++
-      }
-    }
-    nb = res
+    const value = await req.json()
+    nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
     status = undefined
     // iff not run already
     // execute()
@@ -146,23 +117,21 @@
     {#if nb}
       <Cells>
         {#each nb.cells as cell (cell.index)}
-          {#if cell.cell_type == 'code'}
+          {#if cell.cell_type === 'code'}
             <Cell type="code">
               <Input>
                 <Prompt
-                  running={current_code_cell ? current_code_cell === cell.index : undefined}
+                  running={current_code_cell !== undefined ? cell.index >= current_code_cell : undefined}
+                  error={any(cell.outputs.map(({ output_type }) => output_type === 'error'))}
                   counter={cell.execution_count}
+                  cell_type={cell.cell_type}
                 />
                 <Source
                   language="python"
-                  source={Array.isArray(cell.source) ? cell.source.join('') : cell.source}
+                  source={collapse(cell.source)}
                 />
               </Input>
-              <Outputs>
-                {#each cell.outputs as cell_output}
-                  <Output data={cell_output} />
-                {/each}
-              </Outputs>
+              <Outputs data={cell.outputs || []} />
             </Cell>
           {:else if cell.cell_type === 'markdown'}
             <Cell type="text">
@@ -170,9 +139,7 @@
                 <Prompt />
                 <div class="inner_cell">
                   <div class="text_cell_render border-box-sizing rendered_html">
-                    <Markdown
-                      data={Array.isArray(cell.source) ? cell.source.join('') : cell.source}
-                    />
+                    <Markdown data={collapse(cell.source)} />
                   </div>
                 </div>
               </Input>

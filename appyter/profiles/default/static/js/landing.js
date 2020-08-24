@@ -292,6 +292,7 @@ module.exports = Markdown;
 
 const { HtmlTag, SvelteComponent, append, attr, check_outros, create_component, destroy_component, detach, element, empty, group_outros, init, insert, mount_component, noop, safe_not_equal, set_data, space, text, transition_in, transition_out } = require("svelte/internal");
 const Markdown = require("./Markdown.svelte");
+const { default: collapse } = require("../../utils/collapse.js");
 
 function create_if_block(ctx) {
 	let div;
@@ -372,7 +373,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (55:4) {:else}
+// (56:4) {:else}
 function create_else_block_2(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[0]) + "";
 	let t;
@@ -395,7 +396,7 @@ function create_else_block_2(ctx) {
 	};
 }
 
-// (48:43) 
+// (49:43) 
 function create_if_block_10(ctx) {
 	let div;
 	let pre;
@@ -444,7 +445,7 @@ function create_if_block_10(ctx) {
 	};
 }
 
-// (23:50) 
+// (24:50) 
 function create_if_block_4(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -525,7 +526,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (15:52) 
+// (16:52) 
 function create_if_block_2(ctx) {
 	let div;
 
@@ -569,10 +570,10 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (11:4) {#if data.output_type === 'stream'}
+// (12:4) {#if data.output_type === 'stream'}
 function create_if_block_1(ctx) {
 	let div;
-	let t_value = /*data*/ ctx[0].text + "";
+	let t_value = collapse(/*data*/ ctx[0].text) + "";
 	let t;
 	let div_class_value;
 
@@ -587,7 +588,7 @@ function create_if_block_1(ctx) {
 			append(div, t);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && t_value !== (t_value = /*data*/ ctx[0].text + "")) set_data(t, t_value);
+			if (dirty & /*data*/ 1 && t_value !== (t_value = collapse(/*data*/ ctx[0].text) + "")) set_data(t, t_value);
 
 			if (dirty & /*data*/ 1 && div_class_value !== (div_class_value = "output_stream output_" + /*data*/ ctx[0].name + " output_text")) {
 				attr(div, "class", div_class_value);
@@ -601,7 +602,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (45:6) {:else}
+// (46:6) {:else}
 function create_else_block_1(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[0]) + "";
 	let t;
@@ -624,10 +625,10 @@ function create_else_block_1(ctx) {
 	};
 }
 
-// (43:52) 
+// (44:52) 
 function create_if_block_9(ctx) {
 	let html_tag;
-	let raw_value = "<script>" + /*data*/ ctx[0].data["application/javascript"] + "</script>" + "";
+	let raw_value = "<script>" + collapse(/*data*/ ctx[0].data["application/javascript"]) + "</script>" + "";
 	let html_anchor;
 
 	return {
@@ -640,7 +641,7 @@ function create_if_block_9(ctx) {
 			insert(target, html_anchor, anchor);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && raw_value !== (raw_value = "<script>" + /*data*/ ctx[0].data["application/javascript"] + "</script>" + "")) html_tag.p(raw_value);
+			if (dirty & /*data*/ 1 && raw_value !== (raw_value = "<script>" + collapse(/*data*/ ctx[0].data["application/javascript"]) + "</script>" + "")) html_tag.p(raw_value);
 		},
 		i: noop,
 		o: noop,
@@ -651,11 +652,11 @@ function create_if_block_9(ctx) {
 	};
 }
 
-// (39:40) 
+// (40:40) 
 function create_if_block_8(ctx) {
 	let div;
 	let pre;
-	let t_value = /*data*/ ctx[0].data["text/plain"] + "";
+	let t_value = collapse(/*data*/ ctx[0].data["text/plain"]) + "";
 	let t;
 	let div_class_value;
 
@@ -672,7 +673,7 @@ function create_if_block_8(ctx) {
 			append(pre, t);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && t_value !== (t_value = /*data*/ ctx[0].data["text/plain"] + "")) set_data(t, t_value);
+			if (dirty & /*data*/ 1 && t_value !== (t_value = collapse(/*data*/ ctx[0].data["text/plain"]) + "")) set_data(t, t_value);
 
 			if (dirty & /*data*/ 1 && div_class_value !== (div_class_value = "output_stream output_" + /*data*/ ctx[0].name + " output_text")) {
 				attr(div, "class", div_class_value);
@@ -686,7 +687,7 @@ function create_if_block_8(ctx) {
 	};
 }
 
-// (35:43) 
+// (36:43) 
 function create_if_block_7(ctx) {
 	let div;
 	let markdown;
@@ -695,7 +696,7 @@ function create_if_block_7(ctx) {
 
 	markdown = new Markdown({
 			props: {
-				data: /*data*/ ctx[0].data["text/markdown"]
+				data: collapse(/*data*/ ctx[0].data["text/markdown"])
 			}
 		});
 
@@ -712,7 +713,7 @@ function create_if_block_7(ctx) {
 		},
 		p(ctx, dirty) {
 			const markdown_changes = {};
-			if (dirty & /*data*/ 1) markdown_changes.data = /*data*/ ctx[0].data["text/markdown"];
+			if (dirty & /*data*/ 1) markdown_changes.data = collapse(/*data*/ ctx[0].data["text/markdown"]);
 			markdown.$set(markdown_changes);
 
 			if (!current || dirty & /*data*/ 1 && div_class_value !== (div_class_value = "output_stream output_" + /*data*/ ctx[0].name + " output_markdown")) {
@@ -735,10 +736,10 @@ function create_if_block_7(ctx) {
 	};
 }
 
-// (31:39) 
+// (32:39) 
 function create_if_block_6(ctx) {
 	let div;
-	let raw_value = /*data*/ ctx[0].data["text/html"] + "";
+	let raw_value = collapse(/*data*/ ctx[0].data["text/html"]) + "";
 
 	return {
 		c() {
@@ -750,7 +751,7 @@ function create_if_block_6(ctx) {
 			div.innerHTML = raw_value;
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && raw_value !== (raw_value = /*data*/ ctx[0].data["text/html"] + "")) div.innerHTML = raw_value;;
+			if (dirty & /*data*/ 1 && raw_value !== (raw_value = collapse(/*data*/ ctx[0].data["text/html"]) + "")) div.innerHTML = raw_value;;
 		},
 		i: noop,
 		o: noop,
@@ -760,7 +761,7 @@ function create_if_block_6(ctx) {
 	};
 }
 
-// (24:6) {#if data.data['image/png']}
+// (25:6) {#if data.data['image/png']}
 function create_if_block_5(ctx) {
 	let div;
 	let img;
@@ -771,7 +772,7 @@ function create_if_block_5(ctx) {
 			div = element("div");
 			img = element("img");
 			attr(img, "class", "img-fluid");
-			if (img.src !== (img_src_value = "data:img/png;base64," + /*data*/ ctx[0].data["image/png"])) attr(img, "src", img_src_value);
+			if (img.src !== (img_src_value = "data:img/png;base64," + collapse(/*data*/ ctx[0].data["image/png"]))) attr(img, "src", img_src_value);
 			attr(div, "class", "output_png");
 		},
 		m(target, anchor) {
@@ -779,7 +780,7 @@ function create_if_block_5(ctx) {
 			append(div, img);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && img.src !== (img_src_value = "data:img/png;base64," + /*data*/ ctx[0].data["image/png"])) {
+			if (dirty & /*data*/ 1 && img.src !== (img_src_value = "data:img/png;base64," + collapse(/*data*/ ctx[0].data["image/png"]))) {
 				attr(img, "src", img_src_value);
 			}
 		},
@@ -791,9 +792,9 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (19:8) {:else}
+// (20:8) {:else}
 function create_else_block(ctx) {
-	let t_value = /*data*/ ctx[0].data["text/plain"] + "";
+	let t_value = collapse(/*data*/ ctx[0].data["text/plain"]) + "";
 	let t;
 
 	return {
@@ -804,7 +805,7 @@ function create_else_block(ctx) {
 			insert(target, t, anchor);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && t_value !== (t_value = /*data*/ ctx[0].data["text/plain"] + "")) set_data(t, t_value);
+			if (dirty & /*data*/ 1 && t_value !== (t_value = collapse(/*data*/ ctx[0].data["text/plain"]) + "")) set_data(t, t_value);
 		},
 		d(detaching) {
 			if (detaching) detach(t);
@@ -812,10 +813,10 @@ function create_else_block(ctx) {
 	};
 }
 
-// (17:8) {#if data.data['text/html']}
+// (18:8) {#if data.data['text/html']}
 function create_if_block_3(ctx) {
 	let html_tag;
-	let raw_value = /*data*/ ctx[0].data["text/html"] + "";
+	let raw_value = collapse(/*data*/ ctx[0].data["text/html"]) + "";
 	let html_anchor;
 
 	return {
@@ -828,7 +829,7 @@ function create_if_block_3(ctx) {
 			insert(target, html_anchor, anchor);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && raw_value !== (raw_value = /*data*/ ctx[0].data["text/html"] + "")) html_tag.p(raw_value);
+			if (dirty & /*data*/ 1 && raw_value !== (raw_value = collapse(/*data*/ ctx[0].data["text/html"]) + "")) html_tag.p(raw_value);
 		},
 		d(detaching) {
 			if (detaching) detach(html_anchor);
@@ -919,24 +920,78 @@ class Output extends SvelteComponent {
 
 module.exports = Output;
 
-},{"./Markdown.svelte":4,"svelte/internal":262}],6:[function(require,module,exports){
+},{"../../utils/collapse.js":271,"./Markdown.svelte":4,"svelte/internal":262}],6:[function(require,module,exports){
 /* Outputs.svelte generated by Svelte v3.24.1 */
 "use strict";
 
-const { SvelteComponent, append, attr, create_slot, detach, element, init, insert, safe_not_equal, transition_in, transition_out, update_slot } = require("svelte/internal");
+const { SvelteComponent, append, attr, check_outros, create_component, destroy_component, destroy_each, detach, element, group_outros, init, insert, mount_component, safe_not_equal, transition_in, transition_out } = require("svelte/internal");
+const Output = require("./Output.svelte");
+const { default: collapse } = require("../../utils/collapse.js");
+
+function get_each_context(ctx, list, i) {
+	const child_ctx = ctx.slice();
+	child_ctx[2] = list[i];
+	return child_ctx;
+}
+
+// (31:4) {#each [...reduce_output_streams(data)] as output}
+function create_each_block(ctx) {
+	let output;
+	let current;
+	output = new Output({ props: { data: /*output*/ ctx[2] } });
+
+	return {
+		c() {
+			create_component(output.$$.fragment);
+		},
+		m(target, anchor) {
+			mount_component(output, target, anchor);
+			current = true;
+		},
+		p(ctx, dirty) {
+			const output_changes = {};
+			if (dirty & /*data*/ 1) output_changes.data = /*output*/ ctx[2];
+			output.$set(output_changes);
+		},
+		i(local) {
+			if (current) return;
+			transition_in(output.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transition_out(output.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			destroy_component(output, detaching);
+		}
+	};
+}
 
 function create_fragment(ctx) {
 	let div1;
 	let div0;
 	let current;
-	const default_slot_template = /*$$slots*/ ctx[1].default;
-	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[0], null);
+	let each_value = [.../*reduce_output_streams*/ ctx[1](/*data*/ ctx[0])];
+	let each_blocks = [];
+
+	for (let i = 0; i < each_value.length; i += 1) {
+		each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));
+	}
+
+	const out = i => transition_out(each_blocks[i], 1, 1, () => {
+		each_blocks[i] = null;
+	});
 
 	return {
 		c() {
 			div1 = element("div");
 			div0 = element("div");
-			if (default_slot) default_slot.c();
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
 			attr(div0, "class", "output");
 			attr(div1, "class", "output_wrapper");
 		},
@@ -944,71 +999,164 @@ function create_fragment(ctx) {
 			insert(target, div1, anchor);
 			append(div1, div0);
 
-			if (default_slot) {
-				default_slot.m(div0, null);
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].m(div0, null);
 			}
 
 			current = true;
 		},
 		p(ctx, [dirty]) {
-			if (default_slot) {
-				if (default_slot.p && dirty & /*$$scope*/ 1) {
-					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[0], dirty, null, null);
+			if (dirty & /*reduce_output_streams, data*/ 3) {
+				each_value = [.../*reduce_output_streams*/ ctx[1](/*data*/ ctx[0])];
+				let i;
+
+				for (i = 0; i < each_value.length; i += 1) {
+					const child_ctx = get_each_context(ctx, each_value, i);
+
+					if (each_blocks[i]) {
+						each_blocks[i].p(child_ctx, dirty);
+						transition_in(each_blocks[i], 1);
+					} else {
+						each_blocks[i] = create_each_block(child_ctx);
+						each_blocks[i].c();
+						transition_in(each_blocks[i], 1);
+						each_blocks[i].m(div0, null);
+					}
 				}
+
+				group_outros();
+
+				for (i = each_value.length; i < each_blocks.length; i += 1) {
+					out(i);
+				}
+
+				check_outros();
 			}
 		},
 		i(local) {
 			if (current) return;
-			transition_in(default_slot, local);
+
+			for (let i = 0; i < each_value.length; i += 1) {
+				transition_in(each_blocks[i]);
+			}
+
 			current = true;
 		},
 		o(local) {
-			transition_out(default_slot, local);
+			each_blocks = each_blocks.filter(Boolean);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				transition_out(each_blocks[i]);
+			}
+
 			current = false;
 		},
 		d(detaching) {
 			if (detaching) detach(div1);
-			if (default_slot) default_slot.d(detaching);
+			destroy_each(each_blocks, detaching);
 		}
 	};
 }
 
 function instance($$self, $$props, $$invalidate) {
-	let { $$slots = {}, $$scope } = $$props;
+	let { data = [] } = $$props;
+
+	function* reduce_output_streams(outputs) {
+		let streams = {};
+
+		for (const output of outputs) {
+			if (output.output_type === "stream") {
+				if (streams[output.name] === undefined) {
+					const output_text = collapse(output.text);
+					streams[output.name] = { ...output, text: output_text };
+				} else {
+					const output_text = collapse(output.text);
+					if (output_text.startsWith("\r")) streams[output.name].text = output_text; else streams[output.name].text += output_text;
+				}
+			} else {
+				yield output;
+			}
+		}
+
+		for (const stream in streams) {
+			yield streams[stream];
+		}
+	}
 
 	$$self.$$set = $$props => {
-		if ("$$scope" in $$props) $$invalidate(0, $$scope = $$props.$$scope);
+		if ("data" in $$props) $$invalidate(0, data = $$props.data);
 	};
 
-	return [$$scope, $$slots];
+	return [data, reduce_output_streams];
 }
 
 class Outputs extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, {});
+		init(this, options, instance, create_fragment, safe_not_equal, { data: 0 });
 	}
 }
 
 module.exports = Outputs;
 
-},{"svelte/internal":262}],7:[function(require,module,exports){
+},{"../../utils/collapse.js":271,"./Output.svelte":5,"svelte/internal":262}],7:[function(require,module,exports){
 /* Prompt.svelte generated by Svelte v3.24.1 */
 "use strict";
 
-const { SvelteComponent, attr, detach, element, init, insert, noop, safe_not_equal, set_data, text } = require("svelte/internal");
+const { SvelteComponent, attr, detach, element, empty, init, insert, noop, safe_not_equal, set_data, set_style, text } = require("svelte/internal");
 
 function create_if_block(ctx) {
-	let t0;
-	let t1;
+	let if_block_anchor;
 
 	function select_block_type(ctx, dirty) {
-		if (/*running*/ ctx[1]) return create_if_block_1;
-		if (/*counter*/ ctx[0]) return create_if_block_2;
+		if (/*error*/ ctx[3]) return create_if_block_1;
 		return create_else_block;
 	}
 
 	let current_block_type = select_block_type(ctx, -1);
+	let if_block = current_block_type(ctx);
+
+	return {
+		c() {
+			if_block.c();
+			if_block_anchor = empty();
+		},
+		m(target, anchor) {
+			if_block.m(target, anchor);
+			insert(target, if_block_anchor, anchor);
+		},
+		p(ctx, dirty) {
+			if (current_block_type === (current_block_type = select_block_type(ctx, dirty)) && if_block) {
+				if_block.p(ctx, dirty);
+			} else {
+				if_block.d(1);
+				if_block = current_block_type(ctx);
+
+				if (if_block) {
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			}
+		},
+		d(detaching) {
+			if_block.d(detaching);
+			if (detaching) detach(if_block_anchor);
+		}
+	};
+}
+
+// (12:4) {:else}
+function create_else_block(ctx) {
+	let t0;
+	let t1;
+
+	function select_block_type_1(ctx, dirty) {
+		if (/*running*/ ctx[2]) return create_if_block_2;
+		if (/*counter*/ ctx[1]) return create_if_block_3;
+		return create_else_block_1;
+	}
+
+	let current_block_type = select_block_type_1(ctx, -1);
 	let if_block = current_block_type(ctx);
 
 	return {
@@ -1023,7 +1171,7 @@ function create_if_block(ctx) {
 			insert(target, t1, anchor);
 		},
 		p(ctx, dirty) {
-			if (current_block_type === (current_block_type = select_block_type(ctx, dirty)) && if_block) {
+			if (current_block_type === (current_block_type = select_block_type_1(ctx, dirty)) && if_block) {
 				if_block.p(ctx, dirty);
 			} else {
 				if_block.d(1);
@@ -1043,8 +1191,28 @@ function create_if_block(ctx) {
 	};
 }
 
-// (8:54) {:else}
-function create_else_block(ctx) {
+// (10:4) {#if error}
+function create_if_block_1(ctx) {
+	let b;
+
+	return {
+		c() {
+			b = element("b");
+			b.textContent = "In [E]:";
+			set_style(b, "color", "red");
+		},
+		m(target, anchor) {
+			insert(target, b, anchor);
+		},
+		p: noop,
+		d(detaching) {
+			if (detaching) detach(b);
+		}
+	};
+}
+
+// (13:56) {:else}
+function create_else_block_1(ctx) {
 	let t;
 
 	return {
@@ -1061,19 +1229,19 @@ function create_else_block(ctx) {
 	};
 }
 
-// (8:45) 
-function create_if_block_2(ctx) {
+// (13:47) 
+function create_if_block_3(ctx) {
 	let t;
 
 	return {
 		c() {
-			t = text(/*counter*/ ctx[0]);
+			t = text(/*counter*/ ctx[1]);
 		},
 		m(target, anchor) {
 			insert(target, t, anchor);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*counter*/ 1) set_data(t, /*counter*/ ctx[0]);
+			if (dirty & /*counter*/ 2) set_data(t, /*counter*/ ctx[1]);
 		},
 		d(detaching) {
 			if (detaching) detach(t);
@@ -1081,8 +1249,8 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (8:13) {#if running}
-function create_if_block_1(ctx) {
+// (13:15) {#if running}
+function create_if_block_2(ctx) {
 	let t;
 
 	return {
@@ -1101,7 +1269,7 @@ function create_if_block_1(ctx) {
 
 function create_fragment(ctx) {
 	let div;
-	let if_block = (/*counter*/ ctx[0] || /*running*/ ctx[1]) && create_if_block(ctx);
+	let if_block = /*cell_type*/ ctx[0] === "code" && create_if_block(ctx);
 
 	return {
 		c() {
@@ -1114,7 +1282,7 @@ function create_fragment(ctx) {
 			if (if_block) if_block.m(div, null);
 		},
 		p(ctx, [dirty]) {
-			if (/*counter*/ ctx[0] || /*running*/ ctx[1]) {
+			if (/*cell_type*/ ctx[0] === "code") {
 				if (if_block) {
 					if_block.p(ctx, dirty);
 				} else {
@@ -1137,21 +1305,31 @@ function create_fragment(ctx) {
 }
 
 function instance($$self, $$props, $$invalidate) {
+	let { cell_type } = $$props;
 	let { counter } = $$props;
 	let { running } = $$props;
+	let { error } = $$props;
 
 	$$self.$$set = $$props => {
-		if ("counter" in $$props) $$invalidate(0, counter = $$props.counter);
-		if ("running" in $$props) $$invalidate(1, running = $$props.running);
+		if ("cell_type" in $$props) $$invalidate(0, cell_type = $$props.cell_type);
+		if ("counter" in $$props) $$invalidate(1, counter = $$props.counter);
+		if ("running" in $$props) $$invalidate(2, running = $$props.running);
+		if ("error" in $$props) $$invalidate(3, error = $$props.error);
 	};
 
-	return [counter, running];
+	return [cell_type, counter, running, error];
 }
 
 class Prompt extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, { counter: 0, running: 1 });
+
+		init(this, options, instance, create_fragment, safe_not_equal, {
+			cell_type: 0,
+			counter: 1,
+			running: 2,
+			error: 3
+		});
 	}
 }
 
@@ -39624,7 +39802,7 @@ module.exports=/[\0-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-
 /* landing.svelte generated by Svelte v3.24.1 */
 "use strict";
 
-const { SvelteComponent, append, attr, check_outros, create_component, destroy_component, destroy_each, detach, element, empty, group_outros, init, insert, listen, mount_component, outro_and_destroy_block, safe_not_equal, set_data, space, text, transition_in, transition_out, update_keyed_each } = require("svelte/internal");
+const { SvelteComponent, append, attr, check_outros, create_component, destroy_component, detach, element, empty, group_outros, init, insert, listen, mount_component, outro_and_destroy_block, safe_not_equal, set_data, space, text, transition_in, transition_out, update_keyed_each } = require("svelte/internal");
 const { tick, onMount } = require("svelte");
 const Cells = require("../../../../components/jupyter/Cells.svelte");
 const Cell = require("../../../../components/jupyter/Cell.svelte");
@@ -39634,12 +39812,8 @@ const Source = require("../../../../components/jupyter/Source.svelte");
 const Outputs = require("../../../../components/jupyter/Outputs.svelte");
 const Output = require("../../../../components/jupyter/Output.svelte");
 const Markdown = require("../../../../components/jupyter/Markdown.svelte");
-
-function get_each_context_1(ctx, list, i) {
-	const child_ctx = ctx.slice();
-	child_ctx[16] = list[i];
-	return child_ctx;
-}
+const { default: collapse } = require("../../../../utils/collapse");
+const { default: any } = require("../../../../utils/any");
 
 function get_each_context(ctx, list, i) {
 	const child_ctx = ctx.slice();
@@ -39647,7 +39821,7 @@ function get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (137:2) {#if status}
+// (108:2) {#if status}
 function create_if_block_3(ctx) {
 	let div1;
 	let div0;
@@ -39681,7 +39855,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (146:4) {#if nb}
+// (117:4) {#if nb}
 function create_if_block(ctx) {
 	let cells;
 	let current;
@@ -39704,7 +39878,7 @@ function create_if_block(ctx) {
 		p(ctx, dirty) {
 			const cells_changes = {};
 
-			if (dirty & /*$$scope, nb, current_code_cell*/ 524312) {
+			if (dirty & /*$$scope, nb, current_code_cell*/ 65560) {
 				cells_changes.$$scope = { dirty, ctx };
 			}
 
@@ -39725,7 +39899,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (167:50) 
+// (136:50) 
 function create_if_block_2(ctx) {
 	let cell;
 	let current;
@@ -39733,7 +39907,7 @@ function create_if_block_2(ctx) {
 	cell = new Cell({
 			props: {
 				type: "text",
-				$$slots: { default: [create_default_slot_4] },
+				$$slots: { default: [create_default_slot_3] },
 				$$scope: { ctx }
 			}
 		});
@@ -39749,7 +39923,7 @@ function create_if_block_2(ctx) {
 		p(ctx, dirty) {
 			const cell_changes = {};
 
-			if (dirty & /*$$scope, nb*/ 524304) {
+			if (dirty & /*$$scope, nb*/ 65552) {
 				cell_changes.$$scope = { dirty, ctx };
 			}
 
@@ -39770,7 +39944,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (149:10) {#if cell.cell_type == 'code'}
+// (120:10) {#if cell.cell_type === 'code'}
 function create_if_block_1(ctx) {
 	let cell;
 	let current;
@@ -39794,7 +39968,7 @@ function create_if_block_1(ctx) {
 		p(ctx, dirty) {
 			const cell_changes = {};
 
-			if (dirty & /*$$scope, nb, current_code_cell*/ 524312) {
+			if (dirty & /*$$scope, nb, current_code_cell*/ 65560) {
 				cell_changes.$$scope = { dirty, ctx };
 			}
 
@@ -39815,8 +39989,8 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (169:14) <Input>
-function create_default_slot_5(ctx) {
+// (138:14) <Input>
+function create_default_slot_4(ctx) {
 	let prompt;
 	let t;
 	let div1;
@@ -39826,11 +40000,7 @@ function create_default_slot_5(ctx) {
 	prompt = new Prompt({});
 
 	markdown = new Markdown({
-			props: {
-				data: Array.isArray(/*cell*/ ctx[13].source)
-				? /*cell*/ ctx[13].source.join("")
-				: /*cell*/ ctx[13].source
-			}
+			props: { data: collapse(/*cell*/ ctx[13].source) }
 		});
 
 	return {
@@ -39853,11 +40023,7 @@ function create_default_slot_5(ctx) {
 		},
 		p(ctx, dirty) {
 			const markdown_changes = {};
-
-			if (dirty & /*nb*/ 16) markdown_changes.data = Array.isArray(/*cell*/ ctx[13].source)
-			? /*cell*/ ctx[13].source.join("")
-			: /*cell*/ ctx[13].source;
-
+			if (dirty & /*nb*/ 16) markdown_changes.data = collapse(/*cell*/ ctx[13].source);
 			markdown.$set(markdown_changes);
 		},
 		i(local) {
@@ -39880,15 +40046,15 @@ function create_default_slot_5(ctx) {
 	};
 }
 
-// (168:12) <Cell type="text">
-function create_default_slot_4(ctx) {
+// (137:12) <Cell type="text">
+function create_default_slot_3(ctx) {
 	let input;
 	let t;
 	let current;
 
 	input = new Input({
 			props: {
-				$$slots: { default: [create_default_slot_5] },
+				$$slots: { default: [create_default_slot_4] },
 				$$scope: { ctx }
 			}
 		});
@@ -39906,7 +40072,7 @@ function create_default_slot_4(ctx) {
 		p(ctx, dirty) {
 			const input_changes = {};
 
-			if (dirty & /*$$scope, nb*/ 524304) {
+			if (dirty & /*$$scope, nb*/ 65552) {
 				input_changes.$$scope = { dirty, ctx };
 			}
 
@@ -39928,8 +40094,8 @@ function create_default_slot_4(ctx) {
 	};
 }
 
-// (151:14) <Input>
-function create_default_slot_3(ctx) {
+// (122:14) <Input>
+function create_default_slot_2(ctx) {
 	let prompt;
 	let t;
 	let source;
@@ -39937,19 +40103,19 @@ function create_default_slot_3(ctx) {
 
 	prompt = new Prompt({
 			props: {
-				running: /*current_code_cell*/ ctx[3]
-				? /*current_code_cell*/ ctx[3] === /*cell*/ ctx[13].index
+				running: /*current_code_cell*/ ctx[3] !== undefined
+				? /*cell*/ ctx[13].index >= /*current_code_cell*/ ctx[3]
 				: undefined,
-				counter: /*cell*/ ctx[13].execution_count
+				error: any(/*cell*/ ctx[13].outputs.map(func)),
+				counter: /*cell*/ ctx[13].execution_count,
+				cell_type: /*cell*/ ctx[13].cell_type
 			}
 		});
 
 	source = new Source({
 			props: {
 				language: "python",
-				source: Array.isArray(/*cell*/ ctx[13].source)
-				? /*cell*/ ctx[13].source.join("")
-				: /*cell*/ ctx[13].source
+				source: collapse(/*cell*/ ctx[13].source)
 			}
 		});
 
@@ -39968,18 +40134,16 @@ function create_default_slot_3(ctx) {
 		p(ctx, dirty) {
 			const prompt_changes = {};
 
-			if (dirty & /*current_code_cell, nb*/ 24) prompt_changes.running = /*current_code_cell*/ ctx[3]
-			? /*current_code_cell*/ ctx[3] === /*cell*/ ctx[13].index
+			if (dirty & /*current_code_cell, nb*/ 24) prompt_changes.running = /*current_code_cell*/ ctx[3] !== undefined
+			? /*cell*/ ctx[13].index >= /*current_code_cell*/ ctx[3]
 			: undefined;
 
+			if (dirty & /*nb*/ 16) prompt_changes.error = any(/*cell*/ ctx[13].outputs.map(func));
 			if (dirty & /*nb*/ 16) prompt_changes.counter = /*cell*/ ctx[13].execution_count;
+			if (dirty & /*nb*/ 16) prompt_changes.cell_type = /*cell*/ ctx[13].cell_type;
 			prompt.$set(prompt_changes);
 			const source_changes = {};
-
-			if (dirty & /*nb*/ 16) source_changes.source = Array.isArray(/*cell*/ ctx[13].source)
-			? /*cell*/ ctx[13].source.join("")
-			: /*cell*/ ctx[13].source;
-
+			if (dirty & /*nb*/ 16) source_changes.source = collapse(/*cell*/ ctx[13].source);
 			source.$set(source_changes);
 		},
 		i(local) {
@@ -40001,125 +40165,7 @@ function create_default_slot_3(ctx) {
 	};
 }
 
-// (162:16) {#each cell.outputs as cell_output}
-function create_each_block_1(ctx) {
-	let output;
-	let current;
-	output = new Output({ props: { data: /*cell_output*/ ctx[16] } });
-
-	return {
-		c() {
-			create_component(output.$$.fragment);
-		},
-		m(target, anchor) {
-			mount_component(output, target, anchor);
-			current = true;
-		},
-		p(ctx, dirty) {
-			const output_changes = {};
-			if (dirty & /*nb*/ 16) output_changes.data = /*cell_output*/ ctx[16];
-			output.$set(output_changes);
-		},
-		i(local) {
-			if (current) return;
-			transition_in(output.$$.fragment, local);
-			current = true;
-		},
-		o(local) {
-			transition_out(output.$$.fragment, local);
-			current = false;
-		},
-		d(detaching) {
-			destroy_component(output, detaching);
-		}
-	};
-}
-
-// (161:14) <Outputs>
-function create_default_slot_2(ctx) {
-	let each_1_anchor;
-	let current;
-	let each_value_1 = /*cell*/ ctx[13].outputs;
-	let each_blocks = [];
-
-	for (let i = 0; i < each_value_1.length; i += 1) {
-		each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
-	}
-
-	const out = i => transition_out(each_blocks[i], 1, 1, () => {
-		each_blocks[i] = null;
-	});
-
-	return {
-		c() {
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].c();
-			}
-
-			each_1_anchor = empty();
-		},
-		m(target, anchor) {
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].m(target, anchor);
-			}
-
-			insert(target, each_1_anchor, anchor);
-			current = true;
-		},
-		p(ctx, dirty) {
-			if (dirty & /*nb*/ 16) {
-				each_value_1 = /*cell*/ ctx[13].outputs;
-				let i;
-
-				for (i = 0; i < each_value_1.length; i += 1) {
-					const child_ctx = get_each_context_1(ctx, each_value_1, i);
-
-					if (each_blocks[i]) {
-						each_blocks[i].p(child_ctx, dirty);
-						transition_in(each_blocks[i], 1);
-					} else {
-						each_blocks[i] = create_each_block_1(child_ctx);
-						each_blocks[i].c();
-						transition_in(each_blocks[i], 1);
-						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
-					}
-				}
-
-				group_outros();
-
-				for (i = each_value_1.length; i < each_blocks.length; i += 1) {
-					out(i);
-				}
-
-				check_outros();
-			}
-		},
-		i(local) {
-			if (current) return;
-
-			for (let i = 0; i < each_value_1.length; i += 1) {
-				transition_in(each_blocks[i]);
-			}
-
-			current = true;
-		},
-		o(local) {
-			each_blocks = each_blocks.filter(Boolean);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				transition_out(each_blocks[i]);
-			}
-
-			current = false;
-		},
-		d(detaching) {
-			destroy_each(each_blocks, detaching);
-			if (detaching) detach(each_1_anchor);
-		}
-	};
-}
-
-// (150:12) <Cell type="code">
+// (121:12) <Cell type="code">
 function create_default_slot_1(ctx) {
 	let input;
 	let t0;
@@ -40129,16 +40175,13 @@ function create_default_slot_1(ctx) {
 
 	input = new Input({
 			props: {
-				$$slots: { default: [create_default_slot_3] },
+				$$slots: { default: [create_default_slot_2] },
 				$$scope: { ctx }
 			}
 		});
 
 	outputs = new Outputs({
-			props: {
-				$$slots: { default: [create_default_slot_2] },
-				$$scope: { ctx }
-			}
+			props: { data: /*cell*/ ctx[13].outputs || [] }
 		});
 
 	return {
@@ -40158,17 +40201,13 @@ function create_default_slot_1(ctx) {
 		p(ctx, dirty) {
 			const input_changes = {};
 
-			if (dirty & /*$$scope, nb, current_code_cell*/ 524312) {
+			if (dirty & /*$$scope, nb, current_code_cell*/ 65560) {
 				input_changes.$$scope = { dirty, ctx };
 			}
 
 			input.$set(input_changes);
 			const outputs_changes = {};
-
-			if (dirty & /*$$scope, nb*/ 524304) {
-				outputs_changes.$$scope = { dirty, ctx };
-			}
-
+			if (dirty & /*nb*/ 16) outputs_changes.data = /*cell*/ ctx[13].outputs || [];
 			outputs.$set(outputs_changes);
 		},
 		i(local) {
@@ -40191,7 +40230,7 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (148:8) {#each nb.cells as cell (cell.index)}
+// (119:8) {#each nb.cells as cell (cell.index)}
 function create_each_block(key_1, ctx) {
 	let first;
 	let current_block_type_index;
@@ -40202,7 +40241,7 @@ function create_each_block(key_1, ctx) {
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
-		if (/*cell*/ ctx[13].cell_type == "code") return 0;
+		if (/*cell*/ ctx[13].cell_type === "code") return 0;
 		if (/*cell*/ ctx[13].cell_type === "markdown") return 1;
 		return -1;
 	}
@@ -40285,7 +40324,7 @@ function create_each_block(key_1, ctx) {
 	};
 }
 
-// (147:6) <Cells>
+// (118:6) <Cells>
 function create_default_slot(ctx) {
 	let each_blocks = [];
 	let each_1_lookup = new Map();
@@ -40317,7 +40356,7 @@ function create_default_slot(ctx) {
 			current = true;
 		},
 		p(ctx, dirty) {
-			if (dirty & /*nb, Array, current_code_cell, undefined*/ 24) {
+			if (dirty & /*nb, collapse, current_code_cell, undefined, any*/ 24) {
 				const each_value = /*nb*/ ctx[4].cells;
 				group_outros();
 				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, each_1_anchor.parentNode, outro_and_destroy_block, create_each_block, each_1_anchor, get_each_context);
@@ -40485,26 +40524,7 @@ function create_fragment(ctx) {
 
 let started = false;
 let scroll = false;
-
-function* reduce_output_streams(outputs) {
-	let streams = {};
-
-	for (const output of outputs) {
-		if (output.output_type === "stream") {
-			if (streams[output.name] === undefined) {
-				streams[output.name] = output;
-			} else {
-				if (output.text.startsWith("\r")) streams[output.name].text = output.text; else streams[output.name].text += output.text;
-			}
-		} else {
-			yield output;
-		}
-	}
-
-	for (const stream in streams) {
-		yield streams[stream];
-	}
-}
+const func = ({ output_type }) => output_type === "error";
 
 function instance($$self, $$props, $$invalidate) {
 	let { requirejs } = $$props;
@@ -40544,28 +40564,26 @@ function instance($$self, $$props, $$invalidate) {
 	let nb;
 
 	async function setup_async_exec() {
-		$$invalidate(3, current_code_cell = 1);
-
 		socket.on("status", async value => {
 			await tick();
 			$$invalidate(1, status = value);
 			$$invalidate(2, statusBg = "primary");
 		});
 
-		socket.on("redirect", async value => {
-			window.location.replace(value);
-		});
-
 		socket.on("error", async value => {
 			await tick();
+			$$invalidate(3, current_code_cell = undefined);
 			$$invalidate(1, status = `Error: ${value}`);
 			$$invalidate(2, statusBg = "danger");
 		});
 
 		socket.on("nb", async value => {
 			await tick();
-			value.cells = value.cells.map(({ source, ...cell }, index) => ({ ...cell, source: source.join(""), index }));
-			$$invalidate(4, nb = value);
+
+			$$invalidate(4, nb = {
+				...value,
+				cells: value.cells.map((cell, index) => ({ ...cell, index }))
+			});
 		});
 
 		socket.on("progress", async value => {
@@ -40578,16 +40596,7 @@ function instance($$self, $$props, $$invalidate) {
 			let cell_index = value_index[1];
 			let { execution_count, outputs } = value;
 			await tick();
-
-			$$invalidate(
-				4,
-				nb.cells[cell_index] = {
-					...nb.cells[cell_index],
-					execution_count,
-					outputs: [...reduce_output_streams(outputs)]
-				},
-				nb
-			);
+			$$invalidate(4, nb.cells[cell_index] = { ...nb.cells[cell_index], ...value }, nb);
 		});
 	}
 
@@ -40600,18 +40609,13 @@ function instance($$self, $$props, $$invalidate) {
 
 	onMount(async () => {
 		const req = await fetch(nbdownload);
-		const res = await req.json();
-		let i = 0, j = 0;
+		const value = await req.json();
 
-		for (const cell in res.cells) {
-			res.cells[cell].index = i++;
+		$$invalidate(4, nb = {
+			...value,
+			cells: value.cells.map((cell, index) => ({ ...cell, index }))
+		});
 
-			if (res.cells[cell].cell_type === "code") {
-				res.cells[cell].execution_count = j++;
-			}
-		}
-
-		$$invalidate(4, nb = res);
 		$$invalidate(1, status = undefined);
 	}); // iff not run already
 	// execute()
@@ -40633,6 +40637,54 @@ class Landing extends SvelteComponent {
 
 module.exports = Landing;
 
-},{"../../../../components/jupyter/Cell.svelte":1,"../../../../components/jupyter/Cells.svelte":2,"../../../../components/jupyter/Input.svelte":3,"../../../../components/jupyter/Markdown.svelte":4,"../../../../components/jupyter/Output.svelte":5,"../../../../components/jupyter/Outputs.svelte":6,"../../../../components/jupyter/Prompt.svelte":7,"../../../../components/jupyter/Source.svelte":8,"svelte":261,"svelte/internal":262}]},{},[269])(269)
+},{"../../../../components/jupyter/Cell.svelte":1,"../../../../components/jupyter/Cells.svelte":2,"../../../../components/jupyter/Input.svelte":3,"../../../../components/jupyter/Markdown.svelte":4,"../../../../components/jupyter/Output.svelte":5,"../../../../components/jupyter/Outputs.svelte":6,"../../../../components/jupyter/Prompt.svelte":7,"../../../../components/jupyter/Source.svelte":8,"../../../../utils/any":270,"../../../../utils/collapse":271,"svelte":261,"svelte/internal":262}],270:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = any;
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function any(L) {
+  var _iterator = _createForOfIteratorHelper(L),
+      _step;
+
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var el = _step.value;
+      if (el) return true;
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
+  return false;
+}
+
+},{}],271:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = collapse;
+
+function collapse(text) {
+  if (Array.isArray(text)) {
+    return text.join('');
+  } else {
+    return text;
+  }
+}
+
+},{}]},{},[269])(269)
 });
 
