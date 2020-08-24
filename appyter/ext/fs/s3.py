@@ -61,7 +61,7 @@ class Filesystem:
     except Exception:
       import traceback
       traceback.print_exc()
-      raise Exception(f"An error occurred while trying to access {path}")
+      raise Exception(f"An error occurred while trying to copy {src} to {dst}")
   #
   def link(self, src, dst):
     try:
@@ -71,7 +71,7 @@ class Filesystem:
     except Exception:
       import traceback
       traceback.print_exc()
-      raise Exception(f"An error occurred while trying to access {path}")
+      raise Exception(f"An error occurred while trying to link {src} to {dst}")
   #
   def rm(self, path, recursive=False):
     try:
