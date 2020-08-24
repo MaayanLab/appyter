@@ -16,6 +16,7 @@ class Filesystem:
   #
   def open(self, path, mode='r'):
     try:
+      assert path
       return open(FS.join(self._prefix, path), mode=mode)
     except FileNotFoundError:
       raise Exception('No such file or directory: {path}')
@@ -26,6 +27,7 @@ class Filesystem:
   #
   def exists(self, path):
     try:
+      assert path
       return os.path.isfile(FS.join(self._prefix, path)) or os.path.islink(FS.join(self._prefix, path))
     except Exception:
       import traceback
@@ -34,6 +36,7 @@ class Filesystem:
   #
   def makedirs(self, path, exist_ok=False):
     try:
+      assert path
       return os.makedirs(FS.join(self._prefix, path), exist_ok=exist_ok)
     except Exception:
       import traceback
@@ -42,22 +45,25 @@ class Filesystem:
   #
   def cp(self, src, dst):
     try:
+      assert src and dst
       return shutil.copy(FS.join(self._prefix, src), FS.join(self._prefix, dst))
     except Exception:
       import traceback
       traceback.print_exc()
-      raise Exception(f"An error occurred while trying to access {path}")
+      raise Exception(f"An error occurred while trying to copy {src} to {dst}")
   #
   def link(self, src, dst):
     try:
+      assert src and dst
       return os.link(FS.join(self._prefix, src), FS.join(self._prefix, dst))
     except Exception:
       import traceback
       traceback.print_exc()
-      raise Exception(f"An error occurred while trying to access {path}")
+      raise Exception(f"An error occurred while trying to link {src} to {dst}")
   #
   def rm(self, path, recursive=False):
     try:
+      assert path
       if recursive:
         return shutil.rmtree(FS.join(self._prefix, path))
       else:
@@ -69,6 +75,7 @@ class Filesystem:
   #
   def chmod_ro(self, path):
     try:
+      assert path
       return os.chmod(FS.join(self._prefix, path), 400)
     except Exception:
       import traceback

@@ -1,3 +1,4 @@
+import shutil
 import tempfile
 import urllib.parse
 from appyter.ext.fs.file import Filesystem as FSFilesystem
@@ -8,4 +9,4 @@ class Filesystem(FSFilesystem):
     super().__init__(urllib.parse.urlparse('file://' + self._tmpdir))
   #
   def __del__(self):
-    self.rm(self._uri.path, recursive=True)
+    shutil.rmtree(self._uri.path)

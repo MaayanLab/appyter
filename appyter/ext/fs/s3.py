@@ -29,6 +29,7 @@ class Filesystem:
   #
   def open(self, path, mode='r'):
     try:
+      assert path
       return self._fs.open(self._prefix + path, mode=mode)
     except Exception:
       import traceback
@@ -37,6 +38,7 @@ class Filesystem:
   #
   def exists(self, path):
     try:
+      assert path
       return self._fs.exists(self._prefix + path)
     except Exception:
       import traceback
@@ -45,6 +47,7 @@ class Filesystem:
   #
   def makedirs(self, path, exist_ok=False):
     try:
+      assert path
       return self._fs.makedirs(self._prefix + path, exist_ok=exist_ok)
     except Exception:
       import traceback
@@ -53,6 +56,7 @@ class Filesystem:
   #
   def cp(self, src, dst):
     try:
+      assert src and dst
       return self._fs.copy(self._prefix + src, self._prefix + dst, recursive=True)
     except Exception:
       import traceback
@@ -61,6 +65,7 @@ class Filesystem:
   #
   def link(self, src, dst):
     try:
+      assert src and dst
       print('WARNING: s3 does not support links, copying')
       return self._fs.copy(self._prefix + src, self._prefix + dst, recursive=True)
     except Exception:
@@ -70,6 +75,7 @@ class Filesystem:
   #
   def rm(self, path, recursive=False):
     try:
+      assert path
       return self._fs.rm(self._prefix + path, recursive=recursive)
     except Exception:
       import traceback
