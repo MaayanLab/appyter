@@ -1,25 +1,14 @@
-import os
-import shutil
-import tempfile
+import aiohttp
 import traceback
-import urllib.request, urllib.error
-from flask import request, copy_current_request_context, current_app, session
-from flask_socketio import emit
 
 from appyter.ext.fs import Filesystem
 from appyter.render.flask_app.socketio import socketio
 from appyter.render.flask_app.util import secure_filename, secure_url, sha1sum_io, generate_uuid
 
-# remove user agent from urllib.request requests
-_opener = urllib.request.build_opener()
-_opener.addheaders = [('Accept', '*/*')]
-urllib.request.install_opener(_opener)
-
-
 # organize file by content hash
-def organize_file_content(tmp_fs, path):
-  content_hash = sha1sum_io(tmp_fs.open(path, 'rb'))
-  data_fs = Filesystem(Filesystem.join(current_app.config['DATA_DIR'], 'input'))
+def organize_file_content(data_fs, tmp_fs, path):
+  with tmp_fs.open(path, 'rb') as fr:
+    content_hash = sha1sum_io(fr)
   if not data_fs.exists(content_hash):
     Filesystem.mv(src_fs=tmp_fs, src_path=path, dst_fs=data_fs, dst_path=content_hash)
     data_fs.chmod_ro(content_hash)
@@ -27,107 +16,127 @@ def organize_file_content(tmp_fs, path):
     tmp_fs.rm(path)
   return content_hash
 
-
 # download from remote
+async def download_with_progress_and_hash(sid, data_fs, tmp_fs, name, url, path, filename):
+  # TODO: worry about files that are too big/long
+  await socketio.emit('download_start', dict(name=name, filename=filename), room=sid)
+  try:
+    async with aiohttp.ClientSession() as client:
+      async with client.get(url) as resp:
+        # NOTE: this may become an issue if ever someone wants actual html
+        assert resp.content_type != 'text/html', 'Expected data, got html'
+        resp.headers.get('Content-Length', -1)
+        chunk = 0
+        chunk_size = 1024*8
+        total_size = resp.headers.get('Content-Length', -1)
+        async def reporthook(chunk):
+          await socketio.emit(
+            'download_progress',
+            dict(name=name, chunk=chunk, chunk_size=chunk_size, total_size=total_size),
+            room=sid,
+          )
+        with tmp_fs.open(path, 'wb') as fw:
+          await reporthook(chunk)
+          while buf := await resp.content.read(chunk_size):
+            fw.write(buf)
+            chunk += 1
+            await reporthook(chunk)
+  except Exception as e:
+    print('download error')
+    traceback.print_exc()
+    await socketio.emit(
+      'download_error',
+      dict(name=name, filename=filename, url=url, error=str(e)),
+      room=sid,
+    )
+  else:
+    await socketio.emit(
+      'download_complete',
+      dict(
+        name=name, filename=filename,
+        full_filename='/'.join((organize_file_content(data_fs, tmp_fs, path), filename)),
+      ),
+      room=sid,
+    )
+
 @socketio.on('download_start')
-def download(data):
+async def download(sid, data):
+  async with socketio.session(sid) as sess:
+    config = sess['config']
+  #
+  data_fs = Filesystem(Filesystem.join(config['DATA_DIR'], 'input'))
   tmp_fs = Filesystem('tmpfs://')
-  session_dir = secure_filename(request.sid)
+  session_dir = secure_filename(sid)
   tmp_fs.makedirs(session_dir, exist_ok=True)
   name = data.get('name')
   # TODO: hash based on url?
   # TODO: s3 bypass
   url = secure_url(data.get('url'))
   filename = secure_filename(data.get('file'))
-  # TODO: worry about files that are too big/long
-  @copy_current_request_context
-  def download_with_progress_and_hash(name, url, path, filename, emit):
-    emit('download_start', dict(name=name, filename=filename))
-    try:
-      req = urllib.request.urlopen(url)
-      headers = req.info()
-      # NOTE: this may become an issue if ever someone wants actual html
-      assert headers.get('Content-Type') != 'text/html', 'Expected data, got html'
-      chunk = 0
-      chunk_size = 1024*8
-      total_size = headers.get('Content-Length', -1)
-      reporthook = lambda chunk, name=name, chunk_size=chunk_size, total_size=total_size: emit(
-        'download_progress', dict(name=name, chunk=chunk, chunk_size=chunk_size, total_size=total_size)
-      )
-      with tmp_fs.open(path, 'wb') as fw:
-        reporthook(chunk)
-        while buf := req.read(chunk_size):
-          fw.write(buf)
-          chunk += 1
-          reporthook(chunk)
-    except Exception as e:
-      print('download error')
-      traceback.print_exc()
-      emit('download_error', dict(name=name, filename=filename, url=url, error=str(e)))
-    else:
-      emit('download_complete', dict(
-        name=name, filename=filename,
-        full_filename='/'.join((organize_file_content(tmp_fs, path), filename)),
-      ))
-  #
-  emit('download_queued', dict(name=name, filename=filename))
-  socketio.start_background_task(
-    download_with_progress_and_hash,
+  await socketio.emit('download_queued', dict(name=name, filename=filename), room=sid)
+  await download_with_progress_and_hash(
+    sid=sid,
+    data_fs=data_fs,
+    tmp_fs=tmp_fs,
     name=name,
     url=url,
     path=Filesystem.join(session_dir, generate_uuid()),
     filename=filename,
-    emit=emit,
   )
 
 
 # upload from client
 @socketio.on("siofu_start")
-def siofu_start(data):
+async def siofu_start(sid, data):
   try:
     tmp_fs = Filesystem('tmpfs://')
-    session_dir = secure_filename(request.sid)
+    session_dir = secure_filename(sid)
     path = Filesystem.join(session_dir, generate_uuid())
     filename = secure_filename(data.get('name'))
     tmp_fs.makedirs(session_dir, exist_ok=True)
-    session[request.sid] = dict(session.get(request.sid, {}), **{
-      'file_%d' % (data.get('id')): dict(data,
+    async with socketio.session(sid) as sess:
+      sess['file_%d' % (data.get('id'))] = dict(
+        data,
         path=path,
         name=filename,
         bytesLoaded=0,
         fh=tmp_fs.open(path, 'wb'),
-      ),
-    })
-    emit('siofu_ready', {
-      'id': data.get('id'),
-      'name': None,
-    })
+      )
+    await socketio.emit(
+      'siofu_ready',
+      {
+        'id': data.get('id'),
+        'name': None,
+      },
+      room=sid,
+    )
   except Exception as e:
     traceback.print_exc()
-    emit('siofu_error', str(e))
+    await socketio.emit('siofu_error', str(e), room=sid)
 
 @socketio.on("siofu_progress")
-def siofu_progress(evt):
-  session[request.sid]['file_%d' % (evt['id'])]['fh'].write(evt['content'])
+async def siofu_progress(sid, evt):
+  async with socketio.session(sid) as sess:
+    sess['file_%d' % (evt['id'])]['fh'].write(evt['content'])
   print('progress', evt)
-  emit("siofu_chunk", dict(
+  await socketio.emit("siofu_chunk", dict(
     id=evt['id'],
-  ))
+  ), room=sid)
 
 @socketio.on("siofu_done")
-def siofu_done(evt):
+async def siofu_done(sid, evt):
   tmp_fs = Filesystem('tmpfs://')
-  session[request.sid]['file_%d' % (evt['id'])]['fh'].close()
-  path = session[request.sid]['file_%d' % (evt['id'])]['path']
-  filename = session[request.sid]['file_%d' % (evt['id'])]['name']
-  del session[request.sid]['file_%d' % (evt['id'])]
-  emit('siofu_complete', dict(
+  async with socketio.session(sid) as sess:
+    sess['file_%d' % (evt['id'])]['fh'].close()
+    path = sess['file_%d' % (evt['id'])]['path']
+    filename = sess['file_%d' % (evt['id'])]['name']
+    del sess['file_%d' % (evt['id'])]
+  await socketio.emit('siofu_complete', dict(
     id=evt['id'],
     detail=dict(
       full_filename='/'.join((organize_file_content(tmp_fs, path), filename)),
     )
-  ))
-
+  ), room=sid)
 
 # upload from client with POST
 def upload_from_request(req, fnames):
@@ -138,6 +147,7 @@ def upload_from_request(req, fnames):
       filename = secure_filename(fh.filename)
       path = generate_uuid()
       tmp_fs = Filesystem('tmpfs://')
-      fh.save(tmp_fs.open(path, 'w'))
+      with tmp_fs.open(path, 'w') as fw:
+        fh.save(fw)
       data[fname] = '/'.join((organize_file_content(tmp_fs, path), filename))
   return data

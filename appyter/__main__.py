@@ -2,12 +2,6 @@ def main():
   # load dotenv if present
   from dotenv import load_dotenv
   load_dotenv()
-  #
-  import os, sys
-  if '--debug=false' in sys.argv or os.environ.get('DEBUG') == False:
-    print('Patching...')
-    import eventlet
-    eventlet.monkey_patch()
   # load everything permitting injection to cli
   import os
   from appyter.util import importdir

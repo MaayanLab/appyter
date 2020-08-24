@@ -3,11 +3,14 @@ import uuid
 import click
 
 from appyter.cli import cli
-
+# from appyter.ext.flask_aiohttp import AioHTTP
 
 def create_app(**kwargs):
   ''' Completely initialize the flask application
   '''
+  from aiohttp import web
+  from aiohttp_wsgi import WSGIHandler
+  #
   from flask import Flask, Blueprint, current_app
   from flask_cors import CORS
   #
@@ -21,36 +24,37 @@ def create_app(**kwargs):
   from appyter.util import join_routes
   config = get_env(**kwargs)
   #
-  print('Initializing flask...')
-  app = Flask(__name__, static_url_path=None, static_folder=None)
-  CORS(app)
-  app.config.update(config)
-  app.debug = config['DEBUG']
+  print('Initializing aiohttp...')
+  app = web.Application()
+  app['config'] = config
   #
-  if app.config['PROXY']:
+  print('Initializing socketio...')
+  socketio.attach(app)
+  #
+  print('Initializing flask...')
+  flask_app = Flask(__name__, static_url_path=None, static_folder=None)
+  CORS(flask_app)
+  flask_app.config.update(config)
+  flask_app.debug = config['DEBUG']
+  #
+  if flask_app.config['PROXY']:
     print('wsgi proxy fix...')
     from werkzeug.middleware.proxy_fix import ProxyFix
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+    flask_app.wsgi_app = ProxyFix(flask_app.wsgi_app, x_for=1, x_proto=1)
   #
   print('Registering blueprints...')
-  app.register_blueprint(core, url_prefix=app.config['PREFIX'])
-  for blueprint_name, blueprint in find_blueprints(config=app.config).items():
+  flask_app.register_blueprint(core, url_prefix=flask_app.config['PREFIX'])
+  for blueprint_name, blueprint in find_blueprints(config=flask_app.config).items():
     if isinstance(blueprint, Blueprint):
-      app.register_blueprint(blueprint, url_prefix=join_routes(app.config['PREFIX'], blueprint_name))
+      flask_app.register_blueprint(blueprint, url_prefix=join_routes(flask_app.config['PREFIX'], blueprint_name))
     elif callable(blueprint):
-      blueprint(app, url_prefix=join_routes(app.config['PREFIX'], blueprint_name), DATA_DIR=app.config['DATA_DIR'])
+      blueprint(flask_app, url_prefix=join_routes(flask_app.config['PREFIX'], blueprint_name), DATA_DIR=flask_app.config['DATA_DIR'])
     else:
       raise Exception('Unrecognized blueprint type: ' + blueprint_name)
   #
-  print('Initializing socketio...')
-  socketio.init_app(app, 
-    path=f"{app.config['PREFIX']}socket.io",
-    async_mode='threading' if app.config['DEBUG'] else 'eventlet',
-    logger=bool(app.config['DEBUG']),
-    engineio_logger=bool(app.config['DEBUG']),
-    cors_allowed_origins='*',
-  )
-  #
+  print('Registering flask with aiohttp...')
+  wsgi_handler = WSGIHandler(flask_app)
+  app.router.add_route('*', '/{path_info:.*}', wsgi_handler)
   return app
 
 # register flask_app with CLI
@@ -71,27 +75,30 @@ def create_app(**kwargs):
 @click.option('--certfile', envvar='CERTFILE', default=None, help='The SSL certificate public key for wss support')
 @click.argument('ipynb', envvar='IPYNB')
 def flask_app(*args, **kwargs):
-  from appyter.render.flask_app.socketio import socketio
-  from appyter.context import get_extra_files
-  from appyter.util import dict_filter_none
-  #
-  run_args = dict()
-  if not kwargs.get('debug'):
-    run_args.update(
-      keyfile=kwargs.get('keyfile'),
-      certfile=kwargs.get('certfile'),
-    )
-  #
-  app = create_app(**kwargs)
-  run_args.update(
-    host=app.config['HOST'],
-    port=app.config['PORT'],
-    debug=app.config['DEBUG'],
-    use_reloader=app.config['DEBUG'],
+  # write all config to env
+  os.environ.update(
+    CWD=str(kwargs.get('cwd')),
+    PREFIX=str(kwargs.get('prefix')),
+    PROFILE=str(kwargs.get('profile')),
+    EXTRA=str(kwargs.get('extras')),
+    HOST=str(kwargs.get('host')),
+    PORT=str(kwargs.get('port')),
+    PROXY=str(kwargs.get('proxy')),
+    DATA_DIR=str(kwargs.get('data_dir')),
+    DISPATCHER=str(kwargs.get('dispatcher')),
+    SECRET_KEY=str(kwargs.get('secret_key')),
+    DEBUG=str(kwargs.get('debug')),
+    STATIC_DIR=str(kwargs.get('static_dir')),
+    KEYFILE=str(kwargs.get('keyfile')),
+    CERTFILE=str(kwargs.get('certfile')),
+    IPYNB=str(kwargs.get('ipynb')),
   )
   if kwargs.get('debug'):
-    run_args.update(
-      extra_files=get_extra_files(config=app.config),
-    )
-  #
-  return socketio.run(app, **dict_filter_none(run_args))
+    from aiohttp_devtools.logs import setup_logging
+    from aiohttp_devtools.runserver import runserver, run_app
+    setup_logging(True)
+    run_app(*runserver(app_path=__file__))
+  else:
+    from aiohttp import web
+    app = create_app(**kwargs)
+    return web.run_app(app)

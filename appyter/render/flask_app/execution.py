@@ -1,34 +1,19 @@
 import os
-import sys
-import json
-import uuid
-import shutil
-import traceback
-import functools
-import urllib.request
+import aiohttp
 from subprocess import PIPE
-from flask import current_app, request, copy_current_request_context, abort
-from flask_socketio import emit
 
-from appyter.render.flask_app.core import core, prepare_data, prepare_results
-from appyter.render.flask_app.socketio import socketio, join_room, leave_room
-from appyter.render.nbconstruct import render_nb_from_nbtemplate
-from appyter.render.flask_app.util import sanitize_sha1sum, generate_uuid, secure_filename
+from appyter.render.flask_app.core import prepare_data, prepare_results
+from appyter.render.flask_app.socketio import socketio
+from appyter.render.flask_app.util import sanitize_sha1sum, generate_uuid
 from appyter.ext.fs import Filesystem
-from appyter.context import get_jinja2_env
-from appyter.util import join_routes
-
-@socketio.on('connect')
-def _():
-  print('connect', request.sid)
-
-@socketio.on('disconnect')
-def _():
-  print('disconnect', request.sid)
 
 # construct/join a notebook
 @socketio.on('submit')
-def submit(data):
+async def submit(sid, data):
+  async with socketio.session(sid) as sess:
+    request_url = sess['request_url']
+    config = sess['config']
+  #
   if type(data) == dict:
     data = prepare_data(data)
     result_hash = prepare_results(data)
@@ -39,44 +24,34 @@ def submit(data):
     raise Exception('Unrecognized data type')
   #
   # TODO: submit job iff it hasn't already been executed
-  join_room(result_hash)
-  emit('status', 'Queuing execution', room=result_hash)
+  socketio.enter_room(sid, result_hash)
+  await socketio.emit('status', 'Queuing execution', room=result_hash)
   job = dict(
-    url=join_routes(request.base_url, current_app.config['PREFIX'], 'socket.io')[1:], # TODO: use public_url env
-    cwd=Filesystem.join(current_app.config['DATA_DIR'], 'output', result_hash),
-    ipynb=os.path.basename(current_app.config['IPYNB']),
+    url=request_url, # TODO: use public_url env
+    cwd=Filesystem.join(config['DATA_DIR'], 'output', result_hash),
+    ipynb=os.path.basename(config['IPYNB']),
     session=result_hash,
     job=generate_uuid(),
   )
   # TODO: worry about inaccessible dispatcher
-  if current_app.config['DISPATCHER']:
-    queue_size = int(urllib.request.urlopen(
-      urllib.request.Request(
-        current_app.config['DISPATCHER'],
-        method='POST',
-        headers={
-          'Content-Type': 'application/json',
-        },
-      ),
-      data=json.dumps(job).encode(),
-    ).read().decode())
-    # TODO: keep track of queue position?
-    emit('status', f"Queued successfully, you are at position {queue_size} in the queue", room=result_hash)
+  if config['DISPATCHER']:
+    async with aiohttp.ClientSession(headers={'Content-Type': 'application/json'}) as client:
+      async with client.post(config['DISPATCHER'], json=job) as resp:
+        queue_size = await resp.json()
+        # TODO: keep track of queue position?
+        await socketio.emit('status', f"Queued successfully, you are at position {queue_size} in the queue", room=result_hash)
   else:
     from appyter.orchestration.dispatch.native import dispatch
-    if current_app.config['DEBUG']:
-      from subprocess import Popen
-    else:
-      from eventlet.green.subprocess import Popen
-    socketio.start_background_task(dispatch, job=job, Popen=Popen)
+    from asyncio.subprocess import Popen
+    await dispatch(job=job, Popen=Popen)
 
 @socketio.on('join')
-def _(data):
+async def _(sid, data):
   session = data['session']
   job = data['job']
-  join_room(session)
-  emit('joined', job, room=session)
+  socketio.enter_room(sid, session)
+  await socketio.emit('joined', job, room=session)
 
 @socketio.on('message')
-def _(data):
-  emit(data['type'], data['data'], room=data['session'])
+async def _(sid, data):
+  await socketio.emit(data['type'], data['data'], room=data['session'])

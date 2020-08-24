@@ -188,7 +188,7 @@ def get_jinja2_env(context={}, config=None):
 def get_env_from_kwargs(**kwargs):
   import sys
   import uuid
-  assert kwargs != {}
+  # assert kwargs != {}
   PREFIX = kwargs.get('prefix', os.environ.get('PREFIX', '/'))
   PROFILE = kwargs.get('profile', os.environ.get('PROFILE', 'default'))
   EXTRAS = set(try_load_list(kwargs.get('extras', os.environ.get('EXTRAS', ''))))
