@@ -4,6 +4,7 @@ import click
 import asyncio
 import nbformat as nbf
 import functools
+from nbclient.util import ensure_async
 
 from appyter.cli import cli
 from appyter.ext.fs import Filesystem
@@ -31,7 +32,6 @@ async def json_emitter(obj):
   print(json.dumps(obj))
 
 async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
-  # TODO: worry about leaking s3 credentials
   assert callable(emit), 'Emit must be callable'
   fs = Filesystem(cwd)
   with fs.open(ipynb, 'r') as fr:
@@ -53,25 +53,32 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
     )
     await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
     async with client.async_setup_kernel():
-      await emit({ 'type': 'status', 'data': 'Initializing...' })
       # monkey-patch open so that writes go to s3
-      client.kc.execute(''.join([
-        'from appyter.ext.fs import Filesystem as _Filesystem\n',
-        'open = _Filesystem({cwd}).open',
-      ]))
+      # WARNING: In the case of error with this cell, things proceed anyway
+      await ensure_async(
+        client.kc.execute(
+          '\n'.join([
+            f"from appyter.ext.fs import Filesystem as _Filesystem",
+            f"open = _Filesystem({repr(cwd.rstrip('/')+'/')}).open",
+          ]),
+          store_history=False,
+        )
+      )
       await emit({ 'type': 'status', 'data': 'Executing...' })
       await emit({ 'type': 'progress', 'data': 0 })
       n_cells = len(nb.cells)
+      exec_count = 1
       for index, cell in enumerate(nb.cells):
         cell = await client.async_execute_cell(
           cell, index,
-          execution_count=client.code_cells_executed + 1,
+          execution_count=exec_count,
         )
         if cell_is_code(cell):
           if cell_has_error(cell):
-            raise Exception('Cell execution error on cell %d' % (index))
+            raise Exception('Cell execution error on cell %d' % (exec_count))
+          exec_count += 1
         if index < n_cells-1:
-          await emit({ 'type': 'progress', 'data': index+1 })
+          await emit({ 'type': 'progress', 'data': index })
         else:
           await emit({ 'type': 'status', 'data': 'Success' })
   except Exception as e:
