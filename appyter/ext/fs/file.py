@@ -1,6 +1,7 @@
 import os
 import shutil
 import urllib.parse
+from appyter.ext.fs import Filesystem as FS
 
 class Filesystem:
   def __init__(self, uri):
@@ -14,28 +15,65 @@ class Filesystem:
     return self._prefix
   #
   def open(self, path, mode='r'):
-    return open(os.path.join(self._prefix, path), mode=mode)
+    try:
+      return open(FS.join(self._prefix, path), mode=mode)
+    except FileNotFoundError:
+      raise Exception('No such file or directory: {path}')
+    except Exception:
+      import traceback
+      traceback.print_exc()
+      raise Exception(f"An error occurred while trying to access {path}")
   #
   def exists(self, path):
-    return os.path.isfile(os.path.join(self._prefix, path)) or os.path.islink(os.path.join(self._prefix, path))
+    try:
+      return os.path.isfile(FS.join(self._prefix, path)) or os.path.islink(FS.join(self._prefix, path))
+    except Exception:
+      import traceback
+      traceback.print_exc()
+      raise Exception(f"An error occurred while trying to access {path}")
   #
   def makedirs(self, path, exist_ok=False):
-    return os.makedirs(os.path.join(self._prefix, path), exist_ok=exist_ok)
+    try:
+      return os.makedirs(FS.join(self._prefix, path), exist_ok=exist_ok)
+    except Exception:
+      import traceback
+      traceback.print_exc()
+      raise Exception(f"An error occurred while trying to access {path}")
   #
   def cp(self, src, dst):
-    return shutil.copy(os.path.join(self._prefix, src), os.path.join(self._prefix, dst))
+    try:
+      return shutil.copy(FS.join(self._prefix, src), FS.join(self._prefix, dst))
+    except Exception:
+      import traceback
+      traceback.print_exc()
+      raise Exception(f"An error occurred while trying to access {path}")
   #
   def link(self, src, dst):
-    return os.link(os.path.join(self._prefix, src), os.path.join(self._prefix, dst))
+    try:
+      return os.link(FS.join(self._prefix, src), FS.join(self._prefix, dst))
+    except Exception:
+      import traceback
+      traceback.print_exc()
+      raise Exception(f"An error occurred while trying to access {path}")
   #
   def rm(self, path, recursive=False):
-    if recursive:
-      return shutil.rmtree(os.path.join(self._prefix, path))
-    else:
-      return os.remove(os.path.join(self._prefix, path))
+    try:
+      if recursive:
+        return shutil.rmtree(FS.join(self._prefix, path))
+      else:
+        return os.remove(FS.join(self._prefix, path))
+    except Exception:
+      import traceback
+      traceback.print_exc()
+      raise Exception(f"An error occurred while trying to access {path}")
   #
   def chmod_ro(self, path):
-    return os.chmod(os.path.join(self._prefix, path), 400)
+    try:
+      return os.chmod(FS.join(self._prefix, path), 400)
+    except Exception:
+      import traceback
+      traceback.print_exc()
+      raise Exception(f"An error occurred while trying to access {path}")
   #
   def __exit__(self, *args):
     pass

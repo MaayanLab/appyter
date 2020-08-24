@@ -2,6 +2,7 @@ import os
 import shutil
 import importlib
 import urllib.parse
+from werkzeug.utils import safe_join
 
 class Filesystem:
   def __init__(self, uri):
@@ -36,7 +37,7 @@ class Filesystem:
     return self._fs.makedirs(path, exist_ok=exist_ok)
   #
   def cp(self, src, dst):
-    return self._fs.cp(path, src, dst)
+    return self._fs.cp(src, dst)
   #
   def link(self, src, dst):
     return self._fs.link(src, dst)
@@ -52,7 +53,7 @@ class Filesystem:
   #
   @staticmethod
   def join(*args):
-    return os.path.join(*args)
+    return safe_join(*args)
   #
   @staticmethod
   def cp(src_fs=None, src_path=None, dst_fs=None, dst_path=None):
