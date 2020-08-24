@@ -32,14 +32,12 @@ async def evaluate_saga(sio, msg_queue, job):
     elif msg['type'] == 'connect_error':
       raise Exception(str(msg))
     elif msg['type'] == 'joined' and msg['data'] == job['job']:
-      # TODO: load ipynb from s3/appyter
       await nbexecute_async(
         ipynb=job['ipynb'],
         emit=emit_factory(sio, job['session']),
         cwd=job['cwd'],
       )
       await sio.disconnect()
-      # TODO: save ipynb to s3/appyter
     msg_queue.task_done()
 
 async def execute_async(job):
@@ -57,4 +55,4 @@ async def execute_async(job):
     c.cancel()
 
 def execute(job):
-  asyncio.run(execute_async(job))
+  asyncio.run(execute_async(job), debug=job.get('DEBUG', False))

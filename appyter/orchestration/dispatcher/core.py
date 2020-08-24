@@ -19,7 +19,7 @@ def on_submit():
   if request.method == 'GET':
     return f"Appyter {current_app.config['DISPATCH']} dispatcher"
   elif request.method == 'POST':
-    dispatch_queue.put(request.json)
+    dispatch_queue.put(dict(request.json, debug=current_app.config['DEBUG']))
     return jsonify(dispatch_queue.qsize())
 
 def dispatcher(Q=None, dispatch=None):
