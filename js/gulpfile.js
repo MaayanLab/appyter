@@ -7,6 +7,7 @@ const sourcemaps = require('gulp-sourcemaps')
 const rename = require('gulp-rename')
 const browserify = require('browserify')
 const sveltify = require('sveltify')
+const babelify = require('babelify')
 const root = path.join(__dirname, '..')
 
 const js = {
@@ -23,6 +24,7 @@ gulp.task('build', function () {
         debug: true,
         standalone: file.basename,
         transform: [
+          [babelify, {presets: ['@babel/preset-env']}],
           sveltify,
         ],
       }).bundle()

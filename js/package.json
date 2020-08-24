@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/maayanlab/appyter#readme",
   "devDependencies": {
+    "@babel/core": "^7.11.4",
+    "@babel/preset-env": "^7.11.0",
     "babelify": "^10.0.0",
     "browserify": "^16.5.2",
     "gulp": "^4.0.2",
