@@ -195,20 +195,20 @@ def get_env_from_kwargs(**kwargs):
   HOST = kwargs.get('host', os.environ.get('HOST', '127.0.0.1'))
   PORT = try_json_loads(kwargs.get('port', os.environ.get('PORT', 5000)))
   PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('PROXY', False)))
-  CWD = os.path.realpath(kwargs.get('cwd', os.environ.get('CWD', os.getcwd())))
-  DATA_DIR = kwargs.get('data-dir', os.environ.get('DATA_DIR', os.path.abspath('data')))
+  CWD = os.path.abspath(kwargs.get('cwd', os.environ.get('CWD', os.getcwd())))
+  DATA_DIR = kwargs.get('data-dir', os.environ.get('DATA_DIR', os.path.abspath(os.path.join(CWD, 'data'))))
   DISPATCHER = kwargs.get('dispatcher', os.environ.get('DISPATCHER'))
   SECRET_KEY = kwargs.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
   DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
-  STATIC_DIR = kwargs.get('static-dir', os.environ.get('STATIC_DIR', os.path.abspath('static')))
+  STATIC_DIR = kwargs.get('static-dir', os.environ.get('STATIC_DIR', os.path.abspath(os.path.join(CWD, 'static'))))
   STATIC_PREFIX = join_routes(PREFIX, 'static')
   IPYNB = os.path.relpath(kwargs.get('ipynb', os.environ.get('IPYNB')), CWD)
   assert IPYNB != None, 'ipynb was not found'
   #
   if os.path.abspath(CWD) not in sys.path:
-    sys.path.insert(0, os.path.abspath(CWD))
-  if os.path.abspath(CWD) not in os.environ['PATH'].split(':'):
-    os.environ['PATH'] = os.path.abspath(CWD) + ':' + os.environ['PATH']
+    sys.path.insert(0, CWD)
+  if CWD not in os.environ['PATH'].split(':'):
+    os.environ['PATH'] = CWD + ':' + os.environ['PATH']
   #
   return dict(
     PREFIX=PREFIX,

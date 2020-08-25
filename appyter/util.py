@@ -70,3 +70,33 @@ def importdir_deep(_dirname_, _package_, _globals_, filter_mod=lambda m, k, v: n
       for k, v in mod.__dict__.items()
       if filter_mod(mod, k, v)
     })
+
+def click_option_setenv(spec, envvar=None, **kwargs):
+  ''' Like click.option but explicitly set os.environ as well.
+  '''
+  import os, re, functools, click
+  m = re.match(r'^--(.+)$', spec)
+  assert m
+  var = m.group(1)
+  def decorator(func):
+    @click.option(spec, envvar=envvar, **kwargs)
+    @functools.wraps(func)
+    def wrapper(**kwargs):
+      if kwargs.get(var) is not None:
+        os.environ[envvar] = str(kwargs[var])
+      return func(**kwargs)
+    return wrapper
+  return decorator
+
+def click_argument_setenv(var, envvar=None, **kwargs):
+  ''' Like click.argument but explicitly set os.environ as well.
+  '''
+  import os, re, functools, click
+  def decorator(func):
+    @click.argument(var, envvar=envvar, **kwargs)
+    @functools.wraps(func)
+    def wrapper(**kwargs):
+      os.environ[envvar] = kwargs[var]
+      return func(**kwargs)
+    return wrapper
+  return decorator
