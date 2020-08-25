@@ -1,6 +1,8 @@
 import os
 import uuid
 import click
+import logging
+logger = logging.getLogger(__name__)
 
 from appyter.cli import cli
 # from appyter.ext.flask_aiohttp import AioHTTP
@@ -24,25 +26,28 @@ def create_app(**kwargs):
   from appyter.util import join_routes
   config = get_env(**kwargs)
   #
-  print('Initializing aiohttp...')
+  if config['DEBUG']:
+    logging.basicConfig(level=logging.DEBUG)
+  #
+  logger.info('Initializing aiohttp...')
   app = web.Application()
   app['config'] = config
   #
-  print('Initializing socketio...')
+  logger.info('Initializing socketio...')
   socketio.attach(app)
   #
-  print('Initializing flask...')
+  logger.info('Initializing flask...')
   flask_app = Flask(__name__, static_url_path=None, static_folder=None)
   CORS(flask_app)
   flask_app.config.update(config)
   flask_app.debug = config['DEBUG']
   #
   if flask_app.config['PROXY']:
-    print('wsgi proxy fix...')
+    logger.info('wsgi proxy fix...')
     from werkzeug.middleware.proxy_fix import ProxyFix
     flask_app.wsgi_app = ProxyFix(flask_app.wsgi_app, x_for=1, x_proto=1)
   #
-  print('Registering blueprints...')
+  logger.info('Registering blueprints...')
   flask_app.register_blueprint(core, url_prefix=flask_app.config['PREFIX'])
   for blueprint_name, blueprint in find_blueprints(config=flask_app.config).items():
     if isinstance(blueprint, Blueprint):
@@ -52,7 +57,7 @@ def create_app(**kwargs):
     else:
       raise Exception('Unrecognized blueprint type: ' + blueprint_name)
   #
-  print('Registering flask with aiohttp...')
+  logger.info('Registering flask with aiohttp...')
   wsgi_handler = WSGIHandler(flask_app)
   app.router.add_route('*', '/{path_info:.*}', wsgi_handler)
   return app

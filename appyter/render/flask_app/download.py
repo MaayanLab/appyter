@@ -1,5 +1,7 @@
 import aiohttp
 import traceback
+import logging
+logger = logging.getLogger(__name__)
 
 from appyter.ext.fs import Filesystem
 from appyter.render.flask_app.socketio import socketio
@@ -42,8 +44,7 @@ async def download_with_progress_and_hash(sid, data_fs, name, url, path, filenam
               chunk += 1
               await reporthook(chunk)
     except Exception as e:
-      print('download error')
-      traceback.print_exc()
+      logger.error(f"download error: {traceback.format_exc()}")
       await socketio.emit(
         'download_error',
         dict(name=name, filename=filename, url=url, error=str(e)),
@@ -113,7 +114,7 @@ async def siofu_start(sid, data):
 async def siofu_progress(sid, evt):
   async with socketio.session(sid) as sess:
     sess['file_%d' % (evt['id'])]['fh'].write(evt['content'])
-  print('progress', evt)
+  logger.debug(f"progress: {evt}")
   await socketio.emit("siofu_chunk", dict(
     id=evt['id'],
   ), room=sid)
