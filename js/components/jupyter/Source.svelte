@@ -3,8 +3,6 @@
 
   export let language
   export let source
-
-  // TODO: highlight python
 </script>
 
 <div class="inner_cell">

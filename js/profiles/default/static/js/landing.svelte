@@ -22,9 +22,7 @@
       _deps = await new Promise(
         (resolve, reject) =>
           requirejs(['socket'], function (socket, SocketIOFileUpload) {
-            resolve({
-              socket,
-            })
+            resolve({ socket })
           }, reject)
       )
       socket = _deps.socket
@@ -78,7 +76,8 @@
     await ensure_deps()
     await ensure_connected()
     await setup_async_exec()
-    socket.emit('submit', window.location.pathname.split('/').filter(p => p)[0])
+    const paths = window.location.pathname.split('/').filter(p => p)
+    socket.emit('submit', paths[paths.length - 1])
   }
 
   onMount(async () => {

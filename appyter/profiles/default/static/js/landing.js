@@ -39821,7 +39821,7 @@ function get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (108:2) {#if status}
+// (107:2) {#if status}
 function create_if_block_3(ctx) {
 	let div1;
 	let div0;
@@ -39855,7 +39855,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (117:4) {#if nb}
+// (116:4) {#if nb}
 function create_if_block(ctx) {
 	let cells;
 	let current;
@@ -39899,7 +39899,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (136:50) 
+// (135:50) 
 function create_if_block_2(ctx) {
 	let cell;
 	let current;
@@ -39944,7 +39944,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (120:10) {#if cell.cell_type === 'code'}
+// (119:10) {#if cell.cell_type === 'code'}
 function create_if_block_1(ctx) {
 	let cell;
 	let current;
@@ -39989,7 +39989,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (138:14) <Input>
+// (137:14) <Input>
 function create_default_slot_4(ctx) {
 	let prompt;
 	let t;
@@ -40046,7 +40046,7 @@ function create_default_slot_4(ctx) {
 	};
 }
 
-// (137:12) <Cell type="text">
+// (136:12) <Cell type="text">
 function create_default_slot_3(ctx) {
 	let input;
 	let t;
@@ -40094,7 +40094,7 @@ function create_default_slot_3(ctx) {
 	};
 }
 
-// (122:14) <Input>
+// (121:14) <Input>
 function create_default_slot_2(ctx) {
 	let prompt;
 	let t;
@@ -40165,7 +40165,7 @@ function create_default_slot_2(ctx) {
 	};
 }
 
-// (121:12) <Cell type="code">
+// (120:12) <Cell type="code">
 function create_default_slot_1(ctx) {
 	let input;
 	let t0;
@@ -40230,7 +40230,7 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (119:8) {#each nb.cells as cell (cell.index)}
+// (118:8) {#each nb.cells as cell (cell.index)}
 function create_each_block(key_1, ctx) {
 	let first;
 	let current_block_type_index;
@@ -40324,7 +40324,7 @@ function create_each_block(key_1, ctx) {
 	};
 }
 
-// (118:6) <Cells>
+// (117:6) <Cells>
 function create_default_slot(ctx) {
 	let each_blocks = [];
 	let each_1_lookup = new Map();
@@ -40604,7 +40604,8 @@ function instance($$self, $$props, $$invalidate) {
 		await ensure_deps();
 		await ensure_connected();
 		await setup_async_exec();
-		socket.emit("submit", window.location.pathname.split("/").filter(p => p)[0]);
+		const paths = window.location.pathname.split("/").filter(p => p);
+		socket.emit("submit", paths[paths.length - 1]);
 	}
 
 	onMount(async () => {
