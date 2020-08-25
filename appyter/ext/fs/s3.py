@@ -24,7 +24,7 @@ class Filesystem:
       traceback.print_exc()
       raise Exception(f"An internal error occurred")
   #
-  def path(self):
+  def path(self, path=''):
     return None
   #
   def __enter__(self):

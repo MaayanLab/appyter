@@ -24,8 +24,8 @@ class Filesystem:
   def __enter__(self):
     return self._fs.__enter__()
   #
-  def path(self):
-    return self._fs.path()
+  def path(self, path=''):
+    return self._fs.path(path)
   #
   def close(self):
     return self._fs.close()

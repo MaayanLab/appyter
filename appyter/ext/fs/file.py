@@ -11,8 +11,8 @@ class Filesystem:
   def __enter__(self):
     return self
   #
-  def path(self):
-    return self._prefix
+  def path(self, path=''):
+    return FS.join(self._prefix, path)
   #
   def close(self):
     pass
