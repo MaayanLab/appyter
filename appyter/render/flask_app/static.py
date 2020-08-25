@@ -56,9 +56,14 @@ def profile(path):
 
 @route_join_with_or_without_slash(core, '<path:path>', methods=['GET'])
 def data_files(path):
-  data_fs = Filesystem(Filesystem.join(current_app.config['DATA_DIR'], 'output'))
   if path.endswith('/'):
-    path = '/'.join((path[:-1], 'index.html'))
-  if data_fs.exists(path):
-    return send_file(data_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
+    fs = Filesystem(current_app.config['CWD'])
+    env = get_jinja2_env(config=current_app.config)
+    return env.get_template('landing.j2').render(
+      _nb=os.path.basename(current_app.config['IPYNB']),
+    )
+  else:
+    data_fs = Filesystem(Filesystem.join(current_app.config['DATA_DIR'], 'output'))
+    if data_fs.exists(path):
+      return send_file(data_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
   abort(404)
