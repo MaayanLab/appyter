@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 
 from appyter.cli import cli
 from appyter.util import click_option_setenv, click_argument_setenv
-# from appyter.ext.flask_aiohttp import AioHTTP
 
 def create_app(**kwargs):
   ''' Completely initialize the flask application
@@ -35,7 +34,7 @@ def create_app(**kwargs):
   app['config'] = config
   #
   logger.info('Initializing socketio...')
-  socketio.attach(app)
+  socketio.attach(app, f"{config['PREFIX']}socket.io")
   #
   logger.info('Initializing flask...')
   flask_app = Flask(__name__, static_url_path=None, static_folder=None)

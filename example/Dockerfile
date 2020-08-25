@@ -29,6 +29,8 @@ RUN set -x \
 WORKDIR /app
 COPY . /app
 
+ENV HOST=0.0.0.0
+ENV PORT=5000
 ENV PROFILE=biojupies
 ENV EXTRAS=toc
 ENV DEBUG=false
