@@ -23,9 +23,11 @@ def get_fields():
   '''
   global _fields
   if not _fields:
-    fs = Filesystem(current_app.config['DATA_DIR'])
-    with fs.open('index.json', 'r') as fr:
-      _fields = json.load(fr)
+    fs = Filesystem(current_app.config['CWD'])
+    with fs.open(current_app.config['IPYNB'], 'r') as fr:
+      env = get_jinja2_env(config=current_app.config)
+      nbtemplate = nb_from_ipynb_io(fr)
+      _fields = render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
   return _fields
 
 _ipynb_hash = None
@@ -71,12 +73,8 @@ def prepare_results(data):
   results_hash = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data=data))
   data_fs = Filesystem(current_app.config['DATA_DIR'])
   results_path = Filesystem.join('output', results_hash)
-  if not data_fs.exists(Filesystem.join(results_path, 'index.html')):
-    # construct/write landing page
-    data_fs.link(
-      Filesystem.join('landing.html'),
-      Filesystem.join(results_path, 'index.html')
-    )
+  if not data_fs.exists(Filesystem.join(results_path, current_app.config['IPYNB'])):
+    # construct/write files into directory
     data_fs.makedirs(results_path, exist_ok=True)
     fields = get_fields()
     file_fields = {
