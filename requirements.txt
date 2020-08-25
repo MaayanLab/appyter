@@ -7,6 +7,7 @@ click-default-group
 eventlet @ git+git://github.com/eventlet/eventlet.git@c74e867cf99bb7b9708b33a294656c4abbc0edec
 flask
 flask_cors
+flask_socketio
 ipython
 jinja2
 jq
