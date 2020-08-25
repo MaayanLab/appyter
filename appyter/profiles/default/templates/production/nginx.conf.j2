@@ -1,0 +1,62 @@
+pid {{ _tmp_fs.path('nginx.pid') }};
+worker_processes 1;
+daemon off;
+
+events {
+  worker_connections  1024;
+}
+
+http {
+  include /etc/nginx/mime.types;
+  default_type application/octet-stream;
+
+  log_format main '\$remote_addr:\$http_x_forwarded_for - \$remote_user [\$time_local] '
+                  '"\$request" \$status \$body_bytes_sent "\$http_referer" '
+                  '"\$http_user_agent"' ;
+
+  access_log {{ _tmp_fs.path('nginx.log') }};
+  error_log {{ _tmp_fs.path('nginx.log') }};
+
+  gzip              on;
+  gzip_http_version 1.0;
+  gzip_proxied      any;
+  gzip_min_length   500;
+  gzip_disable      "MSIE [1-6]\.";
+  gzip_types        text/plain text/xml text/css
+                    text/comma-separated-values
+                    text/javascript
+                    application/x-javascript
+                    application/atom+xml;
+
+  client_body_buffer_size     10M;
+  client_max_body_size        10M;
+  proxy_buffering off;
+  proxy_request_buffering off;
+  proxy_cache off;
+
+  upstream appyter {
+    {% for n in range(1, 1+1) %}
+    server unix:{{ _tmp_fs.path() }}appyter_{{ n }}.sock fail_timeout=0;
+    {% endfor %}
+  }
+
+  server {
+    listen {{ _config.PORT }};
+    server_name {{ _config.HOST }};
+    include /etc/nginx/mime.types;
+    charset utf-8;
+    sendfile on;
+    keepalive_timeout 0;
+
+    location {{ _config.PREFIX }} {
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_redirect off;
+      proxy_buffering off;
+      proxy_pass http://appyter;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+    }
+  }
+}

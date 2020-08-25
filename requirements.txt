@@ -20,3 +20,4 @@ nbformat
 python-dotenv
 python-socketio
 s3fs
+supervisor

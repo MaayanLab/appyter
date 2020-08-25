@@ -17,29 +17,6 @@ from appyter.render.flask_app.util import sanitize_sha1sum, sanitize_uuid, route
 
 core = Blueprint('__main__', __name__)
 
-@core.before_app_first_request
-def prerender():
-  ''' Pre-render certain pages for quicker access / direct access via nginx in production
-  '''
-  env = get_jinja2_env(config=current_app.config)
-  fs = Filesystem(current_app.config['CWD'])
-  with fs.open(current_app.config['IPYNB']) as fr:
-    nbtemplate = nb_from_ipynb_io(fr)
-  #
-  data_fs = Filesystem(current_app.config['DATA_DIR'])
-  with data_fs.open('index.html', 'w') as fw:
-    fw.write(render_form_from_nbtemplate(env, nbtemplate))
-  with data_fs.open('index.json', 'w') as fw:
-    json.dump(render_nbtemplate_json_from_nbtemplate(env, nbtemplate), fw)
-  with data_fs.open('landing.html', 'w') as fw:
-    env.get_template(
-      'landing.j2',
-    ).stream(
-      _nb=os.path.basename(current_app.config['IPYNB']),
-    ).dump(
-      fw
-    )
-
 _fields = None
 def get_fields():
   ''' Helper to get/cache fields even if we're on a different thread

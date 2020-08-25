@@ -69,6 +69,7 @@ def create_app(**kwargs):
 @click_option_setenv('--profile', envvar='PROFILE', default='default', help='Specify the profile to use for rendering')
 @click_option_setenv('--extras', envvar='EXTRAS', default=[], type=str, multiple=True, help='Specify extras flags')
 @click_option_setenv('--host', envvar='HOST', default='127.0.0.1', help='The host the flask server should run on')
+@click_option_setenv('--socket', envvar='SOCKET', default=None, help='The socket to mount to (when running in production)')
 @click_option_setenv('--port', envvar='PORT', type=int, default=5000, help='The port this flask server should run on')
 @click_option_setenv('--proxy', envvar='PROXY', type=bool, default=False, help='Whether this is running behind a proxy and the IP should be fixed for CORS')
 @click_option_setenv('--data-dir', envvar='DATA_DIR', default='data', help='The directory to store data of executions')
@@ -80,25 +81,16 @@ def create_app(**kwargs):
 @click_option_setenv('--certfile', envvar='CERTFILE', default=None, help='The SSL certificate public key for wss support')
 @click_argument_setenv('ipynb', envvar='IPYNB')
 def flask_app(**kwargs):
-  # write all config to env
+  import logging
+  logging.basicConfig(level=logging.DEBUG if kwargs.get('debug') else logging.INFO)
   if kwargs.get('debug'):
-    import appyter
-    from aiohttp_devtools.logs import setup_logging
-    from aiohttp_devtools.runserver import runserver, run_app
-    setup_logging(True)
-    run_app(*runserver(
-      # the path of appyter's install location
-      python_path=os.path.dirname(appyter.__path__[0]),
-      # the path to this particular file
-      app_path=__file__,
-      # server configuration
-      host=kwargs.get('host'),
-      main_port=kwargs.get('port'),
-      # watch cwd, we serve static files a different way
-      static_path=kwargs.get('cwd'),
-      static_url='/_static/',
-    ))
-  else:
+    from appyter.render.flask_app.development import serve
+    serve(__file__, **kwargs)
+  elif kwargs.get('socket'):
     from aiohttp import web
+    logging.info(f"Launching aiohttp server on {kwargs['socket']}")
     app = create_app(**kwargs)
-    return web.run_app(app, host=kwargs.get('host'), port=kwargs.get('port'))
+    web.run_app(app, path=kwargs['socket'])
+  else:
+    from appyter.render.flask_app.production import serve
+    serve(__file__, **kwargs)
