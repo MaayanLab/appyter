@@ -27,7 +27,7 @@ async def submit(sid, data):
   socketio.enter_room(sid, result_hash)
   await socketio.emit('status', 'Queuing execution', room=result_hash)
   job = dict(
-    url=request_url, # TODO: use public_url env
+    url=request_url,
     cwd=Filesystem.join(config['DATA_DIR'], 'output', result_hash),
     ipynb=os.path.basename(config['IPYNB']),
     session=result_hash,
@@ -41,9 +41,8 @@ async def submit(sid, data):
         # TODO: keep track of queue position?
         await socketio.emit('status', f"Queued successfully, you are at position {queue_size} in the queue", room=result_hash)
   else:
-    from appyter.orchestration.dispatch.native import dispatch
-    from asyncio.subprocess import Popen
-    await dispatch(job=job, Popen=Popen)
+    from appyter.orchestration.job.job import execute_async
+    await execute_async(job)
 
 @socketio.on('join')
 async def _(sid, data):
