@@ -83,11 +83,23 @@ def create_app(**kwargs):
 def flask_app(**kwargs):
   # write all config to env
   if kwargs.get('debug'):
+    import appyter
     from aiohttp_devtools.logs import setup_logging
     from aiohttp_devtools.runserver import runserver, run_app
     setup_logging(True)
-    run_app(*runserver(app_path=__file__))
+    run_app(*runserver(
+      # the path of appyter's install location
+      python_path=os.path.dirname(appyter.__path__[0]),
+      # the path to this particular file
+      app_path=__file__,
+      # server configuration
+      host=kwargs.get('host'),
+      main_port=kwargs.get('port'),
+      # watch cwd, we serve static files a different way
+      static_path=kwargs.get('cwd'),
+      static_url='/_static/',
+    ))
   else:
     from aiohttp import web
     app = create_app(**kwargs)
-    return web.run_app(app)
+    return web.run_app(app, host=kwargs.get('host'), port=kwargs.get('port'))
