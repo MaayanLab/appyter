@@ -191,7 +191,7 @@ def get_env_from_kwargs(**kwargs):
   # assert kwargs != {}
   PREFIX = kwargs.get('prefix', os.environ.get('PREFIX', '/'))
   PROFILE = kwargs.get('profile', os.environ.get('PROFILE', 'default'))
-  EXTRAS = set(try_load_list(kwargs.get('extras', os.environ.get('EXTRAS', ''))))
+  EXTRAS = try_load_list(kwargs.get('extras', os.environ.get('EXTRAS', '')))
   HOST = kwargs.get('host', os.environ.get('HOST', '127.0.0.1'))
   PORT = try_json_loads(kwargs.get('port', os.environ.get('PORT', 5000)))
   PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('PROXY', False)))

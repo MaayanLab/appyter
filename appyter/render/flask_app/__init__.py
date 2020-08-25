@@ -34,7 +34,7 @@ def create_app(**kwargs):
   app['config'] = config
   #
   logger.info('Initializing socketio...')
-  socketio.attach(app, f"{config['PREFIX']}socket.io")
+  socketio.attach(app, join_routes(config['PREFIX'], 'socket.io'))
   #
   logger.info('Initializing flask...')
   flask_app = Flask(__name__, static_url_path=None, static_folder=None)

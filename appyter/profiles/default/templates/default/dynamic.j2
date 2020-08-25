@@ -8,7 +8,7 @@
 {% block script %}
 {{ super() }}
 <script type="text/javascript" charset="utf-8">
-require(['{{ url_for('__main__.profile', path='js') + '/dynamic.js' }}'], function (Component) {
+require(['{{ url_for('profile', path='js') + '/dynamic.js' }}'], function (Component) {
   var self = document.getElementById("_content")
   var component = new Component({
     target: self,

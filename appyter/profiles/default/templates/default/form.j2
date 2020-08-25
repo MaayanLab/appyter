@@ -35,7 +35,7 @@
         var props = JSON.parse(self.children[0].innerHTML)
         Object.assign(props, { requirejs: require })
         self.children[0].remove()
-        require([`{{ url_for('__main__.profile', path='js') + '/fields/${props.field}.js' }}`], function (Component) {
+        require([`{{ url_for('profile', path='js') + '/fields/${props.field}.js' }}`], function (Component) {
           var component = new Component({
             target: self,
             props: props,

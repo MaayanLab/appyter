@@ -59,7 +59,7 @@
     </script>
     <script>
       define('socket', ['socketio'], function (io) {
-        return io({ path: '{{ _config.PREFIX }}socket.io' })
+        return io({ path: {{ join_routes(_config.PREFIX, 'socket.io')|jsonify }} })
       })
     </script>
     {% if _config.DEBUG %}

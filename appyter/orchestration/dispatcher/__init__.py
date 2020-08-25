@@ -5,6 +5,7 @@ def create_app(**kwargs):
   from flask import Flask
   from appyter.orchestration.dispatcher.socketio import socketio
   from appyter.orchestration.dispatcher.core import core
+  from appyter.util import join_routes
   print('Initializing flask...')
   app = Flask(__name__)
   app.config.update(dict(
@@ -23,7 +24,7 @@ def create_app(**kwargs):
   app.register_blueprint(core, url_prefix=app.config['PREFIX'])
   print('Initializing socketio...')
   socketio.init_app(app,
-    path=f"{app.config['PREFIX']}socket.io",
+    path=join_routes(app.config['PREFIX'], 'socket.io'),
     async_mode='threading' if app.config['DEBUG'] else 'eventlet',
     logger=bool(app.config['DEBUG']),
     engineio_logger=bool(app.config['DEBUG']),
