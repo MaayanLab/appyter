@@ -186,6 +186,7 @@ def get_jinja2_env(context={}, config=None):
   return env
 
 def get_env_from_kwargs(**kwargs):
+  import os
   import sys
   import uuid
   # assert kwargs != {}
@@ -202,8 +203,8 @@ def get_env_from_kwargs(**kwargs):
   DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
   STATIC_DIR = kwargs.get('static-dir', os.environ.get('STATIC_DIR', os.path.abspath(os.path.join(CWD, 'static'))))
   STATIC_PREFIX = join_routes(PREFIX, 'static')
-  IPYNB = os.path.relpath(kwargs.get('ipynb', os.environ.get('IPYNB')), CWD)
-  assert IPYNB != None, 'ipynb was not found'
+  IPYNB = kwargs.get('ipynb', os.environ.get('IPYNB'))
+  assert IPYNB != None and os.path.isfile(os.path.join(CWD, IPYNB)), 'ipynb was not found'
   #
   if os.path.abspath(CWD) not in sys.path:
     sys.path.insert(0, CWD)
