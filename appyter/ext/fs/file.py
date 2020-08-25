@@ -20,6 +20,7 @@ class Filesystem:
   def open(self, path, mode='r'):
     try:
       assert path
+      os.makedirs(os.path.dirname(FS.join(self._prefix, path)), exist_ok=True)
       return open(FS.join(self._prefix, path), mode=mode)
     except FileNotFoundError:
       raise Exception(f"No such file or directory: {path}")
@@ -49,6 +50,7 @@ class Filesystem:
   def cp(self, src, dst):
     try:
       assert src and dst
+      os.makedirs(os.path.dirname(FS.join(self._prefix, dst)), exist_ok=True)
       return shutil.copy(FS.join(self._prefix, src), FS.join(self._prefix, dst))
     except Exception:
       import traceback
@@ -58,6 +60,7 @@ class Filesystem:
   def link(self, src, dst):
     try:
       assert src and dst
+      os.makedirs(os.path.dirname(FS.join(self._prefix, dst)), exist_ok=True)
       return os.link(FS.join(self._prefix, src), FS.join(self._prefix, dst))
     except Exception:
       import traceback
