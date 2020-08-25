@@ -10,7 +10,7 @@ async def _(sid, environ):
   request = environ['aiohttp.request']
   logger.debug(f"connect: {sid}")
   async with socketio.session(sid) as sess:
-    sess['request_url'] = str(request.url)
+    sess['request_url'] = f"{request.scheme}://{request.host}{request.path}"
     sess['config'] = request.app['config']
 
 @socketio.on('disconnect')
