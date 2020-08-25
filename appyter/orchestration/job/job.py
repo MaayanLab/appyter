@@ -1,5 +1,6 @@
 import asyncio
 import socketio
+import urllib.parse
 
 async def remote_message_producer(sio, msg_queue, job):
   @sio.event
@@ -15,7 +16,8 @@ async def remote_message_producer(sio, msg_queue, job):
   async def joined(data):
     await msg_queue.put(dict(type='joined', data=data))
   #
-  await sio.connect(job['url'])
+  url = urllib.parse.urlparse(job['url'])
+  await sio.connect(f"{url.scheme}://{url.netloc}", socketio_path=url.path)
   await sio.wait()
 
 def emit_factory(sio, session):
