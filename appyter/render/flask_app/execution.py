@@ -26,12 +26,16 @@ async def submit(sid, data):
   socketio.enter_room(sid, result_hash)
   await socketio.emit('status', 'Queuing execution', room=result_hash)
   job = dict(
-    url=join_routes(config['INTERNAL_URL'], 'socket.io') + '/',
     cwd=Filesystem.join(config['DATA_DIR'], 'output', result_hash),
     ipynb=os.path.basename(config['IPYNB']),
     session=result_hash,
     job=generate_uuid(),
   )
+  if config['DISPATCHER_URL']:
+    job['url'] = join_routes(config['DISPATCHER_URL'], 'socket.io') + '/'
+  if config['DISPATCHER_IMAGE']:
+    job['image'] = config['DISPATCHER_IMAGE']
+  #
   # TODO: worry about inaccessible dispatcher
   if config['DISPATCHER']:
     async with aiohttp.ClientSession(headers={'Content-Type': 'application/json'}) as client:

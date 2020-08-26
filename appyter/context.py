@@ -191,7 +191,8 @@ def get_env_from_kwargs(**kwargs):
   CWD = os.path.abspath(kwargs.get('cwd', os.environ.get('CWD', str(os.getcwd()))))
   DATA_DIR = kwargs.get('data_dir', os.environ.get('DATA_DIR', 'data'))
   DISPATCHER = kwargs.get('dispatcher', os.environ.get('DISPATCHER'))
-  INTERNAL_URL = kwargs.get('internal_url', os.environ.get('INTERNAL_URL'))
+  DISPATCHER_URL = kwargs.get('dispatcher_url', os.environ.get('DISPATCHER_URL'))
+  DISPATCHER_IMAGE = kwargs.get('dispatcher_image', os.environ.get('DISPATCHER_IMAGE'))
   SECRET_KEY = kwargs.get('secret_key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
   DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
   STATIC_DIR = kwargs.get('static_dir', os.environ.get('STATIC_DIR', os.path.join(CWD, 'static')))
@@ -222,7 +223,8 @@ def get_env_from_kwargs(**kwargs):
     CWD=CWD,
     DATA_DIR=DATA_DIR,
     DISPATCHER=DISPATCHER,
-    INTERNAL_URL=INTERNAL_URL,
+    DISPATCHER_URL=DISPATCHER_URL,
+    DISPATCHER_IMAGE=DISPATCHER_IMAGE,
     SECRET_KEY=SECRET_KEY,
     DEBUG=DEBUG,
     STATIC_DIR=STATIC_DIR,
