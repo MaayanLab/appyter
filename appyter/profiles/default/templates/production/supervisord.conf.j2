@@ -20,7 +20,7 @@ numprocs=1
 numprocs_start=1
 autostart=true
 autorestart=true
-environment={% for k, v in _config.items() %}{% if v is not none %}{{ k }}={{ str(v)|jsonify }}{% if not loop.last %},{% endif %}{% endif %}{% endfor %}
+environment={% for k, v in _config.items() %}{% if v is not none %}{{ k }}={{ v|jsonify_repr }}{% if not loop.last %},{% endif %}{% endif %}{% endfor %}
 command={{ sys.executable }} -u -m appyter --socket={{ _tmp_fs.path() }}%(program_name)s_%(process_num)d.sock
 stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0

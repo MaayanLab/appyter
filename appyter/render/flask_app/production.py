@@ -2,7 +2,7 @@ def s3_to_http(s3_uri):
   import urllib.parse
   uri = urllib.parse.urlparse(s3_uri)
   q = dict(urllib.parse.parse_qsl(uri.query))
-  return f"{'https' if q.get('use_ssl') else 'http'}://{uri.netloc}/{uri.path}"
+  return f"{'https' if q.get('use_ssl') else 'http'}://{uri.hostname}:{uri.port or (443 if q.get('use_ssl') else 80)}{uri.path}"
 
 def serve(app_path, **kwargs):
   import os
@@ -55,4 +55,4 @@ def serve(app_path, **kwargs):
         sys.exit(proc.wait())
       except KeyboardInterrupt:
         proc.terminate()
-        sys.exit(0)
+        sys.exit(proc.wait())
