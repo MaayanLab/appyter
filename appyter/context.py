@@ -7,8 +7,7 @@ from appyter.cli import cli
 from appyter.util import importdir_deep, join_routes, try_json_loads, try_load_list
 
 def find_fields_dir_mappings(config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   cwd = config['CWD']
   profile = config['PROFILE']
   mappings = {}
@@ -19,8 +18,7 @@ def find_fields_dir_mappings(config=None):
   return mappings
 
 def find_fields(config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   cwd = config['CWD']
   profile = config['PROFILE']
   from appyter.fields import Field
@@ -63,8 +61,7 @@ def describe_field(field, **kwargs):
 
 
 def find_filters_dir_mappings(config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   cwd = config['CWD']
   profile = config['PROFILE']
   mappings = {}
@@ -75,8 +72,7 @@ def find_filters_dir_mappings(config=None):
   return mappings
 
 def find_filters(config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   cwd = config['CWD']
   profile = config['PROFILE']
   ctx = {}
@@ -91,8 +87,7 @@ def find_filters(config=None):
   return ctx
 
 def find_blueprints_dir_mappings(config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   cwd = config['CWD']
   profile = config['PROFILE']
   mappings = {}
@@ -112,8 +107,7 @@ def filter_blueprints(m, k, v):
   return False
 
 def find_blueprints(config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   cwd = config['CWD']
   profile = config['PROFILE']
   ctx = {}
@@ -128,8 +122,7 @@ def find_blueprints(config=None):
   return ctx
 
 def find_templates_dir(config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   cwd = config['CWD']
   profile = config['PROFILE']
   return list(filter(os.path.isdir, [
@@ -139,8 +132,7 @@ def find_templates_dir(config=None):
   ]))
 
 def get_extra_files(config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   cwd = config['CWD']
   profile = config['PROFILE']
   dirs = [
@@ -168,8 +160,7 @@ def get_profile_directory(profile):
   return os.path.join(os.path.dirname(__file__), 'profiles', profile)
 
 def get_jinja2_env(context={}, config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   #
   import sys
   from appyter.fields import build_fields
@@ -184,30 +175,36 @@ def get_jinja2_env(context={}, config=None):
   env.filters.update(**find_filters(config=config))
   env.globals.update(**find_filters(config=config))
   env.globals.update(_config=config)
-  env.globals.update(**build_fields(find_fields(config=config), context=context))
+  env.globals.update(**build_fields(find_fields(config=config), context=context, env=env))
   return env
 
 def get_env_from_kwargs(**kwargs):
   import os
   import sys
   import uuid
-  # assert kwargs != {}
   PREFIX = kwargs.get('prefix', os.environ.get('PREFIX', '/'))
   PROFILE = kwargs.get('profile', os.environ.get('PROFILE', 'default'))
   EXTRAS = try_load_list(kwargs.get('extras', os.environ.get('EXTRAS', '')))
   HOST = kwargs.get('host', os.environ.get('HOST', '127.0.0.1'))
   PORT = try_json_loads(kwargs.get('port', os.environ.get('PORT', 5000)))
   PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('PROXY', False)))
-  CWD = os.path.abspath(kwargs.get('cwd', os.environ.get('CWD', os.getcwd())))
-  DATA_DIR = kwargs.get('data-dir', os.environ.get('DATA_DIR', os.path.abspath(os.path.join(CWD, 'data'))))
+  CWD = os.path.abspath(kwargs.get('cwd', os.environ.get('CWD', str(os.getcwd()))))
+  DATA_DIR = kwargs.get('data_dir', os.environ.get('DATA_DIR', 'data'))
   DISPATCHER = kwargs.get('dispatcher', os.environ.get('DISPATCHER'))
-  SECRET_KEY = kwargs.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
+  SECRET_KEY = kwargs.get('secret_key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
   DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
-  STATIC_DIR = kwargs.get('static-dir', os.environ.get('STATIC_DIR', os.path.abspath(os.path.join(CWD, 'static'))))
+  STATIC_DIR = kwargs.get('static_dir', os.environ.get('STATIC_DIR', os.path.join(CWD, 'static')))
   STATIC_PREFIX = join_routes(PREFIX, 'static')
   IPYNB = kwargs.get('ipynb', os.environ.get('IPYNB'))
+  #
   if IPYNB is None or not os.path.isfile(os.path.join(CWD, IPYNB)):
     logger.error('ipynb was not found')
+  #
+  if '://' not in DATA_DIR and not os.path.isabs(DATA_DIR):
+    DATA_DIR = os.path.join(CWD, DATA_DIR)
+  #
+  if '://' not in STATIC_DIR and not os.path.isabs(STATIC_DIR):
+    STATIC_DIR = os.path.join(CWD, STATIC_DIR)
   #
   if os.path.abspath(CWD) not in sys.path:
     sys.path.insert(0, CWD)

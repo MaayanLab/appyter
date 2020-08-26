@@ -10,15 +10,16 @@ from copy import copy
 from flask import Markup
 from appyter.context import get_jinja2_env
 
-def build_fields(fields, context={}):
+def build_fields(fields, context={}, env=None):
   ''' INTERNAL: Build a dictionary of Field instances
   '''
   return {
-    field_name: lambda name=None, _field=field, _context=context, **kwargs: _field(
+    field_name: lambda name=None, _field=field, _context=context, _env=env, **kwargs: _field(
       **dict(kwargs,
         name=name,
         value=_context.get(name),
-      )
+      ),
+      _env=env,
     )
     for field_name, field in fields.items()
   }
@@ -37,6 +38,7 @@ class Field(dict):
       default=None,
       value=None,
       section=None,
+      _env=None,
       **kwargs):
     '''
     :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
@@ -62,6 +64,7 @@ class Field(dict):
       )
     )
     assert name is not None, "Name should be defined and unique"
+    self._env = _env
   
   @property
   def args(self):
@@ -81,14 +84,14 @@ class Field(dict):
     :param \**kwargs: The instance values of the form e.g. `Field.render(**field.args)`
     '''
     return Markup(
-      get_jinja2_env().get_template(
+      self._env.get_template(
         self.template
       ).render(dict(**kwargs, this=self))
     )
   
   def render_svelte(self, **kwargs):
     return Markup(
-      get_jinja2_env().get_template(
+      self._env.get_template(
         'svelte.j2'
       ).render(dict(**kwargs, this=self))
     )
