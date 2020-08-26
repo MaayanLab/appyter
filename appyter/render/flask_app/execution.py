@@ -4,7 +4,7 @@ from subprocess import PIPE
 
 from appyter.render.flask_app.core import prepare_data, prepare_results
 from appyter.render.flask_app.socketio import socketio
-from appyter.render.flask_app.util import sanitize_sha1sum, generate_uuid
+from appyter.render.flask_app.util import sanitize_sha1sum, generate_uuid, join_routes
 from appyter.ext.fs import Filesystem
 
 # construct/join a notebook
@@ -26,7 +26,7 @@ async def submit(sid, data):
   socketio.enter_room(sid, result_hash)
   await socketio.emit('status', 'Queuing execution', room=result_hash)
   job = dict(
-    url=config['INTERNAL_URL'],
+    url=join_routes(config['INTERNAL_URL'], 'socket.io') + '/',
     cwd=Filesystem.join(config['DATA_DIR'], 'output', result_hash),
     ipynb=os.path.basename(config['IPYNB']),
     session=result_hash,
