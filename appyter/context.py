@@ -1,6 +1,8 @@
 import os
 import glob
 import click
+import logging
+logger = logging.getLogger(__name__)
 from appyter.cli import cli
 from appyter.util import importdir_deep, join_routes, try_json_loads, try_load_list
 
@@ -204,7 +206,8 @@ def get_env_from_kwargs(**kwargs):
   STATIC_DIR = kwargs.get('static-dir', os.environ.get('STATIC_DIR', os.path.abspath(os.path.join(CWD, 'static'))))
   STATIC_PREFIX = join_routes(PREFIX, 'static')
   IPYNB = kwargs.get('ipynb', os.environ.get('IPYNB'))
-  assert IPYNB != None and os.path.isfile(os.path.join(CWD, IPYNB)), 'ipynb was not found'
+  if IPYNB is None or not os.path.isfile(os.path.join(CWD, IPYNB)):
+    logger.error('ipynb was not found')
   #
   if os.path.abspath(CWD) not in sys.path:
     sys.path.insert(0, CWD)
