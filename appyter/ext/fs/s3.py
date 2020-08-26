@@ -14,7 +14,7 @@ class Filesystem:
         self._config['token'] = self._uri.username
       else:
         self._config.update(dict(urllib.parse.parse_qsl(self._uri.query)))
-      self._config['client_kwargs'] = dict(endpoint_url=f"{'https' if self._config.get('use_ssl') else 'http'}://{self._uri.netloc}")
+      self._config['client_kwargs'] = dict(endpoint_url=f"{'https' if self._config.get('use_ssl') else 'http'}://{self._uri.hostname}:{self._uri.port or (443 if self._config.get('use_ssl') else 80)}")
       self._config['config_kwargs'] = dict(signature_version='s3v4')
       #
       self._prefix = self._uri.path.lstrip('/').rstrip('/') + '/'
