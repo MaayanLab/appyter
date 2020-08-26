@@ -36,9 +36,6 @@ class Filesystem:
   def exists(self, path):
     return self._fs.exists(path)
   #
-  def makedirs(self, path, exist_ok=False):
-    return self._fs.makedirs(path, exist_ok=exist_ok)
-  #
   def cp(self, src, dst):
     return self._fs.cp(src, dst)
   #

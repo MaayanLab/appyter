@@ -75,7 +75,6 @@ def prepare_results(data):
   results_path = Filesystem.join('output', results_hash)
   if not data_fs.exists(Filesystem.join(results_path, current_app.config['IPYNB'])):
     # construct/write files into directory
-    data_fs.makedirs(results_path, exist_ok=True)
     fields = get_fields()
     file_fields = {
       field['args']['name']

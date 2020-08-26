@@ -54,15 +54,6 @@ class Filesystem:
       traceback.print_exc()
       raise Exception(f"An error occurred while trying to access {path}")
   #
-  def makedirs(self, path, exist_ok=False):
-    try:
-      assert path
-      return self._fs.makedirs(self._prefix + path, exist_ok=exist_ok)
-    except Exception:
-      import traceback
-      traceback.print_exc()
-      raise Exception(f"An error occurred while trying to access {path}")
-  #
   def cp(self, src, dst):
     try:
       assert src and dst
