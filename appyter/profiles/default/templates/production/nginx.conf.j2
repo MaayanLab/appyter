@@ -1,3 +1,13 @@
+{%- macro appyter_proxy() -%}
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_redirect off;
+      proxy_buffering off;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_pass http://appyter;
+{%- endmacro -%}
 pid {{ _tmp_fs.path('nginx.pid') }};
 worker_processes 1;
 daemon off;
@@ -14,8 +24,8 @@ http {
                   '"\$request" \$status \$body_bytes_sent "\$http_referer" '
                   '"\$http_user_agent"' ;
 
-  access_log {{ _tmp_fs.path('nginx.log') }};
-  error_log {{ _tmp_fs.path('nginx.log') }};
+  access_log /dev/stdout;
+  error_log stderr info;
 
   gzip              on;
   gzip_http_version 1.0;
@@ -48,15 +58,54 @@ http {
     sendfile on;
     keepalive_timeout 0;
 
-    location {{ _config.PREFIX }} {
+    location = {{ _config.PREFIX.rstrip('/') }}/ {
+      if ($request_method = GET) {
+        rewrite ^(.*)/$ $1/index.html;
+      }
+      {{ appyter_proxy() }}
+    }
+
+    location = {{ join_routes(_config.PREFIX, 'index.html') }} {
+      root {{ _tmp_fs.path() }};
+      try_files /index.html =404;
+    }
+
+    location = {{ join_routes(_config.PREFIX, 'favicon.ico') }} {
+      root {{ _config.STATIC_DIR }};
+      try_files /favicon.ico =404;
+    }
+
+    location ^~ {{ join_routes(_config.PREFIX, 'static') }} {
+      alias {{ _config.STATIC_DIR }};
+    }
+
+    location ^~ {{ join_routes(_config.PREFIX, 'profile') }} {
+      alias {{ os.path.join(get_profile_directory('default'), 'static') }};
+    }
+
+    location ^~ {{ join_routes(_config.PREFIX, 'socket.io') }} {
+      {{ appyter_proxy() }}
+    }
+
+    location ~ ^{{ join_routes(_config.PREFIX, '[^/]+') }}/$ {
+      root {{ _tmp_fs.path() }};
+      try_files /landing.html =404;
+    }
+
+    location ~ ^{{ join_routes(_config.PREFIX, '([^/]+)', '(.+)') }}$ {
+      {%- if _config.DATA_DIR.startswith('/') %}
+      alias {{ join_routes(_config.DATA_DIR, 'output', '$1', '$2') }};
+      {%- elif _config.DATA_DIR.startswith('s3://') %}
       proxy_set_header Host $http_host;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_redirect off;
-      proxy_buffering off;
-      proxy_pass http://appyter;
-      proxy_http_version 1.1;
-      proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
+      proxy_pass {{ join_routes(s3_to_http(_config.DATA_DIR), 'output', '$1', '$2') }};
+      {%- else %}
+      {{ appyter_proxy() }}
+      {%- endif %}
+    }
+
+    location {{ _config.PREFIX }} {
+      {{ appyter_proxy() }}
     }
   }
 }

@@ -1,3 +1,9 @@
+def s3_to_http(s3_uri):
+  import urllib.parse
+  uri = urllib.parse.urlparse(s3_uri)
+  q = urllib.parse.parse_qsl(uri.query)
+  return f"{'https' if q.get('use_ssl') else 'http'}://{uri.host}/{uri.path}"
+
 def serve(app_path, **kwargs):
   import os
   import sys
@@ -8,10 +14,11 @@ def serve(app_path, **kwargs):
   logger = logging.getLogger(__name__)
   from subprocess import Popen
   from appyter.ext.fs import Filesystem
-  from appyter.context import get_env, get_jinja2_env
+  from appyter.context import get_env, get_jinja2_env, get_profile_directory
   from appyter.util import join_routes
   from appyter.profiles.default.filters.url_for import url_for
   config = get_env(**kwargs)
+  logger.info(kwargs)
   env = get_jinja2_env(config=config)
   env.globals.update(url_for=functools.partial(url_for, production=config))
   with Filesystem('tmpfs://') as tmp_fs:
@@ -37,7 +44,11 @@ def serve(app_path, **kwargs):
     with tmp_fs.open('supervisord.conf', 'w') as fw:
       env.get_template('production/supervisord.conf.j2').stream(_tmp_fs=tmp_fs, sys=sys, str=str).dump(fw)
     with tmp_fs.open('nginx.conf', 'w') as fw:
-      env.get_template('production/nginx.conf.j2').stream(_tmp_fs=tmp_fs, join_routes=join_routes).dump(fw)
+      env.get_template('production/nginx.conf.j2').stream(
+        _tmp_fs=tmp_fs, os=os,
+        s3_to_http=s3_to_http,
+        get_profile_directory=get_profile_directory,
+      ).dump(fw)
     logger.info(f"Starting production instance at http://{kwargs['host']}:{kwargs['port']}{kwargs['prefix']} ...")
     with Popen(['supervisord', '-n', '-c', tmp_fs.path('supervisord.conf')]) as proc:
       try:
