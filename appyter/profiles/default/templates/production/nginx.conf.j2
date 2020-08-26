@@ -45,9 +45,11 @@ http {
   proxy_cache off;
 
   upstream appyter {
-    {% for n in range(1, 1+1) %}
+    {#- {% for n in range(1, _config.N_PROCS+1) %} #}
+    {%- with n=1 %}
     server unix:{{ _tmp_fs.path() }}appyter_{{ n }}.sock fail_timeout=0;
-    {% endfor %}
+    {%- endwith %}
+    {#- {% endfor %} #}
   }
 
   server {
