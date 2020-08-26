@@ -11,7 +11,6 @@ from appyter.ext.fs import Filesystem
 @socketio.on('submit')
 async def submit(sid, data):
   async with socketio.session(sid) as sess:
-    request_url = sess['request_url']
     config = sess['config']
   #
   if type(data) == dict:
@@ -27,7 +26,7 @@ async def submit(sid, data):
   socketio.enter_room(sid, result_hash)
   await socketio.emit('status', 'Queuing execution', room=result_hash)
   job = dict(
-    url=request_url,
+    url=config['INTERNAL_URL'],
     cwd=Filesystem.join(config['DATA_DIR'], 'output', result_hash),
     ipynb=os.path.basename(config['IPYNB']),
     session=result_hash,
