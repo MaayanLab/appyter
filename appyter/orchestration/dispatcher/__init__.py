@@ -25,7 +25,7 @@ def create_app(**kwargs):
   print('Initializing socketio...')
   socketio.init_app(app,
     path=join_routes(app.config['PREFIX'], 'socket.io'),
-    async_mode='threading' if app.config['DEBUG'] else 'eventlet',
+    async_mode='threading',
     logger=bool(app.config['DEBUG']),
     engineio_logger=bool(app.config['DEBUG']),
     cors_allowed_origins='*',
