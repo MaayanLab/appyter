@@ -1,8 +1,8 @@
 def s3_to_http(s3_uri):
   import urllib.parse
   uri = urllib.parse.urlparse(s3_uri)
-  q = urllib.parse.parse_qsl(uri.query)
-  return f"{'https' if q.get('use_ssl') else 'http'}://{uri.host}/{uri.path}"
+  q = dict(urllib.parse.parse_qsl(uri.query))
+  return f"{'https' if q.get('use_ssl') else 'http'}://{uri.netloc}/{uri.path}"
 
 def serve(app_path, **kwargs):
   import os
