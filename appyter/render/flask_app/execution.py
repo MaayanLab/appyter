@@ -32,7 +32,7 @@ async def submit(sid, data):
     job=generate_uuid(),
   )
   if config['DISPATCHER_URL']:
-    job['url'] = join_routes(config['DISPATCHER_URL'], 'socket.io') + '/'
+    job['url'] = join_routes(config['DISPATCHER_URL'], 'socket.io').lstrip('/') + '/'
   if config['DISPATCHER_IMAGE']:
     job['image'] = config['DISPATCHER_IMAGE']
   #
