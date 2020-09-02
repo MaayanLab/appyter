@@ -41,6 +41,7 @@ def init_disaptcher():
       __package__
     ).dispatch,
     Popen=Popen,
+    namespace=current_app.config['KUBE_NAMESPACE'],
   )
   #
   print('Starting background tasks...')

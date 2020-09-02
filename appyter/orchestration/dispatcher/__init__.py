@@ -15,6 +15,7 @@ def create_app(**kwargs):
     JOBS=kwargs.get('jobs'),
     DEBUG=kwargs.get('debug'),
     PREFIX=kwargs.get('prefix'),
+    KUBE_NAMESPACE=kwargs.get('kube_namespace'),
     DISPATCH=kwargs.get('dispatch'),
   ))
   if app.config['PROXY']:
@@ -39,6 +40,7 @@ def create_app(**kwargs):
 @click.option('--proxy', envvar='PROXY', type=bool, default=False, help='Whether this is running behind a proxy and the IP should be fixed for CORS')
 @click.option('--jobs', envvar='JOBS', type=int, default=1, help='Number of concurrent jobs to dispatch')
 @click.option('--debug', envvar='DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
+@click.option('--kube-namespace', envvar='KUBE_NAMESPACE', type=str, default='default', help='The kubernetes namespace (kubernetes dispatch)')
 @click.option('--dispatch', envvar='DISPATCH', type=str, default='native', help='The dispatcher mechanism to use (see list-dispatchers)')
 def dispatcher(*args, **kwargs):
   from appyter.orchestration.dispatcher.socketio import socketio

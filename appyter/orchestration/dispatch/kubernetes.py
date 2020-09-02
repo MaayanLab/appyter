@@ -3,10 +3,25 @@
 
 import json
 
+
+def endless_watch(*args, **kwargs):
+  from kubernetes import watch
+  w = watch.Watch()
+  s = iter(w.stream(*args, **kwargs))
+  v = None
+  while True:
+    try:
+      event = next(s)
+      v = event['object'].metadata.resource_version
+      yield event
+    except StopIteration:
+      s = iter(w.stream(*args, **kwargs, resource_version=v))
+
 def dispatch(job=None, namespace='default', **kwargs):
   from kubernetes import client, config
   config.load_incluster_config()
-  client.BatchV1Api().create_namespaced_job(
+  batchV1 = client.BatchV1Api()
+  batchV1.create_namespaced_job(
     namespace=namespace,
     body=client.V1Job(
       api_version='batch/v1',
@@ -18,7 +33,7 @@ def dispatch(job=None, namespace='default', **kwargs):
         template=client.V1PodTemplateSpec(
           metadata=client.V1ObjectMeta(
             labels=dict(
-              app=f"appyter-{job['session']}",
+              job=f"appyter-{job['session']}",
             )
           ),
           spec=client.V1PodSpec(
@@ -36,4 +51,8 @@ def dispatch(job=None, namespace='default', **kwargs):
       ),
     ),
   )
-  # TODO: watch job, on job completed return
+  for job in endless_watch(batchV1.list_namespaced_job, namespace, 
+    label_selector=f"job=appyter-{job['session']}"
+  ):
+    if job.status.succeeded or job.status.failed:
+      break
