@@ -2,6 +2,8 @@ from queue import Queue
 import functools
 import importlib
 from flask import Blueprint, request, current_app, jsonify
+import logging
+logger = logging.getLogger(__name__)
 
 from appyter.orchestration.dispatcher.socketio import socketio
 
@@ -26,7 +28,10 @@ def dispatcher(Q=None, dispatch=None):
   while True:
     while not Q.empty():
       job = Q.get()
-      dispatch(job=job)
+      try:
+        dispatch(job=job)
+      except:
+        logger.error(f"dispatch error: {traceback.format_exc()}")
       Q.task_done()
     socketio.sleep(1)
 
