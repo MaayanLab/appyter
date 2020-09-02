@@ -53,7 +53,7 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
   for event in endless_watch(batchV1.list_namespaced_job, namespace, 
     label_selector=f"job-name={job['job']}"
   ):
-    logger.debug(json.dumps(event))
+    logger.debug(str(event))
     event_type = event['type']
     event_job = event['object']
     if event_type == 'MODIFIED':
