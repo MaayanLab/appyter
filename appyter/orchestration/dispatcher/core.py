@@ -41,6 +41,7 @@ def init_disaptcher():
       __package__
     ).dispatch,
     Popen=Popen,
+    debug=current_app.config['DEBUG'],
     namespace=current_app.config['KUBE_NAMESPACE'],
   )
   #

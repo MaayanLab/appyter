@@ -17,7 +17,7 @@ def endless_watch(*args, **kwargs):
     except StopIteration:
       s = iter(w.stream(*args, **kwargs, resource_version=v))
 
-def dispatch(job=None, namespace='default', **kwargs):
+def dispatch(job=None, namespace='default', debug=False, **kwargs):
   from kubernetes import client, config
   config.load_incluster_config()
   batchV1 = client.BatchV1Api()
@@ -31,11 +31,6 @@ def dispatch(job=None, namespace='default', **kwargs):
       ),
       spec=client.V1JobSpec(
         template=client.V1PodTemplateSpec(
-          metadata=client.V1ObjectMeta(
-            labels=dict(
-              job=f"appyter-{job['session']}",
-            )
-          ),
           spec=client.V1PodSpec(
             restart_policy='Never',
             containers=[
@@ -47,15 +42,19 @@ def dispatch(job=None, namespace='default', **kwargs):
             ],
           ),
         ),
-        backoff_limit=4
+        backoff_limit=1,
       ),
     ),
   )
+  #
   for event in endless_watch(batchV1.list_namespaced_job, namespace, 
-    label_selector=f"job=appyter-{job['session']}"
+    label_selector=f"job-name={job['session']}"
   ):
     event_type = event['type']
     job = event['object']
     if event_type == 'MODIFIED':
       if job.status.succeeded or job.status.failed:
         break
+  #
+  if not debug:
+    batchV1.delete_namespaced_job(job['session'], namespace)
