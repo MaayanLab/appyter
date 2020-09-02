@@ -64,9 +64,7 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
   if not debug:
     batchV1.delete_namespaced_job(job['job'], namespace)
     # delete associated pod(s)
-    for event in coreV1.list_namespaced_pod(namespace, label_selector=f"job-name={job['job']}", watch=False):
-      event_type = event['type']
-      event_pod = event['object']
+    for event_pod in coreV1.list_namespaced_pod(namespace, label_selector=f"job-name={job['job']}", watch=False).items:
       coreV1.delete_namespaced_pod(event_pod.metadata.name, namespace)
   #
   logger.info(f"{job['job']} completed")
