@@ -31,6 +31,7 @@ def dispatcher(Q=None, dispatch=None):
       try:
         dispatch(job=job)
       except:
+        import traceback
         logger.error(f"dispatch error: {traceback.format_exc()}")
       Q.task_done()
     socketio.sleep(1)
