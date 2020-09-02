@@ -23,6 +23,7 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
   logger.info(f"starting {job['job']}")
   from kubernetes import client, config
   config.load_incluster_config()
+  coreV1 = client.CoreV1Api()
   batchV1 = client.BatchV1Api()
   batchV1.create_namespaced_job(
     namespace=namespace,
@@ -60,6 +61,12 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
       if event_job.status.succeeded or event_job.status.failed:
         break
   #
-  logger.info(f"{job['job']} completed")
   if not debug:
     batchV1.delete_namespaced_job(job['job'], namespace)
+    # delete associated pod(s)
+    for event in coreV1.list_namespaced_pod(namespace, label_selector=f"job-name={job['job']}", watch=False):
+      event_type = event['type']
+      event_pod = event['object']
+      coreV1.delete_namespaced_pod(event_pod.metadata.name, namespace)
+  #
+  logger.info(f"{job['job']} completed")
