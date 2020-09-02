@@ -54,6 +54,14 @@ http {
     {#- {% endfor %} #}
   }
 
+  {%- if _config.DATA_DIR.startswith('s3://') %}
+  {%- with s3_url = s3_to_url(_config.DATA_DIR) %}
+  upstream s3 {
+    server {{ s3_url.netloc }} fail_timeout=0;
+  }
+  {%- endwith %}
+  {%- endif %}
+
   server {
     listen {{ _config.PORT }};
     server_name {{ _config.HOST }};
@@ -100,9 +108,12 @@ http {
       {%- if _config.DATA_DIR.startswith('/') %}
       alias {{ join_routes(_config.DATA_DIR, 'output', '$1', '$2') }};
       {%- elif _config.DATA_DIR.startswith('s3://') %}
+      {%- with s3_url = s3_to_url(_config.DATA_DIR) %}
+      rewrite ^{{ join_routes(_config.PREFIX, '([^/]+)', '(.+)') }}$ {{ join_routes(s3_url.path, 'output', '$1', '$2') }} break;
       proxy_set_header Host $http_host;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_pass {{ join_routes(s3_to_http(_config.DATA_DIR), 'output', '$1', '$2').strip('/') }};
+      proxy_pass http://s3;
+      {%- endwith %}
       {%- else %}
       {{ appyter_proxy() }}
       {%- endif %}

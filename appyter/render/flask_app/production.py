@@ -1,8 +1,8 @@
-def s3_to_http(s3_uri):
+def s3_to_url(s3_uri):
   import urllib.parse
   uri = urllib.parse.urlparse(s3_uri)
   q = dict(urllib.parse.parse_qsl(uri.query))
-  return f"{'https' if q.get('use_ssl') else 'http'}://{uri.hostname}:{uri.port or (443 if q.get('use_ssl') else 80)}{uri.path}"
+  return urllib.parse.urlparse(f"{'https' if q.get('use_ssl') else 'http'}://{uri.hostname}:{uri.port or (443 if q.get('use_ssl') else 80)}/{uri.path}")
 
 def serve(app_path, **kwargs):
   import os
@@ -46,7 +46,7 @@ def serve(app_path, **kwargs):
     with tmp_fs.open('nginx.conf', 'w') as fw:
       env.get_template('production/nginx.conf.j2').stream(
         _tmp_fs=tmp_fs, os=os,
-        s3_to_http=s3_to_http,
+        s3_to_url=s3_to_url,
         get_profile_directory=get_profile_directory,
       ).dump(fw)
     logger.info(f"Starting production instance at http://{kwargs['host']}:{kwargs['port']}{kwargs['prefix']} ...")
