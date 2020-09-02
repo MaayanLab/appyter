@@ -51,8 +51,11 @@ def dispatch(job=None, namespace='default', **kwargs):
       ),
     ),
   )
-  for job in endless_watch(batchV1.list_namespaced_job, namespace, 
+  for event in endless_watch(batchV1.list_namespaced_job, namespace, 
     label_selector=f"job=appyter-{job['session']}"
   ):
-    if job.status.succeeded or job.status.failed:
-      break
+    event_type = event['type']
+    job = event['object']
+    if event_type == 'MODIFIED':
+      if job.status.succeeded or job.status.failed:
+        break
