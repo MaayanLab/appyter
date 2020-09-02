@@ -2,6 +2,8 @@
 '''
 
 import json
+import logging
+logger = logging.getLogger(__name__)
 
 
 def endless_watch(*args, **kwargs):
@@ -50,6 +52,8 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
   for event in endless_watch(batchV1.list_namespaced_job, namespace, 
     label_selector=f"job-name={job['session']}"
   ):
+    if not debug:
+      logger.info(json.dumps(event))
     event_type = event['type']
     event_job = event['object']
     if event_type == 'MODIFIED':
