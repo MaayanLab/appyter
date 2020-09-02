@@ -51,9 +51,9 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
     label_selector=f"job-name={job['session']}"
   ):
     event_type = event['type']
-    job = event['object']
+    event_job = event['object']
     if event_type == 'MODIFIED':
-      if job.status.succeeded or job.status.failed:
+      if event_job.status.succeeded or event_job.status.failed:
         break
   #
   if not debug:
