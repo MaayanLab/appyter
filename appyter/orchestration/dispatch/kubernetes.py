@@ -20,6 +20,7 @@ def endless_watch(*args, **kwargs):
       s = iter(w.stream(*args, **kwargs, resource_version=v))
 
 def dispatch(job=None, namespace='default', debug=False, **kwargs):
+  logger.info(f"starting {job['job']}")
   from kubernetes import client, config
   config.load_incluster_config()
   batchV1 = client.BatchV1Api()
@@ -29,7 +30,7 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
       api_version='batch/v1',
       kind='Job',
       metadata=client.V1ObjectMeta(
-        name=job['session'],
+        name=job['job'],
       ),
       spec=client.V1JobSpec(
         template=client.V1PodTemplateSpec(
@@ -37,7 +38,7 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
             restart_policy='Never',
             containers=[
               client.V1Container(
-                name=f"appyter-{job['session']}",
+                name=f"appyter-{job['job']}",
                 image=job['image'],
                 command=['appyter', 'orchestration', 'job', json.dumps(job)],
               ),
@@ -50,15 +51,15 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
   )
   #
   for event in endless_watch(batchV1.list_namespaced_job, namespace, 
-    label_selector=f"job-name={job['session']}"
+    label_selector=f"job-name={job['job']}"
   ):
-    if not debug:
-      logger.info(json.dumps(event))
+    logger.debug(json.dumps(event))
     event_type = event['type']
     event_job = event['object']
     if event_type == 'MODIFIED':
       if event_job.status.succeeded or event_job.status.failed:
         break
   #
+  logger.info(f"{job['job']} completed")
   if not debug:
-    batchV1.delete_namespaced_job(job['session'], namespace)
+    batchV1.delete_namespaced_job(job['job'], namespace)

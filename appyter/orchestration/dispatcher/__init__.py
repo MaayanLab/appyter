@@ -2,10 +2,12 @@ import click
 from appyter.orchestration.cli import orchestration
 
 def create_app(**kwargs):
+  import logging
   from flask import Flask
   from appyter.orchestration.dispatcher.socketio import socketio
   from appyter.orchestration.dispatcher.core import core
   from appyter.util import join_routes
+  logging.basicConfig(level=logging.DEBUG if kwargs.get('debug') else logging.INFO)
   print('Initializing flask...')
   app = Flask(__name__)
   app.config.update(dict(
