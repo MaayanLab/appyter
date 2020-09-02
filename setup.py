@@ -9,6 +9,9 @@ setup(
   long_description=open('README.md', 'r').read(),
   license='Apache-2.0',
   install_requires=list(map(str.strip, open('requirements.txt', 'r').readlines())),
+  extras_require={
+    'production': list(map(str.strip, open('requirements.production.txt', 'r').readlines())),
+  },
   packages=find_packages(exclude=('example',)),
   include_package_data=True,
   entry_points={
