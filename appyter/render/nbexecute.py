@@ -57,6 +57,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
   with Filesystem('tmpfs://') as tmp_fs:
     try:
       await emit({ 'type': 'status', 'data': 'Starting' })
+      iopub_hook = iopub_hook_factory(nb, emit)
       client = NotebookClientIOPubHook(
         nb,
         allow_errors=True,
@@ -67,7 +68,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
           PATH=os.environ['PATH'],
         ),
         resources={ 'metadata': {'path': tmp_fs.path()} },
-        iopub_hook=iopub_hook_factory(nb, emit),
+        iopub_hook=iopub_hook,
       )
       await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
       async with client.async_setup_kernel():
@@ -91,6 +92,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
             cell, index,
             execution_count=exec_count,
           )
+          await iopub_hook(cell, index)
           if cell_is_code(cell):
             if cell_has_error(cell):
               raise Exception('Cell execution error on cell %d' % (exec_count))
