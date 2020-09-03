@@ -4,7 +4,7 @@ import click
 import logging
 logger = logging.getLogger(__name__)
 from appyter.cli import cli
-from appyter.util import importdir_deep, join_routes, try_json_loads, try_load_list
+from appyter.util import importdir_deep, join_routes, try_json_loads
 
 def find_fields_dir_mappings(config=None):
   assert config is not None
@@ -182,22 +182,22 @@ def get_env_from_kwargs(**kwargs):
   import os
   import sys
   import uuid
-  PREFIX = kwargs.get('prefix', os.environ.get('PREFIX', '/'))
-  PROFILE = kwargs.get('profile', os.environ.get('PROFILE', 'default'))
-  EXTRAS = try_load_list(kwargs.get('extras', os.environ.get('EXTRAS', '')))
-  HOST = kwargs.get('host', os.environ.get('HOST', '127.0.0.1'))
+  PREFIX = try_json_loads(kwargs.get('prefix', os.environ.get('PREFIX', '/')))
+  PROFILE = try_json_loads(kwargs.get('profile', os.environ.get('PROFILE', 'default')))
+  EXTRAS = try_json_loads(kwargs.get('extras', os.environ.get('EXTRAS', '')))
+  HOST = try_json_loads(kwargs.get('host', os.environ.get('HOST', '127.0.0.1')))
   PORT = try_json_loads(kwargs.get('port', os.environ.get('PORT', 5000)))
   PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('PROXY', False)))
-  CWD = os.path.abspath(kwargs.get('cwd', os.environ.get('CWD', str(os.getcwd()))))
-  DATA_DIR = kwargs.get('data_dir', os.environ.get('DATA_DIR', 'data'))
-  DISPATCHER = kwargs.get('dispatcher', os.environ.get('DISPATCHER'))
-  DISPATCHER_URL = kwargs.get('dispatcher_url', os.environ.get('DISPATCHER_URL'))
-  DISPATCHER_IMAGE = kwargs.get('dispatcher_image', os.environ.get('DISPATCHER_IMAGE'))
-  SECRET_KEY = kwargs.get('secret_key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
+  CWD = try_json_loads(os.path.abspath(kwargs.get('cwd', os.environ.get('CWD', str(os.getcwd())))))
+  DATA_DIR = try_json_loads(kwargs.get('data_dir', os.environ.get('DATA_DIR', 'data')))
+  DISPATCHER = try_json_loads(kwargs.get('dispatcher', os.environ.get('DISPATCHER')))
+  DISPATCHER_URL = try_json_loads(kwargs.get('dispatcher_url', os.environ.get('DISPATCHER_URL')))
+  DISPATCHER_IMAGE = try_json_loads(kwargs.get('dispatcher_image', os.environ.get('DISPATCHER_IMAGE')))
+  SECRET_KEY = try_json_loads(kwargs.get('secret_key', os.environ.get('SECRET_KEY', str(uuid.uuid4()))))
   DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
-  STATIC_DIR = kwargs.get('static_dir', os.environ.get('STATIC_DIR', os.path.join(CWD, 'static')))
+  STATIC_DIR = try_json_loads(kwargs.get('static_dir', os.environ.get('STATIC_DIR', os.path.join(CWD, 'static'))))
   STATIC_PREFIX = join_routes(PREFIX, 'static')
-  IPYNB = kwargs.get('ipynb', os.environ.get('IPYNB'))
+  IPYNB = try_json_loads(kwargs.get('ipynb', os.environ.get('IPYNB')))
   #
   if IPYNB is None or not os.path.isfile(os.path.join(CWD, IPYNB)):
     logger.error('ipynb was not found')

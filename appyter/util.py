@@ -1,23 +1,18 @@
+import json
 import urllib.parse
 from werkzeug.utils import secure_filename
 
 def try_json_loads(v):
-  import json
   try:
     return json.loads(v)
   except:
     return v
 
-def try_load_list(v):
-  v = try_json_loads(v)
-  if type(v) in [list, tuple, set, frozenset]:
-    return list(v)
-  elif type(v) == str:
-    return v.split(',')
-  elif v is None:
-    return []
+def try_json_dumps(v):
+  if type(v) == str:
+    return v
   else:
-    raise Exception(f"Unrecognized type for list ({type(v)})")
+    return json.dumps(v)
 
 def dict_filter_none(d):
   return { k: v for k, v in d.items() if v }
@@ -83,7 +78,7 @@ def click_option_setenv(spec, envvar=None, **kwargs):
     @functools.wraps(func)
     def wrapper(**kwargs):
       if kwargs.get(var) is not None:
-        os.environ[envvar] = str(kwargs[var])
+        os.environ[envvar] = try_json_dumps(kwargs[var])
       return func(**kwargs)
     return wrapper
   return decorator
@@ -96,7 +91,7 @@ def click_argument_setenv(var, envvar=None, **kwargs):
     @click.argument(var, envvar=envvar, **kwargs)
     @functools.wraps(func)
     def wrapper(**kwargs):
-      os.environ[envvar] = kwargs[var]
+      os.environ[envvar] = try_json_dumps(kwargs[var])
       return func(**kwargs)
     return wrapper
   return decorator
