@@ -12,6 +12,7 @@ from appyter.ext.fs import Filesystem
 async def submit(sid, data):
   async with socketio.session(sid) as sess:
     config = sess['config']
+    request_url = sess['request_url']
   #
   if type(data) == dict:
     data = prepare_data(data)
@@ -31,8 +32,12 @@ async def submit(sid, data):
     session=result_hash,
     job=generate_uuid(),
   )
+  #
   if config['DISPATCHER_URL']:
     job['url'] = join_routes(config['DISPATCHER_URL'], 'socket.io').lstrip('/') + '/'
+  else:
+    job['url'] = request_url
+  #
   if config['DISPATCHER_IMAGE']:
     job['image'] = config['DISPATCHER_IMAGE']
   #
