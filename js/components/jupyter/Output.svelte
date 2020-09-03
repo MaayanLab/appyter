@@ -1,5 +1,6 @@
 <script>
   import * as Markdown from './Markdown.svelte'
+  import * as Ansi from './Ansi.svelte'
   import collapse from '../../utils/collapse.js'
 
   export let data
@@ -11,14 +12,14 @@
   <div class="output_subarea">
     {#if data.output_type === 'stream'}
       <div class="output_stream output_{data.name} output_text">
-        {collapse(data.text)}
+        <Ansi data={collapse(data.text)} />
       </div>
     {:else if data.output_type === 'execute_result'}
       <div class="output_html rendered_html output_execute_result">
         {#if data.data['text/html']}
           {@html collapse(data.data['text/html'])}
         {:else}
-          {collapse(data.data['text/plain'])}
+          <Ansi data={collapse(data.data['text/plain'])} />
         {/if}
       </div>
     {:else if data.output_type === 'display_data'}
@@ -39,7 +40,7 @@
         </div>
       {:else if data.data['text/plain']}
         <div class="output_stream output_{data.name} output_text">
-          <pre>{collapse(data.data['text/plain'])}</pre>
+          <Ansi data={collapse(data.data['text/plain'])} />
         </div>
       {:else if data.data['application/javascript']}
         {@html '<script>'+collapse(data.data['application/javascript'])+'</script>'}
@@ -48,10 +49,11 @@
       {/if}
     {:else if data.output_type === 'error'}
       <div class="output_subarea output_test output_error">
-        <pre>
-          {data.ename}: {data.evalue}<br />
-          {data.traceback}
-        </pre>
+        {#if data.traceback !== undefined}
+          <Ansi data="{collapse(data.traceback, '\n')}" />
+        {:else}
+          <Ansi data="{data.ename}: {data.evalue}" />
+        {/if}
       </div>
     {:else}
       {JSON.stringify(data)}

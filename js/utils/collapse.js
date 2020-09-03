@@ -1,6 +1,6 @@
-export default function collapse(text) {
+export default function collapse(text, join='') {
   if (Array.isArray(text)) {
-    return text.join('')
+    return text.join(join)
   } else {
     return text
   }

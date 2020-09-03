@@ -9,10 +9,10 @@
     for (const output of outputs) {
       if (output.output_type === 'stream') {
         if (streams[output.name] === undefined) {
-          const output_text = collapse(output.text)
+          const output_text = collapse(output.text, '\n')
           streams[output.name] = {...output, text: output_text}
         } else {
-          const output_text = collapse(output.text)
+          const output_text = collapse(output.text, '\n')
           if (output_text.startsWith('\r')) streams[output.name].text = output_text
           else streams[output.name].text += output_text
         }
