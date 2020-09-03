@@ -39817,7 +39817,7 @@ const { default: any } = require("../../../../utils/any");
 
 function get_each_context(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[13] = list[i];
+	child_ctx[12] = list[i];
 	return child_ctx;
 }
 
@@ -39878,7 +39878,7 @@ function create_if_block(ctx) {
 		p(ctx, dirty) {
 			const cells_changes = {};
 
-			if (dirty & /*$$scope, nb, current_code_cell*/ 65560) {
+			if (dirty & /*$$scope, nb, current_code_cell*/ 32792) {
 				cells_changes.$$scope = { dirty, ctx };
 			}
 
@@ -39923,7 +39923,7 @@ function create_if_block_2(ctx) {
 		p(ctx, dirty) {
 			const cell_changes = {};
 
-			if (dirty & /*$$scope, nb*/ 65552) {
+			if (dirty & /*$$scope, nb*/ 32784) {
 				cell_changes.$$scope = { dirty, ctx };
 			}
 
@@ -39968,7 +39968,7 @@ function create_if_block_1(ctx) {
 		p(ctx, dirty) {
 			const cell_changes = {};
 
-			if (dirty & /*$$scope, nb, current_code_cell*/ 65560) {
+			if (dirty & /*$$scope, nb, current_code_cell*/ 32792) {
 				cell_changes.$$scope = { dirty, ctx };
 			}
 
@@ -40000,7 +40000,7 @@ function create_default_slot_4(ctx) {
 	prompt = new Prompt({});
 
 	markdown = new Markdown({
-			props: { data: collapse(/*cell*/ ctx[13].source) }
+			props: { data: collapse(/*cell*/ ctx[12].source) }
 		});
 
 	return {
@@ -40023,7 +40023,7 @@ function create_default_slot_4(ctx) {
 		},
 		p(ctx, dirty) {
 			const markdown_changes = {};
-			if (dirty & /*nb*/ 16) markdown_changes.data = collapse(/*cell*/ ctx[13].source);
+			if (dirty & /*nb*/ 16) markdown_changes.data = collapse(/*cell*/ ctx[12].source);
 			markdown.$set(markdown_changes);
 		},
 		i(local) {
@@ -40072,7 +40072,7 @@ function create_default_slot_3(ctx) {
 		p(ctx, dirty) {
 			const input_changes = {};
 
-			if (dirty & /*$$scope, nb*/ 65552) {
+			if (dirty & /*$$scope, nb*/ 32784) {
 				input_changes.$$scope = { dirty, ctx };
 			}
 
@@ -40104,18 +40104,18 @@ function create_default_slot_2(ctx) {
 	prompt = new Prompt({
 			props: {
 				running: /*current_code_cell*/ ctx[3] !== undefined
-				? /*cell*/ ctx[13].index >= /*current_code_cell*/ ctx[3]
+				? /*cell*/ ctx[12].index >= /*current_code_cell*/ ctx[3]
 				: undefined,
-				error: any(/*cell*/ ctx[13].outputs.map(func)),
-				counter: /*cell*/ ctx[13].execution_count,
-				cell_type: /*cell*/ ctx[13].cell_type
+				error: any(/*cell*/ ctx[12].outputs.map(func)),
+				counter: /*cell*/ ctx[12].execution_count,
+				cell_type: /*cell*/ ctx[12].cell_type
 			}
 		});
 
 	source = new Source({
 			props: {
 				language: "python",
-				source: collapse(/*cell*/ ctx[13].source)
+				source: collapse(/*cell*/ ctx[12].source)
 			}
 		});
 
@@ -40135,15 +40135,15 @@ function create_default_slot_2(ctx) {
 			const prompt_changes = {};
 
 			if (dirty & /*current_code_cell, nb*/ 24) prompt_changes.running = /*current_code_cell*/ ctx[3] !== undefined
-			? /*cell*/ ctx[13].index >= /*current_code_cell*/ ctx[3]
+			? /*cell*/ ctx[12].index >= /*current_code_cell*/ ctx[3]
 			: undefined;
 
-			if (dirty & /*nb*/ 16) prompt_changes.error = any(/*cell*/ ctx[13].outputs.map(func));
-			if (dirty & /*nb*/ 16) prompt_changes.counter = /*cell*/ ctx[13].execution_count;
-			if (dirty & /*nb*/ 16) prompt_changes.cell_type = /*cell*/ ctx[13].cell_type;
+			if (dirty & /*nb*/ 16) prompt_changes.error = any(/*cell*/ ctx[12].outputs.map(func));
+			if (dirty & /*nb*/ 16) prompt_changes.counter = /*cell*/ ctx[12].execution_count;
+			if (dirty & /*nb*/ 16) prompt_changes.cell_type = /*cell*/ ctx[12].cell_type;
 			prompt.$set(prompt_changes);
 			const source_changes = {};
-			if (dirty & /*nb*/ 16) source_changes.source = collapse(/*cell*/ ctx[13].source);
+			if (dirty & /*nb*/ 16) source_changes.source = collapse(/*cell*/ ctx[12].source);
 			source.$set(source_changes);
 		},
 		i(local) {
@@ -40181,7 +40181,7 @@ function create_default_slot_1(ctx) {
 		});
 
 	outputs = new Outputs({
-			props: { data: /*cell*/ ctx[13].outputs || [] }
+			props: { data: /*cell*/ ctx[12].outputs || [] }
 		});
 
 	return {
@@ -40201,13 +40201,13 @@ function create_default_slot_1(ctx) {
 		p(ctx, dirty) {
 			const input_changes = {};
 
-			if (dirty & /*$$scope, nb, current_code_cell*/ 65560) {
+			if (dirty & /*$$scope, nb, current_code_cell*/ 32792) {
 				input_changes.$$scope = { dirty, ctx };
 			}
 
 			input.$set(input_changes);
 			const outputs_changes = {};
-			if (dirty & /*nb*/ 16) outputs_changes.data = /*cell*/ ctx[13].outputs || [];
+			if (dirty & /*nb*/ 16) outputs_changes.data = /*cell*/ ctx[12].outputs || [];
 			outputs.$set(outputs_changes);
 		},
 		i(local) {
@@ -40241,8 +40241,8 @@ function create_each_block(key_1, ctx) {
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
-		if (/*cell*/ ctx[13].cell_type === "code") return 0;
-		if (/*cell*/ ctx[13].cell_type === "markdown") return 1;
+		if (/*cell*/ ctx[12].cell_type === "code") return 0;
+		if (/*cell*/ ctx[12].cell_type === "markdown") return 1;
 		return -1;
 	}
 
@@ -40331,7 +40331,7 @@ function create_default_slot(ctx) {
 	let each_1_anchor;
 	let current;
 	let each_value = /*nb*/ ctx[4].cells;
-	const get_key = ctx => /*cell*/ ctx[13].index;
+	const get_key = ctx => /*cell*/ ctx[12].index;
 
 	for (let i = 0; i < each_value.length; i += 1) {
 		let child_ctx = get_each_context(ctx, each_value, i);
@@ -40505,8 +40505,6 @@ function create_fragment(ctx) {
 	};
 }
 
-let started = false;
-let scroll = false;
 const func = ({ output_type }) => output_type === "error";
 
 function instance($$self, $$props, $$invalidate) {
@@ -40543,7 +40541,6 @@ function instance($$self, $$props, $$invalidate) {
 
 	let statusBg = "primary";
 	var current_code_cell;
-	let md;
 	let nb;
 
 	async function setup_async_exec() {
@@ -40551,6 +40548,10 @@ function instance($$self, $$props, $$invalidate) {
 			await tick();
 			$$invalidate(1, status = value);
 			$$invalidate(2, statusBg = "primary");
+
+			if (status === "Success") {
+				$$invalidate(3, current_code_cell = undefined);
+			}
 		});
 
 		socket.on("error", async value => {

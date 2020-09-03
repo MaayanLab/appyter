@@ -38,9 +38,6 @@
   let status = 'Loading...'
   let statusBg = 'primary'
   var current_code_cell
-  let started = false
-  let scroll = false
-  let md
   let nb
 
   async function setup_async_exec() {
@@ -48,6 +45,9 @@
       await tick()
       status = value
       statusBg = 'primary'
+      if (status === 'Success') {
+        current_code_cell = undefined
+      }
     })
     socket.on('error', async (value) => {
       await tick()
