@@ -15,6 +15,7 @@ require(['{{ url_for('profile', path='js') + '/landing.js' }}'], function (Compo
     props: {
       requirejs: require,
       nbdownload: {{ _nb|jsonify }},
+      extras: {{ _config.EXTRAS|jsonify }},
     },
   })
   self.classList.remove('loading')

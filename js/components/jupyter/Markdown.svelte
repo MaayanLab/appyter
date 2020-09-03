@@ -1,6 +1,8 @@
 <script>
   import * as MarkdownIt from 'markdown-it'
+  import * as MarkdownItAnchor from 'markdown-it-anchor'
   import * as hljs from 'highlight.js'
+  import slugify from '../../utils/slugify'
 
   export let data
   let rendered
@@ -14,6 +16,9 @@
       }
       return ''
     }
+  }).use(MarkdownItAnchor, {
+    slugify,
+    permalink: true,
   })
   $: rendered = md.render(data)
 </script>

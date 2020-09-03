@@ -362,7 +362,7 @@ function create_if_block(ctx) {
 		create_if_block_2,
 		create_if_block_4,
 		create_if_block_10,
-		create_else_block_2
+		create_else_block_3
 	];
 
 	const if_blocks = [];
@@ -430,8 +430,8 @@ function create_if_block(ctx) {
 	};
 }
 
-// (55:4) {:else}
-function create_else_block_2(ctx) {
+// (58:4) {:else}
+function create_else_block_3(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[0]) + "";
 	let t;
 
@@ -456,59 +456,68 @@ function create_else_block_2(ctx) {
 // (50:43) 
 function create_if_block_10(ctx) {
 	let div;
-	let ansi0;
-	let t;
-	let ansi1;
+	let current_block_type_index;
+	let if_block;
 	let current;
+	const if_block_creators = [create_if_block_11, create_else_block_2];
+	const if_blocks = [];
 
-	ansi0 = new Ansi({
-			props: {
-				data: "" + (/*data*/ ctx[0].ename + ": " + /*data*/ ctx[0].evalue)
-			}
-		});
+	function select_block_type_3(ctx, dirty) {
+		if (/*data*/ ctx[0].traceback !== undefined) return 0;
+		return 1;
+	}
 
-	ansi1 = new Ansi({
-			props: { data: /*data*/ ctx[0].traceback }
-		});
+	current_block_type_index = select_block_type_3(ctx, -1);
+	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
 
 	return {
 		c() {
 			div = element("div");
-			create_component(ansi0.$$.fragment);
-			t = space();
-			create_component(ansi1.$$.fragment);
+			if_block.c();
 			attr(div, "class", "output_subarea output_test output_error");
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
-			mount_component(ansi0, div, null);
-			append(div, t);
-			mount_component(ansi1, div, null);
+			if_blocks[current_block_type_index].m(div, null);
 			current = true;
 		},
 		p(ctx, dirty) {
-			const ansi0_changes = {};
-			if (dirty & /*data*/ 1) ansi0_changes.data = "" + (/*data*/ ctx[0].ename + ": " + /*data*/ ctx[0].evalue);
-			ansi0.$set(ansi0_changes);
-			const ansi1_changes = {};
-			if (dirty & /*data*/ 1) ansi1_changes.data = /*data*/ ctx[0].traceback;
-			ansi1.$set(ansi1_changes);
+			let previous_block_index = current_block_type_index;
+			current_block_type_index = select_block_type_3(ctx, dirty);
+
+			if (current_block_type_index === previous_block_index) {
+				if_blocks[current_block_type_index].p(ctx, dirty);
+			} else {
+				group_outros();
+
+				transition_out(if_blocks[previous_block_index], 1, 1, () => {
+					if_blocks[previous_block_index] = null;
+				});
+
+				check_outros();
+				if_block = if_blocks[current_block_type_index];
+
+				if (!if_block) {
+					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+					if_block.c();
+				}
+
+				transition_in(if_block, 1);
+				if_block.m(div, null);
+			}
 		},
 		i(local) {
 			if (current) return;
-			transition_in(ansi0.$$.fragment, local);
-			transition_in(ansi1.$$.fragment, local);
+			transition_in(if_block);
 			current = true;
 		},
 		o(local) {
-			transition_out(ansi0.$$.fragment, local);
-			transition_out(ansi1.$$.fragment, local);
+			transition_out(if_block);
 			current = false;
 		},
 		d(detaching) {
 			if (detaching) detach(div);
-			destroy_component(ansi0);
-			destroy_component(ansi1);
+			if_blocks[current_block_type_index].d();
 		}
 	};
 }
@@ -597,14 +606,19 @@ function create_if_block_4(ctx) {
 // (17:52) 
 function create_if_block_2(ctx) {
 	let div;
+	let current_block_type_index;
+	let if_block;
+	let current;
+	const if_block_creators = [create_if_block_3, create_else_block];
+	const if_blocks = [];
 
 	function select_block_type_1(ctx, dirty) {
-		if (/*data*/ ctx[0].data["text/html"]) return create_if_block_3;
-		return create_else_block;
+		if (/*data*/ ctx[0].data["text/html"]) return 0;
+		return 1;
 	}
 
-	let current_block_type = select_block_type_1(ctx, -1);
-	let if_block = current_block_type(ctx);
+	current_block_type_index = select_block_type_1(ctx, -1);
+	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
 
 	return {
 		c() {
@@ -614,26 +628,46 @@ function create_if_block_2(ctx) {
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
-			if_block.m(div, null);
+			if_blocks[current_block_type_index].m(div, null);
+			current = true;
 		},
 		p(ctx, dirty) {
-			if (current_block_type === (current_block_type = select_block_type_1(ctx, dirty)) && if_block) {
-				if_block.p(ctx, dirty);
-			} else {
-				if_block.d(1);
-				if_block = current_block_type(ctx);
+			let previous_block_index = current_block_type_index;
+			current_block_type_index = select_block_type_1(ctx, dirty);
 
-				if (if_block) {
+			if (current_block_type_index === previous_block_index) {
+				if_blocks[current_block_type_index].p(ctx, dirty);
+			} else {
+				group_outros();
+
+				transition_out(if_blocks[previous_block_index], 1, 1, () => {
+					if_blocks[previous_block_index] = null;
+				});
+
+				check_outros();
+				if_block = if_blocks[current_block_type_index];
+
+				if (!if_block) {
+					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
 					if_block.c();
-					if_block.m(div, null);
 				}
+
+				transition_in(if_block, 1);
+				if_block.m(div, null);
 			}
 		},
-		i: noop,
-		o: noop,
+		i(local) {
+			if (current) return;
+			transition_in(if_block);
+			current = true;
+		},
+		o(local) {
+			transition_out(if_block);
+			current = false;
+		},
 		d(detaching) {
 			if (detaching) detach(div);
-			if_block.d();
+			if_blocks[current_block_type_index].d();
 		}
 	};
 }
@@ -681,6 +715,84 @@ function create_if_block_1(ctx) {
 		d(detaching) {
 			if (detaching) detach(div);
 			destroy_component(ansi);
+		}
+	};
+}
+
+// (54:8) {:else}
+function create_else_block_2(ctx) {
+	let ansi;
+	let current;
+
+	ansi = new Ansi({
+			props: {
+				data: "" + (/*data*/ ctx[0].ename + ": " + /*data*/ ctx[0].evalue)
+			}
+		});
+
+	return {
+		c() {
+			create_component(ansi.$$.fragment);
+		},
+		m(target, anchor) {
+			mount_component(ansi, target, anchor);
+			current = true;
+		},
+		p(ctx, dirty) {
+			const ansi_changes = {};
+			if (dirty & /*data*/ 1) ansi_changes.data = "" + (/*data*/ ctx[0].ename + ": " + /*data*/ ctx[0].evalue);
+			ansi.$set(ansi_changes);
+		},
+		i(local) {
+			if (current) return;
+			transition_in(ansi.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transition_out(ansi.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			destroy_component(ansi, detaching);
+		}
+	};
+}
+
+// (52:8) {#if data.traceback !== undefined}
+function create_if_block_11(ctx) {
+	let ansi;
+	let current;
+
+	ansi = new Ansi({
+			props: {
+				data: collapse(/*data*/ ctx[0].traceback, "\n")
+			}
+		});
+
+	return {
+		c() {
+			create_component(ansi.$$.fragment);
+		},
+		m(target, anchor) {
+			mount_component(ansi, target, anchor);
+			current = true;
+		},
+		p(ctx, dirty) {
+			const ansi_changes = {};
+			if (dirty & /*data*/ 1) ansi_changes.data = collapse(/*data*/ ctx[0].traceback, "\n");
+			ansi.$set(ansi_changes);
+		},
+		i(local) {
+			if (current) return;
+			transition_in(ansi.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transition_out(ansi.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			destroy_component(ansi, detaching);
 		}
 	};
 }
@@ -891,21 +1003,39 @@ function create_if_block_5(ctx) {
 
 // (21:8) {:else}
 function create_else_block(ctx) {
-	let t_value = collapse(/*data*/ ctx[0].data["text/plain"]) + "";
-	let t;
+	let ansi;
+	let current;
+
+	ansi = new Ansi({
+			props: {
+				data: collapse(/*data*/ ctx[0].data["text/plain"])
+			}
+		});
 
 	return {
 		c() {
-			t = text(t_value);
+			create_component(ansi.$$.fragment);
 		},
 		m(target, anchor) {
-			insert(target, t, anchor);
+			mount_component(ansi, target, anchor);
+			current = true;
 		},
 		p(ctx, dirty) {
-			if (dirty & /*data*/ 1 && t_value !== (t_value = collapse(/*data*/ ctx[0].data["text/plain"]) + "")) set_data(t, t_value);
+			const ansi_changes = {};
+			if (dirty & /*data*/ 1) ansi_changes.data = collapse(/*data*/ ctx[0].data["text/plain"]);
+			ansi.$set(ansi_changes);
+		},
+		i(local) {
+			if (current) return;
+			transition_in(ansi.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transition_out(ansi.$$.fragment, local);
+			current = false;
 		},
 		d(detaching) {
-			if (detaching) detach(t);
+			destroy_component(ansi, detaching);
 		}
 	};
 }
@@ -928,6 +1058,8 @@ function create_if_block_3(ctx) {
 		p(ctx, dirty) {
 			if (dirty & /*data*/ 1 && raw_value !== (raw_value = collapse(/*data*/ ctx[0].data["text/html"]) + "")) html_tag.p(raw_value);
 		},
+		i: noop,
+		o: noop,
 		d(detaching) {
 			if (detaching) detach(html_anchor);
 			if (detaching) html_tag.d();
@@ -1164,10 +1296,10 @@ function instance($$self, $$props, $$invalidate) {
 		for (const output of outputs) {
 			if (output.output_type === "stream") {
 				if (streams[output.name] === undefined) {
-					const output_text = collapse(output.text);
+					const output_text = collapse(output.text, "\n");
 					streams[output.name] = { ...output, text: output_text };
 				} else {
-					const output_text = collapse(output.text);
+					const output_text = collapse(output.text, "\n");
 					if (output_text.startsWith("\r")) streams[output.name].text = output_text; else streams[output.name].text += output_text;
 				}
 			} else {
@@ -41252,8 +41384,10 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = collapse;
 
 function collapse(text) {
+  var join = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
   if (Array.isArray(text)) {
-    return text.join('');
+    return text.join(join);
   } else {
     return text;
   }

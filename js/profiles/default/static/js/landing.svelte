@@ -9,10 +9,15 @@
   import * as Output from '../../../../components/jupyter/Output.svelte'
   import * as Markdown from '../../../../components/jupyter/Markdown.svelte'
   import collapse from '../../../../utils/collapse'
+  import slugify from '../../../../utils/slugify'
   import any from '../../../../utils/any'
 
   export let requirejs
   export let nbdownload
+  export let extras = []
+
+  let nb
+  let show_code = false
 
   // get deps with requirejs
   let socket
@@ -34,11 +39,31 @@
     }
   }
 
-  // state
+  // table of contents
+  function *get_md_headers(md) {
+    let re = /^(#+)\s*(.+?)\s*$/gm
+    let m
+    while ((m = re.exec(md)) !== null) {
+      yield { h: m[1].length, label: m[2] }
+    }
+  }
+
+  let toc
+  $: {
+    if (nb !== undefined && nb.cells !== undefined && extras.indexOf('toc') !== -1) {
+      toc = nb.cells
+        .filter(({ cell_type }) => cell_type === 'markdown')
+        .reduce((headers, { source }) => [
+          ...headers,
+          ...get_md_headers(collapse(source, '\n'))
+        ], [])
+    }
+  }
+
+  // dynamic notebook
   let status = 'Loading...'
   let statusBg = 'primary'
   var current_code_cell
-  let nb
 
   async function setup_async_exec() {
     socket.on('status', async (value) => {
@@ -80,6 +105,7 @@
     socket.emit('submit', paths[paths.length - 1])
   }
 
+  // initialization
   onMount(async () => {
     const req = await fetch(nbdownload)
     const value = await req.json()
@@ -88,8 +114,103 @@
     if (nb.metadata.execution_info === undefined) {
       await execute()
     }
+    show_code = extras.indexOf('hide-code') === -1
   })
 </script>
+
+{#if toc !== undefined}
+  <style>
+    .toc {
+      display: block;
+    }
+    .toc.h1 {
+      font-size: 150%;
+      text-indent: 0em;
+    }
+    .toc.h2 {
+      font-size: 140%;
+      text-indent: 1em;
+    }
+    .toc.h3 {
+      font-size: 130%;
+      text-indent: 1.5em;
+    }
+    .toc.h4 {
+      font-size: 120%;
+      text-indent: 1.75em;
+    }
+    .toc.h5 {
+      font-size: 110%;
+      text-indent: 1.85em;
+    }
+    .toc.h6 {
+      font-size: 100%;
+      text-indent: 2em;
+    }
+  </style>
+{/if}
+
+<style>
+  /* markdown-it-anchors */
+  :global(a.header-anchor) {
+    text-decoration: none;
+    cursor: pointer;
+  }
+  :global(h1) {
+    display: block;
+  }
+  :global(h1) :global(.header-anchor) { 
+    display: none;
+  }
+  :global(h1):hover :global(.header-anchor) { 
+    display: inline-block;
+  }
+  :global(h2) {
+    display: block;
+  }
+  :global(h2) :global(.header-anchor) {
+    display: none;
+  }
+  :global(h2):hover :global(.header-anchor) {
+    display: inline-block;
+  }
+  :global(h3) {
+    display: block;
+  }
+  :global(h3) :global(.header-anchor) {
+    display: none;
+  }
+  :global(h3):hover :global(.header-anchor) {
+    display: inline-block;
+  }
+  :global(h4) {
+    display: block;
+  }
+  :global(h4) :global(.header-anchor) {
+    display: none;
+  }
+  :global(h4):hover :global(.header-anchor) {
+    display: inline-block;
+  }
+  :global(h5) {
+    display: block;
+  }
+  :global(h5) :global(.header-anchor) {
+    display: none;
+  }
+  :global(h5):hover :global(.header-anchor) {
+    display: inline-block;
+  }
+  :global(h6) {
+    display: block;
+  }
+  :global(h6) :global(.header-anchor) {
+    display: none;
+  }
+  :global(h6):hover :global(.header-anchor) {
+    display: inline-block;
+  }
+</style>
 
 <div class="row">
   <div class="col-sm-12 text-center">
@@ -99,6 +220,15 @@
       role="button"
       href="{nbdownload}"
     >Download Notebook</a>
+    {#if extras.indexOf('toggle-code') !== -1}
+      <a
+        href="javascript:"
+        class="btn btn-secondary white"
+        on:click={() => show_code = !show_code}
+      >
+        Toggle Code
+      </a>
+    {/if}
   </div>
   <div class="w-100">&nbsp;</div>
   {#if status}
@@ -109,11 +239,32 @@
     </div>
   {/if}
   <div class="w-100"></div>
-  <div class="col-sm-12">
+  {#if toc !== undefined}
+    <div class="col-sm-12 col-md-3 col-xl-2">
+      <div class="row sticky-top">
+        <div class="offset-sm-2 col-sm-8 col-md-12">
+          <div class="mt-5">
+            <legend>Table Of Contents</legend>
+            {#each toc as {h, label}}
+              <a
+                href="#{slugify(label)}"
+                class="toc h{h}"
+              >{label}</a>
+            {/each}
+          </div>
+        </div>
+      </div>
+    </div>
+  {/if}
+  <div
+    class="col-sm-12"
+    class:col-md-9={toc !== undefined}
+    class:col-xl-10={toc !== undefined}
+  >
     {#if nb}
       <Cells>
         {#each nb.cells as cell (cell.index)}
-          {#if cell.cell_type === 'code'}
+          {#if show_code && cell.cell_type === 'code'}
             <Cell type="code">
               <Input>
                 <Prompt
