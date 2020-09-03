@@ -40495,7 +40495,7 @@ function get_each_context_1(ctx, list, i) {
 }
 
 // (134:0) {#if toc !== undefined}
-function create_if_block_6(ctx) {
+function create_if_block_7(ctx) {
 	let style;
 
 	return {
@@ -40513,7 +40513,7 @@ function create_if_block_6(ctx) {
 }
 
 // (236:4) {#if extras.indexOf('toggle-code') !== -1}
-function create_if_block_5(ctx) {
+function create_if_block_6(ctx) {
 	let a;
 	let mounted;
 	let dispose;
@@ -40543,7 +40543,7 @@ function create_if_block_5(ctx) {
 }
 
 // (247:2) {#if status}
-function create_if_block_4(ctx) {
+function create_if_block_5(ctx) {
 	let div1;
 	let div0;
 	let t;
@@ -40577,7 +40577,7 @@ function create_if_block_4(ctx) {
 }
 
 // (255:2) {#if toc !== undefined}
-function create_if_block_3(ctx) {
+function create_if_block_4(ctx) {
 	let div3;
 	let div2;
 	let div1;
@@ -40733,8 +40733,8 @@ function create_if_block(ctx) {
 	};
 }
 
-// (296:50) 
-function create_if_block_2(ctx) {
+// (298:50) 
+function create_if_block_3(ctx) {
 	let cell;
 	let current;
 
@@ -40778,7 +40778,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (280:10) {#if show_code && cell.cell_type === 'code'}
+// (280:10) {#if cell.cell_type === 'code'}
 function create_if_block_1(ctx) {
 	let cell;
 	let current;
@@ -40802,7 +40802,7 @@ function create_if_block_1(ctx) {
 		p(ctx, dirty) {
 			const cell_changes = {};
 
-			if (dirty & /*$$scope, nb, current_code_cell*/ 8388740) {
+			if (dirty & /*$$scope, nb, current_code_cell, show_code*/ 8388748) {
 				cell_changes.$$scope = { dirty, ctx };
 			}
 
@@ -40823,7 +40823,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (298:14) <Input>
+// (300:14) <Input>
 function create_default_slot_4(ctx) {
 	let prompt;
 	let t;
@@ -40880,7 +40880,7 @@ function create_default_slot_4(ctx) {
 	};
 }
 
-// (297:12) <Cell type="text">
+// (299:12) <Cell type="text">
 function create_default_slot_3(ctx) {
 	let input;
 	let t;
@@ -40928,7 +40928,51 @@ function create_default_slot_3(ctx) {
 	};
 }
 
-// (282:14) <Input>
+// (282:14) {#if show_code}
+function create_if_block_2(ctx) {
+	let input;
+	let current;
+
+	input = new Input({
+			props: {
+				$$slots: { default: [create_default_slot_2] },
+				$$scope: { ctx }
+			}
+		});
+
+	return {
+		c() {
+			create_component(input.$$.fragment);
+		},
+		m(target, anchor) {
+			mount_component(input, target, anchor);
+			current = true;
+		},
+		p(ctx, dirty) {
+			const input_changes = {};
+
+			if (dirty & /*$$scope, nb, current_code_cell*/ 8388740) {
+				input_changes.$$scope = { dirty, ctx };
+			}
+
+			input.$set(input_changes);
+		},
+		i(local) {
+			if (current) return;
+			transition_in(input.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transition_out(input.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			destroy_component(input, detaching);
+		}
+	};
+}
+
+// (283:16) <Input>
 function create_default_slot_2(ctx) {
 	let prompt;
 	let t;
@@ -41001,18 +41045,11 @@ function create_default_slot_2(ctx) {
 
 // (281:12) <Cell type="code">
 function create_default_slot_1(ctx) {
-	let input;
 	let t0;
 	let outputs;
 	let t1;
 	let current;
-
-	input = new Input({
-			props: {
-				$$slots: { default: [create_default_slot_2] },
-				$$scope: { ctx }
-			}
-		});
+	let if_block = /*show_code*/ ctx[3] && create_if_block_2(ctx);
 
 	outputs = new Outputs({
 			props: { data: /*cell*/ ctx[16].outputs || [] }
@@ -41020,43 +41057,59 @@ function create_default_slot_1(ctx) {
 
 	return {
 		c() {
-			create_component(input.$$.fragment);
+			if (if_block) if_block.c();
 			t0 = space();
 			create_component(outputs.$$.fragment);
 			t1 = space();
 		},
 		m(target, anchor) {
-			mount_component(input, target, anchor);
+			if (if_block) if_block.m(target, anchor);
 			insert(target, t0, anchor);
 			mount_component(outputs, target, anchor);
 			insert(target, t1, anchor);
 			current = true;
 		},
 		p(ctx, dirty) {
-			const input_changes = {};
+			if (/*show_code*/ ctx[3]) {
+				if (if_block) {
+					if_block.p(ctx, dirty);
 
-			if (dirty & /*$$scope, nb, current_code_cell*/ 8388740) {
-				input_changes.$$scope = { dirty, ctx };
+					if (dirty & /*show_code*/ 8) {
+						transition_in(if_block, 1);
+					}
+				} else {
+					if_block = create_if_block_2(ctx);
+					if_block.c();
+					transition_in(if_block, 1);
+					if_block.m(t0.parentNode, t0);
+				}
+			} else if (if_block) {
+				group_outros();
+
+				transition_out(if_block, 1, 1, () => {
+					if_block = null;
+				});
+
+				check_outros();
 			}
 
-			input.$set(input_changes);
 			const outputs_changes = {};
 			if (dirty & /*nb*/ 4) outputs_changes.data = /*cell*/ ctx[16].outputs || [];
 			outputs.$set(outputs_changes);
 		},
 		i(local) {
 			if (current) return;
-			transition_in(input.$$.fragment, local);
+			transition_in(if_block);
 			transition_in(outputs.$$.fragment, local);
 			current = true;
 		},
 		o(local) {
-			transition_out(input.$$.fragment, local);
+			transition_out(if_block);
 			transition_out(outputs.$$.fragment, local);
 			current = false;
 		},
 		d(detaching) {
-			destroy_component(input, detaching);
+			if (if_block) if_block.d(detaching);
 			if (detaching) detach(t0);
 			destroy_component(outputs, detaching);
 			if (detaching) detach(t1);
@@ -41071,11 +41124,11 @@ function create_each_block(key_1, ctx) {
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [create_if_block_1, create_if_block_2];
+	const if_block_creators = [create_if_block_1, create_if_block_3];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
-		if (/*show_code*/ ctx[3] && /*cell*/ ctx[16].cell_type === "code") return 0;
+		if (/*cell*/ ctx[16].cell_type === "code") return 0;
 		if (/*cell*/ ctx[16].cell_type === "markdown") return 1;
 		return -1;
 	}
@@ -41240,10 +41293,10 @@ function create_fragment(ctx) {
 	let t8;
 	let div3;
 	let current;
-	let if_block0 = /*toc*/ ctx[4] !== undefined && create_if_block_6(ctx);
-	let if_block1 = show_if && create_if_block_5(ctx);
-	let if_block2 = /*status*/ ctx[5] && create_if_block_4(ctx);
-	let if_block3 = /*toc*/ ctx[4] !== undefined && create_if_block_3(ctx);
+	let if_block0 = /*toc*/ ctx[4] !== undefined && create_if_block_7(ctx);
+	let if_block1 = show_if && create_if_block_6(ctx);
+	let if_block2 = /*status*/ ctx[5] && create_if_block_5(ctx);
+	let if_block3 = /*toc*/ ctx[4] !== undefined && create_if_block_4(ctx);
 	let if_block4 = /*nb*/ ctx[2] && create_if_block(ctx);
 
 	return {
@@ -41307,7 +41360,7 @@ function create_fragment(ctx) {
 				if (if_block0) {
 					
 				} else {
-					if_block0 = create_if_block_6(ctx);
+					if_block0 = create_if_block_7(ctx);
 					if_block0.c();
 					if_block0.m(t0.parentNode, t0);
 				}
@@ -41326,7 +41379,7 @@ function create_fragment(ctx) {
 				if (if_block1) {
 					if_block1.p(ctx, dirty);
 				} else {
-					if_block1 = create_if_block_5(ctx);
+					if_block1 = create_if_block_6(ctx);
 					if_block1.c();
 					if_block1.m(div0, null);
 				}
@@ -41339,7 +41392,7 @@ function create_fragment(ctx) {
 				if (if_block2) {
 					if_block2.p(ctx, dirty);
 				} else {
-					if_block2 = create_if_block_4(ctx);
+					if_block2 = create_if_block_5(ctx);
 					if_block2.c();
 					if_block2.m(div4, t6);
 				}
@@ -41352,7 +41405,7 @@ function create_fragment(ctx) {
 				if (if_block3) {
 					if_block3.p(ctx, dirty);
 				} else {
-					if_block3 = create_if_block_3(ctx);
+					if_block3 = create_if_block_4(ctx);
 					if_block3.c();
 					if_block3.m(div4, t8);
 				}

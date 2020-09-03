@@ -277,20 +277,22 @@
     {#if nb}
       <Cells>
         {#each nb.cells as cell (cell.index)}
-          {#if show_code && cell.cell_type === 'code'}
+          {#if cell.cell_type === 'code'}
             <Cell type="code">
-              <Input>
-                <Prompt
-                  running={current_code_cell !== undefined ? cell.index >= current_code_cell : undefined}
-                  error={any(cell.outputs.map(({ output_type }) => output_type === 'error'))}
-                  counter={cell.execution_count}
-                  cell_type={cell.cell_type}
-                />
-                <Source
-                  language="python"
-                  source={collapse(cell.source)}
-                />
-              </Input>
+              {#if show_code}
+                <Input>
+                  <Prompt
+                    running={current_code_cell !== undefined ? cell.index >= current_code_cell : undefined}
+                    error={any(cell.outputs.map(({ output_type }) => output_type === 'error'))}
+                    counter={cell.execution_count}
+                    cell_type={cell.cell_type}
+                  />
+                  <Source
+                    language="python"
+                    source={collapse(cell.source)}
+                  />
+                </Input>
+              {/if}
               <Outputs data={cell.outputs || []} />
             </Cell>
           {:else if cell.cell_type === 'markdown'}
