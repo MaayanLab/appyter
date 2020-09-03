@@ -40494,7 +40494,7 @@ function get_each_context_1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (121:0) {#if toc !== undefined}
+// (134:0) {#if toc !== undefined}
 function create_if_block_6(ctx) {
 	let style;
 
@@ -40512,7 +40512,7 @@ function create_if_block_6(ctx) {
 	};
 }
 
-// (223:4) {#if extras.indexOf('toggle-code') !== -1}
+// (236:4) {#if extras.indexOf('toggle-code') !== -1}
 function create_if_block_5(ctx) {
 	let a;
 	let mounted;
@@ -40542,7 +40542,7 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (234:2) {#if status}
+// (247:2) {#if status}
 function create_if_block_4(ctx) {
 	let div1;
 	let div0;
@@ -40576,7 +40576,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (242:2) {#if toc !== undefined}
+// (255:2) {#if toc !== undefined}
 function create_if_block_3(ctx) {
 	let div3;
 	let div2;
@@ -40653,7 +40653,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (248:12) {#each toc as {h, label}}
+// (261:12) {#each toc as {h, label}}
 function create_each_block_1(ctx) {
 	let a;
 	let t_value = /*label*/ ctx[20] + "";
@@ -40689,7 +40689,7 @@ function create_each_block_1(ctx) {
 	};
 }
 
-// (264:4) {#if nb}
+// (277:4) {#if nb}
 function create_if_block(ctx) {
 	let cells;
 	let current;
@@ -40733,7 +40733,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (283:50) 
+// (296:50) 
 function create_if_block_2(ctx) {
 	let cell;
 	let current;
@@ -40778,7 +40778,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (267:10) {#if show_code && cell.cell_type === 'code'}
+// (280:10) {#if show_code && cell.cell_type === 'code'}
 function create_if_block_1(ctx) {
 	let cell;
 	let current;
@@ -40823,7 +40823,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (285:14) <Input>
+// (298:14) <Input>
 function create_default_slot_4(ctx) {
 	let prompt;
 	let t;
@@ -40880,7 +40880,7 @@ function create_default_slot_4(ctx) {
 	};
 }
 
-// (284:12) <Cell type="text">
+// (297:12) <Cell type="text">
 function create_default_slot_3(ctx) {
 	let input;
 	let t;
@@ -40928,7 +40928,7 @@ function create_default_slot_3(ctx) {
 	};
 }
 
-// (269:14) <Input>
+// (282:14) <Input>
 function create_default_slot_2(ctx) {
 	let prompt;
 	let t;
@@ -40999,7 +40999,7 @@ function create_default_slot_2(ctx) {
 	};
 }
 
-// (268:12) <Cell type="code">
+// (281:12) <Cell type="code">
 function create_default_slot_1(ctx) {
 	let input;
 	let t0;
@@ -41064,7 +41064,7 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (266:8) {#each nb.cells as cell (cell.index)}
+// (279:8) {#each nb.cells as cell (cell.index)}
 function create_each_block(key_1, ctx) {
 	let first;
 	let current_block_type_index;
@@ -41158,7 +41158,7 @@ function create_each_block(key_1, ctx) {
 	};
 }
 
-// (265:6) <Cells>
+// (278:6) <Cells>
 function create_default_slot(ctx) {
 	let each_blocks = [];
 	let each_1_lookup = new Map();
@@ -41459,7 +41459,7 @@ function instance($$self, $$props, $$invalidate) {
 	let toc;
 
 	// dynamic notebook
-	let status = "Loading...";
+	let status;
 
 	let statusBg = "primary";
 	var current_code_cell;
@@ -41515,21 +41515,32 @@ function instance($$self, $$props, $$invalidate) {
 
 	// initialization
 	onMount(async () => {
-		const req = await fetch(nbdownload);
-		const value = await req.json();
-
-		$$invalidate(2, nb = {
-			...value,
-			cells: value.cells.map((cell, index) => ({ ...cell, index }))
-		});
-
-		$$invalidate(5, status = undefined);
-
-		if (nb.metadata.execution_info === undefined) {
-			await execute();
-		}
-
+		await tick();
+		$$invalidate(5, status = "Loading...");
 		$$invalidate(3, show_code = extras.indexOf("hide-code") === -1);
+
+		try {
+			// Load notebook
+			const req = await fetch(nbdownload);
+
+			const value = await req.json();
+			await tick();
+
+			$$invalidate(2, nb = {
+				...value,
+				cells: value.cells.map((cell, index) => ({ ...cell, index }))
+			});
+
+			if (nb.metadata.execution_info === undefined) {
+				// Execute notebook if it hasn't already been executed
+				await execute();
+			} else {
+				$$invalidate(5, status = undefined);
+			}
+		} catch(e) {
+			$$invalidate(5, status = `Error: ${e}`);
+			$$invalidate(6, statusBg = "danger");
+		}
 	});
 
 	const click_handler = () => $$invalidate(3, show_code = !show_code);

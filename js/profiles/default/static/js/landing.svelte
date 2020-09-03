@@ -61,7 +61,7 @@
   }
 
   // dynamic notebook
-  let status = 'Loading...'
+  let status
   let statusBg = 'primary'
   var current_code_cell
 
@@ -107,14 +107,27 @@
 
   // initialization
   onMount(async () => {
-    const req = await fetch(nbdownload)
-    const value = await req.json()
-    nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
-    status = undefined
-    if (nb.metadata.execution_info === undefined) {
-      await execute()
-    }
+    await tick()
+    status = 'Loading...'
     show_code = extras.indexOf('hide-code') === -1
+
+    try {
+      // Load notebook
+      const req = await fetch(nbdownload)
+      const value = await req.json()
+      await tick()
+      nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
+
+      if (nb.metadata.execution_info === undefined) {
+        // Execute notebook if it hasn't already been executed
+        await execute()
+      } else {
+        status = undefined
+      }
+    } catch (e) {
+      status = `Error: ${e}`
+      statusBg = 'danger'
+    }
   })
 </script>
 
