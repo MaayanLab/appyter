@@ -85,17 +85,14 @@
     const value = await req.json()
     nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
     status = undefined
-    // iff not run already
-    // execute()
+    if (nb.metadata.execution_info === undefined) {
+      await execute()
+    }
   })
 </script>
 
 <div class="row">
   <div class="col-sm-12 text-center">
-    <button
-      class="btn btn-primary"
-      on:click={execute}
-    >Execute notebook</button>
     <a
       id="download-notebook"
       class="btn btn-primary"
