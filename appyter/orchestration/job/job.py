@@ -15,6 +15,9 @@ async def remote_message_producer(sio, msg_queue, job):
   @sio.event
   async def joined(data):
     await msg_queue.put(dict(type='joined', data=data))
+  @sio.event
+  async def left(data):
+    await msg_queue.put(dict(type='left', data=data))
   #
   url = urllib.parse.urlparse(job['url'])
   await sio.connect(f"{url.scheme}://{url.netloc}", socketio_path=url.path)
@@ -39,6 +42,8 @@ async def evaluate_saga(sio, msg_queue, job):
         emit=emit_factory(sio, job['session']),
         cwd=job['cwd'],
       )
+      await sio.emit('leave', dict(session=job['session'], job=job['job']))
+    elif msg['type'] == 'left' and msg['data'] == job['job']:
       await sio.disconnect()
     msg_queue.task_done()
 

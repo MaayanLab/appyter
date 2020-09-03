@@ -59,6 +59,13 @@ async def _(sid, data):
   socketio.enter_room(sid, session)
   await socketio.emit('joined', job, room=session)
 
+@socketio.on('leave')
+async def _(sid, data):
+  session = data['session']
+  job = data['job']
+  await socketio.emit('left', job, room=session)
+  socketio.leave_room(sid, session)
+
 @socketio.on('message')
 async def _(sid, data):
   await socketio.emit(data['type'], data['data'], room=data['session'])
