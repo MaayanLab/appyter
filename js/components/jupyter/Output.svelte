@@ -51,13 +51,17 @@
         <Ansi data={collapse(data.text)} />
       </div>
     {:else if data.output_type === 'execute_result'}
-      <div class="output_html rendered_html output_execute_result">
-        {#if data.data['text/html']}
-          <div bind:this={ref} data-target="text/html"></div>
-        {:else}
+      {#if data.data['text/html']}
+        <div
+          bind:this={ref}
+          class="output_html rendered_html output_execute_result"
+          data-target="text/html"
+        ></div>
+      {:else}
+        <div class="output_text output_execute_result">
           <Ansi data={collapse(data.data['text/plain'])} />
-        {/if}
-      </div>
+        </div>
+      {/if}
     {:else if data.output_type === 'display_data'}
       {#if data.data['image/png']}
         <div class="output_png">
@@ -67,9 +71,10 @@
           />
         </div>
       {:else if data.data['text/html']}
-        <div class="output_html rendered_html output_execute_result">
-          <div bind:this={ref} data-target="text/html"></div>
-        </div>
+        <div
+          bind:this={ref} 
+          class="output_html rendered_html output_execute_result"
+          data-target="text/html"></div>
       {:else if data.data['text/markdown']}
         <div class="output_stream output_{data.name} output_markdown">
           <Markdown data={collapse(data.data['text/markdown'])} />
@@ -79,7 +84,11 @@
           <Ansi data={collapse(data.data['text/plain'])} />
         </div>
       {:else if data.data['application/javascript']}
-        <div bind:this={ref} data-target="application/javascript"></div>
+        <div
+          bind:this={ref}
+          style="display: none"
+          data-target="application/javascript"
+        ></div>
       {:else}
         {JSON.stringify(data)}
       {/if}
