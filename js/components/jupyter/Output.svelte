@@ -4,6 +4,7 @@
   import * as Ansi from './Ansi.svelte'
   import collapse from '../../utils/collapse.js'
 
+  export let requirejs
   export let data
   export let ref
 
@@ -11,6 +12,8 @@
   function eval_once(src) {
     if (evaled[src] === undefined) {
       evaled[src] = true
+      // make sure requirejs is accessible
+      const require = requirejs
       eval(src)
     }
   }

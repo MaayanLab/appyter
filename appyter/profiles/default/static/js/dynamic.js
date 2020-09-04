@@ -349,6 +349,7 @@ module.exports = Markdown;
 "use strict";
 
 const { SvelteComponent, append, attr, binding_callbacks, check_outros, create_component, destroy_component, detach, element, empty, group_outros, init, insert, mount_component, noop, safe_not_equal, set_data, space, text, transition_in, transition_out } = require("svelte/internal");
+const { onMount, tick } = require("svelte");
 const Markdown = require("./Markdown.svelte");
 const Ansi = require("./Ansi.svelte");
 const { default: collapse } = require("../../utils/collapse.js");
@@ -432,7 +433,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (75:4) {:else}
+// (90:4) {:else}
 function create_else_block_3(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[1]) + "";
 	let t;
@@ -455,7 +456,7 @@ function create_else_block_3(ctx) {
 	};
 }
 
-// (67:43) 
+// (82:43) 
 function create_if_block_10(ctx) {
 	let div;
 	let current_block_type_index;
@@ -524,7 +525,7 @@ function create_if_block_10(ctx) {
 	};
 }
 
-// (42:50) 
+// (57:50) 
 function create_if_block_4(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -605,7 +606,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (34:52) 
+// (49:52) 
 function create_if_block_2(ctx) {
 	let div;
 	let current_block_type_index;
@@ -674,7 +675,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (30:4) {#if data.output_type === 'stream'}
+// (45:4) {#if data.output_type === 'stream'}
 function create_if_block_1(ctx) {
 	let div;
 	let ansi;
@@ -721,7 +722,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (71:8) {:else}
+// (86:8) {:else}
 function create_else_block_2(ctx) {
 	let ansi;
 	let current;
@@ -760,7 +761,7 @@ function create_else_block_2(ctx) {
 	};
 }
 
-// (69:8) {#if data.traceback !== undefined}
+// (84:8) {#if data.traceback !== undefined}
 function create_if_block_11(ctx) {
 	let ansi;
 	let current;
@@ -799,7 +800,7 @@ function create_if_block_11(ctx) {
 	};
 }
 
-// (64:6) {:else}
+// (79:6) {:else}
 function create_else_block_1(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[1]) + "";
 	let t;
@@ -822,7 +823,7 @@ function create_else_block_1(ctx) {
 	};
 }
 
-// (62:52) 
+// (77:52) 
 function create_if_block_9(ctx) {
 	let div;
 
@@ -833,19 +834,19 @@ function create_if_block_9(ctx) {
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
-			/*div_binding_1*/ ctx[4](div);
+			/*div_binding_1*/ ctx[5](div);
 		},
 		p: noop,
 		i: noop,
 		o: noop,
 		d(detaching) {
 			if (detaching) detach(div);
-			/*div_binding_1*/ ctx[4](null);
+			/*div_binding_1*/ ctx[5](null);
 		}
 	};
 }
 
-// (58:40) 
+// (73:40) 
 function create_if_block_8(ctx) {
 	let div;
 	let ansi;
@@ -894,7 +895,7 @@ function create_if_block_8(ctx) {
 	};
 }
 
-// (54:43) 
+// (69:43) 
 function create_if_block_7(ctx) {
 	let div;
 	let markdown;
@@ -943,7 +944,7 @@ function create_if_block_7(ctx) {
 	};
 }
 
-// (50:39) 
+// (65:39) 
 function create_if_block_6(ctx) {
 	let div1;
 	let div0;
@@ -958,19 +959,19 @@ function create_if_block_6(ctx) {
 		m(target, anchor) {
 			insert(target, div1, anchor);
 			append(div1, div0);
-			/*div0_binding*/ ctx[3](div0);
+			/*div0_binding*/ ctx[4](div0);
 		},
 		p: noop,
 		i: noop,
 		o: noop,
 		d(detaching) {
 			if (detaching) detach(div1);
-			/*div0_binding*/ ctx[3](null);
+			/*div0_binding*/ ctx[4](null);
 		}
 	};
 }
 
-// (43:6) {#if data.data['image/png']}
+// (58:6) {#if data.data['image/png']}
 function create_if_block_5(ctx) {
 	let div;
 	let img;
@@ -1001,7 +1002,7 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (38:8) {:else}
+// (53:8) {:else}
 function create_else_block(ctx) {
 	let ansi;
 	let current;
@@ -1040,7 +1041,7 @@ function create_else_block(ctx) {
 	};
 }
 
-// (36:8) {#if data.data['text/html']}
+// (51:8) {#if data.data['text/html']}
 function create_if_block_3(ctx) {
 	let div;
 
@@ -1051,14 +1052,14 @@ function create_if_block_3(ctx) {
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
-			/*div_binding*/ ctx[2](div);
+			/*div_binding*/ ctx[3](div);
 		},
 		p: noop,
 		i: noop,
 		o: noop,
 		d(detaching) {
 			if (detaching) detach(div);
-			/*div_binding*/ ctx[2](null);
+			/*div_binding*/ ctx[3](null);
 		}
 	};
 }
@@ -1127,8 +1128,21 @@ function create_fragment(ctx) {
 }
 
 function instance($$self, $$props, $$invalidate) {
+	let { requirejs } = $$props;
 	let { data } = $$props;
 	let { ref } = $$props;
+	let evaled = {};
+
+	function eval_once(src) {
+		if (evaled[src] === undefined) {
+			evaled[src] = true;
+
+			// make sure requirejs is accessible
+			const require = requirejs;
+
+			eval(src);
+		}
+	}
 
 	function div_binding($$value) {
 		binding_callbacks[$$value ? "unshift" : "push"](() => {
@@ -1152,6 +1166,7 @@ function instance($$self, $$props, $$invalidate) {
 	}
 
 	$$self.$$set = $$props => {
+		if ("requirejs" in $$props) $$invalidate(2, requirejs = $$props.requirejs);
 		if ("data" in $$props) $$invalidate(1, data = $$props.data);
 		if ("ref" in $$props) $$invalidate(0, ref = $$props.ref);
 	};
@@ -1159,16 +1174,20 @@ function instance($$self, $$props, $$invalidate) {
 	$$self.$$.update = () => {
 		if ($$self.$$.dirty & /*ref, data*/ 3) {
 			$: {
-				if (ref !== undefined) {
+				if (ref) {
 					const target = ref.getAttribute("data-target");
 
 					if (target === "application/json") {
 						const src = collapse(data.data[target]);
 						$$invalidate(0, ref.innerHTML = "<script>" + src + "</script>", ref);
-						eval(src);
+						eval_once(src);
 					} else if (target === "text/html") {
 						$$invalidate(0, ref.innerHTML = collapse(data.data[target]), ref);
-						ref.querySelectorAll("script").forEach(eval);
+
+						ref.querySelectorAll("script").forEach(el => {
+							const src = el.innerHTML;
+							eval_once(src);
+						});
 					} else {
 						console.error("Unrecognized type");
 					}
@@ -1177,19 +1196,19 @@ function instance($$self, $$props, $$invalidate) {
 		}
 	};
 
-	return [ref, data, div_binding, div0_binding, div_binding_1];
+	return [ref, data, requirejs, div_binding, div0_binding, div_binding_1];
 }
 
 class Output extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, { data: 1, ref: 0 });
+		init(this, options, instance, create_fragment, safe_not_equal, { requirejs: 2, data: 1, ref: 0 });
 	}
 }
 
 module.exports = Output;
 
-},{"../../utils/collapse.js":273,"./Ansi.svelte":1,"./Markdown.svelte":5,"svelte/internal":265}],7:[function(require,module,exports){
+},{"../../utils/collapse.js":273,"./Ansi.svelte":1,"./Markdown.svelte":5,"svelte":264,"svelte/internal":265}],7:[function(require,module,exports){
 /* Outputs.svelte generated by Svelte v3.24.1 */
 "use strict";
 
@@ -1199,15 +1218,21 @@ const { default: collapse } = require("../../utils/collapse.js");
 
 function get_each_context(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[2] = list[i];
+	child_ctx[3] = list[i];
 	return child_ctx;
 }
 
-// (31:4) {#each [...reduce_output_streams(data)] as output}
+// (32:4) {#each [...reduce_output_streams(data)] as output}
 function create_each_block(ctx) {
 	let output;
 	let current;
-	output = new Output({ props: { data: /*output*/ ctx[2] } });
+
+	output = new Output({
+			props: {
+				requirejs: /*requirejs*/ ctx[0],
+				data: /*output*/ ctx[3]
+			}
+		});
 
 	return {
 		c() {
@@ -1219,7 +1244,8 @@ function create_each_block(ctx) {
 		},
 		p(ctx, dirty) {
 			const output_changes = {};
-			if (dirty & /*data*/ 1) output_changes.data = /*output*/ ctx[2];
+			if (dirty & /*requirejs*/ 1) output_changes.requirejs = /*requirejs*/ ctx[0];
+			if (dirty & /*data*/ 2) output_changes.data = /*output*/ ctx[3];
 			output.$set(output_changes);
 		},
 		i(local) {
@@ -1241,7 +1267,7 @@ function create_fragment(ctx) {
 	let div1;
 	let div0;
 	let current;
-	let each_value = [.../*reduce_output_streams*/ ctx[1](/*data*/ ctx[0])];
+	let each_value = [.../*reduce_output_streams*/ ctx[2](/*data*/ ctx[1])];
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value.length; i += 1) {
@@ -1275,8 +1301,8 @@ function create_fragment(ctx) {
 			current = true;
 		},
 		p(ctx, [dirty]) {
-			if (dirty & /*reduce_output_streams, data*/ 3) {
-				each_value = [.../*reduce_output_streams*/ ctx[1](/*data*/ ctx[0])];
+			if (dirty & /*requirejs, reduce_output_streams, data*/ 7) {
+				each_value = [.../*reduce_output_streams*/ ctx[2](/*data*/ ctx[1])];
 				let i;
 
 				for (i = 0; i < each_value.length; i += 1) {
@@ -1328,6 +1354,7 @@ function create_fragment(ctx) {
 }
 
 function instance($$self, $$props, $$invalidate) {
+	let { requirejs } = $$props;
 	let { data = [] } = $$props;
 
 	function* reduce_output_streams(outputs) {
@@ -1353,16 +1380,17 @@ function instance($$self, $$props, $$invalidate) {
 	}
 
 	$$self.$$set = $$props => {
-		if ("data" in $$props) $$invalidate(0, data = $$props.data);
+		if ("requirejs" in $$props) $$invalidate(0, requirejs = $$props.requirejs);
+		if ("data" in $$props) $$invalidate(1, data = $$props.data);
 	};
 
-	return [data, reduce_output_streams];
+	return [requirejs, data, reduce_output_streams];
 }
 
 class Outputs extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, { data: 0 });
+		init(this, options, instance, create_fragment, safe_not_equal, { requirejs: 0, data: 1 });
 	}
 }
 

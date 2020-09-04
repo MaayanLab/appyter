@@ -293,7 +293,10 @@
                   />
                 </Input>
               {/if}
-              <Outputs data={cell.outputs || []} />
+              <Outputs
+                requirejs={requirejs}
+                data={cell.outputs || []}
+              />
             </Cell>
           {:else if cell.cell_type === 'markdown'}
             <Cell type="text">
