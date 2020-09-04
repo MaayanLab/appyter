@@ -1,9 +1,38 @@
 <script>
+  import { onMount, tick } from 'svelte'
   import * as Markdown from './Markdown.svelte'
   import * as Ansi from './Ansi.svelte'
   import collapse from '../../utils/collapse.js'
 
   export let data
+  export let ref
+
+  let evaled = {}
+  function eval_once(src) {
+    if (evaled[src] === undefined) {
+      evaled[src] = true
+      eval(src)
+    }
+  }
+
+  $: {
+    if (ref) {
+      const target = ref.getAttribute('data-target')
+      if (target === 'application/json') {
+        const src = collapse(data.data[target])
+        ref.innerHTML = '<script>' + src + '\<\/script>'
+        eval_once(src)
+      } else if (target === 'text/html') {
+        ref.innerHTML = collapse(data.data[target])
+        ref.querySelectorAll('script').forEach((el) => {
+          const src = el.innerHTML
+          eval_once(src)
+        })
+      } else {
+        console.error('Unrecognized type')
+      }
+    }
+  }
 </script>
 
 <div class="output_area">
@@ -17,7 +46,7 @@
     {:else if data.output_type === 'execute_result'}
       <div class="output_html rendered_html output_execute_result">
         {#if data.data['text/html']}
-          {@html collapse(data.data['text/html'])}
+          <div bind:this={ref} data-target="text/html"></div>
         {:else}
           <Ansi data={collapse(data.data['text/plain'])} />
         {/if}
@@ -32,7 +61,7 @@
         </div>
       {:else if data.data['text/html']}
         <div class="output_html rendered_html output_execute_result">
-          {@html collapse(data.data['text/html'])}
+          <div bind:this={ref} data-target="text/html"></div>
         </div>
       {:else if data.data['text/markdown']}
         <div class="output_stream output_{data.name} output_markdown">
@@ -43,7 +72,7 @@
           <Ansi data={collapse(data.data['text/plain'])} />
         </div>
       {:else if data.data['application/javascript']}
-        {@html '<script>'+collapse(data.data['application/javascript'])+'</script>'}
+        <div bind:this={ref} data-target="application/javascript"></div>
       {:else}
         {JSON.stringify(data)}
       {/if}
