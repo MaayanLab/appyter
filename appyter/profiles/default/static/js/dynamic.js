@@ -433,7 +433,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (90:4) {:else}
+// (94:4) {:else}
 function create_else_block_3(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[1]) + "";
 	let t;
@@ -456,7 +456,7 @@ function create_else_block_3(ctx) {
 	};
 }
 
-// (82:43) 
+// (86:43) 
 function create_if_block_10(ctx) {
 	let div;
 	let current_block_type_index;
@@ -525,7 +525,7 @@ function create_if_block_10(ctx) {
 	};
 }
 
-// (57:50) 
+// (61:50) 
 function create_if_block_4(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -606,7 +606,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (49:52) 
+// (53:52) 
 function create_if_block_2(ctx) {
 	let div;
 	let current_block_type_index;
@@ -675,7 +675,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (45:4) {#if data.output_type === 'stream'}
+// (49:4) {#if data.output_type === 'stream'}
 function create_if_block_1(ctx) {
 	let div;
 	let ansi;
@@ -722,7 +722,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (86:8) {:else}
+// (90:8) {:else}
 function create_else_block_2(ctx) {
 	let ansi;
 	let current;
@@ -761,7 +761,7 @@ function create_else_block_2(ctx) {
 	};
 }
 
-// (84:8) {#if data.traceback !== undefined}
+// (88:8) {#if data.traceback !== undefined}
 function create_if_block_11(ctx) {
 	let ansi;
 	let current;
@@ -800,7 +800,7 @@ function create_if_block_11(ctx) {
 	};
 }
 
-// (79:6) {:else}
+// (83:6) {:else}
 function create_else_block_1(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[1]) + "";
 	let t;
@@ -823,7 +823,7 @@ function create_else_block_1(ctx) {
 	};
 }
 
-// (77:52) 
+// (81:52) 
 function create_if_block_9(ctx) {
 	let div;
 
@@ -846,7 +846,7 @@ function create_if_block_9(ctx) {
 	};
 }
 
-// (73:40) 
+// (77:40) 
 function create_if_block_8(ctx) {
 	let div;
 	let ansi;
@@ -895,7 +895,7 @@ function create_if_block_8(ctx) {
 	};
 }
 
-// (69:43) 
+// (73:43) 
 function create_if_block_7(ctx) {
 	let div;
 	let markdown;
@@ -944,7 +944,7 @@ function create_if_block_7(ctx) {
 	};
 }
 
-// (65:39) 
+// (69:39) 
 function create_if_block_6(ctx) {
 	let div1;
 	let div0;
@@ -971,7 +971,7 @@ function create_if_block_6(ctx) {
 	};
 }
 
-// (58:6) {#if data.data['image/png']}
+// (62:6) {#if data.data['image/png']}
 function create_if_block_5(ctx) {
 	let div;
 	let img;
@@ -1002,7 +1002,7 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (53:8) {:else}
+// (57:8) {:else}
 function create_else_block(ctx) {
 	let ansi;
 	let current;
@@ -1041,7 +1041,7 @@ function create_else_block(ctx) {
 	};
 }
 
-// (51:8) {#if data.data['text/html']}
+// (55:8) {#if data.data['text/html']}
 function create_if_block_3(ctx) {
 	let div;
 
@@ -1133,14 +1133,18 @@ function instance($$self, $$props, $$invalidate) {
 	let { ref } = $$props;
 	let evaled = {};
 
-	function eval_once(src) {
+	function try_eval_once(src) {
 		if (evaled[src] === undefined) {
 			evaled[src] = true;
 
 			// make sure requirejs is accessible
 			const require = requirejs;
 
-			eval(src);
+			try {
+				eval(src);
+			} catch(e) {
+				console.error(e);
+			}
 		}
 	}
 
@@ -1180,13 +1184,13 @@ function instance($$self, $$props, $$invalidate) {
 					if (target === "application/json") {
 						const src = collapse(data.data[target]);
 						$$invalidate(0, ref.innerHTML = "<script>" + src + "</script>", ref);
-						eval_once(src);
+						try_eval_once(src);
 					} else if (target === "text/html") {
 						$$invalidate(0, ref.innerHTML = collapse(data.data[target]), ref);
 
 						ref.querySelectorAll("script").forEach(el => {
 							const src = el.innerHTML;
-							eval_once(src);
+							try_eval_once(src);
 						});
 					} else {
 						console.error("Unrecognized type");

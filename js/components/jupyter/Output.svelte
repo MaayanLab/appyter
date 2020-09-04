@@ -9,12 +9,16 @@
   export let ref
 
   let evaled = {}
-  function eval_once(src) {
+  function try_eval_once(src) {
     if (evaled[src] === undefined) {
       evaled[src] = true
       // make sure requirejs is accessible
       const require = requirejs
-      eval(src)
+      try {
+        eval(src)
+      } catch (e) {
+        console.error(e)
+      }
     }
   }
 
@@ -24,12 +28,12 @@
       if (target === 'application/json') {
         const src = collapse(data.data[target])
         ref.innerHTML = '<script>' + src + '\<\/script>'
-        eval_once(src)
+        try_eval_once(src)
       } else if (target === 'text/html') {
         ref.innerHTML = collapse(data.data[target])
         ref.querySelectorAll('script').forEach((el) => {
           const src = el.innerHTML
-          eval_once(src)
+          try_eval_once(src)
         })
       } else {
         console.error('Unrecognized type')
