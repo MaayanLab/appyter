@@ -78,7 +78,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
           client.kc.execute(
             '\n'.join([
               f"from appyter.ext.fs import Filesystem as _Filesystem",
-              f"open = _Filesystem({repr(cwd.rstrip('/')+'/')}).open",
+              f"open = _Filesystem({repr(cwd)}).open",
             ]),
             store_history=False,
           )
