@@ -13,7 +13,7 @@ require(['{{ url_for('profile', path='js') + '/landing.js' }}'], function (Compo
   var component = new Component({
     target: self,
     props: {
-      requirejs: require,
+      requirejs: { require: require, define: define },
       nbdownload: {{ _nb|jsonify }},
       extras: {{ _config.EXTRAS|jsonify }},
     },

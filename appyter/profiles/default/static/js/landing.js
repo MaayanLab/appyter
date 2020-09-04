@@ -1138,7 +1138,7 @@ function instance($$self, $$props, $$invalidate) {
 			evaled[src] = true;
 
 			// make sure requirejs is accessible
-			const require = requirejs;
+			const { require, define } = requirejs;
 
 			try {
 				eval(src);
@@ -41565,7 +41565,7 @@ function instance($$self, $$props, $$invalidate) {
 
 	async function ensure_deps() {
 		if (_deps === undefined) {
-			_deps = await new Promise((resolve, reject) => requirejs(
+			_deps = await new Promise((resolve, reject) => requirejs.require(
 					["socket"],
 					function (socket, SocketIOFileUpload) {
 						resolve({ socket });

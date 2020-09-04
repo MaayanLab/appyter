@@ -26,7 +26,7 @@
     if (_deps === undefined) {
       _deps = await new Promise(
         (resolve, reject) =>
-          requirejs(['socket'], function (socket, SocketIOFileUpload) {
+          requirejs.require(['socket'], function (socket, SocketIOFileUpload) {
             resolve({ socket })
           }, reject)
       )

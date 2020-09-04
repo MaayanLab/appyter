@@ -13,7 +13,7 @@
     if (evaled[src] === undefined) {
       evaled[src] = true
       // make sure requirejs is accessible
-      const require = requirejs
+      const { require, define } = requirejs
       try {
         eval(src)
       } catch (e) {
