@@ -34,29 +34,31 @@ async def json_emitter(obj):
 
 async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
   assert callable(emit), 'Emit must be callable'
-  fs = Filesystem(cwd)
-  with fs.open(ipynb, 'r') as fr:
-    nb = nb_from_ipynb_io(fr)
-  # early stop if we already have execution_info
-  if 'execution_info' in nb.metadata:
-    if 'completed' in nb.metadata['execution_info']:
-      await emit({ 'type': 'error', 'data': f"Execution already completed at {nb.metadata['execution_info']['completed']}" })
-    elif 'started' in nb.metadata['execution_info']:
-      await emit({ 'type': 'error', 'data': f"Execution already started at {nb.metadata['execution_info']['started']}" })
-    else:
-      await emit({ 'type': 'error', 'data': 'Execution already in progress' })
-    return
-  # setup execution_info with start time
-  nb.metadata['execution_info'] = {
-    'started': datetime.datetime.now().replace(
-      tzinfo=datetime.timezone.utc
-    ).isoformat()
-  }
-  with fs.open(ipynb, 'w') as fw:
-    nb_to_ipynb_io(nb, fw)
-  with Filesystem('tmpfs://') as tmp_fs:
+  with Filesystem(cwd) as fs:
+    with fs.open(ipynb, 'r') as fr:
+      nb = nb_from_ipynb_io(fr)
+    # early stop if we already have execution_info
+    if 'execution_info' in nb.metadata:
+      if 'completed' in nb.metadata['execution_info']:
+        await emit({ 'type': 'error', 'data': f"Execution already completed at {nb.metadata['execution_info']['completed']}" })
+      elif 'started' in nb.metadata['execution_info']:
+        await emit({ 'type': 'error', 'data': f"Execution already started at {nb.metadata['execution_info']['started']}" })
+      else:
+        await emit({ 'type': 'error', 'data': 'Execution already in progress' })
+      return
+    # setup execution_info with start time
+    nb.metadata['execution_info'] = {
+      'started': datetime.datetime.now().replace(
+        tzinfo=datetime.timezone.utc
+      ).isoformat()
+    }
+    with fs.open(ipynb, 'w') as fw:
+      nb_to_ipynb_io(nb, fw)
+  #
+  await emit({ 'type': 'status', 'data': 'Starting' })
+  #
+  with Filesystem(cwd, with_path=True) as fs:
     try:
-      await emit({ 'type': 'status', 'data': 'Starting' })
       iopub_hook = iopub_hook_factory(nb, emit)
       client = NotebookClientIOPubHook(
         nb,
@@ -67,22 +69,11 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
           PYTHONPATH=':'.join(sys.path),
           PATH=os.environ['PATH'],
         ),
-        resources={ 'metadata': {'path': tmp_fs.path()} },
-        iopub_hook=iopub_hook,
+        resources={ 'metadata': {'path': fs.path()} },
+        iopub_hook=iopub_hook_factory(nb, emit),
       )
       await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
       async with client.async_setup_kernel():
-        # monkey-patch open so that writes go to s3
-        # WARNING: In the case of error with this cell, things proceed anyway
-        await ensure_async(
-          client.kc.execute(
-            '\n'.join([
-              f"from appyter.ext.fs import Filesystem as _Filesystem",
-              f"open = _Filesystem({repr(cwd)}).open",
-            ]),
-            store_history=False,
-          )
-        )
         await emit({ 'type': 'status', 'data': 'Executing...' })
         await emit({ 'type': 'progress', 'data': 0 })
         n_cells = len(nb.cells)
@@ -110,6 +101,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
     #
     with fs.open(ipynb, 'w') as fw:
       nb_to_ipynb_io(nb, fw)
+  #
 
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')
 @click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')

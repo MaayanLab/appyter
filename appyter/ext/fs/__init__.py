@@ -5,20 +5,29 @@ import urllib.parse
 from werkzeug.security import safe_join
 
 class Filesystem:
-  def __init__(self, uri):
+  def __init__(self, uri, with_path=False):
     if '://' not in uri:
       uri = 'file://' + uri
     uri_parsed = urllib.parse.urlparse(uri)
+    self._fs = None
     if uri_parsed.scheme == 'file':
       from appyter.ext.fs.file import Filesystem as FSFilesystem
       self._fs = FSFilesystem(uri_parsed)
-    elif uri_parsed.scheme == 's3':
-      from appyter.ext.fs.s3 import Filesystem as S3Filesystem
-      self._fs = S3Filesystem(uri_parsed)
-    elif uri_parsed.scheme == 'tmpfs':
+    if uri_parsed.scheme == 'tmpfs':
       from appyter.ext.fs.tmpfs import Filesystem as TmpFilesystem
       self._fs = TmpFilesystem(uri_parsed)
-    else:
+    if uri_parsed.scheme == 's3':
+      if not with_path:
+        from appyter.ext.fs.s3 import Filesystem as S3Filesystem
+        self._fs = S3Filesystem(uri_parsed)
+      else:
+        # we will need rclone to do s3 mounting with_path
+        uri = 's3+rclone'
+    if 'rclone' in uri_parsed.scheme.split('+'):
+      from appyter.ext.fs.rclone import Filesystem as RcloneFilesystem
+      self._fs = RcloneFilesystem(uri_parsed)
+    #
+    if self._fs is None:
       raise Exception(f"Unrecognized scheme {uri}")
   #
   def __enter__(self):
