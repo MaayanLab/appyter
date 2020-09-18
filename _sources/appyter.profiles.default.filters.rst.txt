@@ -12,18 +12,18 @@ appyter.profiles.default.filters.fmt module
    :undoc-members:
    :show-inheritance:
 
-appyter.profiles.default.filters.jq module
-------------------------------------------
-
-.. automodule:: appyter.profiles.default.filters.jq
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 appyter.profiles.default.filters.jsonify module
 -----------------------------------------------
 
 .. automodule:: appyter.profiles.default.filters.jsonify
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.profiles.default.filters.pyeval module
+----------------------------------------------
+
+.. automodule:: appyter.profiles.default.filters.pyeval
    :members:
    :undoc-members:
    :show-inheritance:
