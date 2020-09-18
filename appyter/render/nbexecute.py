@@ -33,10 +33,9 @@ async def json_emitter(obj):
 
 async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
   assert callable(emit), 'Emit must be callable'
-  fs = Filesystem(cwd)
-  with fs.open(ipynb, 'r') as fr:
-    nb = nb_from_ipynb_io(fr)
-  with Filesystem('tmpfs://') as tmp_fs:
+  with Filesystem(cwd, with_path=True) as fs:
+    with fs.open(ipynb, 'r') as fr:
+      nb = nb_from_ipynb_io(fr)
     try:
       await emit({ 'type': 'status', 'data': 'Starting' })
       client = NotebookClientIOPubHook(
@@ -48,22 +47,11 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
           PYTHONPATH=':'.join(sys.path),
           PATH=os.environ['PATH'],
         ),
-        resources={ 'metadata': {'path': tmp_fs.path()} },
+        resources={ 'metadata': {'path': fs.path()} },
         iopub_hook=iopub_hook_factory(nb, emit),
       )
       await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
       async with client.async_setup_kernel():
-        # monkey-patch open so that writes go to s3
-        # WARNING: In the case of error with this cell, things proceed anyway
-        await ensure_async(
-          client.kc.execute(
-            '\n'.join([
-              f"from appyter.ext.fs import Filesystem as _Filesystem",
-              f"open = _Filesystem({repr(cwd.rstrip('/')+'/')}).open",
-            ]),
-            store_history=False,
-          )
-        )
         await emit({ 'type': 'status', 'data': 'Executing...' })
         await emit({ 'type': 'progress', 'data': 0 })
         n_cells = len(nb.cells)
@@ -86,6 +74,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
     #
     with fs.open(ipynb, 'w') as fw:
       nb_to_ipynb_io(nb, fw)
+  #
 
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')
 @click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')

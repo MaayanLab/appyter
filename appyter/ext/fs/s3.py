@@ -64,14 +64,8 @@ class Filesystem:
       raise Exception(f"An error occurred while trying to copy {src} to {dst}")
   #
   def link(self, src, dst):
-    try:
-      assert src and dst
-      print('WARNING: s3 does not support links, copying')
-      return self._fs.copy(self._prefix + src, self._prefix + dst, recursive=True)
-    except Exception:
-      import traceback
-      traceback.print_exc()
-      raise Exception(f"An error occurred while trying to link {src} to {dst}")
+    print('WARNING: s3 does not support links, copying')
+    return self.cp(src, dst)
   #
   def rm(self, path, recursive=False):
     try:
