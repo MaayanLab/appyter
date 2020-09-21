@@ -9,7 +9,6 @@ flask_cors
 flask_socketio
 ipython
 jinja2
-jq
 jupyter
 jupyter_client
 lxml

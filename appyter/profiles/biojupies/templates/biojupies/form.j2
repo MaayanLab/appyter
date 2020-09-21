@@ -3,7 +3,7 @@
 {% block body %}
 <div class="container">
   <form method="POST" enctype="multipart/form-data" action="">
-    {% with orphaned_fields = jq(_fields, '.[].args.name', '.[] | select(.type != "section" and .args.section == null)') %}
+    {% with orphaned_fields = pyeval("[field for field in _fields if field.get('type') != 'section' and not field['args'].get('section')]", _fields=_fields) %}
       {% if orphaned_fields %}
         {{ SectionField(
           name="_primary",
@@ -13,13 +13,9 @@
         ).render(_fields=orphaned_fields) }}
       {% endif %}
     {% endwith %}
-    {% for _field in jq(_fields, '.[].args.name', '.[] | select(.type == "section")') %}
+    {% for _field in pyeval("[field for field in _fields if field.get('type') == 'section']", _fields=_fields) %}
       {{ _field.render(
-        _fields=jq(
-          _fields,
-          '.[].args.name',
-          fmt('.[] | select(.args.section == "{}")', _field.args.name)
-        )
+        _fields=pyeval("[field for field in _fields if field['args']['section'] == _field['args']['name']]", _fields=_fields, _field=_field)
       ) }}
     {% endfor %}
     <div class="row">
