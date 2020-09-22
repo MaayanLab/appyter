@@ -3,6 +3,10 @@ import urllib.parse
 import json
 import re
 import os
+import time
+import logging
+logger = logging.getLogger(__name__)
+
 from appyter.ext.fs.file import Filesystem as FSFilesystem
 
 
@@ -11,7 +15,7 @@ def sh(cmd):
   return Popen(cmd, stdout=PIPE)
 
 def slugify(s):
-  return re.compile(r'[^a-zA-Z0-9-]+').replace(s, '')
+  return re.sub(r'[^a-zA-Z0-9-]+', '', s)
 
 class RcloneParse:
   @staticmethod
@@ -19,20 +23,22 @@ class RcloneParse:
     return getattr(RcloneParse, '_{}'.format(scheme))
 
   @staticmethod
-  def s3(uri):
+  def _s3(uri):
     config = dict(urllib.parse.parse_qsl(uri.query))
     if 'env_auth' not in config:
-      config['env_auth'] = False
+      config['env_auth'] = 'false'
     #
     if 'provider' not in config:
       if uri.hostname.endswith('s3.amazonaws.com'):
         config['provider'] = 'AWS'
       else:
-        config['provider'] = 'minio'
+        config['provider'] = 'Minio'
     #
     if 'endpoint' not in config:
       if config['provider'] != 'AWS':
-        config['endpoint'] = uri.hostname
+        config['endpoint'] = f"{'https' if config.get('use_ssl') else 'http'}://{uri.hostname}"
+        if uri.port:
+          config['endpoint'] += f":{uri.port}"
     #
     if uri.username:
       config['access_key_id'] = uri.username
@@ -47,13 +53,17 @@ class Filesystem(FSFilesystem):
     self._scheme = '+'.join(scheme for scheme in self._uri.scheme.split('+') if scheme != 'rclone')
     self._remote = slugify(f"{self._scheme}:{self._uri.hostname}{self._uri.path}?{self._uri.query}")
     if self._remote not in json.load(sh(['rclone', 'config', 'dump']).stdout).keys():
-      sh([
-        'rclone', 'config', 'create', self._remote, self._scheme,
-      ] + RcloneParse.get(self._scheme)(self._uri))
+      if sh(['rclone', 'config', 'create', self._remote, self._scheme] + RcloneParse.get(self._scheme)(self._uri)).wait() != 0:
+        raise Exception('Error configuring rclone')
     self._tmpdir = tempfile.mkdtemp()
+    logger.debug(f"Mounting {self._remote}:{self._uri.path[1:]} on {self._tmpdir}")
     self._mount = sh([
       'rclone', 'mount', f"{self._remote}:{self._uri.path[1:]}", self._tmpdir,
     ])
+    while not os.path.ismount(self._tmpdir):
+      if self._mount.poll() is not None:
+        raise Exception(f"Mount exited with code {self._mount.returncode} before mounting")
+      time.sleep(0.1)
     super().__init__(urllib.parse.urlparse('file://' + self._tmpdir))
   #
   def __exit__(self, *args):
@@ -66,6 +76,7 @@ class Filesystem(FSFilesystem):
     return super().link(src, dst)
   #
   def close(self):
+    logger.debug('Unmounting...')
     self._mount.terminate()
     self._mount.wait()
     os.rmdir(self._tmpdir)

@@ -22,7 +22,7 @@ class Filesystem:
         self._fs = S3Filesystem(uri_parsed)
       else:
         # we will need rclone to do s3 mounting with_path
-        uri = 's3+rclone'
+        uri_parsed = uri_parsed._replace(scheme='s3+rclone')
     if 'rclone' in uri_parsed.scheme.split('+'):
       from appyter.ext.fs.rclone import Filesystem as RcloneFilesystem
       self._fs = RcloneFilesystem(uri_parsed)
