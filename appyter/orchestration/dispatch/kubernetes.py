@@ -32,6 +32,9 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
       kind='Job',
       metadata=client.V1ObjectMeta(
         name=job['job'],
+        annotations={
+          f"container.apparmor.security.beta.kubernetes.io/appyter-{job['job']}": 'unconfined'
+        },
       ),
       spec=client.V1JobSpec(
         template=client.V1PodTemplateSpec(
@@ -42,6 +45,26 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
                 name=f"appyter-{job['job']}",
                 image=job['image'],
                 command=['appyter', 'orchestration', 'job', json.dumps(job)],
+                security_context=client.V1SecurityContext(
+                  privileged=True,
+                  capabilities=client.V1Capabilities(
+                    add=['SYS_ADMIN'],
+                  ),
+                ),
+                volume_mounts=[
+                  client.V1VolumeMount(
+                    name='fuse',
+                    mount_path='/dev/fuse',
+                  )
+                ],
+              ),
+            ],
+            volumes=[
+              client.V1Volume(
+                name='fuse',
+                host_path=client.V1HostPathVolumeSource(
+                  path='/dev/fuse',
+                )
               ),
             ],
           ),
