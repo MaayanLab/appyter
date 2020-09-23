@@ -900,7 +900,7 @@ function create_if_block_9(ctx) {
 
 	html = new HTML({
 			props: {
-				data: "<script>" + /*data*/ ctx[0].data["application/javascript"] + "</script>"
+				data: "<script>" + collapse(/*data*/ ctx[0].data["application/javascript"]) + "</script>"
 			}
 		});
 
@@ -914,7 +914,7 @@ function create_if_block_9(ctx) {
 		},
 		p(ctx, dirty) {
 			const html_changes = {};
-			if (dirty & /*data*/ 1) html_changes.data = "<script>" + /*data*/ ctx[0].data["application/javascript"] + "</script>";
+			if (dirty & /*data*/ 1) html_changes.data = "<script>" + collapse(/*data*/ ctx[0].data["application/javascript"]) + "</script>";
 			html.$set(html_changes);
 		},
 		i(local) {
@@ -1038,7 +1038,7 @@ function create_if_block_6(ctx) {
 	html = new HTML({
 			props: {
 				classes: "output_html rendered_html output_execute_result",
-				data: /*data*/ ctx[0].data["text/html"]
+				data: collapse(/*data*/ ctx[0].data["text/html"])
 			}
 		});
 
@@ -1052,7 +1052,7 @@ function create_if_block_6(ctx) {
 		},
 		p(ctx, dirty) {
 			const html_changes = {};
-			if (dirty & /*data*/ 1) html_changes.data = /*data*/ ctx[0].data["text/html"];
+			if (dirty & /*data*/ 1) html_changes.data = collapse(/*data*/ ctx[0].data["text/html"]);
 			html.$set(html_changes);
 		},
 		i(local) {
@@ -1153,7 +1153,7 @@ function create_if_block_3(ctx) {
 	html = new HTML({
 			props: {
 				classes: "output_html rendered_html output_execute_result",
-				data: /*data*/ ctx[0].data["text/html"]
+				data: collapse(/*data*/ ctx[0].data["text/html"])
 			}
 		});
 
@@ -1167,7 +1167,7 @@ function create_if_block_3(ctx) {
 		},
 		p(ctx, dirty) {
 			const html_changes = {};
-			if (dirty & /*data*/ 1) html_changes.data = /*data*/ ctx[0].data["text/html"];
+			if (dirty & /*data*/ 1) html_changes.data = collapse(/*data*/ ctx[0].data["text/html"]);
 			html.$set(html_changes);
 		},
 		i(local) {

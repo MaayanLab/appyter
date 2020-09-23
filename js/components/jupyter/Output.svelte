@@ -19,7 +19,7 @@
       {#if data.data['text/html']}
         <HTML
           classes="output_html rendered_html output_execute_result"
-          data={data.data['text/html']}
+          data={collapse(data.data['text/html'])}
         />
       {:else}
         <div class="output_text output_execute_result">
@@ -37,7 +37,7 @@
       {:else if data.data['text/html']}
         <HTML
           classes="output_html rendered_html output_execute_result"
-          data={data.data['text/html']}
+          data={collapse(data.data['text/html'])}
         />
       {:else if data.data['text/markdown']}
         <div class="output_stream output_{data.name} output_markdown">
@@ -48,7 +48,7 @@
           <Ansi data={collapse(data.data['text/plain'])} />
         </div>
       {:else if data.data['application/javascript']}
-        <HTML data="<script>{data.data['application/javascript']}</script>" />
+        <HTML data="<script>{collapse(data.data['application/javascript'])}</script>" />
       {:else}
         {JSON.stringify(data)}
       {/if}
