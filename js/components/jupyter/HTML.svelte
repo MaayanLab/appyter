@@ -19,6 +19,6 @@
   $: if (ref) ref.querySelectorAll('script').forEach(el => try_eval_once(el.innerHTML))
 </script>
 
-<div this:ref={ref} class={classes}>
+<div bind:this={ref} class={classes}>
   {@html data}
 </div>
