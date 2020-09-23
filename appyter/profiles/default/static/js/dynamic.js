@@ -309,6 +309,7 @@ function instance($$self, $$props, $$invalidate) {
 	let rendered;
 
 	const md = new MarkdownIt({
+			html: true,
 			highlight(str, lang) {
 				if (lang && hljs.getLanguage(lang)) {
 					try {
@@ -320,7 +321,7 @@ function instance($$self, $$props, $$invalidate) {
 
 				return "";
 			}
-		}).use(MarkdownItAnchor, { slugify, permalink: true });
+		}).use(MarkdownItAnchor, { permalink: true, slugify });
 
 	$$self.$$set = $$props => {
 		if ("data" in $$props) $$invalidate(1, data = $$props.data);

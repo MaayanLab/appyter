@@ -309,6 +309,7 @@ function instance($$self, $$props, $$invalidate) {
 	let rendered;
 
 	const md = new MarkdownIt({
+			html: true,
 			highlight(str, lang) {
 				if (lang && hljs.getLanguage(lang)) {
 					try {
@@ -320,7 +321,7 @@ function instance($$self, $$props, $$invalidate) {
 
 				return "";
 			}
-		}).use(MarkdownItAnchor, { slugify, permalink: true });
+		}).use(MarkdownItAnchor, { permalink: true, slugify });
 
 	$$self.$$set = $$props => {
 		if ("data" in $$props) $$invalidate(1, data = $$props.data);
@@ -40629,12 +40630,17 @@ function create_if_block_5(ctx) {
 	let div0;
 	let legend;
 	let t1;
+	let current;
 	let each_value_1 = /*toc*/ ctx[4];
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value_1.length; i += 1) {
 		each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
 	}
+
+	const out = i => transition_out(each_blocks[i], 1, 1, () => {
+		each_blocks[i] = null;
+	});
 
 	return {
 		c() {
@@ -40666,6 +40672,8 @@ function create_if_block_5(ctx) {
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].m(div0, null);
 			}
+
+			current = true;
 		},
 		p(ctx, dirty) {
 			if (dirty & /*slugify, toc*/ 16) {
@@ -40677,19 +40685,41 @@ function create_if_block_5(ctx) {
 
 					if (each_blocks[i]) {
 						each_blocks[i].p(child_ctx, dirty);
+						transition_in(each_blocks[i], 1);
 					} else {
 						each_blocks[i] = create_each_block_1(child_ctx);
 						each_blocks[i].c();
+						transition_in(each_blocks[i], 1);
 						each_blocks[i].m(div0, null);
 					}
 				}
 
-				for (; i < each_blocks.length; i += 1) {
-					each_blocks[i].d(1);
+				group_outros();
+
+				for (i = each_value_1.length; i < each_blocks.length; i += 1) {
+					out(i);
 				}
 
-				each_blocks.length = each_value_1.length;
+				check_outros();
 			}
+		},
+		i(local) {
+			if (current) return;
+
+			for (let i = 0; i < each_value_1.length; i += 1) {
+				transition_in(each_blocks[i]);
+			}
+
+			current = true;
+		},
+		o(local) {
+			each_blocks = each_blocks.filter(Boolean);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				transition_out(each_blocks[i]);
+			}
+
+			current = false;
 		},
 		d(detaching) {
 			if (detaching) detach(div3);
@@ -40701,40 +40731,57 @@ function create_if_block_5(ctx) {
 // (260:12) {#each toc as {h, label}}
 function create_each_block_1(ctx) {
 	let a;
-	let t_value = /*label*/ ctx[20] + "";
+	let markdown;
 	let t;
 	let a_href_value;
 	let a_class_value;
+	let current;
+	markdown = new Markdown({ props: { data: /*label*/ ctx[20] } });
 
 	return {
 		c() {
 			a = element("a");
-			t = text(t_value);
+			create_component(markdown.$$.fragment);
+			t = space();
 			attr(a, "href", a_href_value = "#" + slugify(/*label*/ ctx[20]));
 			attr(a, "class", a_class_value = "toc h" + /*h*/ ctx[19]);
 		},
 		m(target, anchor) {
 			insert(target, a, anchor);
+			mount_component(markdown, a, null);
 			append(a, t);
+			current = true;
 		},
 		p(ctx, dirty) {
-			if (dirty & /*toc*/ 16 && t_value !== (t_value = /*label*/ ctx[20] + "")) set_data(t, t_value);
+			const markdown_changes = {};
+			if (dirty & /*toc*/ 16) markdown_changes.data = /*label*/ ctx[20];
+			markdown.$set(markdown_changes);
 
-			if (dirty & /*toc*/ 16 && a_href_value !== (a_href_value = "#" + slugify(/*label*/ ctx[20]))) {
+			if (!current || dirty & /*toc*/ 16 && a_href_value !== (a_href_value = "#" + slugify(/*label*/ ctx[20]))) {
 				attr(a, "href", a_href_value);
 			}
 
-			if (dirty & /*toc*/ 16 && a_class_value !== (a_class_value = "toc h" + /*h*/ ctx[19])) {
+			if (!current || dirty & /*toc*/ 16 && a_class_value !== (a_class_value = "toc h" + /*h*/ ctx[19])) {
 				attr(a, "class", a_class_value);
 			}
 		},
+		i(local) {
+			if (current) return;
+			transition_in(markdown.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transition_out(markdown.$$.fragment, local);
+			current = false;
+		},
 		d(detaching) {
 			if (detaching) detach(a);
+			destroy_component(markdown);
 		}
 	};
 }
 
-// (276:4) {#if nb}
+// (278:4) {#if nb}
 function create_if_block(ctx) {
 	let cells;
 	let current;
@@ -40778,7 +40825,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (279:10) {#if collapse(cell.source) !== ''}
+// (281:10) {#if collapse(cell.source) !== ''}
 function create_if_block_1(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -40863,7 +40910,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (298:52) 
+// (300:52) 
 function create_if_block_4(ctx) {
 	let cell;
 	let current;
@@ -40908,7 +40955,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (280:12) {#if cell.cell_type === 'code'}
+// (282:12) {#if cell.cell_type === 'code'}
 function create_if_block_2(ctx) {
 	let cell;
 	let current;
@@ -40953,7 +41000,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (300:16) <Input>
+// (302:16) <Input>
 function create_default_slot_4(ctx) {
 	let prompt;
 	let t;
@@ -41010,7 +41057,7 @@ function create_default_slot_4(ctx) {
 	};
 }
 
-// (299:14) <Cell type="text">
+// (301:14) <Cell type="text">
 function create_default_slot_3(ctx) {
 	let input;
 	let t;
@@ -41058,7 +41105,7 @@ function create_default_slot_3(ctx) {
 	};
 }
 
-// (282:16) {#if show_code}
+// (284:16) {#if show_code}
 function create_if_block_3(ctx) {
 	let input;
 	let current;
@@ -41102,7 +41149,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (283:18) <Input>
+// (285:18) <Input>
 function create_default_slot_2(ctx) {
 	let prompt;
 	let t;
@@ -41173,7 +41220,7 @@ function create_default_slot_2(ctx) {
 	};
 }
 
-// (281:14) <Cell type="code">
+// (283:14) <Cell type="code">
 function create_default_slot_1(ctx) {
 	let t0;
 	let outputs;
@@ -41247,7 +41294,7 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (278:8) {#each nb.cells as cell (cell.index)}
+// (280:8) {#each nb.cells as cell (cell.index)}
 function create_each_block(key_1, ctx) {
 	let first;
 	let show_if = collapse(/*cell*/ ctx[16].source) !== "";
@@ -41313,7 +41360,7 @@ function create_each_block(key_1, ctx) {
 	};
 }
 
-// (277:6) <Cells>
+// (279:6) <Cells>
 function create_default_slot(ctx) {
 	let each_blocks = [];
 	let each_1_lookup = new Map();
@@ -41506,14 +41553,24 @@ function create_fragment(ctx) {
 			if (/*toc*/ ctx[4] !== undefined) {
 				if (if_block3) {
 					if_block3.p(ctx, dirty);
+
+					if (dirty & /*toc*/ 16) {
+						transition_in(if_block3, 1);
+					}
 				} else {
 					if_block3 = create_if_block_5(ctx);
 					if_block3.c();
+					transition_in(if_block3, 1);
 					if_block3.m(div4, t8);
 				}
 			} else if (if_block3) {
-				if_block3.d(1);
-				if_block3 = null;
+				group_outros();
+
+				transition_out(if_block3, 1, 1, () => {
+					if_block3 = null;
+				});
+
+				check_outros();
 			}
 
 			if (/*nb*/ ctx[2]) {
@@ -41549,10 +41606,12 @@ function create_fragment(ctx) {
 		},
 		i(local) {
 			if (current) return;
+			transition_in(if_block3);
 			transition_in(if_block4);
 			current = true;
 		},
 		o(local) {
+			transition_out(if_block3);
 			transition_out(if_block4);
 			current = false;
 		},
