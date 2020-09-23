@@ -2,7 +2,6 @@
   import * as Output from "./Output.svelte"
   import collapse from '../../utils/collapse.js'
 
-  export let requirejs
   export let data = []
 
   function *reduce_output_streams(outputs) {
@@ -30,10 +29,7 @@
 <div class="output_wrapper">
   <div class="output">
     {#each [...reduce_output_streams(data)] as output}
-      <Output
-        requirejs={requirejs}
-        data={output}
-      />
+      <Output data={output} />
     {/each}
   </div>
 </div>

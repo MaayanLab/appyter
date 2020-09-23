@@ -1,11 +1,11 @@
 <script>
   import { onMount } from "svelte";
 
-  export let requirejs
+  export let window
   export let args
 
   // get deps with requirejs
-  requirejs.config({
+  window.require.config({
     paths: {
       'socketio-file-upload': 'https://cdn.jsdelivr.net/npm/socketio-file-upload@0.7.0/client.min',
     },
@@ -22,7 +22,7 @@
     if (_deps === undefined) {
       _deps = await new Promise(
         (resolve, reject) =>
-          requirejs(['socket', 'socketio-file-upload'], function (socket, SocketIOFileUpload) {
+          window.require(['socket', 'socketio-file-upload'], function (socket, SocketIOFileUpload) {
             resolve({
               socket,
               siofu: new SocketIOFileUpload(socket),

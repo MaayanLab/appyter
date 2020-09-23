@@ -6,13 +6,12 @@
   import * as Prompt from '../../../../components/jupyter/Prompt.svelte'
   import * as Source from '../../../../components/jupyter/Source.svelte'
   import * as Outputs from '../../../../components/jupyter/Outputs.svelte'
-  import * as Output from '../../../../components/jupyter/Output.svelte'
   import * as Markdown from '../../../../components/jupyter/Markdown.svelte'
   import collapse from '../../../../utils/collapse'
   import slugify from '../../../../utils/slugify'
   import any from '../../../../utils/any'
 
-  export let requirejs
+  export let window
   export let nbdownload
   export let extras = []
 
@@ -26,7 +25,7 @@
     if (_deps === undefined) {
       _deps = await new Promise(
         (resolve, reject) =>
-          requirejs.require(['socket'], function (socket, SocketIOFileUpload) {
+          window.require(['socket'], function (socket, SocketIOFileUpload) {
             resolve({ socket })
           }, reject)
       )
@@ -293,10 +292,7 @@
                   />
                 </Input>
               {/if}
-              <Outputs
-                requirejs={requirejs}
-                data={cell.outputs || []}
-              />
+              <Outputs data={cell.outputs || []} />
             </Cell>
           {:else if cell.cell_type === 'markdown'}
             <Cell type="text">

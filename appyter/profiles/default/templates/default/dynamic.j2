@@ -13,7 +13,7 @@ require(['{{ url_for('profile', path='js') + '/dynamic.js' }}'], function (Compo
   var component = new Component({
     target: self,
     props: {
-      requirejs: require,
+      window: window,
       nbdownload: {{ _nb|jsonify }},
       data: {{ _data }},
     },

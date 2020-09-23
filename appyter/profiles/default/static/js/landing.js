@@ -349,7 +349,6 @@ module.exports = Markdown;
 "use strict";
 
 const { SvelteComponent, append, attr, binding_callbacks, check_outros, create_component, destroy_component, detach, element, empty, group_outros, init, insert, mount_component, noop, safe_not_equal, set_data, set_style, space, text, transition_in, transition_out } = require("svelte/internal");
-const { onMount, tick } = require("svelte");
 const Markdown = require("./Markdown.svelte");
 const Ansi = require("./Ansi.svelte");
 const { default: collapse } = require("../../utils/collapse.js");
@@ -433,7 +432,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (103:4) {:else}
+// (99:4) {:else}
 function create_else_block_3(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[1]) + "";
 	let t;
@@ -456,7 +455,7 @@ function create_else_block_3(ctx) {
 	};
 }
 
-// (95:43) 
+// (91:43) 
 function create_if_block_10(ctx) {
 	let div;
 	let current_block_type_index;
@@ -525,7 +524,7 @@ function create_if_block_10(ctx) {
 	};
 }
 
-// (65:50) 
+// (61:50) 
 function create_if_block_4(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -606,7 +605,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (53:52) 
+// (49:52) 
 function create_if_block_2(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -674,7 +673,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (49:4) {#if data.output_type === 'stream'}
+// (45:4) {#if data.output_type === 'stream'}
 function create_if_block_1(ctx) {
 	let div;
 	let ansi;
@@ -721,7 +720,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (99:8) {:else}
+// (95:8) {:else}
 function create_else_block_2(ctx) {
 	let ansi;
 	let current;
@@ -760,7 +759,7 @@ function create_else_block_2(ctx) {
 	};
 }
 
-// (97:8) {#if data.traceback !== undefined}
+// (93:8) {#if data.traceback !== undefined}
 function create_if_block_11(ctx) {
 	let ansi;
 	let current;
@@ -799,7 +798,7 @@ function create_if_block_11(ctx) {
 	};
 }
 
-// (92:6) {:else}
+// (88:6) {:else}
 function create_else_block_1(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[1]) + "";
 	let t;
@@ -822,7 +821,7 @@ function create_else_block_1(ctx) {
 	};
 }
 
-// (86:52) 
+// (82:52) 
 function create_if_block_9(ctx) {
 	let div;
 
@@ -834,19 +833,19 @@ function create_if_block_9(ctx) {
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
-			/*div_binding_2*/ ctx[5](div);
+			/*div_binding_2*/ ctx[4](div);
 		},
 		p: noop,
 		i: noop,
 		o: noop,
 		d(detaching) {
 			if (detaching) detach(div);
-			/*div_binding_2*/ ctx[5](null);
+			/*div_binding_2*/ ctx[4](null);
 		}
 	};
 }
 
-// (82:40) 
+// (78:40) 
 function create_if_block_8(ctx) {
 	let div;
 	let ansi;
@@ -895,7 +894,7 @@ function create_if_block_8(ctx) {
 	};
 }
 
-// (78:43) 
+// (74:43) 
 function create_if_block_7(ctx) {
 	let div;
 	let markdown;
@@ -944,7 +943,7 @@ function create_if_block_7(ctx) {
 	};
 }
 
-// (73:39) 
+// (69:39) 
 function create_if_block_6(ctx) {
 	let div;
 
@@ -956,19 +955,19 @@ function create_if_block_6(ctx) {
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
-			/*div_binding_1*/ ctx[4](div);
+			/*div_binding_1*/ ctx[3](div);
 		},
 		p: noop,
 		i: noop,
 		o: noop,
 		d(detaching) {
 			if (detaching) detach(div);
-			/*div_binding_1*/ ctx[4](null);
+			/*div_binding_1*/ ctx[3](null);
 		}
 	};
 }
 
-// (66:6) {#if data.data['image/png']}
+// (62:6) {#if data.data['image/png']}
 function create_if_block_5(ctx) {
 	let div;
 	let img;
@@ -999,7 +998,7 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (60:6) {:else}
+// (56:6) {:else}
 function create_else_block(ctx) {
 	let div;
 	let ansi;
@@ -1043,7 +1042,7 @@ function create_else_block(ctx) {
 	};
 }
 
-// (54:6) {#if data.data['text/html']}
+// (50:6) {#if data.data['text/html']}
 function create_if_block_3(ctx) {
 	let div;
 
@@ -1055,14 +1054,14 @@ function create_if_block_3(ctx) {
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
-			/*div_binding*/ ctx[3](div);
+			/*div_binding*/ ctx[2](div);
 		},
 		p: noop,
 		i: noop,
 		o: noop,
 		d(detaching) {
 			if (detaching) detach(div);
-			/*div_binding*/ ctx[3](null);
+			/*div_binding*/ ctx[2](null);
 		}
 	};
 }
@@ -1131,7 +1130,6 @@ function create_fragment(ctx) {
 }
 
 function instance($$self, $$props, $$invalidate) {
-	let { requirejs } = $$props;
 	let { data } = $$props;
 	let { ref } = $$props;
 	let evaled = {};
@@ -1140,11 +1138,8 @@ function instance($$self, $$props, $$invalidate) {
 		if (evaled[src] === undefined) {
 			evaled[src] = true;
 
-			// make sure requirejs is accessible
-			const { require, define } = requirejs;
-
 			try {
-				eval(src);
+				new Function(src)();
 			} catch(e) {
 				console.error(e);
 			}
@@ -1173,7 +1168,6 @@ function instance($$self, $$props, $$invalidate) {
 	}
 
 	$$self.$$set = $$props => {
-		if ("requirejs" in $$props) $$invalidate(2, requirejs = $$props.requirejs);
 		if ("data" in $$props) $$invalidate(1, data = $$props.data);
 		if ("ref" in $$props) $$invalidate(0, ref = $$props.ref);
 	};
@@ -1203,19 +1197,19 @@ function instance($$self, $$props, $$invalidate) {
 		}
 	};
 
-	return [ref, data, requirejs, div_binding, div_binding_1, div_binding_2];
+	return [ref, data, div_binding, div_binding_1, div_binding_2];
 }
 
 class Output extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, { requirejs: 2, data: 1, ref: 0 });
+		init(this, options, instance, create_fragment, safe_not_equal, { data: 1, ref: 0 });
 	}
 }
 
 module.exports = Output;
 
-},{"../../utils/collapse.js":274,"./Ansi.svelte":1,"./Markdown.svelte":5,"svelte":264,"svelte/internal":265}],7:[function(require,module,exports){
+},{"../../utils/collapse.js":274,"./Ansi.svelte":1,"./Markdown.svelte":5,"svelte/internal":265}],7:[function(require,module,exports){
 /* Outputs.svelte generated by Svelte v3.24.1 */
 "use strict";
 
@@ -1225,21 +1219,15 @@ const { default: collapse } = require("../../utils/collapse.js");
 
 function get_each_context(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[3] = list[i];
+	child_ctx[2] = list[i];
 	return child_ctx;
 }
 
-// (32:4) {#each [...reduce_output_streams(data)] as output}
+// (31:4) {#each [...reduce_output_streams(data)] as output}
 function create_each_block(ctx) {
 	let output;
 	let current;
-
-	output = new Output({
-			props: {
-				requirejs: /*requirejs*/ ctx[0],
-				data: /*output*/ ctx[3]
-			}
-		});
+	output = new Output({ props: { data: /*output*/ ctx[2] } });
 
 	return {
 		c() {
@@ -1251,8 +1239,7 @@ function create_each_block(ctx) {
 		},
 		p(ctx, dirty) {
 			const output_changes = {};
-			if (dirty & /*requirejs*/ 1) output_changes.requirejs = /*requirejs*/ ctx[0];
-			if (dirty & /*data*/ 2) output_changes.data = /*output*/ ctx[3];
+			if (dirty & /*data*/ 1) output_changes.data = /*output*/ ctx[2];
 			output.$set(output_changes);
 		},
 		i(local) {
@@ -1274,7 +1261,7 @@ function create_fragment(ctx) {
 	let div1;
 	let div0;
 	let current;
-	let each_value = [.../*reduce_output_streams*/ ctx[2](/*data*/ ctx[1])];
+	let each_value = [.../*reduce_output_streams*/ ctx[1](/*data*/ ctx[0])];
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value.length; i += 1) {
@@ -1308,8 +1295,8 @@ function create_fragment(ctx) {
 			current = true;
 		},
 		p(ctx, [dirty]) {
-			if (dirty & /*requirejs, reduce_output_streams, data*/ 7) {
-				each_value = [.../*reduce_output_streams*/ ctx[2](/*data*/ ctx[1])];
+			if (dirty & /*reduce_output_streams, data*/ 3) {
+				each_value = [.../*reduce_output_streams*/ ctx[1](/*data*/ ctx[0])];
 				let i;
 
 				for (i = 0; i < each_value.length; i += 1) {
@@ -1361,7 +1348,6 @@ function create_fragment(ctx) {
 }
 
 function instance($$self, $$props, $$invalidate) {
-	let { requirejs } = $$props;
 	let { data = [] } = $$props;
 
 	function* reduce_output_streams(outputs) {
@@ -1387,17 +1373,16 @@ function instance($$self, $$props, $$invalidate) {
 	}
 
 	$$self.$$set = $$props => {
-		if ("requirejs" in $$props) $$invalidate(0, requirejs = $$props.requirejs);
-		if ("data" in $$props) $$invalidate(1, data = $$props.data);
+		if ("data" in $$props) $$invalidate(0, data = $$props.data);
 	};
 
-	return [requirejs, data, reduce_output_streams];
+	return [data, reduce_output_streams];
 }
 
 class Outputs extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, { requirejs: 0, data: 1 });
+		init(this, options, instance, create_fragment, safe_not_equal, { data: 0 });
 	}
 }
 
@@ -40541,7 +40526,6 @@ const Input = require("../../../../components/jupyter/Input.svelte");
 const Prompt = require("../../../../components/jupyter/Prompt.svelte");
 const Source = require("../../../../components/jupyter/Source.svelte");
 const Outputs = require("../../../../components/jupyter/Outputs.svelte");
-const Output = require("../../../../components/jupyter/Output.svelte");
 const Markdown = require("../../../../components/jupyter/Markdown.svelte");
 const { default: collapse } = require("../../../../utils/collapse");
 const { default: slugify } = require("../../../../utils/slugify");
@@ -40567,7 +40551,7 @@ function get_each_context_1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (134:0) {#if toc !== undefined}
+// (133:0) {#if toc !== undefined}
 function create_if_block_7(ctx) {
 	let style;
 
@@ -40585,7 +40569,7 @@ function create_if_block_7(ctx) {
 	};
 }
 
-// (236:4) {#if extras.indexOf('toggle-code') !== -1}
+// (235:4) {#if extras.indexOf('toggle-code') !== -1}
 function create_if_block_6(ctx) {
 	let a;
 	let mounted;
@@ -40615,7 +40599,7 @@ function create_if_block_6(ctx) {
 	};
 }
 
-// (247:2) {#if status}
+// (246:2) {#if status}
 function create_if_block_5(ctx) {
 	let div1;
 	let div0;
@@ -40626,8 +40610,8 @@ function create_if_block_5(ctx) {
 		c() {
 			div1 = element("div");
 			div0 = element("div");
-			t = text(/*status*/ ctx[6]);
-			attr(div0, "class", div0_class_value = "alert alert-" + /*statusBg*/ ctx[7]);
+			t = text(/*status*/ ctx[5]);
+			attr(div0, "class", div0_class_value = "alert alert-" + /*statusBg*/ ctx[6]);
 			attr(div0, "role", "alert");
 			attr(div1, "class", "col-sm-8 offset-sm-2");
 		},
@@ -40637,9 +40621,9 @@ function create_if_block_5(ctx) {
 			append(div0, t);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*status*/ 64) set_data(t, /*status*/ ctx[6]);
+			if (dirty & /*status*/ 32) set_data(t, /*status*/ ctx[5]);
 
-			if (dirty & /*statusBg*/ 128 && div0_class_value !== (div0_class_value = "alert alert-" + /*statusBg*/ ctx[7])) {
+			if (dirty & /*statusBg*/ 64 && div0_class_value !== (div0_class_value = "alert alert-" + /*statusBg*/ ctx[6])) {
 				attr(div0, "class", div0_class_value);
 			}
 		},
@@ -40649,7 +40633,7 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (255:2) {#if toc !== undefined}
+// (254:2) {#if toc !== undefined}
 function create_if_block_4(ctx) {
 	let div3;
 	let div2;
@@ -40657,7 +40641,7 @@ function create_if_block_4(ctx) {
 	let div0;
 	let legend;
 	let t1;
-	let each_value_1 = /*toc*/ ctx[5];
+	let each_value_1 = /*toc*/ ctx[4];
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value_1.length; i += 1) {
@@ -40696,8 +40680,8 @@ function create_if_block_4(ctx) {
 			}
 		},
 		p(ctx, dirty) {
-			if (dirty & /*slugify, toc*/ 32) {
-				each_value_1 = /*toc*/ ctx[5];
+			if (dirty & /*slugify, toc*/ 16) {
+				each_value_1 = /*toc*/ ctx[4];
 				let i;
 
 				for (i = 0; i < each_value_1.length; i += 1) {
@@ -40726,7 +40710,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (261:12) {#each toc as {h, label}}
+// (260:12) {#each toc as {h, label}}
 function create_each_block_1(ctx) {
 	let a;
 	let t_value = /*label*/ ctx[20] + "";
@@ -40746,13 +40730,13 @@ function create_each_block_1(ctx) {
 			append(a, t);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*toc*/ 32 && t_value !== (t_value = /*label*/ ctx[20] + "")) set_data(t, t_value);
+			if (dirty & /*toc*/ 16 && t_value !== (t_value = /*label*/ ctx[20] + "")) set_data(t, t_value);
 
-			if (dirty & /*toc*/ 32 && a_href_value !== (a_href_value = "#" + slugify(/*label*/ ctx[20]))) {
+			if (dirty & /*toc*/ 16 && a_href_value !== (a_href_value = "#" + slugify(/*label*/ ctx[20]))) {
 				attr(a, "href", a_href_value);
 			}
 
-			if (dirty & /*toc*/ 32 && a_class_value !== (a_class_value = "toc h" + /*h*/ ctx[19])) {
+			if (dirty & /*toc*/ 16 && a_class_value !== (a_class_value = "toc h" + /*h*/ ctx[19])) {
 				attr(a, "class", a_class_value);
 			}
 		},
@@ -40762,7 +40746,7 @@ function create_each_block_1(ctx) {
 	};
 }
 
-// (277:4) {#if nb}
+// (276:4) {#if nb}
 function create_if_block(ctx) {
 	let cells;
 	let current;
@@ -40785,7 +40769,7 @@ function create_if_block(ctx) {
 		p(ctx, dirty) {
 			const cells_changes = {};
 
-			if (dirty & /*$$scope, nb, requirejs, current_code_cell, show_code*/ 8388889) {
+			if (dirty & /*$$scope, nb, current_code_cell, show_code*/ 8388748) {
 				cells_changes.$$scope = { dirty, ctx };
 			}
 
@@ -40806,7 +40790,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (301:50) 
+// (297:50) 
 function create_if_block_3(ctx) {
 	let cell;
 	let current;
@@ -40830,7 +40814,7 @@ function create_if_block_3(ctx) {
 		p(ctx, dirty) {
 			const cell_changes = {};
 
-			if (dirty & /*$$scope, nb*/ 8388616) {
+			if (dirty & /*$$scope, nb*/ 8388612) {
 				cell_changes.$$scope = { dirty, ctx };
 			}
 
@@ -40851,7 +40835,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (280:10) {#if cell.cell_type === 'code'}
+// (279:10) {#if cell.cell_type === 'code'}
 function create_if_block_1(ctx) {
 	let cell;
 	let current;
@@ -40875,7 +40859,7 @@ function create_if_block_1(ctx) {
 		p(ctx, dirty) {
 			const cell_changes = {};
 
-			if (dirty & /*$$scope, requirejs, nb, current_code_cell, show_code*/ 8388889) {
+			if (dirty & /*$$scope, nb, current_code_cell, show_code*/ 8388748) {
 				cell_changes.$$scope = { dirty, ctx };
 			}
 
@@ -40896,7 +40880,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (303:14) <Input>
+// (299:14) <Input>
 function create_default_slot_4(ctx) {
 	let prompt;
 	let t;
@@ -40930,7 +40914,7 @@ function create_default_slot_4(ctx) {
 		},
 		p(ctx, dirty) {
 			const markdown_changes = {};
-			if (dirty & /*nb*/ 8) markdown_changes.data = collapse(/*cell*/ ctx[16].source);
+			if (dirty & /*nb*/ 4) markdown_changes.data = collapse(/*cell*/ ctx[16].source);
 			markdown.$set(markdown_changes);
 		},
 		i(local) {
@@ -40953,7 +40937,7 @@ function create_default_slot_4(ctx) {
 	};
 }
 
-// (302:12) <Cell type="text">
+// (298:12) <Cell type="text">
 function create_default_slot_3(ctx) {
 	let input;
 	let t;
@@ -40979,7 +40963,7 @@ function create_default_slot_3(ctx) {
 		p(ctx, dirty) {
 			const input_changes = {};
 
-			if (dirty & /*$$scope, nb*/ 8388616) {
+			if (dirty & /*$$scope, nb*/ 8388612) {
 				input_changes.$$scope = { dirty, ctx };
 			}
 
@@ -41001,7 +40985,7 @@ function create_default_slot_3(ctx) {
 	};
 }
 
-// (282:14) {#if show_code}
+// (281:14) {#if show_code}
 function create_if_block_2(ctx) {
 	let input;
 	let current;
@@ -41024,7 +41008,7 @@ function create_if_block_2(ctx) {
 		p(ctx, dirty) {
 			const input_changes = {};
 
-			if (dirty & /*$$scope, nb, current_code_cell*/ 8388872) {
+			if (dirty & /*$$scope, nb, current_code_cell*/ 8388740) {
 				input_changes.$$scope = { dirty, ctx };
 			}
 
@@ -41045,7 +41029,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (283:16) <Input>
+// (282:16) <Input>
 function create_default_slot_2(ctx) {
 	let prompt;
 	let t;
@@ -41054,8 +41038,8 @@ function create_default_slot_2(ctx) {
 
 	prompt = new Prompt({
 			props: {
-				running: /*current_code_cell*/ ctx[8] !== undefined
-				? /*cell*/ ctx[16].index >= /*current_code_cell*/ ctx[8]
+				running: /*current_code_cell*/ ctx[7] !== undefined
+				? /*cell*/ ctx[16].index >= /*current_code_cell*/ ctx[7]
 				: undefined,
 				error: any(/*cell*/ ctx[16].outputs.map(func)),
 				counter: /*cell*/ ctx[16].execution_count,
@@ -41085,16 +41069,16 @@ function create_default_slot_2(ctx) {
 		p(ctx, dirty) {
 			const prompt_changes = {};
 
-			if (dirty & /*current_code_cell, nb*/ 264) prompt_changes.running = /*current_code_cell*/ ctx[8] !== undefined
-			? /*cell*/ ctx[16].index >= /*current_code_cell*/ ctx[8]
+			if (dirty & /*current_code_cell, nb*/ 132) prompt_changes.running = /*current_code_cell*/ ctx[7] !== undefined
+			? /*cell*/ ctx[16].index >= /*current_code_cell*/ ctx[7]
 			: undefined;
 
-			if (dirty & /*nb*/ 8) prompt_changes.error = any(/*cell*/ ctx[16].outputs.map(func));
-			if (dirty & /*nb*/ 8) prompt_changes.counter = /*cell*/ ctx[16].execution_count;
-			if (dirty & /*nb*/ 8) prompt_changes.cell_type = /*cell*/ ctx[16].cell_type;
+			if (dirty & /*nb*/ 4) prompt_changes.error = any(/*cell*/ ctx[16].outputs.map(func));
+			if (dirty & /*nb*/ 4) prompt_changes.counter = /*cell*/ ctx[16].execution_count;
+			if (dirty & /*nb*/ 4) prompt_changes.cell_type = /*cell*/ ctx[16].cell_type;
 			prompt.$set(prompt_changes);
 			const source_changes = {};
-			if (dirty & /*nb*/ 8) source_changes.source = collapse(/*cell*/ ctx[16].source);
+			if (dirty & /*nb*/ 4) source_changes.source = collapse(/*cell*/ ctx[16].source);
 			source.$set(source_changes);
 		},
 		i(local) {
@@ -41116,19 +41100,16 @@ function create_default_slot_2(ctx) {
 	};
 }
 
-// (281:12) <Cell type="code">
+// (280:12) <Cell type="code">
 function create_default_slot_1(ctx) {
 	let t0;
 	let outputs;
 	let t1;
 	let current;
-	let if_block = /*show_code*/ ctx[4] && create_if_block_2(ctx);
+	let if_block = /*show_code*/ ctx[3] && create_if_block_2(ctx);
 
 	outputs = new Outputs({
-			props: {
-				requirejs: /*requirejs*/ ctx[0],
-				data: /*cell*/ ctx[16].outputs || []
-			}
+			props: { data: /*cell*/ ctx[16].outputs || [] }
 		});
 
 	return {
@@ -41146,11 +41127,11 @@ function create_default_slot_1(ctx) {
 			current = true;
 		},
 		p(ctx, dirty) {
-			if (/*show_code*/ ctx[4]) {
+			if (/*show_code*/ ctx[3]) {
 				if (if_block) {
 					if_block.p(ctx, dirty);
 
-					if (dirty & /*show_code*/ 16) {
+					if (dirty & /*show_code*/ 8) {
 						transition_in(if_block, 1);
 					}
 				} else {
@@ -41170,8 +41151,7 @@ function create_default_slot_1(ctx) {
 			}
 
 			const outputs_changes = {};
-			if (dirty & /*requirejs*/ 1) outputs_changes.requirejs = /*requirejs*/ ctx[0];
-			if (dirty & /*nb*/ 8) outputs_changes.data = /*cell*/ ctx[16].outputs || [];
+			if (dirty & /*nb*/ 4) outputs_changes.data = /*cell*/ ctx[16].outputs || [];
 			outputs.$set(outputs_changes);
 		},
 		i(local) {
@@ -41194,7 +41174,7 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (279:8) {#each nb.cells as cell (cell.index)}
+// (278:8) {#each nb.cells as cell (cell.index)}
 function create_each_block(key_1, ctx) {
 	let first;
 	let current_block_type_index;
@@ -41288,13 +41268,13 @@ function create_each_block(key_1, ctx) {
 	};
 }
 
-// (278:6) <Cells>
+// (277:6) <Cells>
 function create_default_slot(ctx) {
 	let each_blocks = [];
 	let each_1_lookup = new Map();
 	let each_1_anchor;
 	let current;
-	let each_value = /*nb*/ ctx[3].cells;
+	let each_value = /*nb*/ ctx[2].cells;
 	const get_key = ctx => /*cell*/ ctx[16].index;
 
 	for (let i = 0; i < each_value.length; i += 1) {
@@ -41320,8 +41300,8 @@ function create_default_slot(ctx) {
 			current = true;
 		},
 		p(ctx, dirty) {
-			if (dirty & /*requirejs, nb, collapse, current_code_cell, undefined, any, show_code*/ 281) {
-				const each_value = /*nb*/ ctx[3].cells;
+			if (dirty & /*nb, collapse, current_code_cell, undefined, any, show_code*/ 140) {
+				const each_value = /*nb*/ ctx[2].cells;
 				group_outros();
 				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, each_1_anchor.parentNode, outro_and_destroy_block, create_each_block, each_1_anchor, get_each_context);
 				check_outros();
@@ -41360,7 +41340,7 @@ function create_fragment(ctx) {
 	let a;
 	let t1;
 	let t2;
-	let show_if = /*extras*/ ctx[2].indexOf("toggle-code") !== -1;
+	let show_if = /*extras*/ ctx[1].indexOf("toggle-code") !== -1;
 	let t3;
 	let div1;
 	let t5;
@@ -41370,11 +41350,11 @@ function create_fragment(ctx) {
 	let t8;
 	let div3;
 	let current;
-	let if_block0 = /*toc*/ ctx[5] !== undefined && create_if_block_7(ctx);
+	let if_block0 = /*toc*/ ctx[4] !== undefined && create_if_block_7(ctx);
 	let if_block1 = show_if && create_if_block_6(ctx);
-	let if_block2 = /*status*/ ctx[6] && create_if_block_5(ctx);
-	let if_block3 = /*toc*/ ctx[5] !== undefined && create_if_block_4(ctx);
-	let if_block4 = /*nb*/ ctx[3] && create_if_block(ctx);
+	let if_block2 = /*status*/ ctx[5] && create_if_block_5(ctx);
+	let if_block3 = /*toc*/ ctx[4] !== undefined && create_if_block_4(ctx);
+	let if_block4 = /*nb*/ ctx[2] && create_if_block(ctx);
 
 	return {
 		c() {
@@ -41401,13 +41381,13 @@ function create_fragment(ctx) {
 			attr(a, "id", "download-notebook");
 			attr(a, "class", "btn btn-primary");
 			attr(a, "role", "button");
-			attr(a, "href", /*nbdownload*/ ctx[1]);
+			attr(a, "href", /*nbdownload*/ ctx[0]);
 			attr(div0, "class", "col-sm-12 text-center");
 			attr(div1, "class", "w-100");
 			attr(div2, "class", "w-100");
 			attr(div3, "class", "col-sm-12");
-			toggle_class(div3, "col-md-9", /*toc*/ ctx[5] !== undefined);
-			toggle_class(div3, "col-xl-10", /*toc*/ ctx[5] !== undefined);
+			toggle_class(div3, "col-md-9", /*toc*/ ctx[4] !== undefined);
+			toggle_class(div3, "col-xl-10", /*toc*/ ctx[4] !== undefined);
 			attr(div4, "class", "row");
 		},
 		m(target, anchor) {
@@ -41433,7 +41413,7 @@ function create_fragment(ctx) {
 			current = true;
 		},
 		p(ctx, [dirty]) {
-			if (/*toc*/ ctx[5] !== undefined) {
+			if (/*toc*/ ctx[4] !== undefined) {
 				if (if_block0) {
 					
 				} else {
@@ -41446,11 +41426,11 @@ function create_fragment(ctx) {
 				if_block0 = null;
 			}
 
-			if (!current || dirty & /*nbdownload*/ 2) {
-				attr(a, "href", /*nbdownload*/ ctx[1]);
+			if (!current || dirty & /*nbdownload*/ 1) {
+				attr(a, "href", /*nbdownload*/ ctx[0]);
 			}
 
-			if (dirty & /*extras*/ 4) show_if = /*extras*/ ctx[2].indexOf("toggle-code") !== -1;
+			if (dirty & /*extras*/ 2) show_if = /*extras*/ ctx[1].indexOf("toggle-code") !== -1;
 
 			if (show_if) {
 				if (if_block1) {
@@ -41465,7 +41445,7 @@ function create_fragment(ctx) {
 				if_block1 = null;
 			}
 
-			if (/*status*/ ctx[6]) {
+			if (/*status*/ ctx[5]) {
 				if (if_block2) {
 					if_block2.p(ctx, dirty);
 				} else {
@@ -41478,7 +41458,7 @@ function create_fragment(ctx) {
 				if_block2 = null;
 			}
 
-			if (/*toc*/ ctx[5] !== undefined) {
+			if (/*toc*/ ctx[4] !== undefined) {
 				if (if_block3) {
 					if_block3.p(ctx, dirty);
 				} else {
@@ -41491,11 +41471,11 @@ function create_fragment(ctx) {
 				if_block3 = null;
 			}
 
-			if (/*nb*/ ctx[3]) {
+			if (/*nb*/ ctx[2]) {
 				if (if_block4) {
 					if_block4.p(ctx, dirty);
 
-					if (dirty & /*nb*/ 8) {
+					if (dirty & /*nb*/ 4) {
 						transition_in(if_block4, 1);
 					}
 				} else {
@@ -41514,12 +41494,12 @@ function create_fragment(ctx) {
 				check_outros();
 			}
 
-			if (dirty & /*toc, undefined*/ 32) {
-				toggle_class(div3, "col-md-9", /*toc*/ ctx[5] !== undefined);
+			if (dirty & /*toc, undefined*/ 16) {
+				toggle_class(div3, "col-md-9", /*toc*/ ctx[4] !== undefined);
 			}
 
-			if (dirty & /*toc, undefined*/ 32) {
-				toggle_class(div3, "col-xl-10", /*toc*/ ctx[5] !== undefined);
+			if (dirty & /*toc, undefined*/ 16) {
+				toggle_class(div3, "col-xl-10", /*toc*/ ctx[4] !== undefined);
 			}
 		},
 		i(local) {
@@ -41555,7 +41535,7 @@ function* get_md_headers(md) {
 const func = ({ output_type }) => output_type === "error";
 
 function instance($$self, $$props, $$invalidate) {
-	let { requirejs } = $$props;
+	let { window } = $$props;
 	let { nbdownload } = $$props;
 	let { extras = [] } = $$props;
 	let nb;
@@ -41568,7 +41548,7 @@ function instance($$self, $$props, $$invalidate) {
 
 	async function ensure_deps() {
 		if (_deps === undefined) {
-			_deps = await new Promise((resolve, reject) => requirejs.require(
+			_deps = await new Promise((resolve, reject) => window.require(
 					["socket"],
 					function (socket, SocketIOFileUpload) {
 						resolve({ socket });
@@ -41597,25 +41577,25 @@ function instance($$self, $$props, $$invalidate) {
 	async function setup_async_exec() {
 		socket.on("status", async value => {
 			await tick();
-			$$invalidate(6, status = value);
-			$$invalidate(7, statusBg = "primary");
+			$$invalidate(5, status = value);
+			$$invalidate(6, statusBg = "primary");
 
 			if (status === "Success") {
-				$$invalidate(8, current_code_cell = undefined);
+				$$invalidate(7, current_code_cell = undefined);
 			}
 		});
 
 		socket.on("error", async value => {
 			await tick();
-			$$invalidate(8, current_code_cell = undefined);
-			$$invalidate(6, status = `Error: ${value}`);
-			$$invalidate(7, statusBg = "danger");
+			$$invalidate(7, current_code_cell = undefined);
+			$$invalidate(5, status = `Error: ${value}`);
+			$$invalidate(6, statusBg = "danger");
 		});
 
 		socket.on("nb", async value => {
 			await tick();
 
-			$$invalidate(3, nb = {
+			$$invalidate(2, nb = {
 				...value,
 				cells: value.cells.map((cell, index) => ({ ...cell, index }))
 			});
@@ -41623,7 +41603,7 @@ function instance($$self, $$props, $$invalidate) {
 
 		socket.on("progress", async value => {
 			await tick();
-			$$invalidate(8, current_code_cell = value);
+			$$invalidate(7, current_code_cell = value);
 		});
 
 		socket.on("cell", async value_index => {
@@ -41631,7 +41611,7 @@ function instance($$self, $$props, $$invalidate) {
 			let cell_index = value_index[1];
 			let { execution_count, outputs } = value;
 			await tick();
-			$$invalidate(3, nb.cells[cell_index] = { ...nb.cells[cell_index], ...value }, nb);
+			$$invalidate(2, nb.cells[cell_index] = { ...nb.cells[cell_index], ...value }, nb);
 		});
 	}
 
@@ -41646,8 +41626,8 @@ function instance($$self, $$props, $$invalidate) {
 	// initialization
 	onMount(async () => {
 		await tick();
-		$$invalidate(6, status = "Loading...");
-		$$invalidate(4, show_code = extras.indexOf("hide-code") === -1);
+		$$invalidate(5, status = "Loading...");
+		$$invalidate(3, show_code = extras.indexOf("hide-code") === -1);
 
 		try {
 			// Load notebook
@@ -41656,7 +41636,7 @@ function instance($$self, $$props, $$invalidate) {
 			const value = await req.json();
 			await tick();
 
-			$$invalidate(3, nb = {
+			$$invalidate(2, nb = {
 				...value,
 				cells: value.cells.map((cell, index) => ({ ...cell, index }))
 			});
@@ -41665,34 +41645,33 @@ function instance($$self, $$props, $$invalidate) {
 				// Execute notebook if it hasn't already been executed
 				await execute();
 			} else {
-				$$invalidate(6, status = undefined);
+				$$invalidate(5, status = undefined);
 			}
 		} catch(e) {
-			$$invalidate(6, status = `Error: ${e}`);
-			$$invalidate(7, statusBg = "danger");
+			$$invalidate(5, status = `Error: ${e}`);
+			$$invalidate(6, statusBg = "danger");
 		}
 	});
 
-	const click_handler = () => $$invalidate(4, show_code = !show_code);
+	const click_handler = () => $$invalidate(3, show_code = !show_code);
 
 	$$self.$$set = $$props => {
-		if ("requirejs" in $$props) $$invalidate(0, requirejs = $$props.requirejs);
-		if ("nbdownload" in $$props) $$invalidate(1, nbdownload = $$props.nbdownload);
-		if ("extras" in $$props) $$invalidate(2, extras = $$props.extras);
+		if ("window" in $$props) $$invalidate(8, window = $$props.window);
+		if ("nbdownload" in $$props) $$invalidate(0, nbdownload = $$props.nbdownload);
+		if ("extras" in $$props) $$invalidate(1, extras = $$props.extras);
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*nb, extras*/ 12) {
+		if ($$self.$$.dirty & /*nb, extras*/ 6) {
 			$: {
 				if (nb !== undefined && nb.cells !== undefined && extras.indexOf("toc") !== -1) {
-					$$invalidate(5, toc = nb.cells.filter(({ cell_type }) => cell_type === "markdown").reduce((headers, { source }) => [...headers, ...get_md_headers(collapse(source, "\n"))], []));
+					$$invalidate(4, toc = nb.cells.filter(({ cell_type }) => cell_type === "markdown").reduce((headers, { source }) => [...headers, ...get_md_headers(collapse(source, "\n"))], []));
 				}
 			}
 		}
 	};
 
 	return [
-		requirejs,
 		nbdownload,
 		extras,
 		nb,
@@ -41701,6 +41680,7 @@ function instance($$self, $$props, $$invalidate) {
 		status,
 		statusBg,
 		current_code_cell,
+		window,
 		click_handler
 	];
 }
@@ -41709,13 +41689,13 @@ class Landing extends SvelteComponent {
 	constructor(options) {
 		super();
 		if (!document.getElementById("svelte-eetrdb-style")) add_css();
-		init(this, options, instance, create_fragment, safe_not_equal, { requirejs: 0, nbdownload: 1, extras: 2 });
+		init(this, options, instance, create_fragment, safe_not_equal, { window: 8, nbdownload: 0, extras: 1 });
 	}
 }
 
 module.exports = Landing;
 
-},{"../../../../components/jupyter/Cell.svelte":2,"../../../../components/jupyter/Cells.svelte":3,"../../../../components/jupyter/Input.svelte":4,"../../../../components/jupyter/Markdown.svelte":5,"../../../../components/jupyter/Output.svelte":6,"../../../../components/jupyter/Outputs.svelte":7,"../../../../components/jupyter/Prompt.svelte":8,"../../../../components/jupyter/Source.svelte":9,"../../../../utils/any":273,"../../../../utils/collapse":274,"../../../../utils/slugify":275,"svelte":264,"svelte/internal":265}],273:[function(require,module,exports){
+},{"../../../../components/jupyter/Cell.svelte":2,"../../../../components/jupyter/Cells.svelte":3,"../../../../components/jupyter/Input.svelte":4,"../../../../components/jupyter/Markdown.svelte":5,"../../../../components/jupyter/Outputs.svelte":7,"../../../../components/jupyter/Prompt.svelte":8,"../../../../components/jupyter/Source.svelte":9,"../../../../utils/any":273,"../../../../utils/collapse":274,"../../../../utils/slugify":275,"svelte":264,"svelte/internal":265}],273:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

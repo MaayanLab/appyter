@@ -2424,11 +2424,11 @@ function create_fragment(ctx) {
 }
 
 function instance($$self, $$props, $$invalidate) {
-	let { requirejs } = $$props;
+	let { window } = $$props;
 	let { args } = $$props;
 
 	// get deps with requirejs
-	requirejs.config({
+	window.require.config({
 		paths: {
 			"socketio-file-upload": "https://cdn.jsdelivr.net/npm/socketio-file-upload@0.7.0/client.min"
 		},
@@ -2443,7 +2443,7 @@ function instance($$self, $$props, $$invalidate) {
 
 	async function ensure_deps() {
 		if (_deps === undefined) {
-			_deps = await new Promise((resolve, reject) => requirejs(
+			_deps = await new Promise((resolve, reject) => window.require(
 					["socket", "socketio-file-upload"],
 					function (socket, SocketIOFileUpload) {
 						resolve({
@@ -2603,7 +2603,7 @@ function instance($$self, $$props, $$invalidate) {
 	const click_handler = example_name => load_file(args.name, args.examples[example_name], example_name);
 
 	$$self.$$set = $$props => {
-		if ("requirejs" in $$props) $$invalidate(6, requirejs = $$props.requirejs);
+		if ("window" in $$props) $$invalidate(6, window = $$props.window);
 		if ("args" in $$props) $$invalidate(0, args = $$props.args);
 	};
 
@@ -2614,7 +2614,7 @@ function instance($$self, $$props, $$invalidate) {
 		filename,
 		full_filename,
 		load_file,
-		requirejs,
+		window,
 		input0_binding,
 		input1_input_handler,
 		click_handler
@@ -2625,7 +2625,7 @@ class FileField extends SvelteComponent {
 	constructor(options) {
 		super();
 		if (!document_1.getElementById("svelte-7t3aq4-style")) add_css();
-		init(this, options, instance, create_fragment, safe_not_equal, { requirejs: 6, args: 0 });
+		init(this, options, instance, create_fragment, safe_not_equal, { window: 6, args: 0 });
 	}
 }
 

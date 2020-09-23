@@ -33,7 +33,7 @@
       $('.svelte-component').each(function () {
         var self = this
         var props = JSON.parse(self.children[0].innerHTML)
-        Object.assign(props, { requirejs: require })
+        Object.assign(props, { window: window })
         self.children[0].remove()
         require([`{{ url_for('profile', path='js') + '/fields/${props.field}.js' }}`], function (Component) {
           var component = new Component({

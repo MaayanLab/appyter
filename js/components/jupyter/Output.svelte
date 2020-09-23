@@ -1,10 +1,8 @@
 <script>
-  import { onMount, tick } from 'svelte'
   import * as Markdown from './Markdown.svelte'
   import * as Ansi from './Ansi.svelte'
   import collapse from '../../utils/collapse.js'
 
-  export let requirejs
   export let data
   export let ref
 
@@ -12,10 +10,8 @@
   function try_eval_once(src) {
     if (evaled[src] === undefined) {
       evaled[src] = true
-      // make sure requirejs is accessible
-      const { require, define } = requirejs
       try {
-        eval(src)
+        (new Function(src))()
       } catch (e) {
         console.error(e)
       }
