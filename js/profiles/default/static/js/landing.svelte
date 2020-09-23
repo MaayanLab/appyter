@@ -10,6 +10,7 @@
   import collapse from '../../../../utils/collapse'
   import slugify from '../../../../utils/slugify'
   import any from '../../../../utils/any'
+  import hash from '../../../../utils/hash'
 
   export let window
   export let nbdownload
@@ -261,7 +262,9 @@
               <a
                 href="#{slugify(label)}"
                 class="toc h{h}"
-              >{label}</a>
+              >
+                <Markdown data={label} />
+              </a>
             {/each}
           </div>
         </div>
@@ -275,7 +278,7 @@
   >
     {#if nb}
       <Cells>
-        {#each nb.cells as cell (cell.index)}
+        {#each nb.cells as cell (hash(cell))}
           {#if collapse(cell.source) !== ''}
             {#if cell.cell_type === 'code'}
               <Cell type="code">

@@ -1,6 +1,7 @@
 <script>
   import * as Output from "./Output.svelte"
   import collapse from '../../utils/collapse.js'
+  import hash from '../../utils/hash.js'
 
   export let data = []
 
@@ -28,7 +29,7 @@
 
 <div class="output_wrapper">
   <div class="output">
-    {#each [...reduce_output_streams(data)] as output (output.name)}
+    {#each [...reduce_output_streams(data)] as output (hash(output))}
       <Output data={output} />
     {/each}
   </div>

@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "ansi_up": "^4.0.4",
+    "canonical-json": "0.0.4",
     "gulp-rename": "^2.0.0",
     "highlight.js": "^10.1.2",
     "markdown-it": "^11.0.0",
