@@ -41671,7 +41671,7 @@ function create_fragment(ctx) {
 }
 
 function* get_md_headers(md) {
-	let re = /^(#+)\s*(.+?)\s*$/gm;
+	let re = /^(#+)(\s|(<[^>]+>))*(.+?)(\s|(<[^>]+>))*$/gm;
 	let m;
 
 	while ((m = re.exec(md)) !== null) {
