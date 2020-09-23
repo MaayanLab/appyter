@@ -1,45 +1,10 @@
 <script>
   import * as Markdown from './Markdown.svelte'
   import * as Ansi from './Ansi.svelte'
+  import * as HTML from './HTML.svelte'
   import collapse from '../../utils/collapse.js'
 
   export let data
-  export let ref
-
-  let evaled = {}
-  function try_eval_once(src) {
-    if (evaled[src] === undefined) {
-      evaled[src] = true
-      try {
-        (new Function(src))()
-      } catch (e) {
-        console.error(e)
-      }
-    }
-  }
-
-  $: {
-    if (ref) {
-      const target = ref.getAttribute('data-target')
-      if (target === 'application/json') {
-        const src = collapse(data.data[target])
-        if (ref.innerHTML !== '<script>' + src + '\<\/script>') {
-          ref.innerHTML = '<script>' + src + '\<\/script>'
-          try_eval_once(src)
-        }
-      } else if (target === 'text/html') {
-        if (ref.innerHTML !== collapse(data.data[target])) {
-          ref.innerHTML = collapse(data.data[target])
-          ref.querySelectorAll('script').forEach((el) => {
-            const src = el.innerHTML
-            try_eval_once(src)
-          })
-        }
-      } else {
-        console.error('Unrecognized type')
-      }
-    }
-  }
 </script>
 
 <div class="output_area">
@@ -52,11 +17,10 @@
       </div>
     {:else if data.output_type === 'execute_result'}
       {#if data.data['text/html']}
-        <div
-          bind:this={ref}
-          class="output_html rendered_html output_execute_result"
-          data-target="text/html"
-        ></div>
+        <HTML
+          classes="output_html rendered_html output_execute_result"
+          data={data.data['text/html']}
+        />
       {:else}
         <div class="output_text output_execute_result">
           <Ansi data={collapse(data.data['text/plain'])} />
@@ -71,10 +35,10 @@
           />
         </div>
       {:else if data.data['text/html']}
-        <div
-          bind:this={ref} 
-          class="output_html rendered_html output_execute_result"
-          data-target="text/html"></div>
+        <HTML
+          classes="output_html rendered_html output_execute_result"
+          data={data.data['text/html']}
+        />
       {:else if data.data['text/markdown']}
         <div class="output_stream output_{data.name} output_markdown">
           <Markdown data={collapse(data.data['text/markdown'])} />
@@ -84,11 +48,7 @@
           <Ansi data={collapse(data.data['text/plain'])} />
         </div>
       {:else if data.data['application/javascript']}
-        <div
-          bind:this={ref}
-          style="display: none"
-          data-target="application/javascript"
-        ></div>
+        <HTML data="<script>{data.data['application/javascript']}</script>" />
       {:else}
         {JSON.stringify(data)}
       {/if}
