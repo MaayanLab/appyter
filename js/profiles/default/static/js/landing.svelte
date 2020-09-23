@@ -276,35 +276,37 @@
     {#if nb}
       <Cells>
         {#each nb.cells as cell (cell.index)}
-          {#if cell.cell_type === 'code'}
-            <Cell type="code">
-              {#if show_code}
+          {#if collapse(cell.source) !== ''}
+            {#if cell.cell_type === 'code'}
+              <Cell type="code">
+                {#if show_code}
+                  <Input>
+                    <Prompt
+                      running={current_code_cell !== undefined ? cell.index >= current_code_cell : undefined}
+                      error={any(cell.outputs.map(({ output_type }) => output_type === 'error'))}
+                      counter={cell.execution_count}
+                      cell_type={cell.cell_type}
+                    />
+                    <Source
+                      language="python"
+                      source={collapse(cell.source)}
+                    />
+                  </Input>
+                {/if}
+                <Outputs data={cell.outputs || []} />
+              </Cell>
+            {:else if cell.cell_type === 'markdown'}
+              <Cell type="text">
                 <Input>
-                  <Prompt
-                    running={current_code_cell !== undefined ? cell.index >= current_code_cell : undefined}
-                    error={any(cell.outputs.map(({ output_type }) => output_type === 'error'))}
-                    counter={cell.execution_count}
-                    cell_type={cell.cell_type}
-                  />
-                  <Source
-                    language="python"
-                    source={collapse(cell.source)}
-                  />
-                </Input>
-              {/if}
-              <Outputs data={cell.outputs || []} />
-            </Cell>
-          {:else if cell.cell_type === 'markdown'}
-            <Cell type="text">
-              <Input>
-                <Prompt />
-                <div class="inner_cell">
-                  <div class="text_cell_render border-box-sizing rendered_html">
-                    <Markdown data={collapse(cell.source)} />
+                  <Prompt />
+                  <div class="inner_cell">
+                    <div class="text_cell_render border-box-sizing rendered_html">
+                      <Markdown data={collapse(cell.source)} />
+                    </div>
                   </div>
-                </div>
-              </Input>
-            </Cell>
+                </Input>
+              </Cell>
+            {/if}
           {/if}
         {/each}
       </Cells>
