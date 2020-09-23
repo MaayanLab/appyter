@@ -41,7 +41,7 @@
 
   // table of contents
   function *get_md_headers(md) {
-    let re = /^(#+)(\s|(<[^>]+>))*(.+?)(\s|(<[^>]+>))*$/gm
+    let re = /^(#+)\s*(.+?)\s*$/gm
     let m
     while ((m = re.exec(md)) !== null) {
       yield { h: m[1].length, label: m[2] }
