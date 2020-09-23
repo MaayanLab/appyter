@@ -28,7 +28,7 @@
 
 <div class="output_wrapper">
   <div class="output">
-    {#each [...reduce_output_streams(data)] as output}
+    {#each [...reduce_output_streams(data)] as output (output.name)}
       <Output data={output} />
     {/each}
   </div>
