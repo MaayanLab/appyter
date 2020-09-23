@@ -91,7 +91,6 @@
     socket.on('cell', async (value_index) => {
       let value = value_index[0]
       let cell_index = value_index[1]
-      let { execution_count, outputs } = value
       await tick()
       nb.cells[cell_index] = {...nb.cells[cell_index], ...value}
     })

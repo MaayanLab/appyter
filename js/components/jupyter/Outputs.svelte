@@ -18,18 +18,18 @@
           else streams[output.name].text += output_text
         }
       } else {
-        yield output
+        yield {...output, hash: hash(output)}
       }
     }
     for (const stream in streams) {
-      yield streams[stream]
+      yield {...streams[stream], hash: hash(streams[stream])}
     }
   }
 </script>
 
 <div class="output_wrapper">
   <div class="output">
-    {#each [...reduce_output_streams(data)] as output (hash(output))}
+    {#each [...reduce_output_streams(data)] as output (output.hash)}
       <Output data={output} />
     {/each}
   </div>

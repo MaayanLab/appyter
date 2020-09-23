@@ -23,14 +23,18 @@
       const target = ref.getAttribute('data-target')
       if (target === 'application/json') {
         const src = collapse(data.data[target])
-        ref.innerHTML = '<script>' + src + '\<\/script>'
-        try_eval_once(src)
-      } else if (target === 'text/html') {
-        ref.innerHTML = collapse(data.data[target])
-        ref.querySelectorAll('script').forEach((el) => {
-          const src = el.innerHTML
+        if (ref.innerHTML !== '<script>' + src + '\<\/script>') {
+          ref.innerHTML = '<script>' + src + '\<\/script>'
           try_eval_once(src)
-        })
+        }
+      } else if (target === 'text/html') {
+        if (ref.innerHTML !== collapse(data.data[target])) {
+          ref.innerHTML = collapse(data.data[target])
+          ref.querySelectorAll('script').forEach((el) => {
+            const src = el.innerHTML
+            try_eval_once(src)
+          })
+        }
       } else {
         console.error('Unrecognized type')
       }

@@ -433,7 +433,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (99:4) {:else}
+// (103:4) {:else}
 function create_else_block_3(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[1]) + "";
 	let t;
@@ -456,7 +456,7 @@ function create_else_block_3(ctx) {
 	};
 }
 
-// (91:43) 
+// (95:43) 
 function create_if_block_10(ctx) {
 	let div;
 	let current_block_type_index;
@@ -525,7 +525,7 @@ function create_if_block_10(ctx) {
 	};
 }
 
-// (61:50) 
+// (65:50) 
 function create_if_block_4(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -606,7 +606,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (49:52) 
+// (53:52) 
 function create_if_block_2(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -674,7 +674,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (45:4) {#if data.output_type === 'stream'}
+// (49:4) {#if data.output_type === 'stream'}
 function create_if_block_1(ctx) {
 	let div;
 	let ansi;
@@ -721,7 +721,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (95:8) {:else}
+// (99:8) {:else}
 function create_else_block_2(ctx) {
 	let ansi;
 	let current;
@@ -760,7 +760,7 @@ function create_else_block_2(ctx) {
 	};
 }
 
-// (93:8) {#if data.traceback !== undefined}
+// (97:8) {#if data.traceback !== undefined}
 function create_if_block_11(ctx) {
 	let ansi;
 	let current;
@@ -799,7 +799,7 @@ function create_if_block_11(ctx) {
 	};
 }
 
-// (88:6) {:else}
+// (92:6) {:else}
 function create_else_block_1(ctx) {
 	let t_value = JSON.stringify(/*data*/ ctx[1]) + "";
 	let t;
@@ -822,7 +822,7 @@ function create_else_block_1(ctx) {
 	};
 }
 
-// (82:52) 
+// (86:52) 
 function create_if_block_9(ctx) {
 	let div;
 
@@ -846,7 +846,7 @@ function create_if_block_9(ctx) {
 	};
 }
 
-// (78:40) 
+// (82:40) 
 function create_if_block_8(ctx) {
 	let div;
 	let ansi;
@@ -895,7 +895,7 @@ function create_if_block_8(ctx) {
 	};
 }
 
-// (74:43) 
+// (78:43) 
 function create_if_block_7(ctx) {
 	let div;
 	let markdown;
@@ -944,7 +944,7 @@ function create_if_block_7(ctx) {
 	};
 }
 
-// (69:39) 
+// (73:39) 
 function create_if_block_6(ctx) {
 	let div;
 
@@ -968,7 +968,7 @@ function create_if_block_6(ctx) {
 	};
 }
 
-// (62:6) {#if data.data['image/png']}
+// (66:6) {#if data.data['image/png']}
 function create_if_block_5(ctx) {
 	let div;
 	let img;
@@ -999,7 +999,7 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (56:6) {:else}
+// (60:6) {:else}
 function create_else_block(ctx) {
 	let div;
 	let ansi;
@@ -1043,7 +1043,7 @@ function create_else_block(ctx) {
 	};
 }
 
-// (50:6) {#if data.data['text/html']}
+// (54:6) {#if data.data['text/html']}
 function create_if_block_3(ctx) {
 	let div;
 
@@ -1181,15 +1181,20 @@ function instance($$self, $$props, $$invalidate) {
 
 					if (target === "application/json") {
 						const src = collapse(data.data[target]);
-						$$invalidate(0, ref.innerHTML = "<script>" + src + "</script>", ref);
-						try_eval_once(src);
-					} else if (target === "text/html") {
-						$$invalidate(0, ref.innerHTML = collapse(data.data[target]), ref);
 
-						ref.querySelectorAll("script").forEach(el => {
-							const src = el.innerHTML;
+						if (ref.innerHTML !== "<script>" + src + "</script>") {
+							$$invalidate(0, ref.innerHTML = "<script>" + src + "</script>", ref);
 							try_eval_once(src);
-						});
+						}
+					} else if (target === "text/html") {
+						if (ref.innerHTML !== collapse(data.data[target])) {
+							$$invalidate(0, ref.innerHTML = collapse(data.data[target]), ref);
+
+							ref.querySelectorAll("script").forEach(el => {
+								const src = el.innerHTML;
+								try_eval_once(src);
+							});
+						}
 					} else {
 						console.error("Unrecognized type");
 					}
@@ -1225,7 +1230,7 @@ function get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (32:4) {#each [...reduce_output_streams(data)] as output (hash(output))}
+// (32:4) {#each [...reduce_output_streams(data)] as output (output.hash)}
 function create_each_block(key_1, ctx) {
 	let first;
 	let output;
@@ -1273,7 +1278,7 @@ function create_fragment(ctx) {
 	let each_1_lookup = new Map();
 	let current;
 	let each_value = [.../*reduce_output_streams*/ ctx[1](/*data*/ ctx[0])];
-	const get_key = ctx => hash(/*output*/ ctx[2]);
+	const get_key = ctx => /*output*/ ctx[2].hash;
 
 	for (let i = 0; i < each_value.length; i += 1) {
 		let child_ctx = get_each_context(ctx, each_value, i);
@@ -1353,12 +1358,15 @@ function instance($$self, $$props, $$invalidate) {
 					if (output_text.startsWith("\r")) streams[output.name].text = output_text; else streams[output.name].text += output_text;
 				}
 			} else {
-				yield output;
+				yield { ...output, hash: hash(output) };
 			}
 		}
 
 		for (const stream in streams) {
-			yield streams[stream];
+			yield {
+				...streams[stream],
+				hash: hash(streams[stream])
+			};
 		}
 	}
 
@@ -40575,7 +40583,7 @@ function get_each_context_1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (134:0) {#if toc !== undefined}
+// (133:0) {#if toc !== undefined}
 function create_if_block_8(ctx) {
 	let style;
 
@@ -40593,7 +40601,7 @@ function create_if_block_8(ctx) {
 	};
 }
 
-// (236:4) {#if extras.indexOf('toggle-code') !== -1}
+// (235:4) {#if extras.indexOf('toggle-code') !== -1}
 function create_if_block_7(ctx) {
 	let a;
 	let mounted;
@@ -40623,7 +40631,7 @@ function create_if_block_7(ctx) {
 	};
 }
 
-// (247:2) {#if status}
+// (246:2) {#if status}
 function create_if_block_6(ctx) {
 	let div1;
 	let div0;
@@ -40657,7 +40665,7 @@ function create_if_block_6(ctx) {
 	};
 }
 
-// (255:2) {#if toc !== undefined}
+// (254:2) {#if toc !== undefined}
 function create_if_block_5(ctx) {
 	let div3;
 	let div2;
@@ -40763,7 +40771,7 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (261:12) {#each toc as {h, label}}
+// (260:12) {#each toc as {h, label}}
 function create_each_block_1(ctx) {
 	let a;
 	let markdown;
@@ -40816,7 +40824,7 @@ function create_each_block_1(ctx) {
 	};
 }
 
-// (279:4) {#if nb}
+// (278:4) {#if nb}
 function create_if_block(ctx) {
 	let cells;
 	let current;
@@ -40860,7 +40868,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (282:10) {#if collapse(cell.source) !== ''}
+// (281:10) {#if collapse(cell.source) !== ''}
 function create_if_block_1(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -40945,7 +40953,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (301:52) 
+// (300:52) 
 function create_if_block_4(ctx) {
 	let cell;
 	let current;
@@ -40990,7 +40998,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (283:12) {#if cell.cell_type === 'code'}
+// (282:12) {#if cell.cell_type === 'code'}
 function create_if_block_2(ctx) {
 	let cell;
 	let current;
@@ -41035,7 +41043,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (303:16) <Input>
+// (302:16) <Input>
 function create_default_slot_4(ctx) {
 	let prompt;
 	let t;
@@ -41092,7 +41100,7 @@ function create_default_slot_4(ctx) {
 	};
 }
 
-// (302:14) <Cell type="text">
+// (301:14) <Cell type="text">
 function create_default_slot_3(ctx) {
 	let input;
 	let t;
@@ -41140,7 +41148,7 @@ function create_default_slot_3(ctx) {
 	};
 }
 
-// (285:16) {#if show_code}
+// (284:16) {#if show_code}
 function create_if_block_3(ctx) {
 	let input;
 	let current;
@@ -41184,7 +41192,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (286:18) <Input>
+// (285:18) <Input>
 function create_default_slot_2(ctx) {
 	let prompt;
 	let t;
@@ -41255,7 +41263,7 @@ function create_default_slot_2(ctx) {
 	};
 }
 
-// (284:14) <Cell type="code">
+// (283:14) <Cell type="code">
 function create_default_slot_1(ctx) {
 	let t0;
 	let outputs;
@@ -41329,7 +41337,7 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (281:8) {#each nb.cells as cell (hash(cell))}
+// (280:8) {#each nb.cells as cell (hash(cell))}
 function create_each_block(key_1, ctx) {
 	let first;
 	let show_if = collapse(/*cell*/ ctx[16].source) !== "";
@@ -41395,7 +41403,7 @@ function create_each_block(key_1, ctx) {
 	};
 }
 
-// (280:6) <Cells>
+// (279:6) <Cells>
 function create_default_slot(ctx) {
 	let each_blocks = [];
 	let each_1_lookup = new Map();
@@ -41748,7 +41756,6 @@ function instance($$self, $$props, $$invalidate) {
 		socket.on("cell", async value_index => {
 			let value = value_index[0];
 			let cell_index = value_index[1];
-			let { execution_count, outputs } = value;
 			await tick();
 			$$invalidate(2, nb.cells[cell_index] = { ...nb.cells[cell_index], ...value }, nb);
 		});
