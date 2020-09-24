@@ -7,12 +7,12 @@ services:
         appyter_version: git+git://github.com/Maayanlab/appyter.git
     image: maayanlab/appyter-example:latest
     environment:
-      - HOST=0.0.0.0
-      - PREFIX=/example
-      - DATA_DIR=s3://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@s3:9000/${MINIO_BUCKET}/example/
-      - DISPATCHER=http://appyter-orchestrator:5000
-      - DISPATCHER_IMAGE=maayanlab/appyter-example:latest
-      - DISPATCHER_URL=http://appyter-example:5000/example
+      - APPYTER_HOST=0.0.0.0
+      - APPYTER_PREFIX=/example
+      - APPYTER_DATA_DIR=s3://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@s3:9000/${MINIO_BUCKET}/example/
+      - APPYTER_DISPATCHER=http://appyter-orchestrator:5000
+      - APPYTER_DISPATCHER_IMAGE=maayanlab/appyter-example:latest
+      - APPYTER_DISPATCHER_URL=http://appyter-example:5000/example
     ports:
       - 5000:5000
   # the parallel execution orchestrator
@@ -23,10 +23,10 @@ services:
         appyter_version: git+git://github.com/Maayanlab/appyter.git
     image: maayanlab/appyter:latest
     environment:
-      - HOST=0.0.0.0
-      - JOBS=2
-      - DISPATCH=docker
-      - DEBUG=false
+      - APPYTER_HOST=0.0.0.0
+      - APPYTER_JOBS=2
+      - APPYTER_DISPATCH=docker
+      - APPYTER_DEBUG=false
     command:
       - appyter
       - orchestration

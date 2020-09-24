@@ -36,14 +36,14 @@ def create_app(**kwargs):
   return app
 
 @orchestration.command(help='Run the appyter dispatcher')
-@click.option('--prefix', envvar='PREFIX', default='/', help='Specify the prefix for which to mount the webserver onto')
-@click.option('--host', envvar='HOST', default='127.0.0.1', help='The host the flask server should run on')
-@click.option('--port', envvar='PORT', type=int, default=5000, help='The port this flask server should run on')
-@click.option('--proxy', envvar='PROXY', type=bool, default=False, help='Whether this is running behind a proxy and the IP should be fixed for CORS')
-@click.option('--jobs', envvar='JOBS', type=int, default=1, help='Number of concurrent jobs to dispatch')
-@click.option('--debug', envvar='DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
-@click.option('--kube-namespace', envvar='KUBE_NAMESPACE', type=str, default='default', help='The kubernetes namespace (kubernetes dispatch)')
-@click.option('--dispatch', envvar='DISPATCH', type=str, default='native', help='The dispatcher mechanism to use (see list-dispatchers)')
+@click.option('--prefix', envvar='APPYTER_PREFIX', default='/', help='Specify the prefix for which to mount the webserver onto')
+@click.option('--host', envvar='APPYTER_HOST', default='127.0.0.1', help='The host the flask server should run on')
+@click.option('--port', envvar='APPYTER_PORT', type=int, default=5000, help='The port this flask server should run on')
+@click.option('--proxy', envvar='APPYTER_PROXY', type=bool, default=False, help='Whether this is running behind a proxy and the IP should be fixed for CORS')
+@click.option('--jobs', envvar='APPYTER_JOBS', type=int, default=1, help='Number of concurrent jobs to dispatch')
+@click.option('--debug', envvar='APPYTER_DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
+@click.option('--kube-namespace', envvar='APPYTER_KUBE_NAMESPACE', type=str, default='default', help='The kubernetes namespace (kubernetes dispatch)')
+@click.option('--dispatch', envvar='APPYTER_DISPATCH', type=str, default='native', help='The dispatcher mechanism to use (see list-dispatchers)')
 def dispatcher(*args, **kwargs):
   from appyter.orchestration.dispatcher.socketio import socketio
   from appyter.util import dict_filter_none

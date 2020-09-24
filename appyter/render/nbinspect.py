@@ -18,9 +18,9 @@ def render_nbtemplate_json_from_nbtemplate(env, nb):
   ]
 
 @cli.command(help='Inspect appyter for arguments (fields)')
-@click.option('--output', envvar='OUTPUT', default='-', type=click.File('w'), help='The output location of the inspection json')
-@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
-@click.argument('ipynb', envvar='IPYNB')
+@click.option('--output', envvar='APPYTER_OUTPUT', default='-', type=click.File('w'), help='The output location of the inspection json')
+@click.option('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click.argument('ipynb', envvar='APPYTER_IPYNB')
 def nbinspect(cwd, ipynb, output, **kwargs):
   env = get_jinja2_env(get_env(cwd=cwd, ipynb=ipynb, **kwargs))
   nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
