@@ -41,10 +41,13 @@
 
   // table of contents
   function *get_md_headers(md) {
+    const parser = new DOMParser()
     let re = /^(#+)\s*(.+?)\s*$/gm
     let m
     while ((m = re.exec(md)) !== null) {
-      yield { h: m[1].length, label: m[2] }
+      // in the case of HTML embedded into the label, we want only the text
+      const stripped_label = parser.parseFromString(m[2], 'text/html').body.innerText
+      yield { h: m[1].length, label: stripped_label }
     }
   }
 

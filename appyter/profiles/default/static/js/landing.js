@@ -40652,7 +40652,7 @@ function get_each_context_1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (133:0) {#if toc !== undefined}
+// (136:0) {#if toc !== undefined}
 function create_if_block_8(ctx) {
 	let style;
 
@@ -40670,7 +40670,7 @@ function create_if_block_8(ctx) {
 	};
 }
 
-// (235:4) {#if extras.indexOf('toggle-code') !== -1}
+// (238:4) {#if extras.indexOf('toggle-code') !== -1}
 function create_if_block_7(ctx) {
 	let a;
 	let mounted;
@@ -40700,7 +40700,7 @@ function create_if_block_7(ctx) {
 	};
 }
 
-// (246:2) {#if status}
+// (249:2) {#if status}
 function create_if_block_6(ctx) {
 	let div1;
 	let div0;
@@ -40734,7 +40734,7 @@ function create_if_block_6(ctx) {
 	};
 }
 
-// (254:2) {#if toc !== undefined}
+// (257:2) {#if toc !== undefined}
 function create_if_block_5(ctx) {
 	let div3;
 	let div2;
@@ -40840,7 +40840,7 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (260:12) {#each toc as {h, label}}
+// (263:12) {#each toc as {h, label}}
 function create_each_block_1(ctx) {
 	let a;
 	let markdown;
@@ -40893,7 +40893,7 @@ function create_each_block_1(ctx) {
 	};
 }
 
-// (278:4) {#if nb}
+// (281:4) {#if nb}
 function create_if_block(ctx) {
 	let cells;
 	let current;
@@ -40937,7 +40937,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (281:10) {#if collapse(cell.source) !== ''}
+// (284:10) {#if collapse(cell.source) !== ''}
 function create_if_block_1(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -41022,7 +41022,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (300:52) 
+// (303:52) 
 function create_if_block_4(ctx) {
 	let cell;
 	let current;
@@ -41067,7 +41067,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (282:12) {#if cell.cell_type === 'code'}
+// (285:12) {#if cell.cell_type === 'code'}
 function create_if_block_2(ctx) {
 	let cell;
 	let current;
@@ -41112,7 +41112,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (302:16) <Input>
+// (305:16) <Input>
 function create_default_slot_4(ctx) {
 	let prompt;
 	let t;
@@ -41169,7 +41169,7 @@ function create_default_slot_4(ctx) {
 	};
 }
 
-// (301:14) <Cell type="text">
+// (304:14) <Cell type="text">
 function create_default_slot_3(ctx) {
 	let input;
 	let t;
@@ -41217,7 +41217,7 @@ function create_default_slot_3(ctx) {
 	};
 }
 
-// (284:16) {#if show_code}
+// (287:16) {#if show_code}
 function create_if_block_3(ctx) {
 	let input;
 	let current;
@@ -41261,7 +41261,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (285:18) <Input>
+// (288:18) <Input>
 function create_default_slot_2(ctx) {
 	let prompt;
 	let t;
@@ -41332,7 +41332,7 @@ function create_default_slot_2(ctx) {
 	};
 }
 
-// (283:14) <Cell type="code">
+// (286:14) <Cell type="code">
 function create_default_slot_1(ctx) {
 	let t0;
 	let outputs;
@@ -41406,7 +41406,7 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (280:8) {#each nb.cells as cell (hash(cell))}
+// (283:8) {#each nb.cells as cell (hash(cell))}
 function create_each_block(key_1, ctx) {
 	let first;
 	let show_if = collapse(/*cell*/ ctx[16].source) !== "";
@@ -41472,7 +41472,7 @@ function create_each_block(key_1, ctx) {
 	};
 }
 
-// (279:6) <Cells>
+// (282:6) <Cells>
 function create_default_slot(ctx) {
 	let each_blocks = [];
 	let each_1_lookup = new Map();
@@ -41740,11 +41740,15 @@ function create_fragment(ctx) {
 }
 
 function* get_md_headers(md) {
+	const parser = new DOMParser();
 	let re = /^(#+)\s*(.+?)\s*$/gm;
 	let m;
 
 	while ((m = re.exec(md)) !== null) {
-		yield { h: m[1].length, label: m[2] };
+		// in the case of HTML embedded into the label, we want only the text
+		const stripped_label = parser.parseFromString(m[2], "text/html").body.innerText;
+
+		yield { h: m[1].length, label: stripped_label };
 	}
 }
 
