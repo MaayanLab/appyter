@@ -1,4 +1,5 @@
 <script>
+  import * as HTML from '../../../../../components/HTML.svelte';
   export let args
 </script>
 
@@ -36,8 +37,8 @@
           class="tab-pane fade{args.value == choice_name ? ' show active' : ''}"
           role="tabpanel"
         >
-          {#each args.choices[choice_name] as item}
-            {@html args.field_renders[item.args.name]}
+          {#each args.choices[choice_name] as item (item.args.name)}
+            <HTML data={args.field_renders[item.args.name]} />
           {/each}
         </div>
       {/each}
