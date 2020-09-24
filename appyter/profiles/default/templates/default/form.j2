@@ -24,26 +24,3 @@
   </form>
 </div>
 {% endblock %}
-
-{% block script %}
-{{ super() }}
-<script>
-  require(['jquery'], function ($) {
-    $(document).ready(function () {
-      $('.svelte-component').each(function () {
-        var self = this
-        var props = JSON.parse(self.children[0].innerHTML)
-        Object.assign(props, { window: window })
-        self.children[0].remove()
-        require([`{{ url_for('profile', path='js') + '/fields/${props.field}.js' }}`], function (Component) {
-          var component = new Component({
-            target: self,
-            props: props,
-          })
-          self.classList.remove('loading')
-        })
-      })
-    })
-  })
-</script>
-{% endblock %}

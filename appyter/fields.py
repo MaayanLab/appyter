@@ -88,13 +88,6 @@ class Field(dict):
         self.template
       ).render(dict(**kwargs, this=self))
     )
-  
-  def render_svelte(self, **kwargs):
-    return Markup(
-      self._env.get_template(
-        'svelte.j2'
-      ).render(dict(**kwargs, this=self))
-    )
 
   @property
   def field(self):
@@ -107,6 +100,13 @@ class Field(dict):
     ''' Template to use for rendering field
     '''
     return '/'.join(['fields', self.field + '.j2'])
+
+  @property
+  def js_url(self):
+    ''' Template to use for rendering field
+    '''
+    from appyter.profiles.default.filters.url_for import url_for
+    return url_for('profile', path='js') + '/fields/' + self.field + '.js'
 
   @property
   def choices(self):

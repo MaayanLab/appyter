@@ -34,6 +34,23 @@
         return io({ path: {{ join_routes(_config.PREFIX, 'socket.io')|jsonify }} })
       })
     </script>
+    <script>
+      define('svelte', function () {
+        return {
+          render: function (self, file, props) {
+            require([file], function (Component) {
+              Object.assign(props, { window: window })
+              self.children[0].remove()
+              var component = new Component({
+                target: self,
+                props: props,
+              })
+              self.classList.remove('loading')
+            })
+          }
+        }
+      })
+    </script>
     {% if _config.DEBUG %}
     <script>
       require(['socket'], function (socket) {
