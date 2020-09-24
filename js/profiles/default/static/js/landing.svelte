@@ -6,7 +6,7 @@
   import * as Prompt from '../../../../components/jupyter/Prompt.svelte'
   import * as Source from '../../../../components/jupyter/Source.svelte'
   import * as Outputs from '../../../../components/jupyter/Outputs.svelte'
-  import * as Markdown from '../../../../components/jupyter/Markdown.svelte'
+  import * as Markdown from '../../../../components/Markdown.svelte'
   import collapse from '../../../../utils/collapse'
   import slugify from '../../../../utils/slugify'
   import any from '../../../../utils/any'

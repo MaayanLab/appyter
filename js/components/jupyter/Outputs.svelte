@@ -1,5 +1,5 @@
 <script>
-  import * as Output from "./Output.svelte"
+  import * as Output from './Output.svelte'
   import collapse from '../../utils/collapse.js'
   import hash from '../../utils/hash.js'
 

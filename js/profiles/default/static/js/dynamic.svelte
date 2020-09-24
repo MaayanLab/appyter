@@ -7,7 +7,7 @@
   import * as Source from '../../../../components/jupyter/Source.svelte'
   import * as Outputs from '../../../../components/jupyter/Outputs.svelte'
   import * as Output from '../../../../components/jupyter/Output.svelte'
-  import * as Markdown from '../../../../components/jupyter/Markdown.svelte'
+  import * as Markdown from '../../../../components/Markdown.svelte'
 
   export let requirejs
   export let nbdownload

@@ -1,7 +1,7 @@
 <script>
-  import * as Markdown from './Markdown.svelte'
-  import * as Ansi from './Ansi.svelte'
-  import * as HTML from './HTML.svelte'
+  import * as Markdown from '../Markdown.svelte'
+  import * as Ansi from '../Ansi.svelte'
+  import * as HTML from '../HTML.svelte'
   import collapse from '../../utils/collapse.js'
 
   export let data

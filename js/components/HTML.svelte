@@ -16,7 +16,11 @@
     }
   }
 
-  $: if (ref) ref.querySelectorAll('script').forEach(el => try_eval_once(el.innerHTML))
+  $: {
+    if (ref) ref.querySelectorAll('script').forEach(el => try_eval_once(el.innerHTML))
+    console.log('HTML')
+    console.log(data)
+  }
 </script>
 
 <div bind:this={ref} class={classes}>
