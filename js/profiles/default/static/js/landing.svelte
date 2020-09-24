@@ -99,12 +99,14 @@
     })
   }
 
-  async function execute() {
+  async function connect(execute) {
     await ensure_deps()
     await ensure_connected()
     await setup_async_exec()
     const paths = window.location.pathname.split('/').filter(p => p)
-    socket.emit('submit', paths[paths.length - 1])
+    if (execute) {
+      socket.emit('submit', paths[paths.length - 1])
+    }
   }
 
   // initialization
@@ -115,14 +117,18 @@
 
     try {
       // Load notebook
-      const req = await fetch(nbdownload)
+      const req = await fetch(nbdownload, {cache: 'reload'})
       const value = await req.json()
       await tick()
       nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
 
       if (nb.metadata.execution_info === undefined) {
         // Execute notebook if it hasn't already been executed
-        await execute()
+        await connect(true)
+      } else if (nb.metadata.execution_info.completed === undefined) {
+        // Notebook started but hasn't completed
+        status = 'Notebook is currently executing, joining session...'
+        await connect(false)
       } else {
         status = undefined
       }

@@ -40652,7 +40652,7 @@ function get_each_context_1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (136:0) {#if toc !== undefined}
+// (142:0) {#if toc !== undefined}
 function create_if_block_8(ctx) {
 	let style;
 
@@ -40670,7 +40670,7 @@ function create_if_block_8(ctx) {
 	};
 }
 
-// (238:4) {#if extras.indexOf('toggle-code') !== -1}
+// (244:4) {#if extras.indexOf('toggle-code') !== -1}
 function create_if_block_7(ctx) {
 	let a;
 	let mounted;
@@ -40700,7 +40700,7 @@ function create_if_block_7(ctx) {
 	};
 }
 
-// (249:2) {#if status}
+// (255:2) {#if status}
 function create_if_block_6(ctx) {
 	let div1;
 	let div0;
@@ -40734,7 +40734,7 @@ function create_if_block_6(ctx) {
 	};
 }
 
-// (257:2) {#if toc !== undefined}
+// (263:2) {#if toc !== undefined}
 function create_if_block_5(ctx) {
 	let div3;
 	let div2;
@@ -40840,7 +40840,7 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (263:12) {#each toc as {h, label}}
+// (269:12) {#each toc as {h, label}}
 function create_each_block_1(ctx) {
 	let a;
 	let markdown;
@@ -40893,7 +40893,7 @@ function create_each_block_1(ctx) {
 	};
 }
 
-// (281:4) {#if nb}
+// (287:4) {#if nb}
 function create_if_block(ctx) {
 	let cells;
 	let current;
@@ -40937,7 +40937,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (284:10) {#if collapse(cell.source) !== ''}
+// (290:10) {#if collapse(cell.source) !== ''}
 function create_if_block_1(ctx) {
 	let current_block_type_index;
 	let if_block;
@@ -41022,7 +41022,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (303:52) 
+// (309:52) 
 function create_if_block_4(ctx) {
 	let cell;
 	let current;
@@ -41067,7 +41067,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (285:12) {#if cell.cell_type === 'code'}
+// (291:12) {#if cell.cell_type === 'code'}
 function create_if_block_2(ctx) {
 	let cell;
 	let current;
@@ -41112,7 +41112,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (305:16) <Input>
+// (311:16) <Input>
 function create_default_slot_4(ctx) {
 	let prompt;
 	let t;
@@ -41169,7 +41169,7 @@ function create_default_slot_4(ctx) {
 	};
 }
 
-// (304:14) <Cell type="text">
+// (310:14) <Cell type="text">
 function create_default_slot_3(ctx) {
 	let input;
 	let t;
@@ -41217,7 +41217,7 @@ function create_default_slot_3(ctx) {
 	};
 }
 
-// (287:16) {#if show_code}
+// (293:16) {#if show_code}
 function create_if_block_3(ctx) {
 	let input;
 	let current;
@@ -41261,7 +41261,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (288:18) <Input>
+// (294:18) <Input>
 function create_default_slot_2(ctx) {
 	let prompt;
 	let t;
@@ -41332,7 +41332,7 @@ function create_default_slot_2(ctx) {
 	};
 }
 
-// (286:14) <Cell type="code">
+// (292:14) <Cell type="code">
 function create_default_slot_1(ctx) {
 	let t0;
 	let outputs;
@@ -41406,7 +41406,7 @@ function create_default_slot_1(ctx) {
 	};
 }
 
-// (283:8) {#each nb.cells as cell (hash(cell))}
+// (289:8) {#each nb.cells as cell (hash(cell))}
 function create_each_block(key_1, ctx) {
 	let first;
 	let show_if = collapse(/*cell*/ ctx[16].source) !== "";
@@ -41472,7 +41472,7 @@ function create_each_block(key_1, ctx) {
 	};
 }
 
-// (282:6) <Cells>
+// (288:6) <Cells>
 function create_default_slot(ctx) {
 	let each_blocks = [];
 	let each_1_lookup = new Map();
@@ -41834,12 +41834,15 @@ function instance($$self, $$props, $$invalidate) {
 		});
 	}
 
-	async function execute() {
+	async function connect(execute) {
 		await ensure_deps();
 		await ensure_connected();
 		await setup_async_exec();
 		const paths = window.location.pathname.split("/").filter(p => p);
-		socket.emit("submit", paths[paths.length - 1]);
+
+		if (execute) {
+			socket.emit("submit", paths[paths.length - 1]);
+		}
 	}
 
 	// initialization
@@ -41850,7 +41853,7 @@ function instance($$self, $$props, $$invalidate) {
 
 		try {
 			// Load notebook
-			const req = await fetch(nbdownload);
+			const req = await fetch(nbdownload, { cache: "reload" });
 
 			const value = await req.json();
 			await tick();
@@ -41862,7 +41865,12 @@ function instance($$self, $$props, $$invalidate) {
 
 			if (nb.metadata.execution_info === undefined) {
 				// Execute notebook if it hasn't already been executed
-				await execute();
+				await connect(true);
+			} else if (nb.metadata.execution_info.completed === undefined) {
+				// Notebook started but hasn't completed
+				$$invalidate(5, status = "Notebook is currently executing, joining session...");
+
+				await connect(false);
 			} else {
 				$$invalidate(5, status = undefined);
 			}
