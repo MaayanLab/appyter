@@ -34,7 +34,7 @@ def find_fields(config=None):
   return ctx
 
 @cli.command(help='List the available fields')
-@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click.option('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 def list_fields(**kwargs):
   fields = find_fields(get_env(ipynb='app.ipynb', **kwargs))
   field_name_max_size = max(map(len, fields.keys()))
@@ -47,8 +47,8 @@ def list_fields(**kwargs):
     print(field.ljust(field_name_max_size+1), doc_first_line)
 
 @cli.command(help='Describe a field using its docstring')
-@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
-@click.argument('field', envvar='FIELD', type=str)
+@click.option('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click.argument('field', envvar='APPYTER_FIELD', type=str)
 def describe_field(field, **kwargs):
   fields = find_fields(get_env(ipynb='app.ipynb', **kwargs))
   assert field in fields, 'Please choose a valid field name, see list-fields for options'
@@ -178,7 +178,7 @@ def get_jinja2_env(context={}, config=None):
   env.globals.update(**build_fields(find_fields(config=config), context=context, env=env))
   return env
 
-def get_env_from_kwargs(**kwargs):
+def get_env_from_kwargs(mode='default', **kwargs):
   import os
   import sys
   import uuid
@@ -199,7 +199,7 @@ def get_env_from_kwargs(**kwargs):
   STATIC_PREFIX = join_routes(PREFIX, 'static')
   IPYNB = try_json_loads(kwargs.get('ipynb', os.environ.get('APPYTER_IPYNB')))
   #
-  if IPYNB is None or not os.path.isfile(os.path.join(CWD, IPYNB)):
+  if mode != 'magic' and (IPYNB is None or not os.path.isfile(os.path.join(CWD, IPYNB))):
     logger.error('ipynb was not found')
   #
   if '://' not in DATA_DIR and not os.path.isabs(DATA_DIR):
