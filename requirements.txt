@@ -11,6 +11,6 @@ jupyter
 jupyter_client
 lxml
 nbclient
-nbconvert
+nbconvert==5.4.1
 nbformat
 python-dotenv
