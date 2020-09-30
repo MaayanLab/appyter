@@ -117,7 +117,8 @@ http {
 
     location ~ ^{{ join_routes(_config.PREFIX, '([^/]+)', '(.+)') }}$ {
       {%- if _config.DATA_DIR.startswith('/') %}
-      alias {{ join_routes(_config.DATA_DIR, 'output', '$1', '$2') }};
+      root {{ join_routes(_config.DATA_DIR, 'output') }};
+      try_files /$1/$2 =404;
       {%- elif _config.DATA_DIR.startswith('s3://') %}
       {%- with s3_url = s3_to_url(_config.DATA_DIR) %}
       rewrite ^{{ join_routes(_config.PREFIX, '([^/]+)', '(.+)') }}$ {{ join_routes(s3_url.path, 'output', '$1', '$2') }} break;
