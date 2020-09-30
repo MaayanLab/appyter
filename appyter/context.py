@@ -19,8 +19,6 @@ def find_fields_dir_mappings(config=None):
 
 def find_fields(config=None):
   assert config is not None
-  cwd = config['CWD']
-  profile = config['PROFILE']
   from appyter.fields import Field
   ctx = {}
   for _dirname_, _package_ in find_fields_dir_mappings(config=config).items():
@@ -73,8 +71,6 @@ def find_filters_dir_mappings(config=None):
 
 def find_filters(config=None):
   assert config is not None
-  cwd = config['CWD']
-  profile = config['PROFILE']
   ctx = {}
   for _dirname_, _package_ in find_filters_dir_mappings(config=config).items():
     if os.path.isdir(_dirname_):
@@ -108,8 +104,6 @@ def filter_blueprints(m, k, v):
 
 def find_blueprints(config=None):
   assert config is not None
-  cwd = config['CWD']
-  profile = config['PROFILE']
   ctx = {}
   for _dirname_, _package_ in find_blueprints_dir_mappings(config=config).items():
     if os.path.isdir(_dirname_):
@@ -123,18 +117,14 @@ def find_blueprints(config=None):
 
 def find_templates_dir(config=None):
   assert config is not None
-  cwd = config['CWD']
-  profile = config['PROFILE']
   return list(filter(os.path.isdir, [
-    os.path.abspath(os.path.join(cwd, 'templates')) + os.path.sep,
-    os.path.join(os.path.dirname(__file__), 'profiles', profile, 'templates') + os.path.sep,
+    os.path.abspath(os.path.join(config['CWD'], 'templates')) + os.path.sep,
+    os.path.join(os.path.dirname(__file__), 'profiles', config['PROFILE'], 'templates') + os.path.sep,
     os.path.join(os.path.dirname(__file__), 'profiles', 'default', 'templates') + os.path.sep,
   ]))
 
 def get_extra_files(config=None):
   assert config is not None
-  cwd = config['CWD']
-  profile = config['PROFILE']
   dirs = [
     *find_templates_dir(config=config),
     *find_filters_dir_mappings(config=config).keys(),
@@ -153,7 +143,7 @@ def get_extra_files(config=None):
       *glob.glob(os.path.join(d, '**', '_*'), recursive=True),
     }))
   }
-  paths.add(os.path.abspath(os.path.join(cwd, config['IPYNB'])))
+  paths.add(os.path.abspath(os.path.join(config['CWD'], config['IPYNB'])))
   return list(paths)
 
 def get_appyter_directory(path):
@@ -275,9 +265,9 @@ def get_env(**kwargs):
   #
   try:
     return get_env_from_click()
-  except RuntimeError as e:
+  except RuntimeError:
     pass
-  except AssertionError as e:
+  except AssertionError:
     pass
   #
   return config
