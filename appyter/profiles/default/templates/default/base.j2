@@ -7,7 +7,12 @@
   {% block style %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
   {% endblock %}
-  <script src="{{ url_for('static', filename='js/require.js') }}"></script>
+  <script>
+    window._config = {
+      STATIC_URL: {{ url_for('static', filename='')|jsonify }},
+    }
+  </script>
+  <script src="{{ url_for('static', filename='js/lib/requirejs/require.js') }}"></script>
 </head>
 <body>
   {% block body %}{% endblock %}
@@ -15,8 +20,8 @@
     <script>
       require.config({
         paths: {
-          'jquery': 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min',
-          'socketio': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim',
+          'jquery': {{ url_for('static', filename='js/lib/jquery/jquery.min')|jsonify }},
+          'socketio': {{ url_for('static', filename='js/lib/socket.io/socket.io.slim')|jsonify }},
         },
         shim: {
           'socketio': {

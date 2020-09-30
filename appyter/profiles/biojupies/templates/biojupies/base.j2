@@ -15,7 +15,7 @@
 <script>
   require.config({
     paths: {
-      'bootstrap': 'https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min',
+      'bootstrap': {{ url_for('static', filename='js/lib/bootstrap/bootstrap.bundle.min')|jsonify }},
     },
     shim: {
       'bootstrap': ['jquery'],

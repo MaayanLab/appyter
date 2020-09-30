@@ -31,8 +31,32 @@ const css_files = {
 const cp_files = [
   {
     src: path.join(root, 'js/node_modules/requirejs/require.js'),
-    dest: path.join(root, 'appyter/profiles/default/static/js'),
-  }
+    dest: path.join(root, 'appyter/profiles/default/static/js/lib/requirejs'),
+  },
+  {
+    src: path.join(root, 'js/node_modules/jquery/dist/jquery.min.js'),
+    dest: path.join(root, 'appyter/profiles/default/static/js/lib/jquery'),
+  },
+  {
+    src: path.join(root, 'js/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js'),
+    dest: path.join(root, 'appyter/profiles/biojupies/static/js/lib/bootstrap'),
+  },
+  {
+    src: path.join(root, 'js/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js'),
+    dest: path.join(root, 'appyter/profiles/bootstrap/static/js/lib/bootstrap'),
+  },
+  {
+    src: path.join(root, 'js/node_modules/socket.io-client/dist/socket.io.slim.js'),
+    dest: path.join(root, 'appyter/profiles/default/static/js/lib/socket.io'),
+  },
+  {
+    src: path.join(root, 'js/node_modules/socketio-file-upload/client.min.js'),
+    dest: path.join(root, 'appyter/profiles/default/static/js/lib/socketio-file-upload'),
+  },
+  {
+    src: path.join(root, 'js/node_modules/select2/dist/js/select2.min.js'),
+    dest: path.join(root, 'appyter/profiles/bootstrap/static/js/lib/select2'),
+  },
 ]
 
 gulp.task('copy_files', function () {

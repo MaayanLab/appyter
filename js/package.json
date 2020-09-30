@@ -41,8 +41,12 @@
     "canonical-json": "0.0.4",
     "gulp-rename": "^2.0.0",
     "highlight.js": "^10.1.2",
+    "jquery": "^3.5.1",
     "markdown-it": "^11.0.0",
     "markdown-it-anchor": "^5.3.0",
-    "requirejs": "^2.3.6"
+    "requirejs": "^2.3.6",
+    "select2": "^4.0.13",
+    "socket.io": "^2.3.0",
+    "socketio-file-upload": "^0.7.0"
   }
 }

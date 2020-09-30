@@ -7,7 +7,7 @@
   // get deps with requirejs
   window.require.config({
     paths: {
-      'socketio-file-upload': 'https://cdn.jsdelivr.net/npm/socketio-file-upload@0.7.0/client.min',
+      'socketio-file-upload': `${window._config.STATIC_URL}js/lib/socketio-file-upload/client.min`,
     },
     shim: {
       'socketio-file-upload': {
