@@ -14,7 +14,6 @@ from nbclient.util import ensure_async
 from appyter.cli import cli
 from appyter.ext.fs import Filesystem
 from appyter.ext.nbclient import NotebookClientIOPubHook
-from appyter.render.nbviewer import render_nbviewer_from_nb
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io, nb_to_json
 
 
