@@ -5,11 +5,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
 {% endblock %}
 
-{% block body %}
-{{ super() }}
-{% endblock %}
-
-{% block script %}
+{% block script_head %}
 {{ super() }}
 <script>
   require.config({
@@ -23,4 +19,12 @@
     }
   })
 </script>
+{% endblock %}
+
+{% block body %}
+{{ super() }}
+{% endblock %}
+
+{% block script %}
+{{ super() }}
 {% endblock %}

@@ -7,16 +7,13 @@
   {% block style %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
   {% endblock %}
-  <script>
-    window._config = {
-      STATIC_URL: {{ url_for('static', filename='')|jsonify }},
-    }
-  </script>
-  <script src="{{ url_for('static', filename='js/lib/requirejs/require.js') }}"></script>
-</head>
-<body>
-  {% block body %}{% endblock %}
-  {% block script %}
+  {% block script_head %}
+    <script>
+      window._config = {
+        STATIC_URL: {{ url_for('static', filename='')|jsonify }},
+      }
+    </script>
+    <script src="{{ url_for('static', filename='js/lib/requirejs/require.js') }}"></script>
     <script>
       require.config({
         paths: {
@@ -29,13 +26,9 @@
           },
         }
       })
-    </script>
-    <script>
       define('socket', ['socketio'], function (io) {
         return io({ path: {{ join_routes(_config.PREFIX, 'socket.io')|jsonify }} })
       })
-    </script>
-    <script>
       define('svelte', function () {
         return {
           render: function (self, file, props) {
@@ -52,6 +45,11 @@
         }
       })
     </script>
+  {% endblock %}
+</head>
+<body>
+  {% block body %}{% endblock %}
+  {% block script %}
     {% if _config.DEBUG %}
     <script>
       require(['socket'], function (socket) {

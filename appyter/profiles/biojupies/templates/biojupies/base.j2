@@ -6,13 +6,8 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/biojupies.css') }}" />
 {% endblock %}
 
-{% block body %}
+{% block script_head %}
 {{ super() }}
-{% endblock %}
-
-{% block script %}
-{{ super() }}
-<script src="{{ url_for('static', filename='js/lib/fontawesome/all.min.js') }}"></script>
 <script>
   require.config({
     paths: {
@@ -23,4 +18,13 @@
     }
   })
 </script>
+{% endblock %}
+
+{% block body %}
+{{ super() }}
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/lib/fontawesome/all.min.js') }}"></script>
 {% endblock %}
