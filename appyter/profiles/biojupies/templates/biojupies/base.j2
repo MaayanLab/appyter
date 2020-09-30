@@ -12,6 +12,7 @@
 
 {% block script %}
 {{ super() }}
+<script src="{{ url_for('static', filename='js/lib/fontawesome/all.min.js') }}"></script>
 <script>
   require.config({
     paths: {
