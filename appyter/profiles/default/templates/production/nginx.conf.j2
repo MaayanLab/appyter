@@ -87,16 +87,27 @@ http {
       try_files /favicon.ico =404;
     }
 
-    location ^~ {{ join_routes(_config.PREFIX, 'static') }} {
-      alias {{ _config.STATIC_DIR }};
-    }
-
-    location ^~ {{ join_routes(_config.PREFIX, 'profile') }} {
-      alias {{ os.path.join(get_profile_directory('default'), 'static') }};
-    }
-
     location ^~ {{ join_routes(_config.PREFIX, 'socket.io') }} {
       {{ appyter_proxy() }}
+    }
+
+    location ~ ^{{ join_routes(_config.PREFIX, 'static') }}/(.*)$ {
+      root {{ _config.STATIC_DIR }};
+      try_files /$1 @profile_static;
+    }
+
+    location @profile_static {
+      rewrite ^{{ join_routes(_config.PREFIX, 'static') }}/(.*)$ {{ join_routes(_config.PREFIX, 'profile', 'static') }}/$1;
+    }
+
+    location ~ ^{{ join_routes(_config.PREFIX, 'profile') }}/(.*)$ {
+      root {{ get_appyter_directory('profiles') }};
+      try_files
+        {%- if _config.PROFILE != 'default' %}
+        /{{ _config.PROFILE }}/$1
+        {%- endif %}
+        /default/$1
+        =404;
     }
 
     location ~ ^{{ join_routes(_config.PREFIX, '[^/]+') }}/$ {

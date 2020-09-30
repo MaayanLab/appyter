@@ -14,18 +14,17 @@ def serve(app_path, **kwargs):
   logger = logging.getLogger(__name__)
   from subprocess import Popen
   from appyter.ext.fs import Filesystem
-  from appyter.context import get_env, get_jinja2_env, get_profile_directory
+  from appyter.context import get_env, get_jinja2_env, get_appyter_directory
   from appyter.util import join_routes
   from appyter.profiles.default.filters.url_for import url_for
   config = get_env(**kwargs)
   logger.info(kwargs)
   env = get_jinja2_env(config=config)
-  env.globals.update(url_for=functools.partial(url_for, production=config))
   with Filesystem('tmpfs://') as tmp_fs:
     logger.info(f"Working directory {tmp_fs.path()}")
     #
     logger.info(f"Pre-rendering pages...")
-    with Filesystem(kwargs['cwd']).open(kwargs['ipynb']) as fr:
+    with Filesystem(config['CWD']).open(config['IPYNB']) as fr:
       from appyter.parse.nb import nb_from_ipynb_io
       nbtemplate = nb_from_ipynb_io(fr)
     with tmp_fs.open('index.html', 'w') as fw:
@@ -37,7 +36,7 @@ def serve(app_path, **kwargs):
       json.dump(render_nbtemplate_json_from_nbtemplate(env, nbtemplate), fw)
     with tmp_fs.open('landing.html', 'w') as fw:
       env.get_template('landing.j2').stream(
-        _nb=os.path.basename(kwargs['ipynb']),
+        _nb=os.path.basename(config['IPYNB']),
       ).dump(fw)
     #
     logger.info(f"Generating production config...")
@@ -47,9 +46,9 @@ def serve(app_path, **kwargs):
       env.get_template('production/nginx.conf.j2').stream(
         _tmp_fs=tmp_fs, os=os,
         s3_to_url=s3_to_url,
-        get_profile_directory=get_profile_directory,
+        get_appyter_directory=get_appyter_directory,
       ).dump(fw)
-    logger.info(f"Starting production instance at http://{kwargs['host']}:{kwargs['port']}{kwargs['prefix']} ...")
+    logger.info(f"Starting production instance at http://{config['HOST']}:{config['PORT']}{config['PREFIX']} ...")
     with Popen(['supervisord', '-n', '-c', tmp_fs.path('supervisord.conf')]) as proc:
       try:
         sys.exit(proc.wait())

@@ -106,7 +106,7 @@ class Field(dict):
     ''' Template to use for rendering field
     '''
     from appyter.profiles.default.filters.url_for import url_for
-    return url_for('profile', path='js') + '/fields/' + self.field + '.js'
+    return url_for('static', filename='js/fields/' + self.field + '.js')
 
   @property
   def choices(self):

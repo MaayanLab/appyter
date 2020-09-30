@@ -2,11 +2,12 @@
 '''
 import os
 from flask import request, current_app, send_file, send_from_directory, abort, jsonify
+from werkzeug.exceptions import NotFound
 
 from appyter.ext.fs import Filesystem
 from appyter.render.flask_app.core import core
 from appyter.render.flask_app.util import route_join_with_or_without_slash
-from appyter.context import get_profile_directory
+from appyter.context import get_appyter_directory
 from appyter.parse.nb import nb_from_ipynb_io
 from appyter.render.form import render_form_from_nbtemplate
 from appyter.render.nbinspect import render_nbtemplate_json_from_nbtemplate
@@ -48,11 +49,11 @@ def static(filename):
   static = Filesystem(current_app.config['STATIC_DIR'])
   if static.exists(filename):
     return send_file(static.open(filename, 'rb'), attachment_filename=filename)
-  abort(404)
-
-@core.route('/profile/<path:path>', methods=['GET'])
-def profile(path):
-  return send_from_directory(os.path.join(get_profile_directory('default'), 'static'), path)
+  #
+  try:
+    return send_from_directory(get_appyter_directory(f"profiles/{current_app.config['PROFILE']}/static"), filename=filename)
+  except NotFound:
+    return send_from_directory(get_appyter_directory('profiles/default/static'), filename=filename)
 
 @route_join_with_or_without_slash(core, '<path:path>', methods=['GET'])
 def data_files(path):

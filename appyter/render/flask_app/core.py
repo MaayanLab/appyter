@@ -3,7 +3,7 @@ import uuid
 import json
 from flask import Blueprint, request, redirect, abort, send_file, send_from_directory, url_for, current_app, jsonify
 
-from appyter.context import get_jinja2_env, get_profile_directory
+from appyter.context import get_jinja2_env
 from appyter.ext.fs import Filesystem
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.util import secure_filename
