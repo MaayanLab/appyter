@@ -3,3 +3,4 @@ recursive-exclude * __pycache__
 recursive-exclude * *.pyc
 recursive-include * *.j2
 recursive-include * *.js
+recursive-include * *.css
