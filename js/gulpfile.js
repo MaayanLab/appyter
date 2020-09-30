@@ -10,6 +10,7 @@ const sveltify = require('sveltify')
 const babelify = require('babelify')
 const tinyify = require('tinyify')
 const sass = require('gulp-sass')
+const merge = require('merge-stream')
 const root = path.join(__dirname, '..')
 
 const js_files = {
@@ -26,6 +27,25 @@ const css_files = {
   src: path.join(root, 'js/profiles/**/*.scss'),
   dest: path.join(root, 'appyter', 'profiles'),
 }
+
+const cp_files = [
+  {
+    src: path.join(root, 'js/node_modules/requirejs/require.js'),
+    dest: path.join(root, 'appyter/profiles/default/static/js'),
+  }
+]
+
+gulp.task('copy_files', function () {
+  return merge(
+    cp_files.map(
+      function ({ src, dest}) {
+        return gulp
+          .src(src)
+          .pipe(gulp.dest(dest))
+      }
+    )
+  )
+})
 
 gulp.task('build_js', function () {
   return gulp
@@ -83,6 +103,7 @@ gulp.task('build_css', function () {
 })
 
 gulp.task('build', gulp.series([
+  'copy_files',
   'build_js',
   'build_svelte', 
   'build_css',
