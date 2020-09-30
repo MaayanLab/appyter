@@ -34,7 +34,9 @@
     "tinyify": "^3.0.0"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.14.0",
     "ansi_up": "^4.0.4",
+    "bootstrap": "^4.5.2",
     "canonical-json": "0.0.4",
     "gulp-rename": "^2.0.0",
     "highlight.js": "^10.1.2",
