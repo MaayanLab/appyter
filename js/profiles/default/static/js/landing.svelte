@@ -69,6 +69,10 @@
   var current_code_cell
 
   async function setup_async_exec() {
+    socket.on('connect', async () => {
+      const paths = window.location.pathname.split('/').filter(p => p)
+      socket.emit('join', { session: paths[paths.length - 1] })
+    })
     socket.on('status', async (value) => {
       await tick()
       status = value
@@ -106,8 +110,6 @@
     const paths = window.location.pathname.split('/').filter(p => p)
     if (execute) {
       socket.emit('submit', paths[paths.length - 1])
-    } else {
-      socket.emit('join', { session: paths[paths.length - 1] })
     }
   }
 
