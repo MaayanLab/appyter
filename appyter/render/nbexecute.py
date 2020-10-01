@@ -53,61 +53,63 @@ async def nbexecute_async(ipynb='', emit=json_emitter, subscribe_nb=None, cwd=''
   await emit({ 'type': 'status', 'data': 'Starting' })
   #
   try:
-    with Filesystem(cwd, with_path=True) as fs:
-      # setup execution_info with start time
-      nb.metadata['execution_info'] = {
-        'started': datetime.datetime.now().replace(
-          tzinfo=datetime.timezone.utc
-        ).isoformat()
-      }
-      with fs.open(ipynb, 'w') as fw:
-        nb_to_ipynb_io(nb, fw)
-      #
-      try:
-        iopub_hook = iopub_hook_factory(nb, emit)
-        client = NotebookClientIOPubHook(
-          nb,
-          allow_errors=True,
-          timeout=None,
-          kernel_name='python3',
-          env=dict(
-            PYTHONPATH=':'.join(sys.path),
-            PATH=os.environ['PATH'],
-          ),
-          resources={ 'metadata': {'path': fs.path()} },
-          iopub_hook=iopub_hook_factory(nb, emit),
-        )
-        if callable(subscribe_nb):
-          await subscribe_nb(lambda: nb_to_json(nb))
-        await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
-        async with client.async_setup_kernel():
-          await emit({ 'type': 'status', 'data': 'Executing...' })
-          await emit({ 'type': 'progress', 'data': 0 })
-          n_cells = len(nb.cells)
-          exec_count = 1
-          for index, cell in enumerate(nb.cells):
-            cell = await client.async_execute_cell(
-              cell, index,
-              execution_count=exec_count,
-            )
-            await iopub_hook(cell, index)
-            if cell_is_code(cell):
-              if cell_has_error(cell):
-                raise Exception('Cell execution error on cell %d' % (exec_count))
-              exec_count += 1
-            if index < n_cells-1:
-              await emit({ 'type': 'progress', 'data': index })
-            else:
-              await emit({ 'type': 'status', 'data': 'Success' })
-      except Exception as e:
-        await emit({ 'type': 'error', 'data': str(e) })
-      # Save execution completion time
-      nb.metadata['execution_info']['completed'] = datetime.datetime.now().replace(
+    fs = Filesystem(cwd, with_path=True)
+    # setup execution_info with start time
+    nb.metadata['execution_info'] = {
+      'started': datetime.datetime.now().replace(
         tzinfo=datetime.timezone.utc
       ).isoformat()
-      #
-      with fs.open(ipynb, 'w') as fw:
-        nb_to_ipynb_io(nb, fw)
+    }
+    with fs.open(ipynb, 'w') as fw:
+      nb_to_ipynb_io(nb, fw)
+    #
+    try:
+      iopub_hook = iopub_hook_factory(nb, emit)
+      client = NotebookClientIOPubHook(
+        nb,
+        allow_errors=True,
+        timeout=None,
+        kernel_name='python3',
+        env=dict(
+          PYTHONPATH=':'.join(sys.path),
+          PATH=os.environ['PATH'],
+        ),
+        resources={ 'metadata': {'path': fs.path()} },
+        iopub_hook=iopub_hook_factory(nb, emit),
+      )
+      if callable(subscribe_nb):
+        await subscribe_nb(lambda: nb_to_json(nb))
+      await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
+      async with client.async_setup_kernel():
+        await emit({ 'type': 'status', 'data': 'Executing...' })
+        await emit({ 'type': 'progress', 'data': 0 })
+        n_cells = len(nb.cells)
+        exec_count = 1
+        for index, cell in enumerate(nb.cells):
+          cell = await client.async_execute_cell(
+            cell, index,
+            execution_count=exec_count,
+          )
+          await iopub_hook(cell, index)
+          if cell_is_code(cell):
+            if cell_has_error(cell):
+              raise Exception('Cell execution error on cell %d' % (exec_count))
+            exec_count += 1
+          if index < n_cells-1:
+            await emit({ 'type': 'progress', 'data': index })
+          else:
+            await emit({ 'type': 'status', 'data': 'Success' })
+    except Exception as e:
+      await emit({ 'type': 'error', 'data': str(e) })
+    # Save execution completion time
+    nb.metadata['execution_info']['completed'] = datetime.datetime.now().replace(
+      tzinfo=datetime.timezone.utc
+    ).isoformat()
+    #
+    with fs.open(ipynb, 'w') as fw:
+      nb_to_ipynb_io(nb, fw)
+    #
+    fs.close()
   except Exception as e:
     await emit({ 'type': 'status', 'data': 'Error initializing, try again later' })
     logger.error(traceback.format_exc())
