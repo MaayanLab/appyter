@@ -110,6 +110,8 @@
     const paths = window.location.pathname.split('/').filter(p => p)
     if (execute) {
       socket.emit('submit', paths[paths.length - 1])
+    } else {
+      socket.emit('join', { session: paths[paths.length - 1] })
     }
   }
 

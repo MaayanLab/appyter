@@ -27,6 +27,7 @@ async def submit(sid, data):
   else:
     raise Exception('Unrecognized data type')
   #
+  socketio.enter_room(sid, result_hash)
   await socketio.emit('status', 'Queuing execution', sid)
   job = dict(
     cwd=Filesystem.join(config['DATA_DIR'], 'output', result_hash),
