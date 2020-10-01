@@ -44,10 +44,6 @@ def prepare_data(data):
   unrecognized = set(data.keys()) - fields
   if unrecognized:
     raise BadRequest(f"Unrecognized fields: {', '.join(unrecognized)}")
-  #
-  missing = fields - set(data.keys())
-  if missing:
-    raise BadRequest(f"Missing fields: {', '.join(missing)}")
   return data
 
 def prepare_formdata(req):
