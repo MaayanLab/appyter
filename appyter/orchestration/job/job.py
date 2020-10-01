@@ -42,7 +42,7 @@ async def evaluate_saga(sio, msg_queue, job):
   #
   while msg := await msg_queue.get():
     if msg['type'] == 'connect':
-      await sio.emit('join', dict(session=job['session'], job=job['id']))
+      await sio.emit('join', dict(id=job['id'], session=job['session']))
     elif msg['type'] == 'connect_error':
       raise Exception(str(msg))
     elif msg['type'] == 'joined' and msg['data'] == job['id']:
