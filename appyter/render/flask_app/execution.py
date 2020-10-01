@@ -61,6 +61,12 @@ def init(data):
   )
 
 def nbexecute(cwd='', ipynb='', emit=print, Popen=None):
+  if request.sid not in session:
+    session[request.sid] = {}
+  if session[request.sid].get('started'):
+    return
+  session[request.sid]['started'] = True
+  print('nbexecute', cwd)
   import json
   if Popen is None:
     from subprocess import Popen
