@@ -2,6 +2,7 @@ import os
 import uuid
 import json
 from flask import Blueprint, request, redirect, abort, send_file, send_from_directory, url_for, current_app, jsonify
+from werkzeug.exceptions import BadRequest
 
 from appyter.context import get_jinja2_env
 from appyter.ext.fs import Filesystem
@@ -38,7 +39,15 @@ def get_ipynb_hash():
   return _ipynb_hash
 
 def prepare_data(data):
-  # TODO: assert constraints
+  # Assert that all fields are accounted for
+  fields = {field['args']['name'] for field in get_fields()}
+  unrecognized = set(data.keys()) - fields
+  if unrecognized:
+    raise BadRequest(f"Unrecognized fields: {', '.join(unrecognized)}")
+  #
+  missing = fields - set(data.keys())
+  if missing:
+    raise BadRequest(f"Missing fields: {', '.join(missing)}")
   return data
 
 def prepare_formdata(req):
@@ -73,14 +82,19 @@ def prepare_results(data):
   data_fs = Filesystem(current_app.config['DATA_DIR'])
   results_path = Filesystem.join('output', results_hash)
   if not data_fs.exists(Filesystem.join(results_path, current_app.config['IPYNB'])):
-    # construct/write files into directory
-    fields = get_fields()
+    # construct notebook
+    env = get_jinja2_env(config=current_app.config, context=data)
+    fs = Filesystem(current_app.config['CWD'])
+    with fs.open(current_app.config['IPYNB'], 'r') as fr:
+      nbtemplate = nb_from_ipynb_io(fr)
+    # in case of constraint failures, we'll fail here
+    nb = render_nb_from_nbtemplate(env, nbtemplate)
+    # link all input files into output directory
     file_fields = {
       field['args']['name']
-      for field in fields
+      for field in get_fields()
       if field['field'] == 'FileField'
     }
-    # link all input files into output directory
     for file_field in file_fields:
       if fdata := data.get(file_field):
         content_hash, filename = fdata.split('/', maxsplit=1)
@@ -91,12 +105,7 @@ def prepare_results(data):
           Filesystem.join(results_path, filename)
         )
         data[file_field] = filename
-    # construct/write notebook
-    env = get_jinja2_env(config=current_app.config, context=data)
-    fs = Filesystem(current_app.config['CWD'])
-    with fs.open(current_app.config['IPYNB'], 'r') as fr:
-      nbtemplate = nb_from_ipynb_io(fr)
-    nb = render_nb_from_nbtemplate(env, nbtemplate)
+    # write notebook
     nbfile = Filesystem.join(results_path, os.path.basename(current_app.config['IPYNB']))
     with data_fs.open(nbfile, 'w') as fw:
       nb_to_ipynb_io(nb, fw)
