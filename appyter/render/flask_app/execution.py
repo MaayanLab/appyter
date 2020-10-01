@@ -27,8 +27,7 @@ async def submit(sid, data):
   else:
     raise Exception('Unrecognized data type')
   #
-  socketio.enter_room(sid, result_hash)
-  await socketio.emit('status', 'Queuing execution', room=result_hash)
+  await socketio.emit('status', 'Queuing execution', sid)
   job = dict(
     cwd=Filesystem.join(config['DATA_DIR'], 'output', result_hash),
     ipynb=os.path.basename(config['IPYNB']),
@@ -52,16 +51,16 @@ async def submit(sid, data):
         async with aiohttp.ClientSession(headers={'Content-Type': 'application/json'}) as client:
           async with client.post(config['DISPATCHER'], json=job) as resp:
             queue_size = await resp.json()
-            await socketio.emit('status', f"Queued successfully, you are at position {queue_size} in the queue", room=result_hash)
+            await socketio.emit('status', f"Queued successfully, you are at position {queue_size} in the queue", sid)
             queued = True
       except Exception:
         logger.error(traceback.format_exc())
         if backoff < 60:
-          await socketio.emit('status', f"Failed to contact orchestrator, trying again in {backoff}s...", room=result_hash)
+          await socketio.emit('status', f"Failed to contact orchestrator, trying again in {backoff}s...", sid)
           asyncio.sleep(backoff)
           backoff *= 2
         else:
-          await socketio.emit('error', 'Failed to contact orchestrator, please try again later.', room=result_hash)
+          await socketio.emit('error', 'Failed to contact orchestrator, please try again later.', sid)
           break
   else:
     from appyter.orchestration.job.job import execute_async
