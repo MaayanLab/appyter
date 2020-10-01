@@ -25,7 +25,7 @@ async def remote_message_producer(sio, msg_queue, job):
 
 def emit_factory(sio, session):
   async def emit(data):
-    await sio.emit('message', dict(data, session=session))
+    await sio.emit('msg', dict(data, session=session))
   return emit
 
 def replay_nb_factory(sio, session):
@@ -34,7 +34,7 @@ def replay_nb_factory(sio, session):
   def replay_nb(get_nb):
     @sio.event
     async def joined(data):
-      await sio.emit('message', dict(type='nb', data=get_nb(), session=session))
+      await sio.emit('msg', dict(type='nb', data=get_nb(), session=session))
   return replay_nb
 
 async def evaluate_saga(sio, msg_queue, job):

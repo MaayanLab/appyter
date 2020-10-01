@@ -80,6 +80,6 @@ async def _(sid, data):
   await socketio.emit('left', id, room=session)
   socketio.leave_room(sid, session)
 
-@socketio.on('message')
+@socketio.on('msg')
 async def _(sid, data):
   await socketio.emit(data['type'], data['data'], room=data['session'])
