@@ -28,6 +28,16 @@ def emit_factory(sio, session):
     await sio.emit('message', dict(data, session=session))
   return emit
 
+def replay_nb_factory(sio, session):
+  ''' Setup a callback which will send the current notebook if someone joins the room
+  '''
+  async def replay_nb(get_nb):
+    @sio.event
+    async def joined(data):
+      await sio.emit('message', dict({ 'type': 'nb', 'data': get_nb(), 'session': session }))
+    await sio.wait()
+  return replay_nb
+
 async def evaluate_saga(sio, msg_queue, job):
   from appyter.render.nbexecute import nbexecute_async
   #
@@ -38,9 +48,10 @@ async def evaluate_saga(sio, msg_queue, job):
       raise Exception(str(msg))
     elif msg['type'] == 'joined' and msg['data'] == job['job']:
       await nbexecute_async(
-        ipynb=job['ipynb'],
-        emit=emit_factory(sio, job['session']),
         cwd=job['cwd'],
+        emit=emit_factory(sio, job['session']),
+        ipynb=job['ipynb'],
+        subscribe_nb=replay_nb_factory(sio, job['session']),
       )
       await sio.emit('leave', dict(session=job['session'], job=job['job']))
     elif msg['type'] == 'left' and msg['data'] == job['job']:

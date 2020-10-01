@@ -35,7 +35,7 @@ async def json_emitter(obj):
   import json
   print(json.dumps(obj))
 
-async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
+async def nbexecute_async(ipynb='', emit=json_emitter, subscribe_nb=None, cwd=''):
   assert callable(emit), 'Emit must be callable'
   with Filesystem(cwd) as fs:
     with fs.open(ipynb, 'r') as fr:
@@ -77,6 +77,8 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd=''):
           resources={ 'metadata': {'path': fs.path()} },
           iopub_hook=iopub_hook_factory(nb, emit),
         )
+        if callable(subscribe_nb):
+          subscribe_nb(lambda: nb_to_json(nb))
         await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
         async with client.async_setup_kernel():
           await emit({ 'type': 'status', 'data': 'Executing...' })
