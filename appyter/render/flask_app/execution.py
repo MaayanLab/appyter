@@ -1,6 +1,10 @@
 import os
 import aiohttp
+import asyncio
+import traceback
 from subprocess import PIPE
+import logging
+logger = logging.getLogger(__name__)
 
 from appyter.render.flask_app.core import prepare_data, prepare_results
 from appyter.render.flask_app.socketio import socketio
@@ -41,13 +45,25 @@ async def submit(sid, data):
   if config['DISPATCHER_IMAGE']:
     job['image'] = config['DISPATCHER_IMAGE']
   #
-  # TODO: worry about inaccessible dispatcher
   if config['DISPATCHER']:
-    async with aiohttp.ClientSession(headers={'Content-Type': 'application/json'}) as client:
-      async with client.post(config['DISPATCHER'], json=job) as resp:
-        queue_size = await resp.json()
-        # TODO: keep track of queue position?
-        await socketio.emit('status', f"Queued successfully, you are at position {queue_size} in the queue", room=result_hash)
+    queued = False
+    backoff = 1
+    while not queued:
+      try:
+        async with aiohttp.ClientSession(headers={'Content-Type': 'application/json'}) as client:
+          async with client.post(config['DISPATCHER'], json=job) as resp:
+            queue_size = await resp.json()
+            await socketio.emit('status', f"Queued successfully, you are at position {queue_size} in the queue", room=result_hash)
+            queued = True
+      except Exception:
+        logger.error(traceback.format_exc())
+        if backoff < 60:
+          await socketio.emit('status', f"Failed to contact orchestrator, trying again in {backoff}s...", room=result_hash)
+          asyncio.sleep(backoff)
+          backoff *= 2
+        else:
+          await socketio.emit('error', 'Failed to contact orchestrator, please try again later.', room=result_hash)
+          break
   else:
     from appyter.orchestration.job.job import execute_async
     await execute_async(job)
