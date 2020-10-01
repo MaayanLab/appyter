@@ -31,7 +31,7 @@ core = Blueprint('__main__.dispatcher', __name__)
 def on_submit():
   if request.method == 'GET':
     with active.lock:
-      return jsonify({ 'active': list(active), 'queued': dispatch_queue.view() })
+      return jsonify({ 'active': list(active.values()), 'queued': dispatch_queue.view() })
   elif request.method == 'POST':
     dispatch_queue.put(dict(request.json, debug=current_app.config['DEBUG']))
     return jsonify(dispatch_queue.qsize())
