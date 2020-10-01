@@ -41,14 +41,14 @@ def dispatcher(queued=None, active=None, dispatch=None):
     while not queued.empty():
       job = queued.get()
       with active.lock:
-        active[job['job']] = job
+        active[job['id']] = job
       try:
         dispatch(job=job)
       except:
         import traceback
         logger.error(f"dispatch error: {traceback.format_exc()}")
       with active.lock:
-        del active[job['job']]
+        del active[job['id']]
       queued.task_done()
     socketio.sleep(1)
 

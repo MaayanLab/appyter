@@ -20,7 +20,7 @@ def endless_watch(*args, **kwargs):
       s = iter(w.stream(*args, **kwargs, resource_version=v))
 
 def dispatch(job=None, namespace='default', debug=False, **kwargs):
-  logger.info(f"starting {job['job']}")
+  logger.info(f"starting {job['id']}")
   from kubernetes import client, config
   config.load_incluster_config()
   coreV1 = client.CoreV1Api()
@@ -31,9 +31,9 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
       api_version='batch/v1',
       kind='Job',
       metadata=client.V1ObjectMeta(
-        name=job['job'],
+        name=job['id'],
         annotations={
-          f"container.apparmor.security.beta.kubernetes.io/appyter-{job['job']}": 'unconfined'
+          f"container.apparmor.security.beta.kubernetes.io/appyter-{job['id']}": 'unconfined'
         },
       ),
       spec=client.V1JobSpec(
@@ -42,7 +42,7 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
             restart_policy='Never',
             containers=[
               client.V1Container(
-                name=f"appyter-{job['job']}",
+                name=f"appyter-{job['id']}",
                 image=job['image'],
                 command=['appyter', 'orchestration', 'job', json.dumps(job)],
                 security_context=client.V1SecurityContext(
@@ -75,7 +75,7 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
   )
   #
   for event in endless_watch(batchV1.list_namespaced_job, namespace, 
-    label_selector=f"job-name={job['job']}"
+    label_selector=f"job-name={job['id']}"
   ):
     logger.debug(str(event))
     event_type = event['type']
@@ -85,9 +85,9 @@ def dispatch(job=None, namespace='default', debug=False, **kwargs):
         break
   #
   if not debug:
-    batchV1.delete_namespaced_job(job['job'], namespace)
+    batchV1.delete_namespaced_job(job['id'], namespace)
     # delete associated pod(s)
-    for event_pod in coreV1.list_namespaced_pod(namespace, label_selector=f"job-name={job['job']}", watch=False).items:
+    for event_pod in coreV1.list_namespaced_pod(namespace, label_selector=f"job-name={job['id']}", watch=False).items:
       coreV1.delete_namespaced_pod(event_pod.metadata.name, namespace)
   #
-  logger.info(f"{job['job']} completed")
+  logger.info(f"{job['id']} completed")

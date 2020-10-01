@@ -27,14 +27,13 @@ async def submit(sid, data):
   else:
     raise Exception('Unrecognized data type')
   #
-  # TODO: submit job iff it hasn't already been executed
   socketio.enter_room(sid, result_hash)
   await socketio.emit('status', 'Queuing execution', room=result_hash)
   job = dict(
     cwd=Filesystem.join(config['DATA_DIR'], 'output', result_hash),
     ipynb=os.path.basename(config['IPYNB']),
     session=result_hash,
-    job=generate_uuid(),
+    id=generate_uuid(),
   )
   #
   if config['DISPATCHER_URL']:
@@ -70,16 +69,16 @@ async def submit(sid, data):
 
 @socketio.on('join')
 async def _(sid, data):
+  id = data.get('id', sid)
   session = data['session']
-  job = data['job']
   socketio.enter_room(sid, session)
-  await socketio.emit('joined', job, room=session)
+  await socketio.emit('joined', id, room=session)
 
 @socketio.on('leave')
 async def _(sid, data):
+  id = data.get('id', sid)
   session = data['session']
-  job = data['job']
-  await socketio.emit('left', job, room=session)
+  await socketio.emit('left', id, room=session)
   socketio.leave_room(sid, session)
 
 @socketio.on('message')

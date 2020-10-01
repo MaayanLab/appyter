@@ -43,18 +43,18 @@ async def evaluate_saga(sio, msg_queue, job):
   #
   while msg := await msg_queue.get():
     if msg['type'] == 'connect':
-      await sio.emit('join', dict(session=job['session'], job=job['job']))
+      await sio.emit('join', dict(session=job['session'], job=job['id']))
     elif msg['type'] == 'connect_error':
       raise Exception(str(msg))
-    elif msg['type'] == 'joined' and msg['data'] == job['job']:
+    elif msg['type'] == 'joined' and msg['data'] == job['id']:
       await nbexecute_async(
         cwd=job['cwd'],
         emit=emit_factory(sio, job['session']),
         ipynb=job['ipynb'],
         subscribe_nb=replay_nb_factory(sio, job['session']),
       )
-      await sio.emit('leave', dict(session=job['session'], job=job['job']))
-    elif msg['type'] == 'left' and msg['data'] == job['job']:
+      await sio.emit('leave', dict(session=job['session'], job=job['id']))
+    elif msg['type'] == 'left' and msg['data'] == job['id']:
       await sio.disconnect()
     msg_queue.task_done()
 
