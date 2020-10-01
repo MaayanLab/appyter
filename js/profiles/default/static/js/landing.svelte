@@ -71,7 +71,7 @@
   async function setup_async_exec() {
     socket.on('connect', async () => {
       const paths = window.location.pathname.split('/').filter(p => p)
-      socket.emit('join', { session: paths[paths.length - 1] })
+      socket.emit('join', paths[paths.length - 1])
     })
     socket.on('status', async (value) => {
       await tick()
@@ -111,7 +111,7 @@
     if (execute) {
       socket.emit('submit', paths[paths.length - 1])
     } else {
-      socket.emit('join', { session: paths[paths.length - 1] })
+      socket.emit('join', paths[paths.length - 1])
     }
   }
 

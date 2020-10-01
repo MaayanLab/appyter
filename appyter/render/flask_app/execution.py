@@ -69,18 +69,14 @@ async def submit(sid, data):
 
 @socketio.on('join')
 async def _(sid, data):
-  id = data.get('id', sid)
-  session = data['session']
-  socketio.enter_room(sid, session)
-  await socketio.emit('joined', id, room=session)
+  socketio.enter_room(sid, data)
+  await socketio.emit('joined', dict(id=sid, session=data), room=data)
 
 @socketio.on('leave')
 async def _(sid, data):
-  id = data.get('id', sid)
-  session = data['session']
-  await socketio.emit('left', id, room=session)
-  socketio.leave_room(sid, session)
+  await socketio.emit('left', dict(id=sid, session=data), room=data)
+  socketio.leave_room(sid, data)
 
 @socketio.on('msg')
 async def _(sid, data):
-  await socketio.emit(data['type'], data['data'], room=data['session'])
+  await socketio.emit(data['type'], data['data'], to=data.get('to'), room=data.get('session'))

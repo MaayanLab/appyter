@@ -78,7 +78,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter, subscribe_nb=None, cwd=''
           iopub_hook=iopub_hook_factory(nb, emit),
         )
         if callable(subscribe_nb):
-          subscribe_nb(lambda: nb_to_json(nb))
+          await subscribe_nb(lambda: nb_to_json(nb))
         await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
         async with client.async_setup_kernel():
           await emit({ 'type': 'status', 'data': 'Executing...' })
