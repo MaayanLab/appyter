@@ -70,15 +70,22 @@
 
   async function setup_async_exec() {
     socket.on('connect', async () => {
-      console.log('connect')
-      const paths = window.location.pathname.split('/').filter(p => p)
-      socket.emit('join', paths[paths.length - 1])
+      await tick()
+      status = `Connected to server, re-initializing...`
+      statusBg = 'warning'
+      await reinit()
     })
     socket.on('reconnect', async () => {
-      console.log('reconnect')
+      await tick()
+      status = `Reconnecting to server...`
+      statusBg = 'warning'
     })
-    socket.on('disconnect', async () => {
-      console.log('disconnect')
+    socket.on('disconnect', async (reason) => {
+      if (reason !== 'io client disconnect') {
+        await tick()
+        status = `Disconnected from server...`
+        statusBg = 'danger'
+      }
     })
     socket.on('status', async (value) => {
       await tick()
@@ -86,6 +93,7 @@
       statusBg = 'primary'
       if (status === 'Success') {
         current_code_cell = undefined
+        socket.disconnect()
       }
     })
     socket.on('error', async (value) => {
@@ -119,6 +127,28 @@
       socket.emit('submit', paths[paths.length - 1])
     } else {
       socket.emit('join', paths[paths.length - 1])
+    }
+  }
+
+  async function reinit() {
+    try {
+      // Load notebook
+      const req = await fetch(nbdownload, {cache: 'reload'})
+      const value = await req.json()
+      if (value.metadata.execution_info.completed === undefined) {
+        await tick()
+        status = 'Notebook is still executing, rejoining session...'
+        const paths = window.location.pathname.split('/').filter(p => p)
+        socket.emit('join', paths[paths.length - 1])
+      } else {
+        socket.disconnect()
+        await tick()
+        status = 'Success'
+        nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
+      }
+    } catch (e) {
+      status = `Error: ${e}`
+      statusBg = 'danger'
     }
   }
 
