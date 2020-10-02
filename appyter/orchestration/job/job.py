@@ -37,7 +37,6 @@ async def remote_message_producer(sio, msg_queue, job):
   #
   url = urllib.parse.urlparse(job['url'])
   await sio.connect(f"{url.scheme}://{url.netloc}", socketio_path=url.path)
-  await sio.wait()
 
 def emit_factory(msg_queue):
   async def emit(data):
@@ -101,7 +100,6 @@ async def evaluate_saga(sio, msg_queue, job):
     elif msg['type'] == 'stopped':
       await sio.emit('leave', job['session'])
     elif msg['type'] == 'left' and msg['data']['session'] == job['session'] and msg['data']['id'] == sio.sid:
-      await sio.disconnect()
       msg_queue.task_done()
       return
     msg_queue.task_done()
@@ -112,7 +110,7 @@ async def execute_async(job):
   sio.start_background_task(remote_message_producer, sio, msg_queue, job)
   try:
     await evaluate_saga(sio, msg_queue, job)
-    await sio.wait()
+    await sio.disconnect()
   except asyncio.CancelledError:
     raise
 
