@@ -5,63 +5,78 @@ import itertools as it
 import logging
 logger = logging.getLogger(__name__)
 
-async def remote_message_producer(sio, msg_queue, msg_counter, job):
+class OrderedPriorityQueue(asyncio.PriorityQueue):
+  def __init__(self):
+    super().__init__()
+    self._msg_counter = it.count()
+  #
+  async def put(self, msg, priority=0):
+    return await super().put((priority, next(self._msg_counter), msg))
+  #
+  async def get(self):
+    _, _, msg = await super().get()
+    return msg
+
+async def remote_message_producer(sio, msg_queue, job):
   @sio.event
   async def connect():
-    await msg_queue.put((1, next(msg_counter), dict(type='connect', msg='')))
+    await msg_queue.put(dict(type='connect', msg=''), priority=1)
   @sio.event
   async def connect_error():
-    await msg_queue.put((0, next(msg_counter), dict(type='connect_error', msg='')))
+    await msg_queue.put(dict(type='connect_error', msg=''), priority=0)
   @sio.event
   async def disconnect():
-    await msg_queue.put((0, next(msg_counter), dict(type='disconnect', msg='')))
+    await msg_queue.put(dict(type='disconnect', msg=''), priority=0)
   @sio.event
   async def joined(data):
-    await msg_queue.put((1, next(msg_counter), dict(type='joined', data=data)))
+    await msg_queue.put(dict(type='joined', data=data), priority=1)
   @sio.event
   async def left(data):
-    await msg_queue.put((8, next(msg_counter), dict(type='left', data=data)))
+    await msg_queue.put(dict(type='left', data=data), priority=8)
   #
   url = urllib.parse.urlparse(job['url'])
   await sio.connect(f"{url.scheme}://{url.netloc}", socketio_path=url.path)
   await sio.wait()
 
-def emit_factory(msg_queue, msg_counter):
+def emit_factory(msg_queue):
   async def emit(data):
-    await msg_queue.put((5, next(msg_counter), dict(type='msg', data=data)))
+    await msg_queue.put(dict(type='msg', data=data), priority=5)
   return emit
 
-def replay_nb_factory(msg_queue, msg_counter):
+def get_state_factory(msg_queue):
   ''' Setup a callback which will send the current notebook if someone joins the room
   '''
-  async def replay_nb(get_nb):
-    await msg_queue.put((2, next(msg_counter), dict(type='get_nb', data=get_nb)))
-  return replay_nb
+  async def subscribe(get_state):
+    await msg_queue.put(dict(type='get_state', data=get_state), priority=2)
+  return subscribe
 
-async def evaluate_notebook(sio, msg_queue, msg_counter, job):
+async def evaluate_notebook(sio, msg_queue, job):
   from appyter.render.nbexecute import nbexecute_async
   await nbexecute_async(
     cwd=job['cwd'],
-    emit=emit_factory(msg_queue, msg_counter),
+    emit=emit_factory(msg_queue),
     ipynb=job['ipynb'],
-    subscribe_nb=replay_nb_factory(msg_queue, msg_counter),
+    subscribe=get_state_factory(msg_queue),
   )
-  await msg_queue.put((10, next(msg_counter), dict(type='stopped')))
+  await msg_queue.put(dict(type='stopped'), priority=10)
 
-async def evaluate_saga(sio, msg_queue, msg_counter, job):
-  get_nb = None
-  while priority_msg := await msg_queue.get():
-    _, _, msg = priority_msg
+async def evaluate_saga(sio, msg_queue, job):
+  get_state = None
+  while msg := await msg_queue.get():
+    logger.debug(msg)
     if msg['type'] == 'connect':
       await sio.emit('join', job['session'])
     elif msg['type'] == 'connect_error':
       raise Exception(str(msg))
     elif msg['type'] == 'joined' and msg['data']['session'] == job['session'] and msg['data']['id'] == sio.sid:
-      sio.start_background_task(evaluate_notebook, sio, msg_queue, msg_counter, job)
-    elif msg['type'] == 'get_nb':
-      get_nb = msg['data']
-    elif msg['type'] == 'joined' and msg['data']['session'] == job['session'] and callable(get_nb):
-      await sio.emit('msg', dict(type='nb', data=get_nb(), to=msg['data']['id']))
+      sio.start_background_task(evaluate_notebook, sio, msg_queue, job)
+    elif msg['type'] == 'get_state':
+      get_state = msg['data']
+    elif msg['type'] == 'joined' and msg['data']['session'] == job['session'] and callable(get_state):
+      state = get_state()
+      await sio.emit('msg', dict(type='nb', data=state['nb'], to=msg['data']['id']))
+      await sio.emit('msg', dict(type='status', data=state['status'], to=msg['data']['id']))
+      await sio.emit('msg', dict(type='progress', data=state['progress'], to=msg['data']['id']))
     elif msg['type'] == 'msg':
       await sio.emit('msg', dict(msg['data'], session=job['session']))
     elif msg['type'] == 'stopped':
@@ -75,11 +90,10 @@ async def evaluate_saga(sio, msg_queue, msg_counter, job):
 
 async def execute_async(job):
   sio = socketio.AsyncClient(reconnection=False)
-  msg_queue = asyncio.PriorityQueue()
-  msg_counter = it.count()
-  sio.start_background_task(remote_message_producer, sio, msg_queue, msg_counter, job)
+  msg_queue = OrderedPriorityQueue()
+  sio.start_background_task(remote_message_producer, sio, msg_queue, job)
   try:
-    await evaluate_saga(sio, msg_queue, msg_counter, job)
+    await evaluate_saga(sio, msg_queue, job)
     await sio.wait()
   except asyncio.CancelledError:
     raise

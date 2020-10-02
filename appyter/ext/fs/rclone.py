@@ -17,6 +17,13 @@ def sh(cmd):
 def slugify(s):
   return re.sub(r'[^a-zA-Z0-9-]+', '', s)
 
+def sync_async_sleep(amnt, asynchronous=False):
+  if asynchronous:
+    import asyncio
+    asyncio.ensure_future(asyncio.sleep(amnt))
+  else:
+    time.sleep(amnt)
+
 class RcloneParse:
   @staticmethod
   def get(scheme):
@@ -48,7 +55,7 @@ class RcloneParse:
     return [el for key, value in config.items() for el in [key, value]]
 
 class Filesystem(FSFilesystem):
-  def __init__(self, uri):
+  def __init__(self, uri, asynchronous=False):
     self._uri = uri
     self._scheme = '+'.join(scheme for scheme in self._uri.scheme.split('+') if scheme != 'rclone')
     self._remote = slugify(f"{self._scheme}:{self._uri.hostname}{self._uri.path}?{self._uri.query}")
@@ -60,11 +67,11 @@ class Filesystem(FSFilesystem):
     self._mount = sh([
       'rclone', 'mount', f"{self._remote}:{self._uri.path[1:]}", self._tmpdir,
     ])
-    time.sleep(0.1)
+    sync_async_sleep(0.1, asynchronous=asynchronous)
     while not os.path.ismount(self._tmpdir):
       if self._mount.poll() is not None:
         raise Exception(f"Mount exited with code {self._mount.returncode} before mounting")
-      time.sleep(0.1)
+      sync_async_sleep(0.1, asynchronous=asynchronous)
     super().__init__(urllib.parse.urlparse('file://' + self._tmpdir))
   #
   def __exit__(self, *args):

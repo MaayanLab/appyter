@@ -35,9 +35,9 @@ async def json_emitter(obj):
   import json
   print(json.dumps(obj))
 
-async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe_nb=None):
+async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
   assert callable(emit), 'Emit must be callable'
-  with Filesystem(cwd) as fs:
+  with Filesystem(cwd, asynchronous=True) as fs:
     with fs.open(ipynb, 'r') as fr:
       nb = nb_from_ipynb_io(fr)
     # early stop if we already have execution_info
@@ -53,7 +53,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe_nb=None
   await emit({ 'type': 'status', 'data': 'Starting' })
   #
   try:
-    with Filesystem(cwd, with_path=True) as fs:
+    with Filesystem(cwd, with_path=True, asynchronous=True) as fs:
       # setup execution_info with start time
       nb.metadata['execution_info'] = {
         'started': datetime.datetime.now().replace(
@@ -62,6 +62,10 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe_nb=None
       }
       with fs.open(ipynb, 'w') as fw:
         nb_to_ipynb_io(nb, fw)
+      #
+      state = dict(progress=0, status='Starting')
+      if callable(subscribe):
+        await subscribe(lambda: dict(nb=nb_to_json(nb), **state))
       #
       try:
         iopub_hook = iopub_hook_factory(nb, emit)
@@ -77,12 +81,11 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe_nb=None
           resources={ 'metadata': {'path': fs.path()} },
           iopub_hook=iopub_hook,
         )
-        if callable(subscribe_nb):
-          await subscribe_nb(lambda: nb_to_json(nb))
         await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
         async with client.async_setup_kernel():
-          await emit({ 'type': 'status', 'data': 'Executing...' })
-          await emit({ 'type': 'progress', 'data': 0 })
+          state.update(status='Executing...', progress=0)
+          await emit({ 'type': 'status', 'data': state['status'] })
+          await emit({ 'type': 'progress', 'data': state['progress'] })
           n_cells = len(nb.cells)
           exec_count = 1
           for index, cell in enumerate(nb.cells):
@@ -96,9 +99,11 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe_nb=None
                 raise Exception('Cell execution error on cell %d' % (exec_count))
               exec_count += 1
             if index < n_cells-1:
-              await emit({ 'type': 'progress', 'data': index })
+              state['progress'] = index
+              await emit({ 'type': 'progress', 'data': state['progress'] })
             else:
-              await emit({ 'type': 'status', 'data': 'Success' })
+              state['status'] = 'Success'
+              await emit({ 'type': 'status', 'data': state['status'] })
       except asyncio.CancelledError:
         raise
       except Exception as e:

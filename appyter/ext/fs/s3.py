@@ -2,10 +2,10 @@ import s3fs
 import urllib.parse
 
 class Filesystem:
-  def __init__(self, uri):
+  def __init__(self, uri, asynchronous=False):
     try:
       self._uri = uri
-      self._config = {}
+      self._config = {'asynchronous': asynchronous}
       #
       if self._uri.username and self._uri.password:
         self._config['key'] = self._uri.username
@@ -19,6 +19,9 @@ class Filesystem:
       #
       self._prefix = self._uri.path.lstrip('/').rstrip('/') + '/'
       self._fs = s3fs.S3FileSystem(**self._config)
+      if asynchronous:
+        import asyncio
+        asyncio.ensure_future(self._fs._connect())
     except Exception:
       import traceback
       traceback.print_exc()
