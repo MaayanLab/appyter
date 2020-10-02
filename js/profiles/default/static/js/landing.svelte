@@ -26,7 +26,7 @@
     if (_deps === undefined) {
       _deps = await new Promise(
         (resolve, reject) =>
-          window.require(['socket'], function (socket, SocketIOFileUpload) {
+          window.require(['socket'], function (socket) {
             resolve({ socket })
           }, reject)
       )
@@ -70,8 +70,15 @@
 
   async function setup_async_exec() {
     socket.on('connect', async () => {
+      console.log('connect')
       const paths = window.location.pathname.split('/').filter(p => p)
       socket.emit('join', paths[paths.length - 1])
+    })
+    socket.on('reconnect', async () => {
+      console.log('reconnect')
+    })
+    socket.on('disconnect', async () => {
+      console.log('disconnect')
     })
     socket.on('status', async (value) => {
       await tick()
