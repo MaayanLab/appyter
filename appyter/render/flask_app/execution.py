@@ -54,6 +54,8 @@ async def submit(sid, data):
             queue_size = await resp.json()
             await socketio.emit('status', f"Queued successfully, you are at position {queue_size} in the queue", sid)
             queued = True
+      except asyncio.CancelledError:
+        raise
       except Exception:
         logger.error(traceback.format_exc())
         if backoff < 60:

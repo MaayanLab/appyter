@@ -52,8 +52,6 @@ async def evaluate_saga(sio, msg_queue, msg_counter, job):
   get_nb = None
   while priority_msg := await msg_queue.get():
     _, _, msg = priority_msg
-    if msg['type'] == 'joined':
-      logger.debug(msg)
     if msg['type'] == 'connect':
       await sio.emit('join', job['session'])
     elif msg['type'] == 'connect_error':
@@ -70,8 +68,9 @@ async def evaluate_saga(sio, msg_queue, msg_counter, job):
       await sio.emit('leave', job['session'])
     elif msg['type'] == 'left' and msg['data']['session'] == job['session'] and msg['data']['id'] == sio.sid:
       await sio.disconnect()
+    elif msg['type'] == 'disconnect':
       msg_queue.task_done()
-      break
+      return
     msg_queue.task_done()
 
 async def execute_async(job):
@@ -79,8 +78,11 @@ async def execute_async(job):
   msg_queue = asyncio.PriorityQueue()
   msg_counter = it.count()
   sio.start_background_task(remote_message_producer, sio, msg_queue, msg_counter, job)
-  sio.start_background_task(evaluate_saga, sio, msg_queue, msg_counter, job)
-  await sio.wait()
+  try:
+    await evaluate_saga(sio, msg_queue, msg_counter, job)
+    await sio.wait()
+  except asyncio.CancelledError:
+    raise
 
 def execute(job):
   asyncio.run(execute_async(job), debug=job.get('DEBUG', False))
