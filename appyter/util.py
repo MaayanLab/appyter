@@ -72,7 +72,7 @@ def click_option_setenv(spec, envvar=None, **kwargs):
   import os, re, functools, click
   m = re.match(r'^--(.+)$', spec)
   assert m
-  var = m.group(1)
+  var = m.group(1).replace('-', '_')
   def decorator(func):
     @click.option(spec, envvar=envvar, **kwargs)
     @functools.wraps(func)
@@ -91,7 +91,7 @@ def click_argument_setenv(var, envvar=None, **kwargs):
     @click.argument(var, envvar=envvar, **kwargs)
     @functools.wraps(func)
     def wrapper(**kwargs):
-      os.environ[envvar] = try_json_dumps(kwargs[var])
+      os.environ[envvar] = try_json_dumps(kwargs[var.replace('-', '_')])
       return func(**kwargs)
     return wrapper
   return decorator
