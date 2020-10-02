@@ -60,6 +60,7 @@ class Filesystem(FSFilesystem):
     self._mount = sh([
       'rclone', 'mount', f"{self._remote}:{self._uri.path[1:]}", self._tmpdir,
     ])
+    time.sleep(0.1)
     while not os.path.ismount(self._tmpdir):
       if self._mount.poll() is not None:
         raise Exception(f"Mount exited with code {self._mount.returncode} before mounting")
