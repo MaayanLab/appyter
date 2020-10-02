@@ -10,12 +10,13 @@ class OrderedPriorityQueue(asyncio.PriorityQueue):
     super().__init__()
     self._msg_counter = it.count()
   #
-  async def put(self, msg, priority=0):
-    return await super().put((priority, next(self._msg_counter), msg))
+  async def put(self, msg, priority=0, count=None):
+    if count is None:
+      count = next(self._msg_counter)
+    return await super().put((priority, count, msg))
   #
   async def get(self):
-    _, _, msg = await super().get()
-    return msg
+    return await super().get()
 
 async def remote_message_producer(sio, msg_queue, job):
   @sio.event
@@ -61,15 +62,33 @@ async def evaluate_notebook(sio, msg_queue, job):
   await msg_queue.put(dict(type='stopped'), priority=10)
 
 async def evaluate_saga(sio, msg_queue, job):
+  connected = False
+  joined = False
+  executed = False
   get_state = None
-  while msg := await msg_queue.get():
+  while prioritized_msg := await msg_queue.get():
+    priority, count, msg = prioritized_msg
     logger.debug(msg)
     if msg['type'] == 'connect':
+      connected = True
       await sio.emit('join', job['session'])
     elif msg['type'] == 'connect_error':
       raise Exception(str(msg))
+    elif msg['type'] == 'disconnect':
+      connected = False
+      joined = False
+      await asyncio.sleep(0.1)
+    elif not connected:
+      await msg_queue.put(msg, priority=priority, count=count)
+      await asyncio.sleep(0.1)
     elif msg['type'] == 'joined' and msg['data']['session'] == job['session'] and msg['data']['id'] == sio.sid:
-      sio.start_background_task(evaluate_notebook, sio, msg_queue, job)
+      joined = True
+      if not executed:
+        sio.start_background_task(evaluate_notebook, sio, msg_queue, job)
+        executed = True
+    elif not joined:
+      await msg_queue.put(msg, priority=priority, count=count)
+      await asyncio.sleep(0.1)
     elif msg['type'] == 'get_state':
       get_state = msg['data']
     elif msg['type'] == 'joined' and msg['data']['session'] == job['session'] and callable(get_state):
@@ -83,13 +102,12 @@ async def evaluate_saga(sio, msg_queue, job):
       await sio.emit('leave', job['session'])
     elif msg['type'] == 'left' and msg['data']['session'] == job['session'] and msg['data']['id'] == sio.sid:
       await sio.disconnect()
-    elif msg['type'] == 'disconnect':
       msg_queue.task_done()
       return
     msg_queue.task_done()
 
 async def execute_async(job):
-  sio = socketio.AsyncClient(reconnection=False)
+  sio = socketio.AsyncClient()
   msg_queue = OrderedPriorityQueue()
   sio.start_background_task(remote_message_producer, sio, msg_queue, job)
   try:
