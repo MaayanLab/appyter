@@ -78,6 +78,23 @@ def prepare_results(data):
   data_fs = Filesystem(current_app.config['DATA_DIR'])
   results_path = Filesystem.join('output', results_hash)
   if not data_fs.exists(Filesystem.join(results_path, current_app.config['IPYNB'])):
+    # prepare files to be linked and update field to use filename
+    file_fields = {
+      field['args']['name']
+      for field in get_fields()
+      if field['field'] == 'FileField'
+    }
+    links = []
+    for file_field in file_fields:
+      if fdata := data.get(file_field):
+        content_hash, filename = fdata.split('/', maxsplit=1)
+        content_hash = sanitize_sha1sum(content_hash)
+        filename = secure_filename(filename)
+        links.append((
+          Filesystem.join('input', content_hash),
+          Filesystem.join(results_path, filename)
+        ))
+        data[file_field] = filename
     # construct notebook
     env = get_jinja2_env(config=current_app.config, context=data)
     fs = Filesystem(current_app.config['CWD'])
@@ -85,22 +102,9 @@ def prepare_results(data):
       nbtemplate = nb_from_ipynb_io(fr)
     # in case of constraint failures, we'll fail here
     nb = render_nb_from_nbtemplate(env, nbtemplate)
-    # link all input files into output directory
-    file_fields = {
-      field['args']['name']
-      for field in get_fields()
-      if field['field'] == 'FileField'
-    }
-    for file_field in file_fields:
-      if fdata := data.get(file_field):
-        content_hash, filename = fdata.split('/', maxsplit=1)
-        content_hash = sanitize_sha1sum(content_hash)
-        filename = secure_filename(filename)
-        data_fs.link(
-          Filesystem.join('input', content_hash),
-          Filesystem.join(results_path, filename)
-        )
-        data[file_field] = filename
+    # actually link all input files into output directory
+    for src, dest in links:
+      data_fs.link(src, dest)
     # write notebook
     nbfile = Filesystem.join(results_path, os.path.basename(current_app.config['IPYNB']))
     with data_fs.open(nbfile, 'w') as fw:
