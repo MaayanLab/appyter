@@ -1,3 +1,4 @@
+import datetime
 import functools
 import importlib
 from queue import Queue
@@ -31,9 +32,20 @@ core = Blueprint('__main__.dispatcher', __name__)
 def on_submit():
   if request.method == 'GET':
     with active.lock:
-      return jsonify({ 'active': list(active.values()), 'queued': dispatch_queue.view() })
+      return jsonify(dict(
+        active=list(active.values()),
+        queued=dispatch_queue.view(),
+        ts=datetime.datetime.now().replace(
+          tzinfo=datetime.timezone.utc
+        ).isoformat(),
+      ))
   elif request.method == 'POST':
-    dispatch_queue.put(dict(request.json, debug=current_app.config['DEBUG']))
+    dispatch_queue.put(dict(request.json,
+      debug=current_app.config['DEBUG'],
+      queued_ts=datetime.datetime.now().replace(
+        tzinfo=datetime.timezone.utc
+      ).isoformat(),
+    ))
     return jsonify(dispatch_queue.qsize())
 
 def dispatcher(queued=None, active=None, dispatch=None):
@@ -41,7 +53,11 @@ def dispatcher(queued=None, active=None, dispatch=None):
     while not queued.empty():
       job = queued.get()
       with active.lock:
-        active[job['id']] = job
+        active[job['id']] = dict(job,
+          started_ts=datetime.datetime.now().replace(
+            tzinfo=datetime.timezone.utc
+          ).isoformat()
+        )
       try:
         dispatch(job=job)
       except:
