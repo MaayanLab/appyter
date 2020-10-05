@@ -9,6 +9,7 @@ def dispatch(job=None, Popen=None, **kwargs):
   args = ['docker', 'run']
   args += ['--device', '/dev/fuse']
   args += ['--cap-add', 'SYS_ADMIN']
+  args += ['--security-opt', 'seccomp=unconfined']
   try:
     with Popen([
       'docker', 'inspect', os.environ['HOSTNAME'],
