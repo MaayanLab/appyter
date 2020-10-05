@@ -61,7 +61,7 @@ class Filesystem:
   def cp(self, src, dst):
     try:
       assert src and dst
-      return self._fs.copy(self._prefix + src, self._prefix + dst, recursive=True)
+      return self._fs.copy(self._prefix + src, self._prefix + dst)
     except Exception:
       logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to copy {src} to {dst}")
