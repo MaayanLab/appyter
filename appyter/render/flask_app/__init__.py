@@ -28,6 +28,9 @@ def create_app(**kwargs):
   #
   if config['DEBUG']:
     logging.basicConfig(level=logging.DEBUG)
+  else:
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger(__package__).setLevel(logging.INFO)
   #
   logger.info('Initializing aiohttp...')
   app = web.Application()
@@ -79,12 +82,15 @@ def create_app(**kwargs):
 @click_option_setenv('--secret-key', envvar='APPYTER_SECRET_KEY', default=str(uuid.uuid4()), help='A secret key for flask')
 @click_option_setenv('--debug', envvar='APPYTER_DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
 @click_option_setenv('--static-dir', envvar='APPYTER_STATIC_DIR', default='static', help='The folder whether staticfiles are located')
-@click_option_setenv('--keyfile', envvar='APPYTER_KEYFILE', default=None, help='The SSL certificate private key for wss support')
-@click_option_setenv('--certfile', envvar='APPYTER_CERTFILE', default=None, help='The SSL certificate public key for wss support')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def flask_app(**kwargs):
   import logging
-  logging.basicConfig(level=logging.DEBUG if kwargs.get('debug') else logging.INFO)
+  if kwargs.get('debug'):
+    logging.basicConfig(level=logging.DEBUG)
+  else:
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger(__package__).setLevel(logging.INFO)
+  #
   if kwargs.get('debug'):
     from appyter.render.flask_app.development import serve
     serve(__file__, **kwargs)

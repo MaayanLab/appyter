@@ -7,8 +7,9 @@ def create_app(**kwargs):
   from appyter.orchestration.dispatcher.socketio import socketio
   from appyter.orchestration.dispatcher.core import core
   from appyter.util import join_routes
-  logging.basicConfig(level=logging.DEBUG if kwargs.get('debug') else logging.INFO)
-  print('Initializing flask...')
+  logger = logging.getLogger(__name__)
+  logging.basicConfig(level=logging.DEBUG if kwargs.get('debug') else logging.WARNING)
+  logger.info('Initializing flask...')
   app = Flask(__name__)
   app.config.update(dict(
     HOST=kwargs.get('host'),
@@ -21,11 +22,11 @@ def create_app(**kwargs):
     DISPATCH=kwargs.get('dispatch'),
   ))
   if app.config['PROXY']:
-    print('wsgi proxy fix...')
+    logger.info('wsgi proxy fix...')
     from werkzeug.middleware.proxy_fix import ProxyFix
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
   app.register_blueprint(core, url_prefix=app.config['PREFIX'])
-  print('Initializing socketio...')
+  logger.info('Initializing socketio...')
   socketio.init_app(app,
     path=join_routes(app.config['PREFIX'], 'socket.io'),
     async_mode='threading',

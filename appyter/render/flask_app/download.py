@@ -107,7 +107,7 @@ async def siofu_start(sid, data):
       room=sid,
     )
   except Exception as e:
-    traceback.print_exc()
+    logger.error(traceback.format_exc())
     await socketio.emit('siofu_error', str(e), room=sid)
 
 @socketio.on("siofu_progress")

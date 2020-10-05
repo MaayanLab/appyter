@@ -79,7 +79,7 @@ class Filesystem(FSFilesystem):
   #
   def link(self, src, dst):
     if self._scheme == 's3':
-      print('WARNING: s3 does not support links, copying')
+      logger.info('WARNING: s3 does not support links, copying')
       return self.cp(src, dst, recursive=True)
     return super().link(src, dst)
   #

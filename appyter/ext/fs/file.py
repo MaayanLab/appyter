@@ -1,7 +1,12 @@
 import os
 import shutil
 import urllib.parse
+import logging
+import traceback
+logger = logging.getLogger(__name__)
+
 from appyter.ext.fs import Filesystem as FS
+
 
 class Filesystem:
   def __init__(self, uri):
@@ -26,8 +31,7 @@ class Filesystem:
     except FileNotFoundError:
       raise Exception(f"No such file or directory: {path}")
     except Exception:
-      import traceback
-      traceback.print_exc()
+      logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to access {path}")
   #
   def exists(self, path):
@@ -35,8 +39,7 @@ class Filesystem:
       assert path
       return os.path.isfile(FS.join(self._prefix, path)) or os.path.islink(FS.join(self._prefix, path))
     except Exception:
-      import traceback
-      traceback.print_exc()
+      logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to access {path}")
   #
   def cp(self, src, dst):
@@ -45,8 +48,7 @@ class Filesystem:
       os.makedirs(os.path.dirname(FS.join(self._prefix, dst)), exist_ok=True)
       return shutil.copy(FS.join(self._prefix, src), FS.join(self._prefix, dst))
     except Exception:
-      import traceback
-      traceback.print_exc()
+      logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to copy {src} to {dst}")
   #
   def link(self, src, dst):
@@ -55,8 +57,7 @@ class Filesystem:
       os.makedirs(os.path.dirname(FS.join(self._prefix, dst)), exist_ok=True)
       return os.link(FS.join(self._prefix, src), FS.join(self._prefix, dst))
     except Exception:
-      import traceback
-      traceback.print_exc()
+      logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to link {src} to {dst}")
   #
   def rm(self, path, recursive=False):
@@ -67,8 +68,7 @@ class Filesystem:
       else:
         return os.remove(FS.join(self._prefix, path))
     except Exception:
-      import traceback
-      traceback.print_exc()
+      logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to access {path}")
   #
   def chmod_ro(self, path):
@@ -76,8 +76,7 @@ class Filesystem:
       assert path
       return os.chmod(FS.join(self._prefix, path), 400)
     except Exception:
-      import traceback
-      traceback.print_exc()
+      logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to access {path}")
   #
   def __exit__(self, *args):

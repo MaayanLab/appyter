@@ -1,5 +1,9 @@
 import s3fs
 import urllib.parse
+import traceback
+import logging
+logger = logging.getLogger(__name__)
+
 
 class Filesystem:
   def __init__(self, uri, asynchronous=False):
@@ -23,8 +27,7 @@ class Filesystem:
         import asyncio
         asyncio.ensure_future(self._fs._connect())
     except Exception:
-      import traceback
-      traceback.print_exc()
+      logger.error(traceback.format_exc())
       raise Exception(f"An internal error occurred")
   #
   def path(self, path=''):
@@ -44,8 +47,7 @@ class Filesystem:
       assert path
       return self._fs.open(self._prefix + path, mode=mode)
     except Exception:
-      import traceback
-      traceback.print_exc()
+      logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to access {path}")
   #
   def exists(self, path):
@@ -53,8 +55,7 @@ class Filesystem:
       assert path
       return self._fs.exists(self._prefix + path)
     except Exception:
-      import traceback
-      traceback.print_exc()
+      logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to access {path}")
   #
   def cp(self, src, dst):
@@ -62,12 +63,11 @@ class Filesystem:
       assert src and dst
       return self._fs.copy(self._prefix + src, self._prefix + dst, recursive=True)
     except Exception:
-      import traceback
-      traceback.print_exc()
+      logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to copy {src} to {dst}")
   #
   def link(self, src, dst):
-    print('WARNING: s3 does not support links, copying')
+    logger.info('WARNING: s3 does not support links, copying')
     return self.cp(src, dst)
   #
   def rm(self, path, recursive=False):
@@ -75,9 +75,8 @@ class Filesystem:
       assert path
       return self._fs.rm(self._prefix + path, recursive=recursive)
     except Exception:
-      import traceback
-      traceback.print_exc()
+      logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to access {path}")
   #
   def chmod_ro(self, path):
-    print('WARNING: s3 does not support chmod')
+    logger.info('WARNING: s3 does not support chmod')

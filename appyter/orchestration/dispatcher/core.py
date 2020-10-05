@@ -69,8 +69,8 @@ def dispatcher(queued=None, active=None, dispatch=None):
     socketio.sleep(1)
 
 @core.before_app_first_request
-def init_disaptcher():
-  print('Initializing dispatch...')
+def init_dispatcher():
+  logger.info('Initializing dispatch...')
   from subprocess import Popen
   #
   dispatch = functools.partial(
@@ -83,7 +83,7 @@ def init_disaptcher():
     namespace=current_app.config['KUBE_NAMESPACE'],
   )
   #
-  print('Starting background tasks...')
+  logger.info('Starting background tasks...')
   for _ in range(current_app.config['JOBS']):
     socketio.start_background_task(dispatcher, queued=dispatch_queue, active=active, dispatch=dispatch)
 
