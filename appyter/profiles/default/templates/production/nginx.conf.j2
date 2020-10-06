@@ -1,16 +1,13 @@
-{%- macro appyter_proxy() -%}
+{%- macro proxy(remote, ws) -%}
       proxy_set_header Host $http_host;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      {%- if ws %}
       proxy_http_version 1.1;
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection "upgrade";
-      proxy_pass http://appyter;
+      {%- endif %}
+      proxy_pass {{ remote }};
 {%- endmacro -%}
-{%- macro s3_proxy() -%}
-      proxy_set_header Host $http_host;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_pass http://s3;
-{%- endmacro %}
 
 pid {{ _tmp_fs.path('nginx.pid') }};
 worker_processes 1;
@@ -78,7 +75,7 @@ http {
       if ($request_method = GET) {
         rewrite ^(.*)/$ $1/index.html;
       }
-      {{ appyter_proxy() }}
+      {{ proxy('http://appyter', False) }}
     }
 
     location = {{ join_routes(_config.PREFIX, 'index.html') }} {
@@ -92,7 +89,7 @@ http {
     }
 
     location ^~ {{ join_routes(_config.PREFIX, 'socket.io') }} {
-      {{ appyter_proxy() }}
+      {{ proxy('http://appyter', True) }}
     }
 
     location ~ ^{{ join_routes(_config.PREFIX, 'static') }}/(.*)$ {
@@ -126,15 +123,15 @@ http {
       {%- elif _config.DATA_DIR.startswith('s3://') %}
       {%- with s3_url = s3_to_url(_config.DATA_DIR) %}
       rewrite ^{{ join_routes(_config.PREFIX, '([^/]+)', '(.+)') }}$ {{ join_routes(s3_url.path, 'output', '$1', '$2') }} break;
-      {{ s3_proxy() }}
+      {{ proxy('http://s3', False) }}
       {%- endwith %}
       {%- else %}
-      {{ appyter_proxy() }}
+      {{ proxy('http://appyter', False) }}
       {%- endif %}
     }
 
     location {{ _config.PREFIX }} {
-      {{ appyter_proxy() }}
+      {{ proxy('http://appyter', False) }}
     }
   }
 }
