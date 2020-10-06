@@ -73,7 +73,7 @@
       await tick()
       status = `Connected to server, re-initializing...`
       statusBg = 'warning'
-      await reinit()
+      await init()
     })
     socket.on('reconnect', async () => {
       await tick()
@@ -118,10 +118,14 @@
     })
   }
 
+  let connect_init = false
   async function connect(execute) {
-    await ensure_deps()
-    await ensure_connected()
-    await setup_async_exec()
+    if (!connect_init) {
+      connect_init = true
+      await ensure_deps()
+      await ensure_connected()
+      await setup_async_exec()
+    }
     const paths = window.location.pathname.split('/').filter(p => p)
     if (execute) {
       socket.emit('submit', paths[paths.length - 1])
@@ -130,24 +134,32 @@
     }
   }
 
-  async function reinit() {
+  async function init() {
     try {
       // Load notebook
       const req = await fetch(nbdownload, {cache: 'reload'})
+      if (req.status === 404) {
+        throw new Error('Notebook not found')
+      }
       const value = await req.json()
-      if (value.metadata.execution_info.completed === undefined) {
+
+      if (value.metadata.execution_info === undefined) {
+        // Execute notebook if it hasn't already been executed
+        await connect(true)
+      } else if (value.metadata.execution_info.completed === undefined) {
+        // Notebook started but hasn't completed
+        await connect(false)
         await tick()
-        status = 'Notebook is still executing, rejoining session...'
-        const paths = window.location.pathname.split('/').filter(p => p)
-        socket.emit('join', paths[paths.length - 1])
+        status = 'Notebook is currently executing, joining session...'
+        statusBg = 'primary'
       } else {
-        socket.disconnect()
         await tick()
-        status = 'Success'
+        status = undefined
         nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
       }
     } catch (e) {
-      status = `Error: ${e}`
+      await tick()
+      status = `${e}`
       statusBg = 'danger'
     }
   }
@@ -156,29 +168,9 @@
   onMount(async () => {
     await tick()
     status = 'Loading...'
+    statusBg = 'primary'
     show_code = extras.indexOf('hide-code') === -1
-
-    try {
-      // Load notebook
-      const req = await fetch(nbdownload, {cache: 'reload'})
-      const value = await req.json()
-      await tick()
-      nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
-
-      if (nb.metadata.execution_info === undefined) {
-        // Execute notebook if it hasn't already been executed
-        await connect(true)
-      } else if (nb.metadata.execution_info.completed === undefined) {
-        // Notebook started but hasn't completed
-        status = 'Notebook is currently executing, joining session...'
-        await connect(false)
-      } else {
-        status = undefined
-      }
-    } catch (e) {
-      status = `Error: ${e}`
-      statusBg = 'danger'
-    }
+    await init()
   })
 </script>
 
