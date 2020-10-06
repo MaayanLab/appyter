@@ -2,7 +2,7 @@ import datetime
 import functools
 import importlib
 from queue import Queue
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 from threading import Lock
 from flask import Blueprint, request, current_app, jsonify
 import logging
@@ -48,16 +48,26 @@ def on_submit():
     ))
     return jsonify(dispatch_queue.qsize())
 
-def dispatcher(queued=None, active=None, dispatch=None):
+def dispatcher(queued=None, active=None, dispatch=None, jobs_per_image=1):
   while True:
     while not queued.empty():
       job = queued.get()
       with active.lock:
-        active[job['id']] = dict(job,
-          started_ts=datetime.datetime.now().replace(
-            tzinfo=datetime.timezone.utc
-          ).isoformat()
-        )
+        image_jobs = Counter(j['image'] for j in active.values()).get(job['image'], 0)
+        if image_jobs >= jobs_per_image:
+          # TODO: push back onto a priority queue such that the next slot that opens uses this one
+          #       currently, this appyter execution would end up on the back of the queue
+          queued.task_done()
+          queued.put(job)
+          socketio.sleep(1)
+          continue
+        else:
+          # add to active
+          active[job['id']] = dict(job,
+            started_ts=datetime.datetime.now().replace(
+              tzinfo=datetime.timezone.utc
+            ).isoformat()
+          )
       try:
         dispatch(job=job)
       except:
@@ -85,5 +95,10 @@ def init_dispatcher():
   #
   logger.info('Starting background tasks...')
   for _ in range(current_app.config['JOBS']):
-    socketio.start_background_task(dispatcher, queued=dispatch_queue, active=active, dispatch=dispatch)
+    socketio.start_background_task(dispatcher,
+      queued=dispatch_queue,
+      active=active,
+      dispatch=dispatch,
+      jobs_per_image=current_app.config['JOBS_PER_IMAGE'],
+    )
 

@@ -16,6 +16,7 @@ def create_app(**kwargs):
     PORT=kwargs.get('port'),
     PROXY=kwargs.get('proxy'),
     JOBS=kwargs.get('jobs'),
+    JOBS_PER_IMAGE=kwargs.get('jobs_per_image'),
     DEBUG=kwargs.get('debug'),
     PREFIX=kwargs.get('prefix'),
     KUBE_NAMESPACE=kwargs.get('kube_namespace'),
@@ -41,7 +42,8 @@ def create_app(**kwargs):
 @click.option('--host', envvar='APPYTER_HOST', default='127.0.0.1', help='The host the flask server should run on')
 @click.option('--port', envvar='APPYTER_PORT', type=int, default=5000, help='The port this flask server should run on')
 @click.option('--proxy', envvar='APPYTER_PROXY', type=bool, default=False, help='Whether this is running behind a proxy and the IP should be fixed for CORS')
-@click.option('--jobs', envvar='APPYTER_JOBS', type=int, default=1, help='Number of concurrent jobs to dispatch')
+@click.option('--jobs', envvar='APPYTER_JOBS', type=int, default=2, help='Number of concurrent jobs to dispatch')
+@click.option('--jobs-per-image', envvar='APPYTER_JOBS_PER_IMAGE', type=int, default=1, help='Number of concurrent jobs to dispatch for any individual appyter image')
 @click.option('--debug', envvar='APPYTER_DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
 @click.option('--kube-namespace', envvar='APPYTER_KUBE_NAMESPACE', type=str, default='default', help='The kubernetes namespace (kubernetes dispatch)')
 @click.option('--dispatch', envvar='APPYTER_DISPATCH', type=str, default='native', help='The dispatcher mechanism to use (see list-dispatchers)')
