@@ -142,6 +142,9 @@
         throw new Error('Notebook not found')
       }
       const value = await req.json()
+      if (nb === undefined) {
+        nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
+      }
 
       if (value.metadata.execution_info === undefined) {
         // Execute notebook if it hasn't already been executed
