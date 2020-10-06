@@ -1,13 +1,22 @@
 {%- macro appyter_proxy() -%}
       proxy_set_header Host $http_host;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_redirect off;
-      proxy_buffering off;
+      proxy_set_header X-Forwarded-Proto $scheme;
+
       proxy_http_version 1.1;
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection "upgrade";
       proxy_pass http://appyter;
 {%- endmacro -%}
+{%- macro s3_proxy() -%}
+      proxy_set_header Host $http_host;
+      proxy_set_header Referer $http_referer;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+
+      proxy_pass http://s3;
+{%- endmacro %}
+
 pid {{ _tmp_fs.path('nginx.pid') }};
 worker_processes 1;
 daemon off;
@@ -122,9 +131,7 @@ http {
       {%- elif _config.DATA_DIR.startswith('s3://') %}
       {%- with s3_url = s3_to_url(_config.DATA_DIR) %}
       rewrite ^{{ join_routes(_config.PREFIX, '([^/]+)', '(.+)') }}$ {{ join_routes(s3_url.path, 'output', '$1', '$2') }} break;
-      proxy_set_header Host $http_host;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_pass http://s3;
+      {{ s3_proxy() }}
       {%- endwith %}
       {%- else %}
       {{ appyter_proxy() }}
