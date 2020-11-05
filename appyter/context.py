@@ -168,7 +168,14 @@ def get_jinja2_env(context={}, config=None):
   env.globals.update(**build_fields(find_fields(config=config), context=context, env=env))
   return env
 
+_mode = None
 def get_env_from_kwargs(mode='default', **kwargs):
+  global _mode
+  if _mode is None:
+    _mode = mode
+  else:
+    mode = _mode
+  #
   import os
   import sys
   import uuid
@@ -204,6 +211,7 @@ def get_env_from_kwargs(mode='default', **kwargs):
     os.environ['PATH'] = CWD + ':' + os.environ['PATH']
   #
   return dict(
+    MODE=mode,
     PREFIX=PREFIX,
     PROFILE=PROFILE,
     EXTRAS=EXTRAS,
