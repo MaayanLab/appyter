@@ -1,7 +1,7 @@
 import uuid
 import urllib.parse
 
-from appyter.util import join_routes, secure_filename, secure_url
+from appyter.util import join_routes, safe_join, secure_url, secure_filepath
 
 def sha1sum_io(io, chunk_size=65536):
   import hashlib

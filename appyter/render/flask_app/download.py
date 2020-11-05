@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 
 from appyter.ext.fs import Filesystem
 from appyter.render.flask_app.socketio import socketio
-from appyter.render.flask_app.util import secure_filename, secure_url, sha1sum_io, generate_uuid
+from appyter.render.flask_app.util import secure_filepath, secure_url, sha1sum_io, generate_uuid
 
 # organize file by content hash
 def organize_file_content(data_fs, tmp_fs, tmp_path):
@@ -70,7 +70,7 @@ async def download(sid, data):
   # TODO: hash based on url?
   # TODO: s3 bypass
   url = secure_url(data.get('url'))
-  filename = secure_filename(data.get('file'))
+  filename = secure_filepath(data.get('file'))
   await socketio.emit('download_queued', dict(name=name, filename=filename), room=sid)
   await download_with_progress_and_hash(
     sid=sid,
@@ -87,7 +87,7 @@ async def download(sid, data):
 async def siofu_start(sid, data):
   try:
     path = generate_uuid()
-    filename = secure_filename(data.get('name'))
+    filename = secure_filepath(data.get('name'))
     tmp_fs = Filesystem('tmpfs://')
     async with socketio.session(sid) as sess:
       sess['file_%d' % (data.get('id'))] = dict(
@@ -147,7 +147,7 @@ def upload_from_request(req, fnames):
   for fname in fnames:
     fh = req.files.get(fname)
     if fh:
-      filename = secure_filename(fh.filename)
+      filename = secure_filepath(fh.filename)
       path = generate_uuid()
       with Filesystem('tmpfs://') as tmp_fs:
         with tmp_fs.open(path, 'w') as fw:

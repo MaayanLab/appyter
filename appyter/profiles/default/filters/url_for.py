@@ -6,9 +6,8 @@ def url_for(directory, **kwargs):
   if config['DEBUG']:
     try:
       from flask import url_for
-      if directory == 'static':
-        directory = '.'.join(('__main__', directory))
-      return url_for(directory, **kwargs)
+      modified_directory = '.'.join(('__main__', directory)) if directory == 'static' else directory
+      return url_for(modified_directory, **kwargs)
     except RuntimeError:
       filename = kwargs.get('filename', kwargs.get('path'))
       assert filename is not None

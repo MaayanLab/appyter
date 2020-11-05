@@ -7,7 +7,7 @@ from werkzeug.exceptions import BadRequest
 from appyter.context import get_jinja2_env
 from appyter.ext.fs import Filesystem
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
-from appyter.util import secure_filename
+from appyter.util import secure_filepath
 from appyter.render.form import render_form_from_nbtemplate
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.render.nbinspect import render_nbtemplate_json_from_nbtemplate
@@ -89,7 +89,7 @@ def prepare_results(data):
       if fdata := data.get(file_field):
         content_hash, filename = fdata.split('/', maxsplit=1)
         content_hash = sanitize_sha1sum(content_hash)
-        filename = secure_filename(filename)
+        filename = secure_filepath(filename)
         links.append((
           Filesystem.join('input', content_hash),
           Filesystem.join(results_path, filename)

@@ -1,6 +1,6 @@
 import re
 from appyter.fields import Field
-from appyter.util import secure_filename, join_routes
+from appyter.util import secure_filepath, join_routes
 
 class FileField(Field):
   ''' Represing a uploadable File and facilitating that file upload.
@@ -21,7 +21,7 @@ class FileField(Field):
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
   :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
-  def __init__(self, constraint=r'[^/]*', examples={}, **kwargs):
+  def __init__(self, constraint=r'.+', examples={}, **kwargs):
     super().__init__(
       constraint=constraint,
       examples=examples,
@@ -31,7 +31,7 @@ class FileField(Field):
   @property
   def raw_value(self):
     if type(self.args['value']) == str:
-      return secure_filename(self.args['value'])
+      return secure_filepath(self.args['value'])
     else:
       return None
 

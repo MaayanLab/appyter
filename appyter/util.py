@@ -1,6 +1,6 @@
 import json
 import urllib.parse
-from werkzeug.utils import secure_filename
+from werkzeug.security import safe_join
 
 def try_json_loads(v):
   try:
@@ -21,6 +21,15 @@ def join_routes(*routes):
   ''' Utility function for joining routes while striping extraneous slashes
   '''
   return '/' + '/'.join([route.strip('/') for route in routes if route.strip('/')])
+
+def secure_filepath(filepath):
+  ''' Ensures this will be a sanitized relative path
+  '''
+  secured_filepath = safe_join('.', filepath)
+  assert secured_filepath is not None, "Filepath wasn't secure"
+  secured_filepath = secured_filepath[2:]
+  assert secured_filepath, "Filepath became empty while securing"
+  return secured_filepath
 
 def secure_url(url):
   parsed = urllib.parse.urlparse(url)
