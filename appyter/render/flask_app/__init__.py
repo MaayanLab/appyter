@@ -13,7 +13,7 @@ def create_app(**kwargs):
   from aiohttp import web
   from aiohttp_wsgi import WSGIHandler
   #
-  from flask import Flask, Blueprint, current_app
+  from flask import Flask, Blueprint, current_app, redirect
   from flask_cors import CORS
   #
   from appyter.render.flask_app.socketio import socketio
@@ -59,6 +59,13 @@ def create_app(**kwargs):
       blueprint(flask_app, url_prefix=join_routes(flask_app.config['PREFIX'], blueprint_name), DATA_DIR=flask_app.config['DATA_DIR'])
     else:
       raise Exception('Unrecognized blueprint type: ' + blueprint_name)
+  #
+  if flask_app.config['PREFIX'].strip('/'):
+    logger.info('Registering prefix redirect')
+    @flask_app.route('/')
+    @flask_app.route('/<string:path>')
+    def redirect_to_prefix(path=''):
+      return redirect(join_routes(flask_app.config['PREFIX'], path))
   #
   logger.info('Registering flask with aiohttp...')
   wsgi_handler = WSGIHandler(flask_app)

@@ -9,6 +9,7 @@ echo ""
 BASE_PATH=$(realpath "$(dirname $0)/..")
 
 cd ${BASE_PATH} && python3 -m appyter \
+  --debug=false \
   --prefix=/example/ \
   --host=0.0.0.0 \
   --port=5000 \

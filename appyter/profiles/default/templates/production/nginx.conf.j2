@@ -133,5 +133,9 @@ http {
     location {{ _config.PREFIX }} {
       {{ proxy('http://appyter', False) }}
     }
+
+    location / {
+      return 301 {{ _config.PREFIX.rstrip('/') }}$request_uri;
+    }
   }
 }
