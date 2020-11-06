@@ -12,7 +12,7 @@ jinja2
 jupyter
 jupyter_client
 lxml
-nbclient
+nbclient==0.5.0
 nbformat
 python-dotenv
 python-socketio

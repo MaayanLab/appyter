@@ -74,15 +74,16 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
           allow_errors=True,
           timeout=None,
           kernel_name='python3',
-          env=dict(
-            PYTHONPATH=':'.join(sys.path),
-            PATH=os.environ['PATH'],
-          ),
           resources={ 'metadata': {'path': fs.path()} },
           iopub_hook=iopub_hook,
         )
         await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
-        async with client.async_setup_kernel():
+        async with client.async_setup_kernel(
+          env=dict(
+            PYTHONPATH=':'.join(sys.path),
+            PATH=os.environ['PATH'],
+          ),
+        ):
           state.update(status='Executing...', progress=0)
           await emit({ 'type': 'status', 'data': state['status'] })
           await emit({ 'type': 'progress', 'data': state['progress'] })
