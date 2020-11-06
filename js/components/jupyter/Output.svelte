@@ -1,14 +1,19 @@
 <script>
+  import * as Prompt from './Prompt.svelte'
   import * as Markdown from '../Markdown.svelte'
   import * as Ansi from '../Ansi.svelte'
   import * as HTML from '../HTML.svelte'
   import collapse from '../../utils/collapse.js'
 
+  export let index
   export let data
 </script>
 
 <div class="output_area">
-  <div class="prompt"></div>
+  <Prompt
+    index={index}
+    prompt_type="output"
+  />
   {#if data}
   <div class="output_subarea">
     {#if data.output_type === 'stream'}

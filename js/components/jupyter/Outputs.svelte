@@ -4,6 +4,7 @@
   import hash from '../../utils/hash.js'
 
   export let data = []
+  export let index
 
   function *reduce_output_streams(outputs) {
     let streams = {}
@@ -29,8 +30,11 @@
 
 <div class="output_wrapper">
   <div class="output">
-    {#each [...reduce_output_streams(data)] as output (output.hash)}
-      <Output data={output} />
+    {#each [...reduce_output_streams(data)] as output, output_index (output.hash)}
+      <Output
+        index="{index}-{output_index}"
+        data={output}
+      />
     {/each}
   </div>
 </div>

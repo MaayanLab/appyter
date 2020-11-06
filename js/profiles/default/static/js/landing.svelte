@@ -269,6 +269,18 @@
   :global(h6):hover :global(.header-anchor) {
     display: inline-block;
   }
+  /* prompt anchors */
+  :global(a.prompt-anchor) {
+    text-decoration: none;
+    cursor: pointer;
+  }
+  :global(.prompt) :global(.prompt-anchor) { 
+    display: inline-block;
+    visibility: hidden;
+  }
+  :global(.prompt):hover :global(.prompt-anchor) {
+    visibility: visible;
+  }
 </style>
 
 <div class="row">
@@ -331,6 +343,8 @@
                 {#if show_code}
                   <Input>
                     <Prompt
+                      prompt_type="input"
+                      index={cell.index}
                       running={current_code_cell !== undefined ? cell.index >= current_code_cell : undefined}
                       error={any(cell.outputs.map(({ output_type }) => output_type === 'error'))}
                       counter={cell.execution_count}
@@ -342,12 +356,18 @@
                     />
                   </Input>
                 {/if}
-                <Outputs data={cell.outputs || []} />
+                <Outputs
+                  index={cell.index}
+                  data={cell.outputs || []}
+                />
               </Cell>
             {:else if cell.cell_type === 'markdown'}
               <Cell type="text">
                 <Input>
-                  <Prompt />
+                  <Prompt
+                    prompt_type="input"
+                    index={cell.index}
+                  />
                   <div class="inner_cell">
                     <div class="text_cell_render border-box-sizing rendered_html">
                       <Markdown data={collapse(cell.source)} />
