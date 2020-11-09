@@ -15,6 +15,7 @@
   export let window
   export let nbdownload
   export let extras = []
+  export let debug = false
 
   let nb
   let show_code = false
@@ -93,7 +94,9 @@
       statusBg = 'primary'
       if (status === 'Success') {
         current_code_cell = undefined
-        socket.disconnect()
+        if (!debug) {
+          socket.disconnect()
+        }
       }
     })
     socket.on('error', async (value) => {

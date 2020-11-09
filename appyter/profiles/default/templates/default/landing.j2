@@ -10,7 +10,7 @@
       svelte.render(
         document.getElementById("_content"),
         '{{ url_for('static', filename='js/landing.js') }}',
-        JSON.parse(atob('{{ ({'nbdownload': _nb, 'extras': _config.EXTRAS })|jsonify|btoa }}'))
+        JSON.parse(atob('{{ ({'nbdownload': _nb, 'extras': _config.EXTRAS, 'debug': _config.DEBUG })|jsonify|btoa }}'))
       )
     })
   </script>
