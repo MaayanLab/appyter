@@ -6,8 +6,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.render.flask_app.download &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
@@ -38,108 +38,162 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.render.flask_app.download</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">import</span> <span class="nn">aiohttp</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
-<span class="kn">import</span> <span class="nn">urllib.request</span><span class="o">,</span> <span class="nn">urllib.error</span>
-<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">request</span><span class="p">,</span> <span class="n">copy_current_request_context</span><span class="p">,</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">session</span>
-<span class="kn">from</span> <span class="nn">flask_socketio</span> <span class="kn">import</span> <span class="n">emit</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
+<span class="kn">from</span> <span class="nn">appyter.ext.fs</span> <span class="kn">import</span> <span class="n">Filesystem</span>
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app.socketio</span> <span class="kn">import</span> <span class="n">socketio</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.util</span> <span class="kn">import</span> <span class="n">secure_filepath</span><span class="p">,</span> <span class="n">secure_url</span><span class="p">,</span> <span class="n">sha1sum_io</span><span class="p">,</span> <span class="n">generate_uuid</span>
 
-<span class="kn">from</span> <span class="nn">appyter.render.flask_app.util</span> <span class="kn">import</span> <span class="n">secure_filename</span><span class="p">,</span> <span class="n">secure_url</span>
-
-<span class="c1"># remove user agent from urllib.request requests</span>
-<span class="n">_opener</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">build_opener</span><span class="p">()</span>
-<span class="n">_opener</span><span class="o">.</span><span class="n">addheaders</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;Accept&#39;</span><span class="p">,</span> <span class="s1">&#39;*/*&#39;</span><span class="p">)]</span>
-<span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">install_opener</span><span class="p">(</span><span class="n">_opener</span><span class="p">)</span>
+<span class="c1"># organize file by content hash</span>
+<div class="viewcode-block" id="organize_file_content"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.download.organize_file_content">[docs]</a><span class="k">def</span> <span class="nf">organize_file_content</span><span class="p">(</span><span class="n">data_fs</span><span class="p">,</span> <span class="n">tmp_fs</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">):</span>
+  <span class="k">with</span> <span class="n">tmp_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fr</span><span class="p">:</span>
+    <span class="n">content_hash</span> <span class="o">=</span> <span class="n">sha1sum_io</span><span class="p">(</span><span class="n">fr</span><span class="p">)</span>
+  <span class="n">data_path</span> <span class="o">=</span> <span class="n">Filesystem</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="n">content_hash</span><span class="p">)</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">data_fs</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">data_path</span><span class="p">):</span>
+    <span class="n">Filesystem</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="n">src_fs</span><span class="o">=</span><span class="n">tmp_fs</span><span class="p">,</span> <span class="n">src_path</span><span class="o">=</span><span class="n">tmp_path</span><span class="p">,</span> <span class="n">dst_fs</span><span class="o">=</span><span class="n">data_fs</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="n">data_path</span><span class="p">)</span>
+    <span class="n">data_fs</span><span class="o">.</span><span class="n">chmod_ro</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">content_hash</span></div>
 
 <span class="c1"># download from remote</span>
-<div class="viewcode-block" id="download"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.download.download">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;download_start&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;file download start&#39;</span><span class="p">)</span>
-  <span class="n">session_id</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">][</span><span class="s1">&#39;_session&#39;</span><span class="p">]</span>
-  <span class="n">session_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">session_id</span><span class="p">)</span>
-  <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-  <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">session_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-  <span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
-  <span class="n">url</span> <span class="o">=</span> <span class="n">secure_url</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">))</span>
-  <span class="n">filename</span> <span class="o">=</span> <span class="n">secure_filename</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">))</span>
+<div class="viewcode-block" id="download_with_progress_and_hash"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.download.download_with_progress_and_hash">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">download_with_progress_and_hash</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data_fs</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
   <span class="c1"># TODO: worry about files that are too big/long</span>
-  <span class="nd">@copy_current_request_context</span>
-  <span class="k">def</span> <span class="nf">download_with_progress</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">emit</span><span class="p">):</span>
-    <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;download_start&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">))</span>
+  <span class="k">with</span> <span class="n">Filesystem</span><span class="p">(</span><span class="s1">&#39;tmpfs://&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_fs</span><span class="p">:</span>
+    <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;download_start&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">),</span> <span class="n">room</span><span class="o">=</span><span class="n">sid</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-      <span class="n">_</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span>
-        <span class="n">url</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-        <span class="n">reporthook</span><span class="o">=</span><span class="k">lambda</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">,</span> <span class="n">total_size</span><span class="p">:</span> <span class="n">emit</span><span class="p">(</span>
-          <span class="s1">&#39;download_progress&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">chunk</span><span class="o">=</span><span class="n">chunk</span><span class="p">,</span>
-            <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">,</span>
-            <span class="n">total_size</span><span class="o">=</span><span class="n">total_size</span><span class="p">,</span>
-          <span class="p">)</span>
-        <span class="p">),</span>
-      <span class="p">)</span>
-      <span class="c1"># NOTE: this may become an issue if ever someone wants actual html</span>
-      <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">get_content_type</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;text/html&#39;</span><span class="p">,</span> <span class="s1">&#39;Expected data, got html&#39;</span>
+      <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
+          <span class="c1"># NOTE: this may become an issue if ever someone wants actual html</span>
+          <span class="k">assert</span> <span class="n">resp</span><span class="o">.</span><span class="n">content_type</span> <span class="o">!=</span> <span class="s1">&#39;text/html&#39;</span><span class="p">,</span> <span class="s1">&#39;Expected data, got html&#39;</span>
+          <span class="n">resp</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+          <span class="n">chunk</span> <span class="o">=</span> <span class="mi">0</span>
+          <span class="n">chunk_size</span> <span class="o">=</span> <span class="mi">1024</span><span class="o">*</span><span class="mi">8</span>
+          <span class="n">total_size</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+          <span class="k">async</span> <span class="k">def</span> <span class="nf">reporthook</span><span class="p">(</span><span class="n">chunk</span><span class="p">):</span>
+            <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span>
+              <span class="s1">&#39;download_progress&#39;</span><span class="p">,</span>
+              <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">chunk</span><span class="o">=</span><span class="n">chunk</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">,</span> <span class="n">total_size</span><span class="o">=</span><span class="n">total_size</span><span class="p">),</span>
+              <span class="n">room</span><span class="o">=</span><span class="n">sid</span><span class="p">,</span>
+            <span class="p">)</span>
+          <span class="k">with</span> <span class="n">tmp_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">reporthook</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">buf</span> <span class="o">:=</span> <span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">):</span>
+              <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+              <span class="n">chunk</span> <span class="o">+=</span> <span class="mi">1</span>
+              <span class="k">await</span> <span class="n">reporthook</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-      <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;download error&#39;</span><span class="p">)</span>
-      <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
-      <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;download_error&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;download error: </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span>
+        <span class="s1">&#39;download_error&#39;</span><span class="p">,</span>
+        <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span>
+        <span class="n">room</span><span class="o">=</span><span class="n">sid</span><span class="p">,</span>
+      <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-      <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;download_complete&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">))</span>
+      <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span>
+        <span class="s1">&#39;download_complete&#39;</span><span class="p">,</span>
+        <span class="nb">dict</span><span class="p">(</span>
+          <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
+          <span class="n">full_filename</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">organize_file_content</span><span class="p">(</span><span class="n">data_fs</span><span class="p">,</span> <span class="n">tmp_fs</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span> <span class="n">filename</span><span class="p">)),</span>
+        <span class="p">),</span>
+        <span class="n">room</span><span class="o">=</span><span class="n">sid</span><span class="p">,</span>
+      <span class="p">)</span></div>
+
+<div class="viewcode-block" id="download"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.download.download">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;download_start&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">with</span> <span class="n">socketio</span><span class="o">.</span><span class="n">session</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
   <span class="c1">#</span>
-  <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;download_queued&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">))</span>
-  <span class="n">socketio</span><span class="o">.</span><span class="n">start_background_task</span><span class="p">(</span>
-    <span class="n">download_with_progress</span><span class="p">,</span>
+  <span class="n">data_fs</span> <span class="o">=</span> <span class="n">Filesystem</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">])</span>
+  <span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+  <span class="c1"># TODO: hash based on url?</span>
+  <span class="c1"># TODO: s3 bypass</span>
+  <span class="n">url</span> <span class="o">=</span> <span class="n">secure_url</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">))</span>
+  <span class="n">filename</span> <span class="o">=</span> <span class="n">secure_filepath</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">))</span>
+  <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;download_queued&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">),</span> <span class="n">room</span><span class="o">=</span><span class="n">sid</span><span class="p">)</span>
+  <span class="k">await</span> <span class="n">download_with_progress_and_hash</span><span class="p">(</span>
+    <span class="n">sid</span><span class="o">=</span><span class="n">sid</span><span class="p">,</span>
+    <span class="n">data_fs</span><span class="o">=</span><span class="n">data_fs</span><span class="p">,</span>
     <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
     <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">session_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">generate_uuid</span><span class="p">(),</span>
     <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
-    <span class="n">emit</span><span class="o">=</span><span class="n">emit</span><span class="p">,</span>
   <span class="p">)</span></div>
+
 
 <span class="c1"># upload from client</span>
 <div class="viewcode-block" id="siofu_start"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.download.siofu_start">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;siofu_start&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">siofu_start</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;file upload start&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">siofu_start</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
   <span class="k">try</span><span class="p">:</span>
-    <span class="n">session_id</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">][</span><span class="s1">&#39;_session&#39;</span><span class="p">]</span>
-    <span class="n">session_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">session_id</span><span class="p">)</span>
-    <span class="n">filename</span> <span class="o">=</span> <span class="n">secure_filename</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">session_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">filename</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;Invalid Filename&#39;</span>
-    <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">],</span> <span class="o">**</span><span class="p">{</span>
-      <span class="s1">&#39;file_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)):</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">generate_uuid</span><span class="p">()</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">secure_filepath</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
+    <span class="n">tmp_fs</span> <span class="o">=</span> <span class="n">Filesystem</span><span class="p">(</span><span class="s1">&#39;tmpfs://&#39;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">socketio</span><span class="o">.</span><span class="n">session</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+      <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;file_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">))]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
         <span class="n">bytesLoaded</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">session_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">),</span>
-      <span class="p">),</span>
-    <span class="p">})</span>
-    <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;siofu_ready&#39;</span><span class="p">,</span> <span class="p">{</span>
-      <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">),</span>
-      <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">})</span>
+        <span class="n">tmp_fs</span><span class="o">=</span><span class="n">tmp_fs</span><span class="p">,</span>
+        <span class="n">fh</span><span class="o">=</span><span class="n">tmp_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">),</span>
+      <span class="p">)</span>
+    <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span>
+      <span class="s1">&#39;siofu_ready&#39;</span><span class="p">,</span>
+      <span class="p">{</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+      <span class="p">},</span>
+      <span class="n">room</span><span class="o">=</span><span class="n">sid</span><span class="p">,</span>
+    <span class="p">)</span>
   <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
-    <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;siofu_error&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+    <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;siofu_error&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">room</span><span class="o">=</span><span class="n">sid</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="siofu_progress"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.download.siofu_progress">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;siofu_progress&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">siofu_progress</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-  <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">][</span><span class="s1">&#39;file_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])][</span><span class="s1">&#39;fh&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">])</span>
-  <span class="n">emit</span><span class="p">(</span><span class="s2">&quot;siofu_chunk&quot;</span><span class="p">,</span> <span class="p">{</span>
-    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
-  <span class="p">})</span></div>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">siofu_progress</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">with</span> <span class="n">socketio</span><span class="o">.</span><span class="n">session</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+    <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;file_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">evt</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])][</span><span class="s1">&#39;fh&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">evt</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">])</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;progress: </span><span class="si">{</span><span class="n">evt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+  <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s2">&quot;siofu_chunk&quot;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="nb">id</span><span class="o">=</span><span class="n">evt</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
+  <span class="p">),</span> <span class="n">room</span><span class="o">=</span><span class="n">sid</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="siofu_done"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.download.siofu_done">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;siofu_done&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">siofu_done</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;file upload complete&#39;</span><span class="p">)</span>
-  <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">][</span><span class="s1">&#39;file_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])][</span><span class="s1">&#39;fh&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-  <span class="k">del</span> <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">][</span><span class="s1">&#39;file_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])]</span>
-  <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;siofu_complete&#39;</span><span class="p">,</span> <span class="p">{</span>
-    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
-  <span class="p">})</span></div>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">siofu_done</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">with</span> <span class="n">socketio</span><span class="o">.</span><span class="n">session</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+    <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;file_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">evt</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])][</span><span class="s1">&#39;fh&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
+    <span class="n">data_fs</span> <span class="o">=</span> <span class="n">Filesystem</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">])</span>
+    <span class="n">tmp_fs</span> <span class="o">=</span> <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;file_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">evt</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])][</span><span class="s1">&#39;tmp_fs&#39;</span><span class="p">]</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;file_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">evt</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])][</span><span class="s1">&#39;path&#39;</span><span class="p">]</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;file_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">evt</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+    <span class="n">content_hash</span> <span class="o">=</span> <span class="n">organize_file_content</span><span class="p">(</span><span class="n">data_fs</span><span class="p">,</span> <span class="n">tmp_fs</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="n">tmp_fs</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">del</span> <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;file_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">evt</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])]</span>
+  <span class="c1">#</span>
+  <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;siofu_complete&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="nb">id</span><span class="o">=</span><span class="n">evt</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
+    <span class="n">detail</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+      <span class="n">full_filename</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">content_hash</span><span class="p">,</span> <span class="n">filename</span><span class="p">)),</span>
+    <span class="p">)</span>
+  <span class="p">),</span> <span class="n">room</span><span class="o">=</span><span class="n">sid</span><span class="p">)</span></div>
+
+<span class="c1"># upload from client with POST</span>
+<div class="viewcode-block" id="upload_from_request"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.download.upload_from_request">[docs]</a><span class="k">def</span> <span class="nf">upload_from_request</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">fnames</span><span class="p">):</span>
+  <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span>
+  <span class="n">data_fs</span> <span class="o">=</span> <span class="n">Filesystem</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">])</span>
+  <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+  <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">fnames</span><span class="p">:</span>
+    <span class="n">fh</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fh</span><span class="p">:</span>
+      <span class="n">filename</span> <span class="o">=</span> <span class="n">secure_filepath</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+      <span class="n">path</span> <span class="o">=</span> <span class="n">generate_uuid</span><span class="p">()</span>
+      <span class="k">with</span> <span class="n">Filesystem</span><span class="p">(</span><span class="s1">&#39;tmpfs://&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_fs</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">tmp_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+          <span class="n">fh</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fw</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">organize_file_content</span><span class="p">(</span><span class="n">data_fs</span><span class="p">,</span> <span class="n">tmp_fs</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span> <span class="n">filename</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">data</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -179,7 +233,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
     </div>
   </body>
 </html>

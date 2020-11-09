@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.orchestration.dispatch package &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.orchestration.dispatch package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="appyter-orchestration-dispatch-package">
+<h1>appyter.orchestration.dispatch package<a class="headerlink" href="#appyter-orchestration-dispatch-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-appyter.orchestration.dispatch.docker">
+<span id="appyter-orchestration-dispatch-docker-module"></span><h2>appyter.orchestration.dispatch.docker module<a class="headerlink" href="#module-appyter.orchestration.dispatch.docker" title="Permalink to this headline">¶</a></h2>
+<p>Launch job using docker directly</p>
+<dl class="py function">
+<dt id="appyter.orchestration.dispatch.docker.dispatch">
+<code class="sig-prename descclassname">appyter.orchestration.dispatch.docker.</code><code class="sig-name descname">dispatch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">Popen</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatch/docker.html#dispatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatch.docker.dispatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-appyter.orchestration.dispatch.kubernetes">
+<span id="appyter-orchestration-dispatch-kubernetes-module"></span><h2>appyter.orchestration.dispatch.kubernetes module<a class="headerlink" href="#module-appyter.orchestration.dispatch.kubernetes" title="Permalink to this headline">¶</a></h2>
+<p>Launch kubernetes job from within a kubernetes cluster</p>
+<dl class="py function">
+<dt id="appyter.orchestration.dispatch.kubernetes.dispatch">
+<code class="sig-prename descclassname">appyter.orchestration.dispatch.kubernetes.</code><code class="sig-name descname">dispatch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">namespace</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatch/kubernetes.html#dispatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatch.kubernetes.dispatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.orchestration.dispatch.kubernetes.endless_watch">
+<code class="sig-prename descclassname">appyter.orchestration.dispatch.kubernetes.</code><code class="sig-name descname">endless_watch</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatch/kubernetes.html#endless_watch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatch.kubernetes.endless_watch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-appyter.orchestration.dispatch.native">
+<span id="appyter-orchestration-dispatch-native-module"></span><h2>appyter.orchestration.dispatch.native module<a class="headerlink" href="#module-appyter.orchestration.dispatch.native" title="Permalink to this headline">¶</a></h2>
+<p>Launch job natively using python</p>
+<dl class="py function">
+<dt id="appyter.orchestration.dispatch.native.dispatch">
+<code class="sig-prename descclassname">appyter.orchestration.dispatch.native.</code><code class="sig-name descname">dispatch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">Popen</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatch/native.html#dispatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatch.native.dispatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-appyter.orchestration.dispatch">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.orchestration.dispatch" title="Permalink to this headline">¶</a></h2>
+<p>Orchestration dispatcher implementations using different backends</p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">appyter.orchestration.dispatch package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-appyter.orchestration.dispatch.docker">appyter.orchestration.dispatch.docker module</a></li>
+<li><a class="reference internal" href="#module-appyter.orchestration.dispatch.kubernetes">appyter.orchestration.dispatch.kubernetes module</a></li>
+<li><a class="reference internal" href="#module-appyter.orchestration.dispatch.native">appyter.orchestration.dispatch.native module</a></li>
+<li><a class="reference internal" href="#module-appyter.orchestration.dispatch">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/appyter.orchestration.dispatch.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.orchestration.dispatch package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+appyter.ext.asyncio package
+===========================
+
+Submodules
+----------
+
+appyter.ext.asyncio.event\_emitter module
+-----------------------------------------
+
+.. automodule:: appyter.ext.asyncio.event_emitter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: appyter.ext.asyncio
+   :members:
+   :undoc-members:
+   :show-inheritance:

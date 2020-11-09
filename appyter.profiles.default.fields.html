@@ -6,8 +6,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.profiles.default.fields package &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -138,7 +138,7 @@ Should be overridden by subclasses.</p>
 <span id="appyter-profiles-default-fields-filefield-module"></span><h2>appyter.profiles.default.fields.FileField module<a class="headerlink" href="#module-appyter.profiles.default.fields.FileField" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="appyter.profiles.default.fields.FileField.FileField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.FileField.</code><code class="sig-name descname">FileField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">'[^/]*'</span></em>, <em class="sig-param"><span class="n">examples</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.FileField.</code><code class="sig-name descname">FileField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">'.+'</span></em>, <em class="sig-param"><span class="n">examples</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Represing a uploadable File and facilitating that file upload.
 The field ends up being a string of the file path, for example:</p>
@@ -455,6 +455,18 @@ Should be overridden by subclasses.</p>
 Should be overridden by subclasses.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.TabField.TabField.render">
+<code class="sig-name descname">render</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a rendered version of the field (form)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – <p>The instance values of the form e.g. <code class="docutils literal notranslate"><span class="pre">Field.render(**field.args)</span></code></p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -630,7 +642,7 @@ can be used to extend or override those definitions.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
     </div>
   </body>
 </html>

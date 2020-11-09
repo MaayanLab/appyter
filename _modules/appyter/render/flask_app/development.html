@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.render.flask_app.development &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" accesskey="U">appyter.render.flask_app</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.development</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.render.flask_app.development</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="run_app"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.development.run_app">[docs]</a><span class="k">def</span> <span class="nf">run_app</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">os</span>
+  <span class="kn">import</span> <span class="nn">sys</span>
+  <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span>
+  <span class="c1"># TODO: use aio</span>
+  <span class="k">return</span> <span class="n">Popen</span><span class="p">([</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-u&#39;</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;appyter&#39;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;--socket=</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;HOST&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PORT&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+  <span class="p">],</span> <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="app_runner"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.development.app_runner">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">app_runner</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">asyncio</span>
+  <span class="n">state_lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+  <span class="n">state</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">proc</span><span class="o">=</span><span class="n">run_app</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
+  <span class="c1">#</span>
+  <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;reload&#39;</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="n">changes</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reload </span><span class="si">{</span><span class="n">changes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">state_lock</span><span class="p">:</span>
+      <span class="n">proc</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;proc&#39;</span><span class="p">)</span>
+      <span class="n">proc</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+      <span class="n">state</span><span class="p">[</span><span class="s1">&#39;proc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">run_app</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="try_n_times"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.development.try_n_times">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">try_n_times</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">coro</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">asyncio</span>
+  <span class="kn">import</span> <span class="nn">traceback</span>
+  <span class="n">backoff</span> <span class="o">=</span> <span class="mi">1</span>
+  <span class="k">while</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="k">return</span> <span class="k">await</span> <span class="n">coro</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+      <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
+      <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">err</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to run start, trying again in </span><span class="si">{</span><span class="n">backoff</span><span class="si">}</span><span class="s2">s...&quot;</span><span class="p">)</span>
+      <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">backoff</span><span class="p">)</span>
+      <span class="n">backoff</span> <span class="o">*=</span> <span class="mi">2</span></div>
+
+<div class="viewcode-block" id="app_messager"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.development.app_messager">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">app_messager</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">socketio</span>
+  <span class="kn">import</span> <span class="nn">asyncio</span>
+  <span class="kn">from</span> <span class="nn">appyter.util</span> <span class="kn">import</span> <span class="n">join_routes</span>
+  <span class="n">sio</span> <span class="o">=</span> <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span>
+  <span class="n">connected</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+  <span class="c1">#</span>
+  <span class="nd">@sio</span><span class="o">.</span><span class="n">event</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">connect</span><span class="p">():</span>
+    <span class="n">connected</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Connected to appyter server&#39;</span><span class="p">)</span>
+  <span class="nd">@sio</span><span class="o">.</span><span class="n">event</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">connect_error</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+    <span class="n">connected</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+  <span class="nd">@sio</span><span class="o">.</span><span class="n">event</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">disconnect</span><span class="p">():</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Disconnected from appyter server&#39;</span><span class="p">)</span>
+    <span class="n">connected</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+  <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;livereload&#39;</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">livereload</span><span class="p">(</span><span class="n">changes</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LiveReload </span><span class="si">{</span><span class="n">changes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">connected</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;livereload&#39;</span><span class="p">,</span> <span class="p">{})</span>
+  <span class="c1">#</span>
+  <span class="n">origin</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;HOST&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PORT&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="n">path</span> <span class="o">=</span> <span class="n">join_routes</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span> <span class="s2">&quot;socket.io&quot;</span><span class="p">)</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connecting to appyter server at </span><span class="si">{</span><span class="n">origin</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+  <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="k">await</span> <span class="n">try_n_times</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">sio</span><span class="o">.</span><span class="n">connect</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">socketio_path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+  <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="file_watcher"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.development.file_watcher">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">file_watcher</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="kn">from</span> <span class="nn">watchgod</span> <span class="kn">import</span> <span class="n">awatch</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Watching </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">evt</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">for</span> <span class="n">changes</span> <span class="ow">in</span> <span class="n">awatch</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">changes</span><span class="o">=</span><span class="n">changes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="serve"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.development.serve">[docs]</a><span class="k">def</span> <span class="nf">serve</span><span class="p">(</span><span class="n">app_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">os</span>
+  <span class="kn">import</span> <span class="nn">asyncio</span>
+  <span class="kn">import</span> <span class="nn">appyter</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.event_emitter</span> <span class="kn">import</span> <span class="n">EventEmitter</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.watchgod.watcher</span> <span class="kn">import</span> <span class="n">GlobWatcher</span>
+  <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_env</span>
+  <span class="n">config</span> <span class="o">=</span> <span class="n">get_env</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+  <span class="n">emitter</span> <span class="o">=</span> <span class="n">EventEmitter</span><span class="p">()</span>
+  <span class="c1"># run the app and reload it when necessary</span>
+  <span class="n">loop</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">app_runner</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="n">config</span><span class="p">))</span>
+  <span class="c1"># the underlying appyter library</span>
+  <span class="n">loop</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+    <span class="n">file_watcher</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="s1">&#39;reload&#39;</span><span class="p">,</span> <span class="n">appyter</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+      <span class="n">watcher_cls</span><span class="o">=</span><span class="n">GlobWatcher</span><span class="p">,</span>
+      <span class="n">watcher_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">include_dir_glob</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span>
+        <span class="n">include_file_glob</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*.py&#39;</span><span class="p">],</span>
+        <span class="n">exclude_dir_glob</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">exclude_file_glob</span><span class="o">=</span><span class="p">[],</span>
+      <span class="p">),</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+  <span class="c1"># the underlying appyter library&#39;s templates/ipynb/staticfiles/...</span>
+  <span class="n">loop</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+    <span class="n">file_watcher</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="s1">&#39;livereload&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">appyter</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;profiles&#39;</span><span class="p">),</span>
+      <span class="n">watcher_cls</span><span class="o">=</span><span class="n">GlobWatcher</span><span class="p">,</span>
+      <span class="n">watcher_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">include_dir_glob</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span>
+        <span class="n">include_file_glob</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span>
+        <span class="n">exclude_dir_glob</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">exclude_file_glob</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*.py&#39;</span><span class="p">],</span>
+      <span class="p">),</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+  <span class="c1"># the appyter itself&#39;s filters/blueprints</span>
+  <span class="n">loop</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+    <span class="n">file_watcher</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="s1">&#39;reload&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;CWD&#39;</span><span class="p">],</span>
+      <span class="n">watcher_cls</span><span class="o">=</span><span class="n">GlobWatcher</span><span class="p">,</span>
+      <span class="n">watcher_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">include_dir_glob</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">,</span> <span class="s1">&#39;blueprints&#39;</span><span class="p">],</span>
+        <span class="n">include_file_glob</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*.py&#39;</span><span class="p">],</span>
+        <span class="n">exclude_dir_glob</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">exclude_file_glob</span><span class="o">=</span><span class="p">[],</span>
+      <span class="p">),</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+  <span class="c1"># the appyter itself&#39;s templates/ipynb/staticfiles/...</span>
+  <span class="n">loop</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+    <span class="n">file_watcher</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="s1">&#39;livereload&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;CWD&#39;</span><span class="p">],</span>
+      <span class="n">watcher_cls</span><span class="o">=</span><span class="n">GlobWatcher</span><span class="p">,</span>
+      <span class="n">watcher_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">include_dir_glob</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span>
+        <span class="n">include_file_glob</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span>
+        <span class="n">exclude_dir_glob</span><span class="o">=</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">]],</span>
+        <span class="n">exclude_file_glob</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*.py&#39;</span><span class="p">],</span>
+      <span class="p">),</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+  <span class="n">loop</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">app_messager</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="n">config</span><span class="p">))</span>
+  <span class="n">loop</span><span class="o">.</span><span class="n">run_forever</span><span class="p">()</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" >appyter.render.flask_app</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.development</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
+    </div>
+  </body>
+</html>

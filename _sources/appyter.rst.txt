@@ -9,6 +9,7 @@ Subpackages
 
    appyter.ext
    appyter.extras
+   appyter.orchestration
    appyter.parse
    appyter.profiles
    appyter.render

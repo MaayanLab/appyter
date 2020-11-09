@@ -6,8 +6,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.render.flask_app.execution &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
@@ -39,97 +39,89 @@
             
   <h1>Source code for appyter.render.flask_app.execution</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">aiohttp</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
-<span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">PIPE</span>
-<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">copy_current_request_context</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">abort</span>
-<span class="kn">from</span> <span class="nn">flask_socketio</span> <span class="kn">import</span> <span class="n">emit</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">appyter.render.flask_app</span> <span class="kn">import</span> <span class="n">socketio</span>
-<span class="kn">from</span> <span class="nn">appyter.render.flask_app.core</span> <span class="kn">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">post_index_html_dynamic</span><span class="p">,</span> <span class="n">generate_session_id</span>
-<span class="kn">from</span> <span class="nn">appyter.render.flask_app.util</span> <span class="kn">import</span> <span class="n">sanitize_uuid</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.core</span> <span class="kn">import</span> <span class="n">prepare_data</span><span class="p">,</span> <span class="n">prepare_results</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.socketio</span> <span class="kn">import</span> <span class="n">socketio</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.util</span> <span class="kn">import</span> <span class="n">sanitize_sha1sum</span><span class="p">,</span> <span class="n">generate_uuid</span><span class="p">,</span> <span class="n">join_routes</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.fs</span> <span class="kn">import</span> <span class="n">Filesystem</span>
 
-<span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_jinja2_env</span>
-<span class="kn">from</span> <span class="nn">appyter.render.nbconstruct</span> <span class="kn">import</span> <span class="n">render_nb_from_nbtemplate</span>
-
-<span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;session&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-  <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;creating new session&#39;</span><span class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-      <span class="n">_session</span><span class="o">=</span><span class="n">generate_session_id</span><span class="p">()</span>
-    <span class="p">)</span>
-    <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;session&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;session&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">)</span>
-  <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">_session</span><span class="o">=</span><span class="n">sanitize_uuid</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;_session&#39;</span><span class="p">]))</span>
-  <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
-
-<span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_</span><span class="p">():</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">sid</span> <span class="ow">in</span> <span class="n">session</span><span class="p">:</span>
-    <span class="k">del</span> <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">]</span>
-  <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
-
+<span class="c1"># construct/join a notebook</span>
 <div class="viewcode-block" id="submit"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.execution.submit">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-  <span class="c1"># WARNING: this depends on FileFields taking care of filename sanity checking</span>
-  <span class="n">post_index_html_dynamic</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
-  <span class="c1"># TODO: deal with possible redirect</span>
-
-<div class="viewcode-block" id="init"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.execution.init">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;init&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;init&#39;</span><span class="p">)</span>
-  <span class="n">session_id</span> <span class="o">=</span> <span class="n">sanitize_uuid</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_session&#39;</span><span class="p">))</span>
-  <span class="k">if</span> <span class="n">session_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
-    <span class="k">return</span>
-  <span class="n">session_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="n">session_id</span><span class="p">)</span>
-  <span class="n">emit</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;Notebook created, queuing execution&#39;</span><span class="p">)</span>
-  <span class="k">if</span> <span class="ow">not</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">]:</span>
-    <span class="kn">from</span> <span class="nn">eventlet.green.subprocess</span> <span class="kn">import</span> <span class="n">Popen</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">with</span> <span class="n">socketio</span><span class="o">.</span><span class="n">session</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
+    <span class="n">request_url</span> <span class="o">=</span> <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;request_url&#39;</span><span class="p">]</span>
+  <span class="c1">#</span>
+  <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">prepare_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">result_hash</span> <span class="o">=</span> <span class="n">prepare_results</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">result_hash</span> <span class="o">=</span> <span class="n">sanitize_sha1sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">result_hash</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
   <span class="k">else</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span>
-  <span class="n">socketio</span><span class="o">.</span><span class="n">start_background_task</span><span class="p">(</span>
-    <span class="n">copy_current_request_context</span><span class="p">(</span><span class="n">nbexecute</span><span class="p">),</span>
-    <span class="n">cwd</span><span class="o">=</span><span class="n">session_dir</span><span class="p">,</span>
-    <span class="n">ipynb</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">],</span>
-    <span class="n">emit</span><span class="o">=</span><span class="n">emit</span><span class="p">,</span>
-    <span class="n">Popen</span><span class="o">=</span><span class="n">Popen</span><span class="p">,</span>
-  <span class="p">)</span></div>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Unrecognized data type&#39;</span><span class="p">)</span>
+  <span class="c1">#</span>
+  <span class="n">socketio</span><span class="o">.</span><span class="n">enter_room</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">result_hash</span><span class="p">)</span>
+  <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;Queuing execution&#39;</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span>
+  <span class="n">job</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">cwd</span><span class="o">=</span><span class="n">Filesystem</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">],</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="n">result_hash</span><span class="p">),</span>
+    <span class="n">ipynb</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">]),</span>
+    <span class="n">session</span><span class="o">=</span><span class="n">result_hash</span><span class="p">,</span>
+    <span class="nb">id</span><span class="o">=</span><span class="n">generate_uuid</span><span class="p">(),</span>
+  <span class="p">)</span>
+  <span class="c1">#</span>
+  <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;DISPATCHER_URL&#39;</span><span class="p">]:</span>
+    <span class="n">job</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">join_routes</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DISPATCHER_URL&#39;</span><span class="p">],</span> <span class="s1">&#39;socket.io&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">job</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">request_url</span>
+  <span class="c1">#</span>
+  <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;DISPATCHER_IMAGE&#39;</span><span class="p">]:</span>
+    <span class="n">job</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;DISPATCHER_IMAGE&#39;</span><span class="p">]</span>
+  <span class="c1">#</span>
+  <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;DISPATCHER&#39;</span><span class="p">]:</span>
+    <span class="n">queued</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">backoff</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">queued</span><span class="p">:</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">(</span><span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">})</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+          <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DISPATCHER&#39;</span><span class="p">],</span> <span class="n">json</span><span class="o">=</span><span class="n">job</span><span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
+            <span class="n">queue_size</span> <span class="o">=</span> <span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Queued successfully, you are at position </span><span class="si">{</span><span class="n">queue_size</span><span class="si">}</span><span class="s2"> in the queue&quot;</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span>
+            <span class="n">queued</span> <span class="o">=</span> <span class="kc">True</span>
+      <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+        <span class="k">raise</span>
+      <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">backoff</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">:</span>
+          <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Failed to contact orchestrator, trying again in </span><span class="si">{</span><span class="n">backoff</span><span class="si">}</span><span class="s2">s...&quot;</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span>
+          <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">backoff</span><span class="p">)</span>
+          <span class="n">backoff</span> <span class="o">*=</span> <span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;Failed to contact orchestrator, please try again later.&#39;</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span>
+          <span class="k">break</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">appyter.orchestration.job.job</span> <span class="kn">import</span> <span class="n">execute_async</span>
+    <span class="k">await</span> <span class="n">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="nbexecute"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.execution.nbexecute">[docs]</a><span class="k">def</span> <span class="nf">nbexecute</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">ipynb</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">emit</span><span class="o">=</span><span class="nb">print</span><span class="p">,</span> <span class="n">Popen</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-  <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">sid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-  <span class="k">if</span> <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;started&#39;</span><span class="p">):</span>
-    <span class="k">return</span>
-  <span class="n">session</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">sid</span><span class="p">][</span><span class="s1">&#39;started&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;nbexecute&#39;</span><span class="p">,</span> <span class="n">cwd</span><span class="p">)</span>
-  <span class="kn">import</span> <span class="nn">json</span>
-  <span class="k">if</span> <span class="n">Popen</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span>
-  <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
-    <span class="p">[</span>
-      <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span>
-      <span class="s1">&#39;-u&#39;</span><span class="p">,</span>
-      <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;appyter&#39;</span><span class="p">,</span>
-      <span class="s1">&#39;nbexecute&#39;</span><span class="p">,</span>
-      <span class="s1">&#39;--cwd=&#39;</span><span class="o">+</span><span class="n">cwd</span><span class="p">,</span>
-      <span class="n">ipynb</span><span class="p">,</span>
-    <span class="p">],</span>
-    <span class="n">env</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-      <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">),</span>
-      <span class="n">PATH</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PATH&#39;</span><span class="p">],</span>
-    <span class="p">),</span>
-    <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span>
-  <span class="p">)</span> <span class="k">as</span> <span class="n">proc</span><span class="p">:</span>
-    <span class="n">packet</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-    <span class="k">while</span> <span class="n">packet</span><span class="p">:</span>
-      <span class="n">msg</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">packet</span><span class="p">)</span>
-      <span class="n">emit</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">])</span>
-      <span class="n">packet</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span></div>
+<span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+  <span class="n">socketio</span><span class="o">.</span><span class="n">enter_room</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+  <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;joined&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">sid</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">data</span><span class="p">),</span> <span class="n">room</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+<span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;leave&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+  <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">sid</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">data</span><span class="p">),</span> <span class="n">room</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+  <span class="n">socketio</span><span class="o">.</span><span class="n">leave_room</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;msg&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+  <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">to</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;to&#39;</span><span class="p">),</span> <span class="n">room</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;session&#39;</span><span class="p">))</span>
 </pre></div>
 
             <div class="clearer"></div>
@@ -169,7 +161,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
     </div>
   </body>
 </html>

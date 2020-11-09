@@ -6,8 +6,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.parse.nb &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
@@ -37,14 +37,17 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.parse.nb</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">nbformat</span> <span class="k">as</span> <span class="nn">nbf</span>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">nbformat</span> <span class="k">as</span> <span class="nn">nbf</span>
 
 <div class="viewcode-block" id="nb_from_ipynb_string"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_from_ipynb_string">[docs]</a><span class="k">def</span> <span class="nf">nb_from_ipynb_string</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">nbf</span><span class="o">.</span><span class="n">reads</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">as_version</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="nb_from_ipynb_file"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_from_ipynb_file">[docs]</a><span class="k">def</span> <span class="nf">nb_from_ipynb_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fr</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">nbf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fr</span><span class="p">,</span> <span class="n">as_version</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+<div class="viewcode-block" id="nb_from_ipynb_io"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_from_ipynb_io">[docs]</a><span class="k">def</span> <span class="nf">nb_from_ipynb_io</span><span class="p">(</span><span class="n">io</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">nbf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="n">as_version</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="nb_from_json"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_from_json">[docs]</a><span class="k">def</span> <span class="nf">nb_from_json</span><span class="p">(</span><span class="n">j</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">nb_from_ipynb_string</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">j</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="nb_to_ipynb_string"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_to_ipynb_string">[docs]</a><span class="k">def</span> <span class="nf">nb_to_ipynb_string</span><span class="p">(</span><span class="n">nb</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">nbf</span><span class="o">.</span><span class="n">writes</span><span class="p">(</span><span class="n">nb</span><span class="p">)</span></div>
@@ -52,9 +55,8 @@
 <div class="viewcode-block" id="nb_to_ipynb_io"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_to_ipynb_io">[docs]</a><span class="k">def</span> <span class="nf">nb_to_ipynb_io</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="n">io</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">nbf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="n">io</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="nb_to_ipynb_file"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_to_ipynb_file">[docs]</a><span class="k">def</span> <span class="nf">nb_to_ipynb_file</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
-    <span class="n">nb_to_ipynb_io</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="n">fw</span><span class="p">)</span></div>
+<div class="viewcode-block" id="nb_to_json"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_to_json">[docs]</a><span class="k">def</span> <span class="nf">nb_to_json</span><span class="p">(</span><span class="n">nb</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">nb_to_ipynb_string</span><span class="p">(</span><span class="n">nb</span><span class="p">))</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -93,7 +95,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
     </div>
   </body>
 </html>

@@ -1,0 +1,37 @@
+appyter.orchestration.dispatch package
+======================================
+
+Submodules
+----------
+
+appyter.orchestration.dispatch.docker module
+--------------------------------------------
+
+.. automodule:: appyter.orchestration.dispatch.docker
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.orchestration.dispatch.kubernetes module
+------------------------------------------------
+
+.. automodule:: appyter.orchestration.dispatch.kubernetes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.orchestration.dispatch.native module
+--------------------------------------------
+
+.. automodule:: appyter.orchestration.dispatch.native
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: appyter.orchestration.dispatch
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -6,8 +6,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.util &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -37,26 +37,21 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.util</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">urllib.parse</span>
-<span class="kn">from</span> <span class="nn">werkzeug.utils</span> <span class="kn">import</span> <span class="n">secure_filename</span>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
+<span class="kn">from</span> <span class="nn">werkzeug.security</span> <span class="kn">import</span> <span class="n">safe_join</span>
 
 <div class="viewcode-block" id="try_json_loads"><a class="viewcode-back" href="../../appyter.html#appyter.util.try_json_loads">[docs]</a><span class="k">def</span> <span class="nf">try_json_loads</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-  <span class="kn">import</span> <span class="nn">json</span>
   <span class="k">try</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
   <span class="k">except</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">v</span></div>
 
-<div class="viewcode-block" id="try_load_list"><a class="viewcode-back" href="../../appyter.html#appyter.util.try_load_list">[docs]</a><span class="k">def</span> <span class="nf">try_load_list</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-  <span class="n">v</span> <span class="o">=</span> <span class="n">try_json_loads</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-  <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">set</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">]:</span>
-    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-  <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-  <span class="k">elif</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="k">return</span> <span class="p">[]</span>
+<div class="viewcode-block" id="try_json_dumps"><a class="viewcode-back" href="../../appyter.html#appyter.util.try_json_dumps">[docs]</a><span class="k">def</span> <span class="nf">try_json_dumps</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+  <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">v</span>
   <span class="k">else</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unrecognized type for list (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="dict_filter_none"><a class="viewcode-back" href="../../appyter.html#appyter.util.dict_filter_none">[docs]</a><span class="k">def</span> <span class="nf">dict_filter_none</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
   <span class="k">return</span> <span class="p">{</span> <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="p">}</span></div>
@@ -65,6 +60,15 @@
   <span class="sd">&#39;&#39;&#39; Utility function for joining routes while striping extraneous slashes</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">return</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">route</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">routes</span> <span class="k">if</span> <span class="n">route</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)])</span></div>
+
+<div class="viewcode-block" id="secure_filepath"><a class="viewcode-back" href="../../appyter.html#appyter.util.secure_filepath">[docs]</a><span class="k">def</span> <span class="nf">secure_filepath</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Ensures this will be a sanitized relative path</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">secured_filepath</span> <span class="o">=</span> <span class="n">safe_join</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
+  <span class="k">assert</span> <span class="n">secured_filepath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Filepath wasn&#39;t secure&quot;</span>
+  <span class="n">secured_filepath</span> <span class="o">=</span> <span class="n">secured_filepath</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+  <span class="k">assert</span> <span class="n">secured_filepath</span><span class="p">,</span> <span class="s2">&quot;Filepath became empty while securing&quot;</span>
+  <span class="k">return</span> <span class="n">secured_filepath</span></div>
 
 <div class="viewcode-block" id="secure_url"><a class="viewcode-back" href="../../appyter.html#appyter.util.secure_url">[docs]</a><span class="k">def</span> <span class="nf">secure_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
   <span class="n">parsed</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -109,6 +113,36 @@
       <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
       <span class="k">if</span> <span class="n">filter_mod</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
     <span class="p">})</span></div>
+
+<div class="viewcode-block" id="click_option_setenv"><a class="viewcode-back" href="../../appyter.html#appyter.util.click_option_setenv">[docs]</a><span class="k">def</span> <span class="nf">click_option_setenv</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Like click.option but explicitly set os.environ as well.</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">functools</span><span class="o">,</span> <span class="nn">click</span>
+  <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^--(.+)$&#39;</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
+  <span class="k">assert</span> <span class="n">m</span>
+  <span class="n">var</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="n">envvar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">envvar</span><span class="p">]</span> <span class="o">=</span> <span class="n">try_json_dumps</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">var</span><span class="p">])</span>
+      <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+  <span class="k">return</span> <span class="n">decorator</span></div>
+
+<div class="viewcode-block" id="click_argument_setenv"><a class="viewcode-back" href="../../appyter.html#appyter.util.click_argument_setenv">[docs]</a><span class="k">def</span> <span class="nf">click_argument_setenv</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Like click.argument but explicitly set os.environ as well.</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">functools</span><span class="o">,</span> <span class="nn">click</span>
+  <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="n">envvar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">envvar</span><span class="p">]</span> <span class="o">=</span> <span class="n">try_json_dumps</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)])</span>
+      <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+  <span class="k">return</span> <span class="n">decorator</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -147,7 +181,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
     </div>
   </body>
 </html>

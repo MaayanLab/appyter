@@ -44,14 +44,6 @@ appyter.render.nbinspect module
    :undoc-members:
    :show-inheritance:
 
-appyter.render.nbviewer module
-------------------------------
-
-.. automodule:: appyter.render.nbviewer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

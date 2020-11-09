@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.orchestration.job.job &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.orchestration.job.job</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.orchestration.job.job</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">socketio</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
+<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">appyter.ext.asyncio.event_emitter</span> <span class="kn">import</span> <span class="n">EventEmitter</span>
+
+
+<div class="viewcode-block" id="setup_socketio_events"><a class="viewcode-back" href="../../../../appyter.orchestration.job.html#appyter.orchestration.job.job.setup_socketio_events">[docs]</a><span class="k">def</span> <span class="nf">setup_socketio_events</span><span class="p">(</span><span class="n">sio</span><span class="p">,</span> <span class="n">emitter</span><span class="p">):</span>
+  <span class="nd">@sio</span><span class="o">.</span><span class="n">event</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">connect</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;connect&#39;</span><span class="p">)</span>
+  <span class="nd">@sio</span><span class="o">.</span><span class="n">event</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">connect_error</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;connect_error&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">)</span>
+  <span class="nd">@sio</span><span class="o">.</span><span class="n">event</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">disconnect</span><span class="p">():</span>
+    <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">)</span>
+  <span class="nd">@sio</span><span class="o">.</span><span class="n">event</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">joined</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;joined&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+  <span class="nd">@sio</span><span class="o">.</span><span class="n">event</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">left</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="emit_factory"><a class="viewcode-back" href="../../../../appyter.orchestration.job.html#appyter.orchestration.job.job.emit_factory">[docs]</a><span class="k">def</span> <span class="nf">emit_factory</span><span class="p">(</span><span class="n">emitter</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;msg&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">emit</span></div>
+
+<div class="viewcode-block" id="get_state_factory"><a class="viewcode-back" href="../../../../appyter.orchestration.job.html#appyter.orchestration.job.job.get_state_factory">[docs]</a><span class="k">def</span> <span class="nf">get_state_factory</span><span class="p">(</span><span class="n">emitter</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Setup a callback which will send the current notebook if someone joins the room</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">subscribe</span><span class="p">(</span><span class="n">get_state</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;get_state&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">get_state</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">subscribe</span></div>
+
+<div class="viewcode-block" id="evaluate_notebook"><a class="viewcode-back" href="../../../../appyter.orchestration.job.html#appyter.orchestration.job.job.evaluate_notebook">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">evaluate_notebook</span><span class="p">(</span><span class="n">sio</span><span class="p">,</span> <span class="n">emitter</span><span class="p">,</span> <span class="n">job</span><span class="p">):</span>
+  <span class="kn">from</span> <span class="nn">appyter.render.nbexecute</span> <span class="kn">import</span> <span class="n">nbexecute_async</span>
+  <span class="k">await</span> <span class="n">nbexecute_async</span><span class="p">(</span>
+    <span class="n">cwd</span><span class="o">=</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;cwd&#39;</span><span class="p">],</span>
+    <span class="n">emit</span><span class="o">=</span><span class="n">emit_factory</span><span class="p">(</span><span class="n">emitter</span><span class="p">),</span>
+    <span class="n">ipynb</span><span class="o">=</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;ipynb&#39;</span><span class="p">],</span>
+    <span class="n">subscribe</span><span class="o">=</span><span class="n">get_state_factory</span><span class="p">(</span><span class="n">emitter</span><span class="p">),</span>
+  <span class="p">)</span>
+  <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;stopped&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="setup_execute_async"><a class="viewcode-back" href="../../../../appyter.orchestration.job.html#appyter.orchestration.job.job.setup_execute_async">[docs]</a><span class="k">def</span> <span class="nf">setup_execute_async</span><span class="p">(</span><span class="n">sio</span><span class="p">,</span> <span class="n">emitter</span><span class="p">,</span> <span class="n">job</span><span class="p">):</span>
+  <span class="n">client_lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+  <span class="n">state_lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+  <span class="n">state</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">executed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">get_state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+  <span class="n">connected</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+  <span class="n">joined</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+  <span class="c1">#</span>
+  <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;connect&#39;</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">on_connect</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">connected</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">client_lock</span><span class="p">:</span>
+      <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">,</span> <span class="n">job</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">])</span>
+  <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;connect_error&#39;</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">on_connect_error</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">connected</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+  <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">on_disconnect</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">joined</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">connected</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+  <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;joined&#39;</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">on_joined</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">job</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">sio</span><span class="o">.</span><span class="n">sid</span><span class="p">:</span>
+      <span class="n">joined</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+      <span class="k">async</span> <span class="k">with</span> <span class="n">state_lock</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;executed&#39;</span><span class="p">]:</span>
+          <span class="n">state</span><span class="p">[</span><span class="s1">&#39;executed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+          <span class="n">sio</span><span class="o">.</span><span class="n">start_background_task</span><span class="p">(</span><span class="n">evaluate_notebook</span><span class="p">,</span> <span class="n">sio</span><span class="p">,</span> <span class="n">emitter</span><span class="p">,</span> <span class="n">job</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;get_state&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="k">async</span> <span class="k">with</span> <span class="n">state_lock</span><span class="p">:</span>
+        <span class="n">nb_state</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;get_state&#39;</span><span class="p">]()</span>
+        <span class="k">await</span> <span class="n">connected</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">client_lock</span><span class="p">:</span>
+          <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;msg&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;nb&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">nb_state</span><span class="p">[</span><span class="s1">&#39;nb&#39;</span><span class="p">],</span> <span class="n">to</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>
+        <span class="k">await</span> <span class="n">connected</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">client_lock</span><span class="p">:</span>
+          <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;msg&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">nb_state</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">],</span> <span class="n">to</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>
+        <span class="k">await</span> <span class="n">connected</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">client_lock</span><span class="p">:</span>
+          <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;msg&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;progress&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">nb_state</span><span class="p">[</span><span class="s1">&#39;progress&#39;</span><span class="p">],</span> <span class="n">to</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>
+  <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;get_state&#39;</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">on_get_state</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">state_lock</span><span class="p">:</span>
+      <span class="n">state</span><span class="p">[</span><span class="s1">&#39;get_state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+  <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;msg&#39;</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">on_msg</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">connected</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">joined</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">client_lock</span><span class="p">:</span>
+      <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;msg&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]))</span>
+  <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;joined&#39;</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">on_joined</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;joined&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+  <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;stopped&#39;</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">on_stopped</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">connected</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">joined</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">client_lock</span><span class="p">:</span>
+      <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;leave&#39;</span><span class="p">,</span> <span class="n">job</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">])</span>
+  <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">on_left</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">job</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">sio</span><span class="o">.</span><span class="n">sid</span><span class="p">:</span>
+      <span class="k">async</span> <span class="k">with</span> <span class="n">client_lock</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="execute_async"><a class="viewcode-back" href="../../../../appyter.orchestration.job.html#appyter.orchestration.job.job.execute_async">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">):</span>
+  <span class="n">sio</span> <span class="o">=</span> <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span>
+  <span class="n">emitter</span> <span class="o">=</span> <span class="n">EventEmitter</span><span class="p">()</span>
+  <span class="c1">#</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">setup_socketio_events</span><span class="p">(</span><span class="n">sio</span><span class="p">,</span> <span class="n">emitter</span><span class="p">)</span>
+    <span class="n">setup_execute_async</span><span class="p">(</span><span class="n">sio</span><span class="p">,</span> <span class="n">emitter</span><span class="p">,</span> <span class="n">job</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
+    <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s2">://</span><span class="si">{</span><span class="n">url</span><span class="o">.</span><span class="n">netloc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">socketio_path</span><span class="o">=</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+  <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+    <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../appyter.orchestration.job.html#appyter.orchestration.job.job.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">job</span><span class="p">):</span>
+  <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">),</span> <span class="n">debug</span><span class="o">=</span><span class="n">job</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.orchestration.job.job</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
+    </div>
+  </body>
+</html>

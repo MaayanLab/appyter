@@ -4,10 +4,34 @@ appyter.profiles.default.filters package
 Submodules
 ----------
 
+appyter.profiles.default.filters.atob module
+--------------------------------------------
+
+.. automodule:: appyter.profiles.default.filters.atob
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.profiles.default.filters.btoa module
+--------------------------------------------
+
+.. automodule:: appyter.profiles.default.filters.btoa
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.profiles.default.filters.fmt module
 -------------------------------------------
 
 .. automodule:: appyter.profiles.default.filters.fmt
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.profiles.default.filters.join\_routes module
+----------------------------------------------------
+
+.. automodule:: appyter.profiles.default.filters.join_routes
    :members:
    :undoc-members:
    :show-inheritance:

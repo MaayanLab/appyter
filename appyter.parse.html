@@ -6,8 +6,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.parse package &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -46,8 +46,7 @@
 <dt id="appyter.parse.function_call.FunctionCallMatcher">
 <em class="property">class </em><code class="sig-prename descclassname">appyter.parse.function_call.</code><code class="sig-name descname">FunctionCallMatcher</code><a class="reference internal" href="_modules/appyter/parse/function_call.html#FunctionCallMatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Function call parser since regexd isn’t good at nested structures.
-Uncomment prints for debugging.</p>
+<p>Function call parser since regex isn’t good at nested structures.</p>
 <dl class="py attribute">
 <dt id="appyter.parse.function_call.FunctionCallMatcher.controlChars">
 <code class="sig-name descname">controlChars</code><em class="property"> = {'(': ')', '[': ']', '{': '}'}</em><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher.controlChars" title="Permalink to this definition">¶</a></dt>
@@ -79,8 +78,8 @@ Uncomment prints for debugging.</p>
 <div class="section" id="module-appyter.parse.nb">
 <span id="appyter-parse-nb-module"></span><h2>appyter.parse.nb module<a class="headerlink" href="#module-appyter.parse.nb" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.parse.nb.nb_from_ipynb_file">
-<code class="sig-prename descclassname">appyter.parse.nb.</code><code class="sig-name descname">nb_from_ipynb_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/nb.html#nb_from_ipynb_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.nb.nb_from_ipynb_file" title="Permalink to this definition">¶</a></dt>
+<dt id="appyter.parse.nb.nb_from_ipynb_io">
+<code class="sig-prename descclassname">appyter.parse.nb.</code><code class="sig-name descname">nb_from_ipynb_io</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">io</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/nb.html#nb_from_ipynb_io"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.nb.nb_from_ipynb_io" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -89,8 +88,8 @@ Uncomment prints for debugging.</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.parse.nb.nb_to_ipynb_file">
-<code class="sig-prename descclassname">appyter.parse.nb.</code><code class="sig-name descname">nb_to_ipynb_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb</span></em>, <em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/nb.html#nb_to_ipynb_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.nb.nb_to_ipynb_file" title="Permalink to this definition">¶</a></dt>
+<dt id="appyter.parse.nb.nb_from_json">
+<code class="sig-prename descclassname">appyter.parse.nb.</code><code class="sig-name descname">nb_from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">j</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/nb.html#nb_from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.nb.nb_from_json" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -101,6 +100,11 @@ Uncomment prints for debugging.</p>
 <dl class="py function">
 <dt id="appyter.parse.nb.nb_to_ipynb_string">
 <code class="sig-prename descclassname">appyter.parse.nb.</code><code class="sig-name descname">nb_to_ipynb_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/nb.html#nb_to_ipynb_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.nb.nb_to_ipynb_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.parse.nb.nb_to_json">
+<code class="sig-prename descclassname">appyter.parse.nb.</code><code class="sig-name descname">nb_to_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/nb.html#nb_to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.nb.nb_to_json" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -177,7 +181,7 @@ Uncomment prints for debugging.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
     </div>
   </body>
 </html>

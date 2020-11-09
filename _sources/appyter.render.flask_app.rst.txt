@@ -12,6 +12,14 @@ appyter.render.flask\_app.core module
    :undoc-members:
    :show-inheritance:
 
+appyter.render.flask\_app.development module
+--------------------------------------------
+
+.. automodule:: appyter.render.flask_app.development
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.render.flask\_app.download module
 -----------------------------------------
 
@@ -28,10 +36,34 @@ appyter.render.flask\_app.execution module
    :undoc-members:
    :show-inheritance:
 
+appyter.render.flask\_app.livereload module
+-------------------------------------------
+
+.. automodule:: appyter.render.flask_app.livereload
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.render.flask\_app.production module
+-------------------------------------------
+
+.. automodule:: appyter.render.flask_app.production
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.render.flask\_app.socketio module
 -----------------------------------------
 
 .. automodule:: appyter.render.flask_app.socketio
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.render.flask\_app.static module
+---------------------------------------
+
+.. automodule:: appyter.render.flask_app.static
    :members:
    :undoc-members:
    :show-inheritance:
