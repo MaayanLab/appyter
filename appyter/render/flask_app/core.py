@@ -22,7 +22,7 @@ def get_fields():
   ''' Helper to get/cache fields even if we're on a different thread
   '''
   global _fields
-  if not _fields:
+  if not _fields or current_app.config['DEBUG']:
     fs = Filesystem(current_app.config['CWD'])
     with fs.open(current_app.config['IPYNB'], 'r') as fr:
       env = get_jinja2_env(config=current_app.config)
@@ -33,7 +33,7 @@ def get_fields():
 _ipynb_hash = None
 def get_ipynb_hash():
   global _ipynb_hash
-  if not _ipynb_hash:
+  if not _ipynb_hash or current_app.config['DEBUG']:
     fs = Filesystem(current_app.config['CWD'])
     _ipynb_hash = sha1sum_io(fs.open(current_app.config['IPYNB'], 'rb'))
   return _ipynb_hash
