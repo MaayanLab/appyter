@@ -5,77 +5,51 @@
     <title>Appyter</title>
   {% endblock %}
   {% block style %}
-  <style>
-  .progress {
-    height: 25px;
-    width: 100%;
-    background-color: grey;
-  }
-  .progress-bar {
-    height: 100%;
-    background-color: blue;
-  }
-  .progress-bar.bg-success {
-    height: 100%;
-    background-color: green;
-  }
-  </style>
-  {% if 'toc' in _config.EXTRAS %}
-  <style>
-  #_toc h1 {
-    font-size: 150%;
-    text-indent: 0em;
-  }
-  #_toc h2 {
-    font-size: 140%;
-    text-indent: 1em;
-  }
-  #_toc h3 {
-    font-size: 130%;
-    text-indent: 1.5em;
-  }
-  #_toc h4 {
-    font-size: 120%;
-    text-indent: 1.75em;
-  }
-  #_toc h5 {
-    font-size: 110%;
-    text-indent: 1.85em;
-  }
-  #_toc h6 {
-    font-size: 100%;
-    text-indent: 2em;
-  }
-  </style>
-  {% endif %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
   {% endblock %}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
-</head>
-<body>
-  {% block body %}{% endblock %}
-  {% block script %}
+  {% block script_head %}
+    <script>
+      window._config = {
+        STATIC_URL: {{ url_for('static', filename='')|jsonify }},
+      }
+    </script>
+    <script src="{{ url_for('static', filename='js/lib/requirejs/require.js') }}"></script>
     <script>
       require.config({
         paths: {
-          'jquery': 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min',
-          'socketio': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim',
-          'socketio-file-upload': 'https://cdn.jsdelivr.net/npm/socketio-file-upload@0.7.0/client.min',
+          'jquery': {{ url_for('static', filename='js/lib/jquery/jquery.min')|jsonify }},
+          'socketio': {{ url_for('static', filename='js/lib/socket.io/socket.io.slim')|jsonify }},
         },
         shim: {
           'socketio': {
             exports: 'io'
           },
-          'socketio-file-upload': {
-            exports: 'SocketIOFileUpload'
-          },
+        }
+      })
+      define('socket', ['socketio'], function (io) {
+        return io({ path: {{ join_routes(_config.PREFIX, 'socket.io')|jsonify }} })
+      })
+      define('svelte', function () {
+        return {
+          render: function (self, file, props) {
+            require([file], function (Component) {
+              Object.assign(props, { window: window })
+              self.children[0].remove()
+              var component = new Component({
+                target: self,
+                props: props,
+              })
+              self.classList.remove('loading')
+            })
+          }
         }
       })
     </script>
-    <script>
-      define('socket', ['socketio'], function (io) {
-        return io({ path: '{{ _config.PREFIX }}socket.io' })
-      })
-    </script>
+  {% endblock %}
+</head>
+<body>
+  {% block body %}{% endblock %}
+  {% block script %}
     {% if _config.DEBUG %}
     <script>
       require(['socket'], function (socket) {
@@ -83,19 +57,14 @@
         socket.on('connect', function () {
           if (first_connect === true) {
             console.debug('connected')
-            socket.emit('session', { _session: '{{ _session }}' })
             first_connect = false
           } else {
             window.location.reload()
           }
         })
-      })
-    </script>
-    {% else %}
-    <script>
-      require(['socket'], function (socket) {
-        socket.on('connect', function () {
-          socket.emit('session', { _session: '{{ _session }}' })
+        socket.on('livereload', function (data) {
+          console.debug('livereload')
+          window.location.reload()
         })
       })
     </script>

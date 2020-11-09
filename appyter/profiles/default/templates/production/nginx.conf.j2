@@ -1,0 +1,141 @@
+{%- macro proxy(remote, ws) -%}
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      {%- if ws %}
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      {%- endif %}
+      proxy_pass {{ remote }};
+{%- endmacro -%}
+
+pid {{ _tmp_fs.path('nginx.pid') }};
+worker_processes 1;
+daemon off;
+
+events {
+  worker_connections  1024;
+}
+
+http {
+  include /etc/nginx/mime.types;
+  default_type application/octet-stream;
+
+  resolver 127.0.0.11 127.0.0.1 ipv6=off;
+
+  log_format main '\$remote_addr:\$http_x_forwarded_for - \$remote_user [\$time_local] '
+                  '"\$request" \$status \$body_bytes_sent "\$http_referer" '
+                  '"\$http_user_agent"' ;
+
+  access_log /dev/stdout;
+  error_log stderr info;
+
+  gzip              on;
+  gzip_http_version 1.0;
+  gzip_proxied      any;
+  gzip_min_length   500;
+  gzip_disable      "MSIE [1-6]\.";
+  gzip_types        text/plain text/xml text/css
+                    text/comma-separated-values
+                    text/javascript
+                    application/x-javascript
+                    application/atom+xml;
+
+  client_body_buffer_size     10M;
+  client_max_body_size        10M;
+  proxy_buffering off;
+  proxy_request_buffering off;
+  proxy_cache off;
+
+  upstream appyter {
+    {#- {% for n in range(1, _config.N_PROCS+1) %} #}
+    {%- with n=1 %}
+    server unix:{{ _tmp_fs.path() }}appyter_{{ n }}.sock fail_timeout=0;
+    {%- endwith %}
+    {#- {% endfor %} #}
+  }
+
+  {%- if _config.DATA_DIR.startswith('s3://') %}
+  {%- with s3_url = s3_to_url(_config.DATA_DIR) %}
+  upstream s3 {
+    server {{ s3_url.netloc }} fail_timeout=0;
+  }
+  {%- endwith %}
+  {%- endif %}
+
+  server {
+    listen {{ _config.PORT }};
+    server_name {{ _config.HOST }};
+    include /etc/nginx/mime.types;
+    charset utf-8;
+    sendfile on;
+    keepalive_timeout 0;
+
+    location = {{ _config.PREFIX.rstrip('/') }}/ {
+      if ($request_method = GET) {
+        rewrite ^(.*)/$ $1/index.html;
+      }
+      {{ proxy('http://appyter', False) }}
+    }
+
+    location = {{ join_routes(_config.PREFIX, 'index.html') }} {
+      root {{ _tmp_fs.path() }};
+      try_files /index.html =404;
+    }
+
+    location = {{ join_routes(_config.PREFIX, 'favicon.ico') }} {
+      root {{ _config.STATIC_DIR }};
+      try_files /favicon.ico =404;
+    }
+
+    location ^~ {{ join_routes(_config.PREFIX, 'socket.io') }} {
+      {{ proxy('http://appyter', True) }}
+    }
+
+    location ~ ^{{ join_routes(_config.PREFIX, 'static') }}/(.*)$ {
+      root {{ _config.STATIC_DIR }};
+      try_files /$1 @profile_static;
+    }
+
+    location @profile_static {
+      rewrite ^{{ join_routes(_config.PREFIX, 'static') }}/(.*)$ {{ join_routes(_config.PREFIX, 'profile', 'static') }}/$1;
+    }
+
+    location ~ ^{{ join_routes(_config.PREFIX, 'profile') }}/(.*)$ {
+      root {{ get_appyter_directory('profiles') }};
+      try_files
+        {%- if _config.PROFILE != 'default' %}
+        /{{ _config.PROFILE }}/$1
+        {%- endif %}
+        /default/$1
+        =404;
+    }
+
+    location ~ ^{{ join_routes(_config.PREFIX, '[^/]+') }}/$ {
+      root {{ _tmp_fs.path() }};
+      try_files /landing.html =404;
+    }
+
+    location ~ ^{{ join_routes(_config.PREFIX, '([^/]+)', '(.+)') }}$ {
+      {%- if _config.DATA_DIR.startswith('/') %}
+      root {{ join_routes(_config.DATA_DIR, 'output') }};
+      try_files /$1/$2 =404;
+      {%- elif _config.DATA_DIR.startswith('s3://') %}
+      {%- with s3_url = s3_to_url(_config.DATA_DIR) %}
+      rewrite ^{{ join_routes(_config.PREFIX, '([^/]+)', '(.+)') }}$ {{ join_routes(s3_url.path, 'output', '$1', '$2') }} break;
+      {{ proxy('http://s3', False) }}
+      {%- endwith %}
+      {%- else %}
+      {{ proxy('http://appyter', False) }}
+      {%- endif %}
+    }
+
+    location {{ _config.PREFIX }} {
+      {{ proxy('http://appyter', False) }}
+    }
+
+    location / {
+      return 301 {{ _config.PREFIX.rstrip('/') }}$request_uri;
+    }
+  }
+}

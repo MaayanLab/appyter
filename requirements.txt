@@ -1,16 +1,19 @@
+aiohttp
+aiohttp-wsgi
 bs4
 click
 click-default-group
-eventlet @ git+git://github.com/eventlet/eventlet.git@c74e867cf99bb7b9708b33a294656c4abbc0edec
 flask
 flask_cors
-flask-socketio
+flask_socketio
 ipython
 jinja2
 jupyter
 jupyter_client
 lxml
-nbclient
+nbclient==0.5.0
 nbconvert==5.5.0
 nbformat
 python-dotenv
+python-socketio
+watchgod

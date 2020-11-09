@@ -1,0 +1,4 @@
+fsspec==0.8.3
+kubernetes
+s3fs==0.5.1
+supervisor

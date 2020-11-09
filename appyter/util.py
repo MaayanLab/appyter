@@ -1,23 +1,18 @@
+import json
 import urllib.parse
-from werkzeug.utils import secure_filename
+from werkzeug.security import safe_join
 
 def try_json_loads(v):
-  import json
   try:
     return json.loads(v)
   except:
     return v
 
-def try_load_list(v):
-  v = try_json_loads(v)
-  if type(v) in [list, tuple, set, frozenset]:
-    return list(v)
-  elif type(v) == str:
-    return v.split(',')
-  elif v is None:
-    return []
+def try_json_dumps(v):
+  if type(v) == str:
+    return v
   else:
-    raise Exception(f"Unrecognized type for list ({type(v)})")
+    return json.dumps(v)
 
 def dict_filter_none(d):
   return { k: v for k, v in d.items() if v }
@@ -26,6 +21,15 @@ def join_routes(*routes):
   ''' Utility function for joining routes while striping extraneous slashes
   '''
   return '/' + '/'.join([route.strip('/') for route in routes if route.strip('/')])
+
+def secure_filepath(filepath):
+  ''' Ensures this will be a sanitized relative path
+  '''
+  secured_filepath = safe_join('.', filepath)
+  assert secured_filepath is not None, "Filepath wasn't secure"
+  secured_filepath = secured_filepath[2:]
+  assert secured_filepath, "Filepath became empty while securing"
+  return secured_filepath
 
 def secure_url(url):
   parsed = urllib.parse.urlparse(url)
@@ -70,3 +74,33 @@ def importdir_deep(_dirname_, _package_, _globals_, filter_mod=lambda m, k, v: n
       for k, v in mod.__dict__.items()
       if filter_mod(mod, k, v)
     })
+
+def click_option_setenv(spec, envvar=None, **kwargs):
+  ''' Like click.option but explicitly set os.environ as well.
+  '''
+  import os, re, functools, click
+  m = re.match(r'^--(.+)$', spec)
+  assert m
+  var = m.group(1).replace('-', '_')
+  def decorator(func):
+    @click.option(spec, envvar=envvar, **kwargs)
+    @functools.wraps(func)
+    def wrapper(**kwargs):
+      if kwargs.get(var) is not None:
+        os.environ[envvar] = try_json_dumps(kwargs[var])
+      return func(**kwargs)
+    return wrapper
+  return decorator
+
+def click_argument_setenv(var, envvar=None, **kwargs):
+  ''' Like click.argument but explicitly set os.environ as well.
+  '''
+  import os, re, functools, click
+  def decorator(func):
+    @click.argument(var, envvar=envvar, **kwargs)
+    @functools.wraps(func)
+    def wrapper(**kwargs):
+      os.environ[envvar] = try_json_dumps(kwargs[var.replace('-', '_')])
+      return func(**kwargs)
+    return wrapper
+  return decorator

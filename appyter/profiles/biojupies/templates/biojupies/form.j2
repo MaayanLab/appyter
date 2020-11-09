@@ -2,7 +2,7 @@
 
 {% block body %}
 <div class="container">
-  <form method="POST" enctype="multipart/form-data" action="./{{ _session }}/">
+  <form method="POST" enctype="multipart/form-data" action="">
     {% with orphaned_fields = pyeval("[field for field in _fields if field.get('type') != 'section' and not field['args'].get('section')]", _fields=_fields) %}
       {% if orphaned_fields %}
         {{ SectionField(
@@ -19,7 +19,6 @@
       ) }}
     {% endfor %}
     <div class="row">
-      <input name="_session" type="text" style="display: none;" value="{{ _session }}" />
       <div class="col-sm-12">
         &nbsp;
       </div>

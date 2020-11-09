@@ -1,0 +1,11 @@
+<div id={{ this.args.name|jsonify }} class="loading">
+  <script>
+    require(['svelte'], function(svelte) {
+      svelte.render(
+        document.getElementById({{ this.args.name|jsonify }}),
+        {{ this.js_url|jsonify }},
+        JSON.parse(atob('{{ this|jsonify|btoa }}'))
+      )
+    })
+  </script>
+</div>

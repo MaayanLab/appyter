@@ -1,92 +1,84 @@
 import os
-import sys
+import aiohttp
+import asyncio
 import traceback
-import functools
 from subprocess import PIPE
-from flask import current_app, request, copy_current_request_context, session, abort
-from flask_socketio import emit
+import logging
+logger = logging.getLogger(__name__)
 
-from appyter.render.flask_app import socketio
-from appyter.render.flask_app.core import core, post_index_html_dynamic, generate_session_id
-from appyter.render.flask_app.util import sanitize_uuid
+from appyter.render.flask_app.core import prepare_data, prepare_results
+from appyter.render.flask_app.socketio import socketio
+from appyter.render.flask_app.util import sanitize_sha1sum, generate_uuid, join_routes
+from appyter.ext.fs import Filesystem
 
-from appyter.context import get_jinja2_env
-from appyter.render.nbconstruct import render_nb_from_nbtemplate
-
-@socketio.on('session')
-def _(data):
-  if not data:
-    print('creating new session')
-    data = dict(
-      _session=generate_session_id()
-    )
-    emit('session', data)
-  print('session', data, request.sid)
-  session[request.sid] = dict(session.get(request.sid, {}), _session=sanitize_uuid(data['_session']))
-  print(session)
-
-@socketio.on('disconnect')
-def _():
-  print('disconnect', request.sid)
-  if request.sid in session:
-    del session[request.sid]
-  print(session)
-
+# construct/join a notebook
 @socketio.on('submit')
-def submit(data):
-  print('submit', data)
-  # WARNING: this depends on FileFields taking care of filename sanity checking
-  post_index_html_dynamic(data)
-  # TODO: deal with possible redirect
-
-@socketio.on('init')
-def init(data):
-  print('init')
-  session_id = sanitize_uuid(data.get('_session'))
-  if session_id is None:
-    abort(404)
-    return
-  session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
-  emit('status', 'Notebook created, queuing execution')
-  if not current_app.config['DEBUG']:
-    from eventlet.green.subprocess import Popen
+async def submit(sid, data):
+  async with socketio.session(sid) as sess:
+    config = sess['config']
+    request_url = sess['request_url']
+  #
+  if type(data) == dict:
+    data = prepare_data(data)
+    result_hash = prepare_results(data)
+  elif type(data) == str:
+    result_hash = sanitize_sha1sum(data)
+    assert result_hash is not None
   else:
-    from subprocess import Popen
-  socketio.start_background_task(
-    copy_current_request_context(nbexecute),
-    cwd=session_dir,
-    ipynb=current_app.config['IPYNB'],
-    emit=emit,
-    Popen=Popen,
+    raise Exception('Unrecognized data type')
+  #
+  socketio.enter_room(sid, result_hash)
+  await socketio.emit('status', 'Queuing execution', sid)
+  job = dict(
+    cwd=Filesystem.join(config['DATA_DIR'], 'output', result_hash),
+    ipynb=os.path.basename(config['IPYNB']),
+    session=result_hash,
+    id=generate_uuid(),
   )
+  #
+  if config['DISPATCHER_URL']:
+    job['url'] = join_routes(config['DISPATCHER_URL'], 'socket.io').lstrip('/') + '/'
+  else:
+    job['url'] = request_url
+  #
+  if config['DISPATCHER_IMAGE']:
+    job['image'] = config['DISPATCHER_IMAGE']
+  #
+  if config['DISPATCHER']:
+    queued = False
+    backoff = 1
+    while not queued:
+      try:
+        async with aiohttp.ClientSession(headers={'Content-Type': 'application/json'}) as client:
+          async with client.post(config['DISPATCHER'], json=job) as resp:
+            queue_size = await resp.json()
+            await socketio.emit('status', f"Queued successfully, you are at position {queue_size} in the queue", sid)
+            queued = True
+      except asyncio.CancelledError:
+        raise
+      except Exception:
+        logger.error(traceback.format_exc())
+        if backoff < 60:
+          await socketio.emit('status', f"Failed to contact orchestrator, trying again in {backoff}s...", sid)
+          asyncio.sleep(backoff)
+          backoff *= 2
+        else:
+          await socketio.emit('error', 'Failed to contact orchestrator, please try again later.', sid)
+          break
+  else:
+    from appyter.orchestration.job.job import execute_async
+    await execute_async(job)
 
-def nbexecute(cwd='', ipynb='', emit=print, Popen=None):
-  if request.sid not in session:
-    session[request.sid] = {}
-  if session[request.sid].get('started'):
-    return
-  session[request.sid]['started'] = True
-  print('nbexecute', cwd)
-  import json
-  if Popen is None:
-    from subprocess import Popen
-  with Popen(
-    [
-      sys.executable,
-      '-u',
-      '-m', 'appyter',
-      'nbexecute',
-      '--cwd='+cwd,
-      ipynb,
-    ],
-    env=dict(
-      PYTHONPATH=':'.join(sys.path),
-      PATH=os.environ['PATH'],
-    ),
-    stdout=PIPE,
-  ) as proc:
-    packet = proc.stdout.readline()
-    while packet:
-      msg = json.loads(packet)
-      emit(msg['type'], msg['data'])
-      packet = proc.stdout.readline()
+@socketio.on('join')
+async def _(sid, data):
+  socketio.enter_room(sid, data)
+  await socketio.emit('joined', dict(id=sid, session=data), room=data)
+
+@socketio.on('leave')
+async def _(sid, data):
+  await socketio.emit('left', dict(id=sid, session=data), room=data)
+  socketio.leave_room(sid, data)
+
+@socketio.on('msg')
+async def _(sid, data):
+  await socketio.emit(data['type'], data['data'], to=data.get('to'), room=data.get('session'))

@@ -2,8 +2,23 @@
 
 {% block style %}
 {{ super() }}
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
+{% endblock %}
+
+{% block script_head %}
+{{ super() }}
+<script>
+  require.config({
+    paths: {
+      'bootstrap': {{ url_for('static', filename='js/lib/bootstrap/bootstrap.bundle.min')|jsonify }},
+      'select2': {{ url_for('static', filename='js/lib/select2/select2.min')|jsonify }},
+    },
+    shim: {
+      'bootstrap': ['jquery'],
+      'select2': ['jquery'],
+    }
+  })
+</script>
 {% endblock %}
 
 {% block body %}
@@ -12,16 +27,4 @@
 
 {% block script %}
 {{ super() }}
-<script>
-  require.config({
-    paths: {
-      'bootstrap': 'https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min',
-      'select2': 'https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min',
-    },
-    shim: {
-      'bootstrap': ['jquery'],
-      'select2': ['jquery'],
-    }
-  })
-</script>
 {% endblock %}

@@ -1,0 +1,29 @@
+[supervisord]
+
+[program:nginx]
+process_name=%(program_name)s_%(process_num)d
+numprocs=1
+startsecs=0
+startretries=5
+autostart=true
+command=/usr/sbin/nginx -c {{ _tmp_fs.path('nginx.conf') }}
+autorestart=true
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+
+[program:appyter]
+process_name=%(program_name)s_%(process_num)d
+{#- nuprocs={{ _config.N_PROCS }} #}
+numprocs=1
+numprocs_start=1
+autostart=true
+autorestart=true
+{#- NOTE: a `'` anywhere in `v` would cause an issue, we should come up with a way around this #}
+environment={% for k, v in _config.items() %}{% if v is not none %}{{ k }}='{{ v|jsonify }}'{% if not loop.last %},{% endif %}{% endif %}{% endfor %}
+command={{ sys.executable }} -u -m appyter --socket={{ _tmp_fs.path() }}%(program_name)s_%(process_num)d.sock
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0

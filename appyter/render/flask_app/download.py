@@ -1,102 +1,156 @@
-import os
+import aiohttp
 import traceback
-import urllib.request, urllib.error
-from flask import request, copy_current_request_context, current_app, session
-from flask_socketio import emit
+import logging
+logger = logging.getLogger(__name__)
 
+from appyter.ext.fs import Filesystem
 from appyter.render.flask_app.socketio import socketio
+from appyter.render.flask_app.util import secure_filepath, secure_url, sha1sum_io, generate_uuid
 
-from appyter.render.flask_app.util import secure_filename, secure_url
-
-# remove user agent from urllib.request requests
-_opener = urllib.request.build_opener()
-_opener.addheaders = [('Accept', '*/*')]
-urllib.request.install_opener(_opener)
+# organize file by content hash
+def organize_file_content(data_fs, tmp_fs, tmp_path):
+  with tmp_fs.open(tmp_path, 'rb') as fr:
+    content_hash = sha1sum_io(fr)
+  data_path = Filesystem.join('input', content_hash)
+  if not data_fs.exists(data_path):
+    Filesystem.mv(src_fs=tmp_fs, src_path=tmp_path, dst_fs=data_fs, dst_path=data_path)
+    data_fs.chmod_ro(data_path)
+  return content_hash
 
 # download from remote
-@socketio.on('download_start')
-def download(data):
-  print('file download start')
-  session_id = session[request.sid]['_session']
-  session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
-  os.makedirs(current_app.config['DATA_DIR'], exist_ok=True)
-  os.makedirs(session_dir, exist_ok=True)
-  name = data.get('name')
-  url = secure_url(data.get('url'))
-  filename = secure_filename(data.get('file'))
+async def download_with_progress_and_hash(sid, data_fs, name, url, path, filename):
   # TODO: worry about files that are too big/long
-  @copy_current_request_context
-  def download_with_progress(name, url, path, filename, emit):
-    emit('download_start', dict(name=name, filename=filename))
+  with Filesystem('tmpfs://') as tmp_fs:
+    await socketio.emit('download_start', dict(name=name, filename=filename), room=sid)
     try:
-      _, response = urllib.request.urlretrieve(
-        url, filename=path,
-        reporthook=lambda chunk, chunk_size, total_size: emit(
-          'download_progress', dict(
-            name=name,
-            chunk=chunk,
-            chunk_size=chunk_size,
-            total_size=total_size,
-          )
-        ),
-      )
-      # NOTE: this may become an issue if ever someone wants actual html
-      assert response.get_content_type() != 'text/html', 'Expected data, got html'
+      async with aiohttp.ClientSession() as client:
+        async with client.get(url) as resp:
+          # NOTE: this may become an issue if ever someone wants actual html
+          assert resp.content_type != 'text/html', 'Expected data, got html'
+          resp.headers.get('Content-Length', -1)
+          chunk = 0
+          chunk_size = 1024*8
+          total_size = resp.headers.get('Content-Length', -1)
+          async def reporthook(chunk):
+            await socketio.emit(
+              'download_progress',
+              dict(name=name, chunk=chunk, chunk_size=chunk_size, total_size=total_size),
+              room=sid,
+            )
+          with tmp_fs.open(path, 'wb') as fw:
+            await reporthook(chunk)
+            while buf := await resp.content.read(chunk_size):
+              fw.write(buf)
+              chunk += 1
+              await reporthook(chunk)
     except Exception as e:
-      print('download error')
-      traceback.print_exc()
-      emit('download_error', dict(name=name, filename=filename, url=url, error=str(e)))
+      logger.error(f"download error: {traceback.format_exc()}")
+      await socketio.emit(
+        'download_error',
+        dict(name=name, filename=filename, url=url, error=str(e)),
+        room=sid,
+      )
     else:
-      emit('download_complete', dict(name=name, filename=filename))
+      await socketio.emit(
+        'download_complete',
+        dict(
+          name=name, filename=filename,
+          full_filename='/'.join((organize_file_content(data_fs, tmp_fs, path), filename)),
+        ),
+        room=sid,
+      )
+
+@socketio.on('download_start')
+async def download(sid, data):
+  async with socketio.session(sid) as sess:
+    config = sess['config']
   #
-  emit('download_queued', dict(name=name, filename=filename))
-  socketio.start_background_task(
-    download_with_progress,
+  data_fs = Filesystem(config['DATA_DIR'])
+  name = data.get('name')
+  # TODO: hash based on url?
+  # TODO: s3 bypass
+  url = secure_url(data.get('url'))
+  filename = secure_filepath(data.get('file'))
+  await socketio.emit('download_queued', dict(name=name, filename=filename), room=sid)
+  await download_with_progress_and_hash(
+    sid=sid,
+    data_fs=data_fs,
     name=name,
     url=url,
-    path=os.path.join(session_dir, filename),
+    path=generate_uuid(),
     filename=filename,
-    emit=emit,
   )
+
 
 # upload from client
 @socketio.on("siofu_start")
-def siofu_start(data):
-  print('file upload start')
+async def siofu_start(sid, data):
   try:
-    session_id = session[request.sid]['_session']
-    session_dir = os.path.join(current_app.config['DATA_DIR'], session_id)
-    filename = secure_filename(data.get('name'))
-    os.makedirs(current_app.config['DATA_DIR'], exist_ok=True)
-    os.makedirs(session_dir, exist_ok=True)
-    assert filename != '', 'Invalid Filename'
-    session[request.sid] = dict(session[request.sid], **{
-      'file_%d' % (data.get('id')): dict(data,
+    path = generate_uuid()
+    filename = secure_filepath(data.get('name'))
+    tmp_fs = Filesystem('tmpfs://')
+    async with socketio.session(sid) as sess:
+      sess['file_%d' % (data.get('id'))] = dict(
+        data,
+        path=path,
         name=filename,
         bytesLoaded=0,
-        fh=open(os.path.join(session_dir, filename), 'wb'),
-      ),
-    })
-    emit('siofu_ready', {
-      'id': data.get('id'),
-      'name': None,
-    })
+        tmp_fs=tmp_fs,
+        fh=tmp_fs.open(path, 'wb'),
+      )
+    await socketio.emit(
+      'siofu_ready',
+      {
+        'id': data.get('id'),
+        'name': None,
+      },
+      room=sid,
+    )
   except Exception as e:
-    traceback.print_exc()
-    emit('siofu_error', str(e))
+    logger.error(traceback.format_exc())
+    await socketio.emit('siofu_error', str(e), room=sid)
 
 @socketio.on("siofu_progress")
-def siofu_progress(data):
-  session[request.sid]['file_%d' % (data['id'])]['fh'].write(data['content'])
-  emit("siofu_chunk", {
-    'id': data['id'],
-  })
+async def siofu_progress(sid, evt):
+  async with socketio.session(sid) as sess:
+    sess['file_%d' % (evt['id'])]['fh'].write(evt['content'])
+  logger.debug(f"progress: {evt}")
+  await socketio.emit("siofu_chunk", dict(
+    id=evt['id'],
+  ), room=sid)
 
 @socketio.on("siofu_done")
-def siofu_done(data):
-  print('file upload complete')
-  session[request.sid]['file_%d' % (data['id'])]['fh'].close()
-  del session[request.sid]['file_%d' % (data['id'])]
-  emit('siofu_complete', {
-    'id': data['id'],
-  })
+async def siofu_done(sid, evt):
+  async with socketio.session(sid) as sess:
+    sess['file_%d' % (evt['id'])]['fh'].close()
+    config = sess['config']
+    data_fs = Filesystem(config['DATA_DIR'])
+    tmp_fs = sess['file_%d' % (evt['id'])]['tmp_fs']
+    path = sess['file_%d' % (evt['id'])]['path']
+    filename = sess['file_%d' % (evt['id'])]['name']
+    content_hash = organize_file_content(data_fs, tmp_fs, path)
+    tmp_fs.close()
+    del sess['file_%d' % (evt['id'])]
+  #
+  await socketio.emit('siofu_complete', dict(
+    id=evt['id'],
+    detail=dict(
+      full_filename='/'.join((content_hash, filename)),
+    )
+  ), room=sid)
+
+# upload from client with POST
+def upload_from_request(req, fnames):
+  from flask import current_app
+  data_fs = Filesystem(current_app.config['DATA_DIR'])
+  data = dict()
+  for fname in fnames:
+    fh = req.files.get(fname)
+    if fh:
+      filename = secure_filepath(fh.filename)
+      path = generate_uuid()
+      with Filesystem('tmpfs://') as tmp_fs:
+        with tmp_fs.open(path, 'w') as fw:
+          fh.save(fw)
+        data[fname] = '/'.join((organize_file_content(data_fs, tmp_fs, path), filename))
+  return data

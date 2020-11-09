@@ -1,0 +1,46 @@
+version: '3'
+services:
+  appyter-example:
+    build:
+      context: ../
+      args:
+        appyter_version: git+git://github.com/Maayanlab/appyter.git
+    image: maayanlab/appyter-example:latest
+    environment:
+      - APPYTER_HOST=0.0.0.0
+      - APPYTER_PREFIX=/example
+      - APPYTER_DATA_DIR=s3://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@s3:9000/${MINIO_BUCKET}/example/
+      - APPYTER_DISPATCHER=http://appyter-orchestrator:5000
+      - APPYTER_DISPATCHER_IMAGE=maayanlab/appyter-example:latest
+      - APPYTER_DISPATCHER_URL=http://appyter-example:5000/example
+    ports:
+      - 5000:5000
+  # the parallel execution orchestrator
+  appyter-orchestrator:
+    build:
+      context: ./appyter
+      args:
+        appyter_version: git+git://github.com/Maayanlab/appyter.git
+    image: maayanlab/appyter:latest
+    environment:
+      - APPYTER_HOST=0.0.0.0
+      - APPYTER_JOBS=2
+      - APPYTER_DISPATCH=docker
+      - APPYTER_DEBUG=false
+    command:
+      - appyter
+      - orchestration
+      - dispatcher
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  # the s3 data storage
+  s3:
+    build:
+      context: ./s3
+    image: maayanlab/public-s3:latest
+    environment:
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    ports:
+      - 9000:9000

@@ -5,8 +5,9 @@ import nbformat as nbf
 from copy import deepcopy
 
 from appyter.cli import cli
+from appyter.ext.fs import Filesystem
 from appyter.context import get_env, get_jinja2_env
-from appyter.parse.nb import nb_from_ipynb_file, nb_to_ipynb_io
+from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.parse.nbtemplate import cell_match
 
 
@@ -66,16 +67,16 @@ def render_nb_from_nbtemplate(env, nb):
   return nb
 
 @cli.command(help='Construct jupyter notebook from appyter and arguments')
-@click.option('--context', envvar='CONTEXT', default='-', type=click.File('r'), help='JSON serialized context mapping field names to values')
-@click.option('--output', envvar='OUTPUT', default='-', type=click.File('w'), help='The output location of the serialized jupyter notebook')
-@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
-@click.argument('ipynb', envvar='IPYNB')
+@click.option('--context', envvar='APPYTER_CONTEXT', default='-', type=click.File('r'), help='JSON serialized context mapping field names to values')
+@click.option('--output', envvar='APPYTER_OUTPUT', default='-', type=click.File('w'), help='The output location of the serialized jupyter notebook')
+@click.option('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click.argument('ipynb', envvar='APPYTER_IPYNB')
 def nbconstruct(cwd, ipynb, context, output, **kwargs):
   context = json.load(context)
   env = get_jinja2_env(
     config=get_env(cwd=cwd, ipynb=ipynb, **kwargs),
     context=context,
   )
-  nbtemplate = nb_from_ipynb_file(os.path.join(cwd, ipynb))
+  nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   nb_to_ipynb_io(nb, output)

@@ -1,12 +1,13 @@
 import os
 import glob
 import click
+import logging
+logger = logging.getLogger(__name__)
 from appyter.cli import cli
-from appyter.util import importdir_deep, join_routes, try_json_loads, try_load_list
+from appyter.util import importdir_deep, join_routes, try_json_loads
 
 def find_fields_dir_mappings(config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   cwd = config['CWD']
   profile = config['PROFILE']
   mappings = {}
@@ -17,10 +18,7 @@ def find_fields_dir_mappings(config=None):
   return mappings
 
 def find_fields(config=None):
-  if config is None:
-    config = get_env()
-  cwd = config['CWD']
-  profile = config['PROFILE']
+  assert config is not None
   from appyter.fields import Field
   ctx = {}
   for _dirname_, _package_ in find_fields_dir_mappings(config=config).items():
@@ -34,7 +32,7 @@ def find_fields(config=None):
   return ctx
 
 @cli.command(help='List the available fields')
-@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click.option('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 def list_fields(**kwargs):
   fields = find_fields(get_env(ipynb='app.ipynb', **kwargs))
   field_name_max_size = max(map(len, fields.keys()))
@@ -47,8 +45,8 @@ def list_fields(**kwargs):
     print(field.ljust(field_name_max_size+1), doc_first_line)
 
 @cli.command(help='Describe a field using its docstring')
-@click.option('--cwd', envvar='CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
-@click.argument('field', envvar='FIELD', type=str)
+@click.option('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click.argument('field', envvar='APPYTER_FIELD', type=str)
 def describe_field(field, **kwargs):
   fields = find_fields(get_env(ipynb='app.ipynb', **kwargs))
   assert field in fields, 'Please choose a valid field name, see list-fields for options'
@@ -61,8 +59,7 @@ def describe_field(field, **kwargs):
 
 
 def find_filters_dir_mappings(config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   cwd = config['CWD']
   profile = config['PROFILE']
   mappings = {}
@@ -73,10 +70,7 @@ def find_filters_dir_mappings(config=None):
   return mappings
 
 def find_filters(config=None):
-  if config is None:
-    config = get_env()
-  cwd = config['CWD']
-  profile = config['PROFILE']
+  assert config is not None
   ctx = {}
   for _dirname_, _package_ in find_filters_dir_mappings(config=config).items():
     if os.path.isdir(_dirname_):
@@ -89,8 +83,7 @@ def find_filters(config=None):
   return ctx
 
 def find_blueprints_dir_mappings(config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   cwd = config['CWD']
   profile = config['PROFILE']
   mappings = {}
@@ -110,10 +103,7 @@ def filter_blueprints(m, k, v):
   return False
 
 def find_blueprints(config=None):
-  if config is None:
-    config = get_env()
-  cwd = config['CWD']
-  profile = config['PROFILE']
+  assert config is not None
   ctx = {}
   for _dirname_, _package_ in find_blueprints_dir_mappings(config=config).items():
     if os.path.isdir(_dirname_):
@@ -126,21 +116,15 @@ def find_blueprints(config=None):
   return ctx
 
 def find_templates_dir(config=None):
-  if config is None:
-    config = get_env()
-  cwd = config['CWD']
-  profile = config['PROFILE']
+  assert config is not None
   return list(filter(os.path.isdir, [
-    os.path.abspath(os.path.join(cwd, 'templates')) + os.path.sep,
-    os.path.join(os.path.dirname(__file__), 'profiles', profile, 'templates') + os.path.sep,
+    os.path.abspath(os.path.join(config['CWD'], 'templates')) + os.path.sep,
+    os.path.join(os.path.dirname(__file__), 'profiles', config['PROFILE'], 'templates') + os.path.sep,
     os.path.join(os.path.dirname(__file__), 'profiles', 'default', 'templates') + os.path.sep,
   ]))
 
 def get_extra_files(config=None):
-  if config is None:
-    config = get_env()
-  cwd = config['CWD']
-  profile = config['PROFILE']
+  assert config is not None
   dirs = [
     *find_templates_dir(config=config),
     *find_filters_dir_mappings(config=config).keys(),
@@ -159,12 +143,14 @@ def get_extra_files(config=None):
       *glob.glob(os.path.join(d, '**', '_*'), recursive=True),
     }))
   }
-  paths.add(os.path.abspath(os.path.join(cwd, config['IPYNB'])))
+  paths.add(os.path.abspath(os.path.join(config['CWD'], config['IPYNB'])))
   return list(paths)
 
+def get_appyter_directory(path):
+  return os.path.abspath(os.path.join(os.path.dirname(__file__), path))
+
 def get_jinja2_env(context={}, config=None):
-  if config is None:
-    config = get_env()
+  assert config is not None
   #
   import sys
   from appyter.fields import build_fields
@@ -179,35 +165,53 @@ def get_jinja2_env(context={}, config=None):
   env.filters.update(**find_filters(config=config))
   env.globals.update(**find_filters(config=config))
   env.globals.update(_config=config)
-  env.globals.update(**build_fields(find_fields(config=config), context=context))
+  env.globals.update(**build_fields(find_fields(config=config), context=context, env=env))
   return env
 
-def get_env_from_kwargs(**kwargs):
+_mode = None
+def get_env_from_kwargs(mode='default', **kwargs):
+  global _mode
+  if _mode is None:
+    _mode = mode
+  else:
+    mode = _mode
+  #
+  import os
   import sys
   import uuid
-  assert kwargs != {}
-  PREFIX = kwargs.get('prefix', os.environ.get('PREFIX', '/'))
-  PROFILE = kwargs.get('profile', os.environ.get('PROFILE', 'default'))
-  EXTRAS = set(try_load_list(kwargs.get('extras', os.environ.get('EXTRAS', ''))))
-  HOST = kwargs.get('host', os.environ.get('HOST', '127.0.0.1'))
-  PORT = try_json_loads(kwargs.get('port', os.environ.get('PORT', 5000)))
-  PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('PROXY', False)))
-  CWD = os.path.realpath(kwargs.get('cwd', os.environ.get('CWD', os.getcwd())))
-  DATA_DIR = kwargs.get('data-dir', os.environ.get('DATA_DIR', 'data'))
-  MAX_THREADS = try_json_loads(kwargs.get('max-threads', os.environ.get('MAX_THREADS', 10)))
-  SECRET_KEY = kwargs.get('secret-key', os.environ.get('SECRET_KEY', str(uuid.uuid4())))
-  DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('DEBUG', 'true')))
-  STATIC_DIR = kwargs.get('static-dir', os.path.abspath(os.path.join(CWD, 'static')))
+  PREFIX = try_json_loads(kwargs.get('prefix', os.environ.get('APPYTER_PREFIX', '/')))
+  PROFILE = try_json_loads(kwargs.get('profile', os.environ.get('APPYTER_PROFILE', 'default')))
+  EXTRAS = try_json_loads(kwargs.get('extras', os.environ.get('APPYTER_EXTRAS', '')))
+  HOST = try_json_loads(kwargs.get('host', os.environ.get('APPYTER_HOST', '127.0.0.1')))
+  PORT = try_json_loads(kwargs.get('port', os.environ.get('APPYTER_PORT', 5000)))
+  PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('APPYTER_PROXY', False)))
+  CWD = try_json_loads(os.path.abspath(kwargs.get('cwd', os.environ.get('APPYTER_CWD', str(os.getcwd())))))
+  DATA_DIR = try_json_loads(kwargs.get('data_dir', os.environ.get('APPYTER_DATA_DIR', 'data')))
+  DISPATCHER = try_json_loads(kwargs.get('dispatcher', os.environ.get('APPYTER_DISPATCHER')))
+  DISPATCHER_URL = try_json_loads(kwargs.get('dispatcher_url', os.environ.get('APPYTER_DISPATCHER_URL')))
+  DISPATCHER_IMAGE = try_json_loads(kwargs.get('dispatcher_image', os.environ.get('APPYTER_DISPATCHER_IMAGE')))
+  SECRET_KEY = try_json_loads(kwargs.get('secret_key', os.environ.get('APPYTER_SECRET_KEY', str(uuid.uuid4()))))
+  DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('APPYTER_DEBUG', 'true')))
+  STATIC_DIR = try_json_loads(kwargs.get('static_dir', os.environ.get('APPYTER_STATIC_DIR', os.path.join(CWD, 'static'))))
   STATIC_PREFIX = join_routes(PREFIX, 'static')
-  IPYNB = kwargs.get('ipynb', os.environ.get('IPYNB'))
-  assert IPYNB != None, 'ipynb was not found'
+  IPYNB = try_json_loads(kwargs.get('ipynb', os.environ.get('APPYTER_IPYNB')))
+  #
+  if mode != 'magic' and (IPYNB is None or not os.path.isfile(os.path.join(CWD, IPYNB))):
+    logger.error('ipynb was not found')
+  #
+  if '://' not in DATA_DIR and not os.path.isabs(DATA_DIR):
+    DATA_DIR = os.path.join(CWD, DATA_DIR)
+  #
+  if '://' not in STATIC_DIR and not os.path.isabs(STATIC_DIR):
+    STATIC_DIR = os.path.join(CWD, STATIC_DIR)
   #
   if os.path.abspath(CWD) not in sys.path:
-    sys.path.insert(0, os.path.abspath(CWD))
-  if os.path.abspath(CWD) not in os.environ['PATH'].split(':'):
-    os.environ['PATH'] = os.path.abspath(CWD) + ':' + os.environ['PATH']
+    sys.path.insert(0, CWD)
+  if CWD not in os.environ['PATH'].split(':'):
+    os.environ['PATH'] = CWD + ':' + os.environ['PATH']
   #
   return dict(
+    MODE=mode,
     PREFIX=PREFIX,
     PROFILE=PROFILE,
     EXTRAS=EXTRAS,
@@ -216,7 +220,9 @@ def get_env_from_kwargs(**kwargs):
     PROXY=PROXY,
     CWD=CWD,
     DATA_DIR=DATA_DIR,
-    MAX_THREADS=MAX_THREADS,
+    DISPATCHER=DISPATCHER,
+    DISPATCHER_URL=DISPATCHER_URL,
+    DISPATCHER_IMAGE=DISPATCHER_IMAGE,
     SECRET_KEY=SECRET_KEY,
     DEBUG=DEBUG,
     STATIC_DIR=STATIC_DIR,
@@ -267,9 +273,9 @@ def get_env(**kwargs):
   #
   try:
     return get_env_from_click()
-  except RuntimeError as e:
+  except RuntimeError:
     pass
-  except AssertionError as e:
+  except AssertionError:
     pass
   #
   return config

@@ -1,17 +1,1 @@
-<div class="ipynb-field">
-    <div class="form-group">
-        <p>{{ this.args.description }}</p>
-        <div class="custom-file" dropzone="copy">
-            <input type="file" class="custom-file-input" id="{{ this.args.name }}" name="{{ this.args.name }}" >
-            <label class="custom-file-label" for="{{ this.args.name }}">Choose file</label>
-        </div>
-        {% if this.args.examples %}
-            <ul style="list-style-type: none">
-            <span>Load example:</span>
-            {% for example_name, example_url in this.args.examples.items() %}
-                <li style="display: inline">&nbsp;<a href="javascript:load_file('{{ this.args.name }}', '{{ example_url }}', '{{ example_name }}')">{{ example_name }}</a>&nbsp;</li>
-            {% endfor %}
-            <ul>
-        {% endif %}
-    </div>
-</div>
+{% include "fragments/svelte-field.j2" %}
