@@ -21,6 +21,8 @@ def create_app(**kwargs):
   import appyter.render.flask_app.static
   import appyter.render.flask_app.download
   import appyter.render.flask_app.execution
+  if kwargs['debug']:
+    import appyter.render.flask_app.livereload
   #
   from appyter.context import get_env, find_blueprints
   from appyter.util import join_routes
@@ -98,14 +100,19 @@ def flask_app(**kwargs):
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger(__package__).setLevel(logging.INFO)
   #
-  if kwargs.get('debug'):
+  if kwargs.get('socket'):
+    from aiohttp import web
+    socket = kwargs['socket']
+    logging.info(f"Launching aiohttp server on {socket}")
+    app = create_app(**kwargs)
+    if ':' in socket:
+      host, port = socket.split(':')
+      web.run_app(app, host=host, port=int(port))
+    else:
+      web.run_app(app, path=socket)
+  elif kwargs.get('debug'):
     from appyter.render.flask_app.development import serve
     serve(__file__, **kwargs)
-  elif kwargs.get('socket'):
-    from aiohttp import web
-    logging.info(f"Launching aiohttp server on {kwargs['socket']}")
-    app = create_app(**kwargs)
-    web.run_app(app, path=kwargs['socket'])
   else:
     from appyter.render.flask_app.production import serve
     serve(__file__, **kwargs)

@@ -1,5 +1,4 @@
 aiohttp
-aiohttp-devtools
 aiohttp-wsgi
 bs4
 click
@@ -16,3 +15,4 @@ nbclient==0.5.0
 nbformat
 python-dotenv
 python-socketio
+watchgod

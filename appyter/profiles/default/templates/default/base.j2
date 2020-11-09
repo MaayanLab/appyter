@@ -62,6 +62,10 @@
             window.location.reload()
           }
         })
+        socket.on('livereload', function (data) {
+          console.debug('livereload')
+          window.location.reload()
+        })
       })
     </script>
     {% endif %}
