@@ -22,7 +22,7 @@ def render_nbtemplate_json_from_nbtemplate(env, nb):
 @click.option('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click.argument('ipynb', envvar='APPYTER_IPYNB')
 def nbinspect(cwd, ipynb, output, **kwargs):
-  env = get_jinja2_env(get_env(cwd=cwd, ipynb=ipynb, **kwargs))
+  env = get_jinja2_env(config=get_env(cwd=cwd, ipynb=ipynb, mode='inspect',  **kwargs))
   nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
   fields = render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
   json.dump(fields, output)

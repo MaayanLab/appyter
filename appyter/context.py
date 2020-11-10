@@ -196,7 +196,7 @@ def get_env_from_kwargs(mode='default', **kwargs):
   STATIC_PREFIX = join_routes(PREFIX, 'static')
   IPYNB = try_json_loads(kwargs.get('ipynb', os.environ.get('APPYTER_IPYNB')))
   #
-  if mode != 'magic' and (IPYNB is None or not os.path.isfile(os.path.join(CWD, IPYNB))):
+  if mode == 'default' and (IPYNB is None or not os.path.isfile(os.path.join(CWD, IPYNB))):
     logger.error('ipynb was not found')
   #
   if '://' not in DATA_DIR and not os.path.isabs(DATA_DIR):
