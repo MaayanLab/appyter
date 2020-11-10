@@ -74,7 +74,7 @@ def render_nb_from_nbtemplate(env, nb):
 def nbconstruct(cwd, ipynb, context, output, **kwargs):
   context = json.load(context)
   env = get_jinja2_env(
-    config=get_env(cwd=cwd, ipynb=ipynb, **kwargs),
+    config=get_env(cwd=cwd, ipynb=ipynb, mode='construct', **kwargs),
     context=context,
   )
   nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
