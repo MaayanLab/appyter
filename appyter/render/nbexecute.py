@@ -127,8 +127,8 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')
 @click.option('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click.argument('ipynb', envvar='APPYTER_IPYNB')
-def nbexecute(ipynb, emit, cwd):
+def nbexecute(ipynb, cwd):
   import asyncio
   loop = asyncio.get_event_loop()
-  loop.run_until_complete(nbexecute_async(ipynb=ipynb, emit=emit, cwd=cwd))
+  loop.run_until_complete(nbexecute_async(ipynb=ipynb, emit=json_emitter, cwd=cwd))
   loop.close()
