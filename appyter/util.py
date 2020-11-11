@@ -1,6 +1,9 @@
 import json
+import logging
 import urllib.parse
 from werkzeug.security import safe_join
+
+logger = logging.getLogger(__name__)
 
 def try_json_loads(v):
   try:
@@ -28,7 +31,9 @@ def secure_filepath(filepath):
   secured_filepath = safe_join('.', filepath)
   assert secured_filepath is not None, "Filepath wasn't secure"
   secured_filepath = secured_filepath[2:]
-  assert secured_filepath, "Filepath became empty while securing"
+  if not secured_filepath:
+    logger.warn("Filepath became empty while securing")
+    return ''
   return secured_filepath
 
 def secure_url(url):
