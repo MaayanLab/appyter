@@ -38,8 +38,11 @@
             
   <h1>Source code for appyter.util</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">urllib.parse</span>
 <span class="kn">from</span> <span class="nn">werkzeug.security</span> <span class="kn">import</span> <span class="n">safe_join</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="try_json_loads"><a class="viewcode-back" href="../../appyter.html#appyter.util.try_json_loads">[docs]</a><span class="k">def</span> <span class="nf">try_json_loads</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
   <span class="k">try</span><span class="p">:</span>
@@ -67,7 +70,9 @@
   <span class="n">secured_filepath</span> <span class="o">=</span> <span class="n">safe_join</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
   <span class="k">assert</span> <span class="n">secured_filepath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Filepath wasn&#39;t secure&quot;</span>
   <span class="n">secured_filepath</span> <span class="o">=</span> <span class="n">secured_filepath</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
-  <span class="k">assert</span> <span class="n">secured_filepath</span><span class="p">,</span> <span class="s2">&quot;Filepath became empty while securing&quot;</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">secured_filepath</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Filepath became empty while securing&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span>
   <span class="k">return</span> <span class="n">secured_filepath</span></div>
 
 <div class="viewcode-block" id="secure_url"><a class="viewcode-back" href="../../appyter.html#appyter.util.secure_url">[docs]</a><span class="k">def</span> <span class="nf">secure_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
