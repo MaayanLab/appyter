@@ -140,7 +140,9 @@
   async function init() {
     try {
       // Load notebook
-      const req = await fetch(nbdownload, {cache: 'reload'})
+      // https://developer.mozilla.org/en-US/docs/Web/API/Request/cache
+      // no-cache implies a check with the remote server no matter what, it still uses the cache if the resource hasn't changed
+      const req = await fetch(nbdownload, {cache: 'no-cache'})
       if (req.status === 404) {
         throw new Error('Notebook not found')
       }
