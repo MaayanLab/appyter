@@ -203,7 +203,7 @@
   <span class="p">)</span>
   <span class="n">env</span><span class="o">.</span><span class="n">filters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">find_filters</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">))</span>
   <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">find_filters</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">))</span>
-  <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+  <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">_os</span><span class="o">=</span><span class="n">os</span><span class="p">)</span>
   <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">build_fields</span><span class="p">(</span><span class="n">find_fields</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">),</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">env</span></div>
 
@@ -356,7 +356,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
     </div>
   </body>
 </html>
