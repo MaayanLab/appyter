@@ -164,7 +164,7 @@ def get_jinja2_env(context={}, config=None):
   )
   env.filters.update(**find_filters(config=config))
   env.globals.update(**find_filters(config=config))
-  env.globals.update(_config=config)
+  env.globals.update(_config=config, _os=os)
   env.globals.update(**build_fields(find_fields(config=config), context=context, env=env))
   return env
 
