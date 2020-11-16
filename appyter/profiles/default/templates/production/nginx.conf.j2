@@ -1,4 +1,9 @@
-{%- macro proxy(remote, ws) -%}
+{%- macro cache(name) -%}
+  proxy_cache_path {{ _os.path.join(_tmp_fs.path(), name + '.cache.d') }}
+    levels=1:2 keys_zone={{ name }}:10m max_size=1g
+    inactive=60m use_temp_path=off;
+{%- endmacro -%}
+{%- macro proxy(remote, ws, cache) -%}
       proxy_set_header Host $http_host;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
       {%- if ws %}
@@ -7,6 +12,12 @@
       proxy_set_header Connection "upgrade";
       {%- endif %}
       proxy_pass {{ remote }};
+      {%- if cache %}
+      proxy_cache {{ cache }};
+      proxy_cache_revalidate on;
+      proxy_cache_use_stale error timeout http_500 http_502 http_503 http_504;
+      proxy_cache_lock on;
+      {%- endif %}
 {%- endmacro -%}
 
 pid {{ _tmp_fs.path('nginx.pid') }};
@@ -43,9 +54,9 @@ http {
 
   client_body_buffer_size     10M;
   client_max_body_size        10M;
-  proxy_buffering off;
-  proxy_request_buffering off;
-  proxy_cache off;
+
+  {{ cache('appyter-core') }}
+  {{ cache('appyter-data') }}
 
   upstream appyter {
     {#- {% for n in range(1, _config.N_PROCS+1) %} #}
@@ -75,7 +86,7 @@ http {
       if ($request_method = GET) {
         rewrite ^(.*)/$ $1/index.html;
       }
-      {{ proxy('http://appyter', False) }}
+      {{ proxy('http://appyter', False, 'appyter-core') }}
     }
 
     location = {{ join_routes(_config.PREFIX, 'index.html') }} {
@@ -123,19 +134,21 @@ http {
       {%- elif _config.DATA_DIR.startswith('s3://') %}
       {%- with s3_url = s3_to_url(_config.DATA_DIR) %}
       rewrite ^{{ join_routes(_config.PREFIX, '([^/]+)', '(.+)') }}$ {{ join_routes(s3_url.path, 'output', '$1', '$2') }} break;
-      {{ proxy('http://s3', False) }}
+      {{ proxy('http://s3', False, 'appyter-data') }}
       {%- endwith %}
       {%- else %}
-      {{ proxy('http://appyter', False) }}
+      {{ proxy('http://appyter', False, 'appyter-data') }}
       {%- endif %}
     }
 
     location {{ _config.PREFIX }} {
-      {{ proxy('http://appyter', False) }}
+      {{ proxy('http://appyter', False, 'appyter-core') }}
     }
 
+    {%- if _config.PREFIX != '/' %}
     location / {
       return 301 {{ _config.PREFIX.rstrip('/') }}$request_uri;
     }
+    {%- endif %}
   }
 }
