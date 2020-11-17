@@ -185,7 +185,7 @@
   <div class="col-lg-3 bold text-lg-right my-auto">
     {args.label}
     {#if args.description}
-      <sup><i class="far fa-question-circle ml-1" data-toggle="tooltip" title="" data-original-title={args.description}></i></sup>
+      <sup  data-toggle="tooltip" title={args.description}><i class="far fa-question-circle ml-1"></i></sup>
     {/if}:
   </div>
   <div class="col-lg-6 pt-2 pt-lg-0">
