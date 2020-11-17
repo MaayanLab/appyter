@@ -54,8 +54,12 @@ const cp_files = [
     dest: path.join(root, 'appyter/profiles/default/static/js/lib/socketio-file-upload'),
   },
   {
-    src: path.join(root, 'js/node_modules/@fortawesome/fontawesome-free/js/all.min.js'),
-    dest: path.join(root, 'appyter/profiles/biojupies/static/js/lib/fontawesome'),
+    src: path.join(root, 'js/node_modules/@fortawesome/fontawesome-free/css/all.min.css'),
+    dest: path.join(root, 'appyter/profiles/biojupies/static/css/lib/fontawesome/css'),
+  },
+  {
+    src: path.join(root, 'js/node_modules/@fortawesome/fontawesome-free/webfonts/*'),
+    dest: path.join(root, 'appyter/profiles/biojupies/static/css/lib/fontawesome/webfonts'),
   },
   {
     src: path.join(root, 'js/node_modules/select2/dist/js/select2.min.js'),
