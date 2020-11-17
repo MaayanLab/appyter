@@ -40,7 +40,7 @@
 require(['jquery', 'bootstrap'], function ($) {
   $(document).ready(function () {
     $('.collapse').collapse({ toggle: false })
-    $('[data-toggle="tooltip"]').tooltip()
+    $('[data-toggle="tooltip"]').tooltip({ boundary: 'window' })
   })
 })
 </script>
