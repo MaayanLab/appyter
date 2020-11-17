@@ -2,16 +2,20 @@
 
 {% block body %}
 {{ super() }}
-<div class="container">
-  <form method="POST" enctype="multipart/form-data" action="">
-    {% for _field in _fields %}
-      {{ _field.render() }}
-    {% endfor %}
-    <div class="row">
-      <div class="col-sm-12">
-        <input type="submit" value="Submit" />
-      </div>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="container">
+      <form method="POST" enctype="multipart/form-data" action="">
+        {% for _field in _fields %}
+          {{ _field.render() }}
+        {% endfor %}
+        <div class="row">
+          <div class="col-sm-12">
+            <input type="submit" value="Submit" />
+          </div>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>
 {% endblock %}

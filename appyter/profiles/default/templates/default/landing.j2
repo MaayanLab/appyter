@@ -2,17 +2,21 @@
 
 {% block body %}
 {{ super() }}
-{% include "fragments/jupyter.j2" %}
+<div class="row">
+  <div class="col-sm-12">
+    {% include "fragments/jupyter.j2" %}
 
-<div id="_content" class="container loading">
-  <script>
-    require(['svelte'], function(svelte) {
-      svelte.render(
-        document.getElementById("_content"),
-        '{{ url_for('static', filename='js/landing.js') }}',
-        JSON.parse(atob('{{ ({'nbdownload': _nb, 'extras': _config.EXTRAS, 'debug': _config.DEBUG })|jsonify|btoa }}'))
-      )
-    })
-  </script>
+    <div id="_content" class="container loading">
+      <script>
+        require(['svelte'], function(svelte) {
+          svelte.render(
+            document.getElementById("_content"),
+            '{{ url_for('static', filename='js/landing.js') }}',
+            JSON.parse(atob('{{ ({'nbdownload': _nb, 'extras': _config.EXTRAS, 'debug': _config.DEBUG })|jsonify|btoa }}'))
+          )
+        })
+      </script>
+    </div>
+  </div>
 </div>
 {% endblock %}

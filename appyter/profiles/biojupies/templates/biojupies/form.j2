@@ -1,36 +1,40 @@
 {% extends "default/form.j2" %}
 
 {% block body %}
-<div class="container">
-  <form method="POST" enctype="multipart/form-data" action="">
-    {% with orphaned_fields = pyeval("[field for field in _fields if field.get('type') != 'section' and not field['args'].get('section')]", _fields=_fields) %}
-      {% if orphaned_fields %}
-        {{ SectionField(
-          name="_primary",
-          section=null,
-          title="Customize Your Notebook",
-          subtitle="Customize your notebook",
-        ).render(_fields=orphaned_fields) }}
-      {% endif %}
-    {% endwith %}
-    {% for _field in pyeval("[field for field in _fields if field.get('type') == 'section']", _fields=_fields) %}
-      {{ _field.render(
-        _fields=pyeval("[field for field in _fields if field['args']['section'] == _field['args']['name']]", _fields=_fields, _field=_field)
-      ) }}
-    {% endfor %}
-    <div class="row">
-      <div class="col-sm-12">
-        &nbsp;
-      </div>
-      <div class="col-sm-12 text-center">
-        <input
-          class="btn navigate white border-custom bg-blue nodecoration"
-          type="submit"
-          value="Submit"
-        />
-      </div>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="container">
+      <form method="POST" enctype="multipart/form-data" action="">
+        {% with orphaned_fields = pyeval("[field for field in _fields if field.get('type') != 'section' and not field['args'].get('section')]", _fields=_fields) %}
+          {% if orphaned_fields %}
+            {{ SectionField(
+              name="_primary",
+              section=null,
+              title="Customize Your Notebook",
+              subtitle="Customize your notebook",
+            ).render(_fields=orphaned_fields) }}
+          {% endif %}
+        {% endwith %}
+        {% for _field in pyeval("[field for field in _fields if field.get('type') == 'section']", _fields=_fields) %}
+          {{ _field.render(
+            _fields=pyeval("[field for field in _fields if field['args']['section'] == _field['args']['name']]", _fields=_fields, _field=_field)
+          ) }}
+        {% endfor %}
+        <div class="row">
+          <div class="col-sm-12">
+            &nbsp;
+          </div>
+          <div class="col-sm-12 text-center">
+            <input
+              class="btn navigate white border-custom bg-blue nodecoration"
+              type="submit"
+              value="Submit"
+            />
+          </div>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>
 {% endblock %}
 
