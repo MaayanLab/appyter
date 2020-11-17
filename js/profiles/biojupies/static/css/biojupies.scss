@@ -500,3 +500,7 @@ input:checked + .radio-label {
   background-color: #f8f8f9 !important;
   color: black !important;
 }
+
+.tooltip {
+  pointer-events:none;
+}
