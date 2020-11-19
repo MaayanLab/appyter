@@ -9,8 +9,6 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-from nbclient.util import ensure_async
-
 from appyter.cli import cli
 from appyter.ext.fs import Filesystem
 from appyter.ext.nbclient import NotebookClientIOPubHook

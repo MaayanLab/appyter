@@ -1,5 +1,6 @@
 import json
 import logging
+import functools
 import urllib.parse
 from werkzeug.security import safe_join
 
@@ -109,3 +110,11 @@ def click_argument_setenv(var, envvar=None, **kwargs):
       return func(**kwargs)
     return wrapper
   return decorator
+
+def run_in_executor(f):
+  import asyncio
+  @functools.wraps(f)
+  def inner(*args, **kwargs):
+    loop = asyncio.get_running_loop()
+    return loop.run_in_executor(None, lambda: f(*args, **kwargs))
+  return inner
