@@ -5,6 +5,8 @@ import json
 import logging
 logger = logging.getLogger(__name__)
 
+from appyter.util import run_in_executor
+
 
 def endless_watch(*args, **kwargs):
   from kubernetes import watch
@@ -19,6 +21,7 @@ def endless_watch(*args, **kwargs):
     except StopIteration:
       s = iter(w.stream(*args, **kwargs, resource_version=v))
 
+@run_in_executor
 def dispatch(job=None, namespace='default', debug=False, **kwargs):
   logger.info(f"starting {job['id']}")
   from kubernetes import client, config

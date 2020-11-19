@@ -4,13 +4,14 @@
 import os
 import sys
 import json
+import asyncio
 
-def dispatch(job=None, Popen=None, **kwargs):
-  with Popen([
+async def dispatch(job=None, **kwargs):
+  proc = await asyncio.create_subprocess_exec(*[
     sys.executable, '-u',
     '-m', 'appyter', 'orchestration', 'job', json.dumps(job)
   ], env=dict(
     PYTHONPATH=':'.join(sys.path),
     PATH=os.environ['PATH'],
-  )) as proc:
-    return proc.wait()
+  ), stdout=sys.stdout, stderr=sys.stderr)
+  return await proc.wait()

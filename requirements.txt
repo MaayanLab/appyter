@@ -5,7 +5,6 @@ click
 click-default-group
 flask
 flask_cors
-flask_socketio
 ipython
 jinja2
 jupyter

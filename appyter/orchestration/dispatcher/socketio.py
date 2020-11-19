@@ -1,3 +1,3 @@
-from flask_socketio import SocketIO, emit
+from socketio import AsyncServer
 
-socketio = SocketIO()
+socketio = AsyncServer(async_mode='aiohttp')

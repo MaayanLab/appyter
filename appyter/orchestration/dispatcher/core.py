@@ -1,104 +1,110 @@
+import asyncio
 import datetime
 import functools
 import importlib
-from queue import Queue
+from aiohttp import web
+from collections import deque
 from collections import OrderedDict, Counter
-from threading import Lock
-from flask import Blueprint, request, current_app, jsonify
 import logging
 logger = logging.getLogger(__name__)
 
 from appyter.orchestration.dispatcher.socketio import socketio
 
-class ViewableQueue(Queue):
-  def view(self):
-    with self.mutex:
-      return list(self.queue)
-
 class LockedOrderedDict(OrderedDict):
-  lock = Lock()
+  lock = asyncio.Lock()
 
 # NOTE: This is questionable, this queue may run
 #       on a different thread or process; in the case of a thread it's fine
 #       because Queue is thread-safe, but not in the case of a process
 #       we'd need a monkey-patched redis-Queue.
 #
-dispatch_queue = ViewableQueue()
-active = LockedOrderedDict()
 
-core = Blueprint('__main__.dispatcher', __name__)
+core = web.Application()
+routes = web.RouteTableDef()
 
-@core.route('/', methods=['GET', 'POST'])
-def on_submit():
-  if request.method == 'GET':
-    with active.lock:
-      return jsonify(dict(
-        active=list(active.values()),
-        queued=dispatch_queue.view(),
-        ts=datetime.datetime.now().replace(
-          tzinfo=datetime.timezone.utc
-        ).isoformat(),
-      ))
-  elif request.method == 'POST':
-    dispatch_queue.put(dict(request.json,
-      debug=current_app.config['DEBUG'],
-      queued_ts=datetime.datetime.now().replace(
+@routes.get('/')
+async def on_get(request):
+  async with core['tasks'].lock:
+    return web.json_response(dict(
+      tasks=list(core['tasks'].values()),
+      ts=datetime.datetime.now().replace(
         tzinfo=datetime.timezone.utc
       ).isoformat(),
     ))
-    return jsonify(dispatch_queue.qsize())
 
-def dispatcher(queued=None, active=None, dispatch=None, jobs_per_image=1):
-  while True:
-    while not queued.empty():
-      job = queued.get()
-      with active.lock:
-        image_jobs = Counter(j['image'] for j in active.values()).get(job['image'], 0)
-        if image_jobs >= jobs_per_image:
-          # TODO: push back onto a priority queue such that the next slot that opens uses this one
-          #       currently, this appyter execution would end up on the back of the queue
-          queued.task_done()
-          queued.put(job)
-          socketio.sleep(1)
-          continue
-        else:
-          # add to active
-          active[job['id']] = dict(job,
-            started_ts=datetime.datetime.now().replace(
-              tzinfo=datetime.timezone.utc
-            ).isoformat()
-          )
-      try:
-        dispatch(job=job)
-      except:
-        import traceback
-        logger.error(f"dispatch error: {traceback.format_exc()}")
-      with active.lock:
-        del active[job['id']]
-      queued.task_done()
-    socketio.sleep(1)
+@routes.post('/')
+async def on_submit(request):
+  request_data = await request.json()
+  async with core['tasks'].lock:
+    core['tasks'][request_data['id']] = dict(request_data,
+      debug=core['config']['DEBUG'],
+      queued_ts=datetime.datetime.now().replace(
+        tzinfo=datetime.timezone.utc
+      ).isoformat(),
+    )
+  asyncio.create_task(core['dispatch_queue'].put(request_data['id']))
+  return web.json_response(core['dispatch_queue'].qsize() + 1)
 
-@core.before_app_first_request
-def init_dispatcher():
+@core.on_startup.append
+async def start_dispatchers(app):
   logger.info('Initializing dispatch...')
-  from subprocess import Popen
+  #
+  app['dispatch_queue'] = asyncio.Queue()
+  app['tasks'] = LockedOrderedDict()
   #
   dispatch = functools.partial(
     importlib.import_module(
-      '..dispatch.{}'.format(current_app.config['DISPATCH']),
+      '..dispatch.{}'.format(app['config']['DISPATCH']),
       __package__
     ).dispatch,
-    Popen=Popen,
-    debug=current_app.config['DEBUG'],
-    namespace=current_app.config['KUBE_NAMESPACE'],
+    debug=app['config']['DEBUG'],
+    namespace=app['config']['KUBE_NAMESPACE'],
   )
   #
   logger.info('Starting background tasks...')
-  for _ in range(current_app.config['JOBS']):
-    socketio.start_background_task(dispatcher,
-      queued=dispatch_queue,
-      active=active,
-      dispatch=dispatch,
-      jobs_per_image=current_app.config['JOBS_PER_IMAGE'],
+  for _ in range(app['config']['JOBS']):
+    asyncio.create_task(
+      dispatcher(
+        queued=app['dispatch_queue'],
+        tasks=app['tasks'],
+        dispatch=dispatch,
+        jobs_per_image=app['config']['JOBS_PER_IMAGE'],
+      )
     )
 
+core.add_routes(routes)
+
+async def slow_put(queue, item):
+  ''' Queue put debouncing
+  '''
+  await asyncio.sleep(1)
+  await queue.put(item)
+
+async def dispatcher(queued=None, tasks=None, dispatch=None, jobs_per_image=1):
+  while True:
+    job_id = await queued.get()
+    async with tasks.lock:
+      job = tasks[job_id]
+      image_jobs = Counter(t.get('image') for t in tasks.values() if 'started_ts' in t).get(job.get('image'), 0)
+      if image_jobs >= jobs_per_image:
+        # TODO: push back onto a priority queue such that the next slot that opens uses this one
+        #       currently, this appyter execution would end up on the back of the queue
+        queued.task_done()
+        asyncio.create_task(slow_put(queued, job_id))
+        continue
+      else:
+        tasks[job['id']]['started_ts'] = datetime.datetime.now().replace(
+          tzinfo=datetime.timezone.utc
+        ).isoformat()
+    #
+    try:
+      logger.info(f"Dispatching job {job_id}")
+      await dispatch(job=job)
+    except:
+      import traceback
+      logger.error(f"dispatch error: {traceback.format_exc()}")
+    #
+    async with tasks.lock:
+      del tasks[job_id]
+  #
+  job.task_done()
