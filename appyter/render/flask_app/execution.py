@@ -67,7 +67,7 @@ async def submit(sid, data):
           break
   else:
     from appyter.orchestration.job.job import execute_async
-    await execute_async(job)
+    asyncio.create_task(execute_async(job))
 
 @socketio.on('join')
 async def _(sid, data):
