@@ -35,7 +35,7 @@ class EventEmitter:
   async def emit(self, event, **data):
     logger.debug(f"Emitting {event}: {data}")
     event_queue = self._get_queue(event)
-    await event_queue.put(data)
+    asyncio.create_task(event_queue.put(data))
   #
   def on(self, event):
     logger.debug(f"Attaching listener to {event}")
