@@ -75,7 +75,7 @@ def setup_execute_async(sio, emitter, job):
       async with state_lock:
         if not state['executed']:
           state['executed'] = True
-          sio.start_background_task(evaluate_notebook, sio, emitter, job)
+          asyncio.create_task(evaluate_notebook(sio, emitter, job))
     elif callable(state['get_state'], **kwargs):
       async with state_lock:
         nb_state = state['get_state']()
@@ -113,7 +113,7 @@ def setup_execute_async(sio, emitter, job):
       async with client_lock:
         await sio.disconnect()
 
-async def execute_async(job):
+async def execute_async(job, debug=False):
   sio = socketio.AsyncClient()
   emitter = EventEmitter()
   #
@@ -128,4 +128,7 @@ async def execute_async(job):
     raise
 
 def execute(job):
-  asyncio.run(execute_async(job), debug=job.get('DEBUG', False))
+  debug = job.get('debug', False)
+  logging.basicConfig(level=logging.DEBUG if debug else logging.WARNING)
+  logger.info(job)
+  asyncio.run(execute_async(job, debug=debug))
