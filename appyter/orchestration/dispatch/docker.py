@@ -5,7 +5,8 @@ import os
 import sys
 import json
 import asyncio
-from subprocess import PIPE
+import logging
+logger = logging.getLogger(__name__)
 
 async def dispatch(job=None, **kwargs):
   args = ['docker', 'run']
@@ -16,9 +17,11 @@ async def dispatch(job=None, **kwargs):
       'docker', 'inspect', os.environ['HOSTNAME'],
     ], stdout=asyncio.subprocess.PIPE)
     proc_stdout, _ = await proc.communicate()
-    conf = json.load(proc_stdout)
+    conf = json.loads(proc_stdout.decode())
     args += ['--network', conf[0]['HostConfig']['NetworkMode']]
   except:
+    import traceback
+    logger.warn(traceback.format_exc())
     args += []
   #
   args += [
