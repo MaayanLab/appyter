@@ -44,6 +44,29 @@
 <em class="property">class </em><code class="sig-prename descclassname">appyter.ext.nbclient.</code><code class="sig-name descname">NotebookClientIOPubHook</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">nbclient.client.NotebookClient</span></code></p>
 <p>A notebook client with the ability to hook into iopub updates</p>
+<dl class="py method">
+<dt id="appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell">
+<em class="property">async </em><code class="sig-name descname">async_execute_cell</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cell</span><span class="p">:</span> <span class="n">nbformat.notebooknode.NotebookNode</span></em>, <em class="sig-param"><span class="n">cell_index</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">execution_count</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">store_history</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; nbformat.notebooknode.NotebookNode<a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook.async_execute_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes a single code cell.</p>
+<p>To execute all cells see :meth:<code class="docutils literal notranslate"><span class="pre">execute</span></code>.</p>
+<p>cell : nbformat.NotebookNode
+The cell which is currently being processed.
+cell_index : int
+The position of the cell within the notebook object.
+execution_count : int
+The execution count to be assigned to the cell (default: Use kernel response)
+store_history : bool
+Determines if history should be stored in the kernel (default: False).
+Specific to ipython kernels, which can store command histories.</p>
+<p>output : dict
+The execution output payload (or None for no output).</p>
+<p>CellExecutionError
+If execution failed and should raise an exception, this will be raised
+with defaults about the failure.</p>
+<p>cell : NotebookNode
+The cell which was just processed.</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>

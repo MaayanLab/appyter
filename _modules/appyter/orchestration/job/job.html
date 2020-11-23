@@ -114,7 +114,7 @@
       <span class="k">async</span> <span class="k">with</span> <span class="n">state_lock</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;executed&#39;</span><span class="p">]:</span>
           <span class="n">state</span><span class="p">[</span><span class="s1">&#39;executed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-          <span class="n">sio</span><span class="o">.</span><span class="n">start_background_task</span><span class="p">(</span><span class="n">evaluate_notebook</span><span class="p">,</span> <span class="n">sio</span><span class="p">,</span> <span class="n">emitter</span><span class="p">,</span> <span class="n">job</span><span class="p">)</span>
+          <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">evaluate_notebook</span><span class="p">(</span><span class="n">sio</span><span class="p">,</span> <span class="n">emitter</span><span class="p">,</span> <span class="n">job</span><span class="p">))</span>
     <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;get_state&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
       <span class="k">async</span> <span class="k">with</span> <span class="n">state_lock</span><span class="p">:</span>
         <span class="n">nb_state</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;get_state&#39;</span><span class="p">]()</span>
@@ -152,7 +152,7 @@
       <span class="k">async</span> <span class="k">with</span> <span class="n">client_lock</span><span class="p">:</span>
         <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="execute_async"><a class="viewcode-back" href="../../../../appyter.orchestration.job.html#appyter.orchestration.job.job.execute_async">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">):</span>
+<div class="viewcode-block" id="execute_async"><a class="viewcode-back" href="../../../../appyter.orchestration.job.html#appyter.orchestration.job.job.execute_async">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
   <span class="n">sio</span> <span class="o">=</span> <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span>
   <span class="n">emitter</span> <span class="o">=</span> <span class="n">EventEmitter</span><span class="p">()</span>
   <span class="c1">#</span>
@@ -167,7 +167,10 @@
     <span class="k">raise</span></div>
 
 <div class="viewcode-block" id="execute"><a class="viewcode-back" href="../../../../appyter.orchestration.job.html#appyter.orchestration.job.job.execute">[docs]</a><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="n">job</span><span class="p">):</span>
-  <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">),</span> <span class="n">debug</span><span class="o">=</span><span class="n">job</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span></div>
+  <span class="n">debug</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+  <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+  <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">))</span></div>
 </pre></div>
 
             <div class="clearer"></div>

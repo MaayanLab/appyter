@@ -48,36 +48,31 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></p>
 <dl class="py attribute">
 <dt id="appyter.orchestration.dispatcher.core.LockedOrderedDict.lock">
-<code class="sig-name descname">lock</code><em class="property"> = &lt;unlocked _thread.lock object&gt;</em><a class="headerlink" href="#appyter.orchestration.dispatcher.core.LockedOrderedDict.lock" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="appyter.orchestration.dispatcher.core.ViewableQueue">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.orchestration.dispatcher.core.</code><code class="sig-name descname">ViewableQueue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">maxsize</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatcher/core.html#ViewableQueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatcher.core.ViewableQueue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">queue.Queue</span></code></p>
-<dl class="py method">
-<dt id="appyter.orchestration.dispatcher.core.ViewableQueue.view">
-<code class="sig-name descname">view</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatcher/core.html#ViewableQueue.view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatcher.core.ViewableQueue.view" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">lock</code><em class="property"> = &lt;asyncio.locks.Lock object at 0x7f9f7b607250 [unlocked]&gt;</em><a class="headerlink" href="#appyter.orchestration.dispatcher.core.LockedOrderedDict.lock" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt id="appyter.orchestration.dispatcher.core.dispatcher">
-<code class="sig-prename descclassname">appyter.orchestration.dispatcher.core.</code><code class="sig-name descname">dispatcher</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">queued</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">active</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dispatch</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">jobs_per_image</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatcher/core.html#dispatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatcher.core.dispatcher" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-prename descclassname">appyter.orchestration.dispatcher.core.</code><code class="sig-name descname">dispatcher</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">queued</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tasks</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dispatch</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">jobs_per_image</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatcher/core.html#dispatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatcher.core.dispatcher" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.orchestration.dispatcher.core.init_dispatcher">
-<code class="sig-prename descclassname">appyter.orchestration.dispatcher.core.</code><code class="sig-name descname">init_dispatcher</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatcher/core.html#init_dispatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatcher.core.init_dispatcher" title="Permalink to this definition">¶</a></dt>
+<dt id="appyter.orchestration.dispatcher.core.on_get">
+<em class="property">async </em><code class="sig-prename descclassname">appyter.orchestration.dispatcher.core.</code><code class="sig-name descname">on_get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatcher/core.html#on_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatcher.core.on_get" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="appyter.orchestration.dispatcher.core.on_submit">
-<code class="sig-prename descclassname">appyter.orchestration.dispatcher.core.</code><code class="sig-name descname">on_submit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatcher/core.html#on_submit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatcher.core.on_submit" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-prename descclassname">appyter.orchestration.dispatcher.core.</code><code class="sig-name descname">on_submit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatcher/core.html#on_submit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatcher.core.on_submit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.orchestration.dispatcher.core.slow_put">
+<em class="property">async </em><code class="sig-prename descclassname">appyter.orchestration.dispatcher.core.</code><code class="sig-name descname">slow_put</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">queue</span></em>, <em class="sig-param"><span class="n">item</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/orchestration/dispatcher/core.html#slow_put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.orchestration.dispatcher.core.slow_put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queue put debouncing</p>
+</dd></dl>
 
 </div>
 <div class="section" id="module-appyter.orchestration.dispatcher.socketio">

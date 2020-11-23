@@ -38,110 +38,116 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.orchestration.dispatcher.core</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">Queue</span>
+<span class="kn">from</span> <span class="nn">aiohttp</span> <span class="kn">import</span> <span class="n">web</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">Counter</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span>
-<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Blueprint</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">jsonify</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">appyter.orchestration.dispatcher.socketio</span> <span class="kn">import</span> <span class="n">socketio</span>
 
-<div class="viewcode-block" id="ViewableQueue"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.ViewableQueue">[docs]</a><span class="k">class</span> <span class="nc">ViewableQueue</span><span class="p">(</span><span class="n">Queue</span><span class="p">):</span>
-<div class="viewcode-block" id="ViewableQueue.view"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.ViewableQueue.view">[docs]</a>  <span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span><span class="p">:</span>
-      <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span></div></div>
-
 <div class="viewcode-block" id="LockedOrderedDict"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.LockedOrderedDict">[docs]</a><span class="k">class</span> <span class="nc">LockedOrderedDict</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">):</span>
-  <span class="n">lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span></div>
+  <span class="n">lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span></div>
 
 <span class="c1"># NOTE: This is questionable, this queue may run</span>
 <span class="c1">#       on a different thread or process; in the case of a thread it&#39;s fine</span>
 <span class="c1">#       because Queue is thread-safe, but not in the case of a process</span>
 <span class="c1">#       we&#39;d need a monkey-patched redis-Queue.</span>
 <span class="c1">#</span>
-<span class="n">dispatch_queue</span> <span class="o">=</span> <span class="n">ViewableQueue</span><span class="p">()</span>
-<span class="n">active</span> <span class="o">=</span> <span class="n">LockedOrderedDict</span><span class="p">()</span>
 
-<span class="n">core</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;__main__.dispatcher&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">)</span>
+<span class="n">core</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">()</span>
+<span class="n">routes</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">RouteTableDef</span><span class="p">()</span>
 
-<div class="viewcode-block" id="on_submit"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.on_submit">[docs]</a><span class="nd">@core</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
-<span class="k">def</span> <span class="nf">on_submit</span><span class="p">():</span>
-  <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">active</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-      <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
-        <span class="n">active</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">active</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
-        <span class="n">queued</span><span class="o">=</span><span class="n">dispatch_queue</span><span class="o">.</span><span class="n">view</span><span class="p">(),</span>
-        <span class="n">ts</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-          <span class="n">tzinfo</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
-      <span class="p">))</span>
-  <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
-    <span class="n">dispatch_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">,</span>
-      <span class="n">debug</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">],</span>
+<div class="viewcode-block" id="on_get"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.on_get">[docs]</a><span class="nd">@routes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_get</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">with</span> <span class="n">core</span><span class="p">[</span><span class="s1">&#39;tasks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+      <span class="n">tasks</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">core</span><span class="p">[</span><span class="s1">&#39;tasks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+      <span class="n">ts</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+        <span class="n">tzinfo</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span>
+      <span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+    <span class="p">))</span></div>
+
+<div class="viewcode-block" id="on_submit"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.on_submit">[docs]</a><span class="nd">@routes</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_submit</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+  <span class="n">request_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+  <span class="k">async</span> <span class="k">with</span> <span class="n">core</span><span class="p">[</span><span class="s1">&#39;tasks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+    <span class="n">core</span><span class="p">[</span><span class="s1">&#39;tasks&#39;</span><span class="p">][</span><span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">request_data</span><span class="p">,</span>
+      <span class="n">debug</span><span class="o">=</span><span class="n">core</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">],</span>
       <span class="n">queued_ts</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
         <span class="n">tzinfo</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span>
       <span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
-    <span class="p">))</span>
-    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">dispatch_queue</span><span class="o">.</span><span class="n">qsize</span><span class="p">())</span></div>
+    <span class="p">)</span>
+  <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">core</span><span class="p">[</span><span class="s1">&#39;dispatch_queue&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">request_data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>
+  <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span><span class="n">core</span><span class="p">[</span><span class="s1">&#39;dispatch_queue&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="dispatcher"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.dispatcher">[docs]</a><span class="k">def</span> <span class="nf">dispatcher</span><span class="p">(</span><span class="n">queued</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">active</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dispatch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">jobs_per_image</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-  <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-    <span class="k">while</span> <span class="ow">not</span> <span class="n">queued</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
-      <span class="n">job</span> <span class="o">=</span> <span class="n">queued</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-      <span class="k">with</span> <span class="n">active</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-        <span class="n">image_jobs</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">j</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">active</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">image_jobs</span> <span class="o">&gt;=</span> <span class="n">jobs_per_image</span><span class="p">:</span>
-          <span class="c1"># TODO: push back onto a priority queue such that the next slot that opens uses this one</span>
-          <span class="c1">#       currently, this appyter execution would end up on the back of the queue</span>
-          <span class="n">queued</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
-          <span class="n">queued</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
-          <span class="n">socketio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-          <span class="k">continue</span>
-        <span class="k">else</span><span class="p">:</span>
-          <span class="c1"># add to active</span>
-          <span class="n">active</span><span class="p">[</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">job</span><span class="p">,</span>
-            <span class="n">started_ts</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-              <span class="n">tzinfo</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-          <span class="p">)</span>
-      <span class="k">try</span><span class="p">:</span>
-        <span class="n">dispatch</span><span class="p">(</span><span class="n">job</span><span class="o">=</span><span class="n">job</span><span class="p">)</span>
-      <span class="k">except</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">traceback</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dispatch error: </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-      <span class="k">with</span> <span class="n">active</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-        <span class="k">del</span> <span class="n">active</span><span class="p">[</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
-      <span class="n">queued</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
-    <span class="n">socketio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="init_dispatcher"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.init_dispatcher">[docs]</a><span class="nd">@core</span><span class="o">.</span><span class="n">before_app_first_request</span>
-<span class="k">def</span> <span class="nf">init_dispatcher</span><span class="p">():</span>
+<span class="nd">@core</span><span class="o">.</span><span class="n">on_startup</span><span class="o">.</span><span class="n">append</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">start_dispatchers</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
   <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Initializing dispatch...&#39;</span><span class="p">)</span>
-  <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span>
+  <span class="c1">#</span>
+  <span class="n">app</span><span class="p">[</span><span class="s1">&#39;dispatch_queue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+  <span class="n">app</span><span class="p">[</span><span class="s1">&#39;tasks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">LockedOrderedDict</span><span class="p">()</span>
   <span class="c1">#</span>
   <span class="n">dispatch</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
     <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span>
-      <span class="s1">&#39;..dispatch.</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DISPATCH&#39;</span><span class="p">]),</span>
+      <span class="s1">&#39;..dispatch.</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;DISPATCH&#39;</span><span class="p">]),</span>
       <span class="n">__package__</span>
     <span class="p">)</span><span class="o">.</span><span class="n">dispatch</span><span class="p">,</span>
-    <span class="n">Popen</span><span class="o">=</span><span class="n">Popen</span><span class="p">,</span>
-    <span class="n">debug</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">],</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;KUBE_NAMESPACE&#39;</span><span class="p">],</span>
+    <span class="n">debug</span><span class="o">=</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">],</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;KUBE_NAMESPACE&#39;</span><span class="p">],</span>
   <span class="p">)</span>
   <span class="c1">#</span>
   <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Starting background tasks...&#39;</span><span class="p">)</span>
-  <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;JOBS&#39;</span><span class="p">]):</span>
-    <span class="n">socketio</span><span class="o">.</span><span class="n">start_background_task</span><span class="p">(</span><span class="n">dispatcher</span><span class="p">,</span>
-      <span class="n">queued</span><span class="o">=</span><span class="n">dispatch_queue</span><span class="p">,</span>
-      <span class="n">active</span><span class="o">=</span><span class="n">active</span><span class="p">,</span>
-      <span class="n">dispatch</span><span class="o">=</span><span class="n">dispatch</span><span class="p">,</span>
-      <span class="n">jobs_per_image</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;JOBS_PER_IMAGE&#39;</span><span class="p">],</span>
-    <span class="p">)</span></div>
+  <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;JOBS&#39;</span><span class="p">]):</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+      <span class="n">dispatcher</span><span class="p">(</span>
+        <span class="n">queued</span><span class="o">=</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;dispatch_queue&#39;</span><span class="p">],</span>
+        <span class="n">tasks</span><span class="o">=</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;tasks&#39;</span><span class="p">],</span>
+        <span class="n">dispatch</span><span class="o">=</span><span class="n">dispatch</span><span class="p">,</span>
+        <span class="n">jobs_per_image</span><span class="o">=</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;JOBS_PER_IMAGE&#39;</span><span class="p">],</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
 
+<span class="n">core</span><span class="o">.</span><span class="n">add_routes</span><span class="p">(</span><span class="n">routes</span><span class="p">)</span>
+
+<div class="viewcode-block" id="slow_put"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.slow_put">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">slow_put</span><span class="p">(</span><span class="n">queue</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Queue put debouncing</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="dispatcher"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.dispatcher">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">dispatcher</span><span class="p">(</span><span class="n">queued</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tasks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dispatch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">jobs_per_image</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+  <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">job_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">queued</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">tasks</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+      <span class="n">job</span> <span class="o">=</span> <span class="n">tasks</span><span class="p">[</span><span class="n">job_id</span><span class="p">]</span>
+      <span class="n">image_jobs</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tasks</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="s1">&#39;started_ts&#39;</span> <span class="ow">in</span> <span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">image_jobs</span> <span class="o">&gt;=</span> <span class="n">jobs_per_image</span><span class="p">:</span>
+        <span class="c1"># TODO: push back onto a priority queue such that the next slot that opens uses this one</span>
+        <span class="c1">#       currently, this appyter execution would end up on the back of the queue</span>
+        <span class="n">queued</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
+        <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">slow_put</span><span class="p">(</span><span class="n">queued</span><span class="p">,</span> <span class="n">job_id</span><span class="p">))</span>
+        <span class="k">continue</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">tasks</span><span class="p">[</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]][</span><span class="s1">&#39;started_ts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+          <span class="n">tzinfo</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+    <span class="c1">#</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dispatching job </span><span class="si">{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="k">await</span> <span class="n">dispatch</span><span class="p">(</span><span class="n">job</span><span class="o">=</span><span class="n">job</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="kn">import</span> <span class="nn">traceback</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dispatch error: </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1">#</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">tasks</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+      <span class="k">del</span> <span class="n">tasks</span><span class="p">[</span><span class="n">job_id</span><span class="p">]</span>
+  <span class="c1">#</span>
+  <span class="n">job</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span></div>
 </pre></div>
 
             <div class="clearer"></div>

@@ -43,16 +43,17 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
 
-<div class="viewcode-block" id="dispatch"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatch.html#appyter.orchestration.dispatch.native.dispatch">[docs]</a><span class="k">def</span> <span class="nf">dispatch</span><span class="p">(</span><span class="n">job</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Popen</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-  <span class="k">with</span> <span class="n">Popen</span><span class="p">([</span>
+<div class="viewcode-block" id="dispatch"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatch.html#appyter.orchestration.dispatch.native.dispatch">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">dispatch</span><span class="p">(</span><span class="n">job</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="n">proc</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_subprocess_exec</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-u&#39;</span><span class="p">,</span>
     <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;appyter&#39;</span><span class="p">,</span> <span class="s1">&#39;orchestration&#39;</span><span class="p">,</span> <span class="s1">&#39;job&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
   <span class="p">],</span> <span class="n">env</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
     <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">),</span>
     <span class="n">PATH</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PATH&#39;</span><span class="p">],</span>
-  <span class="p">))</span> <span class="k">as</span> <span class="n">proc</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
+  <span class="p">),</span> <span class="n">stdout</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+  <span class="k">return</span> <span class="k">await</span> <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
 </pre></div>
 
             <div class="clearer"></div>

@@ -107,7 +107,7 @@
           <span class="k">break</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">appyter.orchestration.job.job</span> <span class="kn">import</span> <span class="n">execute_async</span>
-    <span class="k">await</span> <span class="n">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">)</span></div>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">))</span></div>
 
 <span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>

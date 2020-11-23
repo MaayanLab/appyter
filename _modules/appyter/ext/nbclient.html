@@ -37,9 +37,12 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.nbclient</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">nbclient</span> <span class="kn">import</span> <span class="n">NotebookClient</span>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
+<span class="kn">from</span> <span class="nn">nbclient</span> <span class="kn">import</span> <span class="n">NotebookClient</span>
+<span class="kn">from</span> <span class="nn">nbformat</span> <span class="kn">import</span> <span class="n">NotebookNode</span>
 <span class="kn">from</span> <span class="nn">nbclient.util</span> <span class="kn">import</span> <span class="n">ensure_async</span>
-<span class="kn">from</span> <span class="nn">nbclient.exceptions</span> <span class="kn">import</span> <span class="n">CellExecutionComplete</span>
+<span class="kn">from</span> <span class="nn">nbclient.exceptions</span> <span class="kn">import</span> <span class="n">CellExecutionComplete</span><span class="p">,</span> <span class="n">DeadKernelError</span><span class="p">,</span> <span class="n">CellControlSignal</span>
 
 <div class="viewcode-block" id="NotebookClientIOPubHook"><a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook">[docs]</a><span class="k">class</span> <span class="nc">NotebookClientIOPubHook</span><span class="p">(</span><span class="n">NotebookClient</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; A notebook client with the ability to hook into iopub updates</span>
@@ -66,7 +69,109 @@
           <span class="n">complete</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">finally</span><span class="p">:</span>
           <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iopub_hook</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">iopub_hook</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span></div>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">iopub_hook</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_kc_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="ne">AssertionError</span><span class="p">):</span>
+      <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">new_event_loop</span><span class="p">()</span>
+      <span class="n">asyncio</span><span class="o">.</span><span class="n">set_event_loop</span><span class="p">(</span><span class="n">loop</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kc</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NotebookClientIOPubHook.async_execute_cell"><a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">async_execute_cell</span><span class="p">(</span>
+      <span class="bp">self</span><span class="p">,</span>
+      <span class="n">cell</span><span class="p">:</span> <span class="n">NotebookNode</span><span class="p">,</span>
+      <span class="n">cell_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+      <span class="n">execution_count</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+      <span class="n">store_history</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NotebookNode</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Executes a single code cell.</span>
+
+<span class="sd">    To execute all cells see :meth:`execute`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cell : nbformat.NotebookNode</span>
+<span class="sd">      The cell which is currently being processed.</span>
+<span class="sd">    cell_index : int</span>
+<span class="sd">      The position of the cell within the notebook object.</span>
+<span class="sd">    execution_count : int</span>
+<span class="sd">      The execution count to be assigned to the cell (default: Use kernel response)</span>
+<span class="sd">    store_history : bool</span>
+<span class="sd">      Determines if history should be stored in the kernel (default: False).</span>
+<span class="sd">      Specific to ipython kernels, which can store command histories.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output : dict</span>
+<span class="sd">      The execution output payload (or None for no output).</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    CellExecutionError</span>
+<span class="sd">      If execution failed and should raise an exception, this will be raised</span>
+<span class="sd">      with defaults about the failure.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cell : NotebookNode</span>
+<span class="sd">      The cell which was just processed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">kc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">cell</span><span class="o">.</span><span class="n">cell_type</span> <span class="o">!=</span> <span class="s1">&#39;code&#39;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">cell</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Skipping non-executing cell </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">cell</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_timing</span> <span class="ow">and</span> <span class="s1">&#39;execution&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]:</span>
+      <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;execution&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Executing cell:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cell</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
+    <span class="n">parent_msg_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span>
+      <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kc_execute</span><span class="p">(</span>
+        <span class="n">cell</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
+        <span class="n">store_history</span><span class="o">=</span><span class="n">store_history</span><span class="p">,</span>
+        <span class="n">stop_on_error</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_errors</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1"># We launched a code cell to execute</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">code_cells_executed</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">exec_timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_timeout</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
+
+    <span class="n">cell</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">clear_before_next_output</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">task_poll_kernel_alive</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">ensure_future</span><span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_async_poll_kernel_alive</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">task_poll_output_msg</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">ensure_future</span><span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_async_poll_output_msg</span><span class="p">(</span><span class="n">parent_msg_id</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">task_poll_for_reply</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">ensure_future</span><span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_async_poll_for_reply</span><span class="p">(</span>
+        <span class="n">parent_msg_id</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">exec_timeout</span><span class="p">,</span> <span class="n">task_poll_output_msg</span><span class="p">,</span> <span class="n">task_poll_kernel_alive</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">exec_reply</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_poll_for_reply</span>
+    <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+      <span class="c1"># can only be cancelled by task_poll_kernel_alive when the kernel is dead</span>
+      <span class="n">task_poll_output_msg</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+      <span class="k">raise</span> <span class="n">DeadKernelError</span><span class="p">(</span><span class="s2">&quot;Kernel died&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="c1"># Best effort to cancel request if it hasn&#39;t been resolved</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Check if the task_poll_output is doing the raising for us</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">CellControlSignal</span><span class="p">):</span>
+          <span class="n">task_poll_output_msg</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+      <span class="k">finally</span><span class="p">:</span>
+        <span class="k">raise</span>
+
+    <span class="k">if</span> <span class="n">execution_count</span><span class="p">:</span>
+      <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;execution_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">execution_count</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_check_raise_for_error</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">exec_reply</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">nb</span><span class="p">[</span><span class="s1">&#39;cells&#39;</span><span class="p">][</span><span class="n">cell_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span>
+    <span class="k">return</span> <span class="n">cell</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
