@@ -1,0 +1,21 @@
+appyter.ext.socketio package
+============================
+
+Submodules
+----------
+
+appyter.ext.socketio.chunk\_mixin module
+----------------------------------------
+
+.. automodule:: appyter.ext.socketio.chunk_mixin
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: appyter.ext.socketio
+   :members:
+   :undoc-members:
+   :show-inheritance:

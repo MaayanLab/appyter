@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.ext.socketio.chunk_mixin &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../socketio.html" accesskey="U">appyter.ext.socketio</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.socketio.chunk_mixin</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.ext.socketio.chunk_mixin</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">socketio</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="chunk"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.chunk_mixin.chunk">[docs]</a><span class="k">def</span> <span class="nf">chunk</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">//</span> <span class="n">chunk_size</span><span class="p">):</span>
+    <span class="k">yield</span> <span class="n">n</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="p">:</span><span class="n">n</span><span class="o">+</span><span class="n">chunk_size</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ChunkMixin"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.chunk_mixin.ChunkMixin">[docs]</a><span class="k">class</span> <span class="nc">ChunkMixin</span><span class="p">:</span>
+  <span class="sd">&#39;&#39;&#39; Works with python-socketio methods to provide chunking for large messages</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">20</span> <span class="c1"># 1 kb</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_receiver</span><span class="p">())</span>
+
+<div class="viewcode-block" id="ChunkMixin.chunk_receiver"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.chunk_mixin.ChunkMixin.chunk_receiver">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">chunk_receiver</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Process `chunked` events on the received side</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">partial_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">partial_data_lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+    <span class="n">event_dispatch_queue</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+    <span class="c1">#</span>
+    <span class="nd">@self</span><span class="o">.</span><span class="n">event</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">chunked</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+      <span class="c1"># forward to/room chunked packets</span>
+      <span class="c1"># TODO: do we need to worry about concurrency here?</span>
+      <span class="k">if</span> <span class="s1">&#39;to&#39;</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">sid</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">])</span>
+      <span class="k">if</span> <span class="s1">&#39;room&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">room</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;room&#39;</span><span class="p">])</span>
+      <span class="c1"># otherwise process them</span>
+      <span class="k">async</span> <span class="k">with</span> <span class="n">partial_data_lock</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">partial_data</span><span class="p">:</span>
+          <span class="n">partial_data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">],</span> <span class="n">chunks</span><span class="o">=</span><span class="p">{},</span> <span class="n">lock</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">())</span>
+      <span class="c1">#</span>
+      <span class="k">async</span> <span class="k">with</span> <span class="n">partial_data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]][</span><span class="s1">&#39;lock&#39;</span><span class="p">]:</span>
+        <span class="n">partial_data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]][</span><span class="s1">&#39;chunks&#39;</span><span class="p">][</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;chunk&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">partial_data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]][</span><span class="s1">&#39;total&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">partial_data</span><span class="p">[</span><span class="s1">&#39;chunks&#39;</span><span class="p">]):</span>
+          <span class="n">_</span><span class="p">,</span> <span class="n">chunks</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">sorted</span><span class="p">(</span><span class="n">partial_data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]][</span><span class="s1">&#39;chunks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+          <span class="k">del</span> <span class="n">partial_data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
+          <span class="n">serialized</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+          <span class="n">sha1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">()</span>
+          <span class="n">sha1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">serialized</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+          <span class="n">data_hash</span> <span class="o">=</span> <span class="n">sha1</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+          <span class="k">if</span> <span class="n">data_hash</span> <span class="o">==</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]:</span>
+            <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">event_dispatch_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">serialized</span><span class="p">)))</span>
+          <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Chunked data was corrupt&quot;</span><span class="p">)</span>
+    <span class="c1">#</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">event_dispatch_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;event&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">])</span>
+      <span class="n">event_dispatch_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChunkMixin.emit"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.chunk_mixin.ChunkMixin.emit">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Use `chunked` events to send in the case of large data packets</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">serialized</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">),</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">serialized</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">ChunkMixin</span><span class="o">.</span><span class="n">CHUNK_SIZE</span><span class="p">:</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Large packet (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">serialized</span><span class="p">)</span><span class="si">}</span><span class="s2">), chunking...&quot;</span><span class="p">)</span>
+      <span class="n">sha1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">()</span>
+      <span class="n">sha1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">serialized</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+      <span class="n">data_hash</span> <span class="o">=</span> <span class="n">sha1</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+      <span class="n">n_chunks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">serialized</span><span class="p">)</span> <span class="o">//</span> <span class="n">ChunkMixin</span><span class="o">.</span><span class="n">CHUNK_SIZE</span>
+      <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">chunked</span> <span class="ow">in</span> <span class="n">chunk</span><span class="p">(</span><span class="n">serialized</span><span class="p">,</span> <span class="n">ChunkMixin</span><span class="o">.</span><span class="n">CHUNK_SIZE</span><span class="p">):</span>
+        <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;chunked&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">data_hash</span><span class="p">,</span> <span class="n">chunk</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">n_chunks</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">chunked</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../socketio.html" >appyter.ext.socketio</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.socketio.chunk_mixin</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

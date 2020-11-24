@@ -10,6 +10,7 @@ Subpackages
    appyter.ext.asyncio
    appyter.ext.fs
    appyter.ext.nbclient
+   appyter.ext.socketio
    appyter.ext.watchgod
 
 Module contents
