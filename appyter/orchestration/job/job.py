@@ -119,10 +119,17 @@ async def execute_async(job, debug=False):
   #
   try:
     setup_socketio_events(sio, emitter)
+    done = asyncio.Event()
+    @emitter.on('stopped')
+    def on_stopped(**kwargs):
+      done.set()
     setup_execute_async(sio, emitter, job)
+    #
     url = urllib.parse.urlparse(job['url'])
     await sio.connect(f"{url.scheme}://{url.netloc}", socketio_path=url.path)
+    #
     await sio.wait()
+    await done.wait()
     await emitter.clear()
   except asyncio.CancelledError:
     raise
@@ -131,4 +138,5 @@ def execute(job):
   debug = job.get('debug', False)
   logging.basicConfig(level=logging.DEBUG if debug else logging.WARNING)
   logger.info(job)
-  asyncio.run(execute_async(job, debug=debug))
+  loop = asyncio.get_event_loop()
+  loop.run_until_complete(execute_async(job, debug=debug))
