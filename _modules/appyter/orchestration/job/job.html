@@ -158,10 +158,17 @@
   <span class="c1">#</span>
   <span class="k">try</span><span class="p">:</span>
     <span class="n">setup_socketio_events</span><span class="p">(</span><span class="n">sio</span><span class="p">,</span> <span class="n">emitter</span><span class="p">)</span>
+    <span class="n">done</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+    <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;stopped&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">on_stopped</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="n">done</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
     <span class="n">setup_execute_async</span><span class="p">(</span><span class="n">sio</span><span class="p">,</span> <span class="n">emitter</span><span class="p">,</span> <span class="n">job</span><span class="p">)</span>
+    <span class="c1">#</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
     <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s2">://</span><span class="si">{</span><span class="n">url</span><span class="o">.</span><span class="n">netloc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">socketio_path</span><span class="o">=</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+    <span class="c1">#</span>
     <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">done</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
     <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
   <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
     <span class="k">raise</span></div>
@@ -170,7 +177,8 @@
   <span class="n">debug</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
   <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
   <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
-  <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">))</span></div>
+  <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+  <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">))</span></div>
 </pre></div>
 
             <div class="clearer"></div>
