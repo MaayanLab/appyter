@@ -28,7 +28,7 @@ async def submit(sid, data):
     raise Exception('Unrecognized data type')
   #
   socketio.enter_room(sid, result_hash)
-  await socketio.emit('status', 'Queuing execution', sid)
+  await socketio.emit('status', 'Queuing execution', to=sid)
   job = dict(
     cwd=Filesystem.join(config['DATA_DIR'], 'output', result_hash),
     ipynb=os.path.basename(config['IPYNB']),
@@ -52,18 +52,18 @@ async def submit(sid, data):
         async with aiohttp.ClientSession(headers={'Content-Type': 'application/json'}) as client:
           async with client.post(config['DISPATCHER'], json=job) as resp:
             queue_size = await resp.json()
-            await socketio.emit('status', f"Queued successfully, you are at position {queue_size} in the queue", sid)
+            await socketio.emit('status', f"Queued successfully, you are at position {queue_size} in the queue", to=sid)
             queued = True
       except asyncio.CancelledError:
         raise
       except Exception:
         logger.error(traceback.format_exc())
         if backoff < 60:
-          await socketio.emit('status', f"Failed to contact orchestrator, trying again in {backoff}s...", sid)
+          await socketio.emit('status', f"Failed to contact orchestrator, trying again in {backoff}s...", to=sid)
           asyncio.sleep(backoff)
           backoff *= 2
         else:
-          await socketio.emit('error', 'Failed to contact orchestrator, please try again later.', sid)
+          await socketio.emit('error', 'Failed to contact orchestrator, please try again later.', to=sid)
           break
   else:
     from appyter.orchestration.job.job import execute_async
@@ -73,12 +73,3 @@ async def submit(sid, data):
 async def _(sid, data):
   socketio.enter_room(sid, data)
   await socketio.emit('joined', dict(id=sid, session=data), room=data)
-
-@socketio.on('leave')
-async def _(sid, data):
-  await socketio.emit('left', dict(id=sid, session=data), room=data)
-  socketio.leave_room(sid, data)
-
-@socketio.on('msg')
-async def _(sid, data):
-  await socketio.emit(data['type'], data['data'], to=data.get('to'), room=data.get('session'))

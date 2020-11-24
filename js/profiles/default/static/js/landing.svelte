@@ -11,6 +11,7 @@
   import slugify from '../../../../utils/slugify'
   import any from '../../../../utils/any'
   import hash from '../../../../utils/hash'
+  import { setup_chunking } from '../../../../lib/socketio'
 
   export let window
   export let nbdownload
@@ -119,6 +120,7 @@
       await tick()
       nb.cells[cell_index] = {...nb.cells[cell_index], ...value}
     })
+    setup_chunking(socket)
   }
 
   let connect_init = false

@@ -29,9 +29,15 @@ def create_app(**kwargs):
   config = get_env(**kwargs)
   #
   if config['DEBUG']:
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(
+      level=logging.DEBUG,
+      format='%(name)s %(message).80s',
+    )
   else:
-    logging.basicConfig(level=logging.WARNING)
+    logging.basicConfig(
+      level=logging.WARNING,
+      format='%(name)s %(message).80s',
+    )
     logging.getLogger(__package__).setLevel(logging.INFO)
   #
   logger.info('Initializing aiohttp...')
@@ -95,9 +101,15 @@ def create_app(**kwargs):
 def flask_app(**kwargs):
   import logging
   if kwargs.get('debug'):
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(
+      level=logging.DEBUG,
+      format='%(name)s %(message).80s',
+    )
   else:
-    logging.basicConfig(level=logging.WARNING)
+    logging.basicConfig(
+      level=logging.WARNING,
+      format='%(name)s %(message).80s',
+    )
     logging.getLogger(__package__).setLevel(logging.INFO)
   #
   if kwargs.get('socket'):

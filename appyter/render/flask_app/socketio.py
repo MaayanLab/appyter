@@ -1,4 +1,4 @@
-from socketio import AsyncServer
+from appyter.ext.socketio import AsyncServer
 
 import logging
 logger = logging.getLogger(__name__)

@@ -34,6 +34,7 @@ async def json_emitter(obj):
   print(json.dumps(obj))
 
 async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
+  logger.info('nbexecute starting')
   assert callable(emit), 'Emit must be callable'
   with Filesystem(cwd, asynchronous=True) as fs:
     with fs.open(ipynb, 'r') as fr:
@@ -61,6 +62,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
       with fs.open(ipynb, 'w') as fw:
         nb_to_ipynb_io(nb, fw)
       #
+      logger.info('nbexecute initializing')
       state = dict(progress=0, status='Starting')
       if callable(subscribe):
         await subscribe(lambda: dict(nb=nb_to_json(nb), **state))
@@ -82,12 +84,14 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
             PATH=os.environ['PATH'],
           ),
         ):
+          logger.info('nbexecute executing')
           state.update(status='Executing...', progress=0)
           await emit({ 'type': 'status', 'data': state['status'] })
           await emit({ 'type': 'progress', 'data': state['progress'] })
           n_cells = len(nb.cells)
           exec_count = 1
           for index, cell in enumerate(nb.cells):
+            logger.info(f"nbexecute executing cell {index}")
             cell = await client.async_execute_cell(
               cell, index,
               execution_count=exec_count,
@@ -106,8 +110,10 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
       except asyncio.CancelledError:
         raise
       except Exception as e:
+        logger.info(f"nbexecute execution error")
         await emit({ 'type': 'error', 'data': str(e) })
       # Save execution completion time
+      logger.info('nbexecute saving')
       nb.metadata['execution_info']['completed'] = datetime.datetime.now().replace(
         tzinfo=datetime.timezone.utc
       ).isoformat()
@@ -120,6 +126,8 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
   except Exception as e:
     await emit({ 'type': 'status', 'data': 'Error initializing, try again later' })
     logger.error(traceback.format_exc())
+  finally:
+    logger.info('nbexecute complete')
   #
 
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')

@@ -13,7 +13,10 @@ def create_app(**kwargs):
   from appyter.orchestration.dispatcher.socketio import socketio
   from appyter.util import join_routes
   #
-  logging.basicConfig(level=logging.DEBUG if kwargs.get('debug') else logging.WARNING)
+  logging.basicConfig(
+    level=logging.DEBUG if kwargs.get('debug') else logging.WARNING,
+    format='%(name)s %(message).80s',
+  )
   #
   logger.info('Initializing aiohttp...')
   config = dict(

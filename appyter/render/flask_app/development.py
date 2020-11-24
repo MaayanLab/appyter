@@ -40,28 +40,14 @@ async def try_n_times(n, coro, *args, **kwargs):
       backoff *= 2
 
 async def app_messager(emitter, config):
-  import socketio
   import asyncio
   from appyter.util import join_routes
-  sio = socketio.AsyncClient()
-  connected = asyncio.Event()
+  from appyter.ext.socketio import AsyncClient
+  sio = AsyncClient()
   #
-  @sio.event
-  async def connect():
-    connected.set()
-    logger.info('Connected to appyter server')
-  @sio.event
-  async def connect_error(error):
-    connected.clear()
-    logger.error(error)
-  @sio.event
-  async def disconnect():
-    logger.info('Disconnected from appyter server')
-    connected.clear()
   @emitter.on('livereload')
   async def livereload(changes):
     logger.info(f"LiveReload {changes}")
-    await connected.wait()
     await sio.emit('livereload', {})
   #
   origin = f"http://{config['HOST']}:{config['PORT']}"

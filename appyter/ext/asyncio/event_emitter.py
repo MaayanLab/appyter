@@ -22,9 +22,16 @@ class EventEmitter:
       while True:
         evt = await event_queue.get()
         logger.debug(f"Calling listeners for {event}...")
-        for listener in self._listeners.get(event, {}).values():
-          asyncio.create_task(listener(**evt))
-        event_queue.task_done()
+        try:
+          await asyncio.gather(*[
+            listener(**evt)
+            for listener in self._listeners.get(event, {}).values()
+          ])
+        except:
+          import traceback
+          logger.error(f"Error in listener for {event}: {traceback.format_exc()}")
+        finally:
+          event_queue.task_done()
     return _consumer
   #
   def _ensure_consumer(self, event):
@@ -35,7 +42,7 @@ class EventEmitter:
   async def emit(self, event, **data):
     logger.debug(f"Emitting {event}: {data}")
     event_queue = self._get_queue(event)
-    asyncio.create_task(event_queue.put(data))
+    await event_queue.put(data)
   #
   def on(self, event):
     logger.debug(f"Attaching listener to {event}")
@@ -51,14 +58,35 @@ class EventEmitter:
     logger.debug(f"Detaching listener from {event}")
     del self._listeners[event][listener]
   #
+  async def wait(self, event):
+    available = asyncio.Event()
+    result = {}
+    @self.on(event)
+    async def waiter(**kwargs):
+      self.off(event, waiter)
+      result[None] = kwargs
+      available.set()
+    await available.wait()
+    return result[None]
+
+  async def flush(self):
+    logger.debug(f"Flushing...")
+    await asyncio.gather(*[
+      event_queue.join()
+      for event_queue in self._queues.values()
+    ])
+  
+  async def remove(self, event):
+    try:
+      await self._queues[event].join()
+      self._consumers[event].cancel()
+      await self._consumers[event]
+    finally:
+      del self._consumers[event]
+
   async def clear(self):
     logger.debug(f"Clearing...")
-    for event in list(self._consumers):
-      try:
-        await self._queues[event].join()
-        self._consumers[event].cancel()
-        await self._consumers[event]
-      except asyncio.CancelledError:
-        pass
-      finally:
-        del self._consumers[event]
+    await asyncio.gather(*[
+      event
+      for event in self._consumers.keys()
+    ])
