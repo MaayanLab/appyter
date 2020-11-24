@@ -125,11 +125,12 @@ async def execute_async(job, debug=False):
       done.set()
     setup_execute_async(sio, emitter, job)
     #
-    url = urllib.parse.urlparse(job['url'])
-    await sio.connect(f"{url.scheme}://{url.netloc}", socketio_path=url.path)
+    while not done.is_set():
+      url = urllib.parse.urlparse(job['url'])
+      await sio.connect(f"{url.scheme}://{url.netloc}", socketio_path=url.path)
+      await sio.wait()
+      await asyncio.sleep(1)
     #
-    await sio.wait()
-    await done.wait()
     await emitter.clear()
   except asyncio.CancelledError:
     raise
