@@ -102,7 +102,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
                 raise Exception('Cell execution error on cell %d' % (exec_count))
               exec_count += 1
             if index < n_cells-1:
-              state['progress'] = index
+              state['progress'] = index + 1
               await emit({ 'type': 'progress', 'data': state['progress'] })
             else:
               state['status'] = 'Success'
