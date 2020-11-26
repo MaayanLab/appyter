@@ -1,0 +1,37 @@
+appyter.ext.socketio package
+============================
+
+Submodules
+----------
+
+appyter.ext.socketio.client module
+----------------------------------
+
+.. automodule:: appyter.ext.socketio.client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.socketio.priority\_queued\_emit module
+--------------------------------------------------
+
+.. automodule:: appyter.ext.socketio.priority_queued_emit
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.socketio.server module
+----------------------------------
+
+.. automodule:: appyter.ext.socketio.server
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: appyter.ext.socketio
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.ext.socketio package &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.socketio package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="appyter-ext-socketio-package">
+<h1>appyter.ext.socketio package<a class="headerlink" href="#appyter-ext-socketio-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-appyter.ext.socketio.client">
+<span id="appyter-ext-socketio-client-module"></span><h2>appyter.ext.socketio.client module<a class="headerlink" href="#module-appyter.ext.socketio.client" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.ext.socketio.client.AsyncClient">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.socketio.client.</code><code class="sig-name descname">AsyncClient</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/client.html#AsyncClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin" title="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">socketio.asyncio_client.AsyncClient</span></code></p>
+<p>Client with packet forwarding, emit buffering &amp; chunking</p>
+<dl class="py attribute">
+<dt id="appyter.ext.socketio.client.AsyncClient.CHUNK_SIZE">
+<code class="sig-name descname">CHUNK_SIZE</code><em class="property"> = 1048576</em><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient.CHUNK_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.socketio.client.AsyncClient.connection_tracker">
+<code class="sig-name descname">connection_tracker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/client.html#AsyncClient.connection_tracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient.connection_tracker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.socketio.client.AsyncClient.disconnect">
+<em class="property">async </em><code class="sig-name descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/client.html#AsyncClient.disconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect from the server.</p>
+<p>Note: this method is a coroutine.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.socketio.client.AsyncClient.emit">
+<em class="property">async </em><code class="sig-name descname">emit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">evt</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">priority</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/client.html#AsyncClient.emit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient.emit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emit a custom event to one or more connected clients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>event</strong> – The event name. It can be any string. The event names</p>
+</dd>
+</dl>
+<p><code class="docutils literal notranslate"><span class="pre">'connect'</span></code>, <code class="docutils literal notranslate"><span class="pre">'message'</span></code> and <code class="docutils literal notranslate"><span class="pre">'disconnect'</span></code> are
+reserved and should not be used.
+:param data: The data to send to the client or clients. Data can be of
+type <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">list</span></code> or <code class="docutils literal notranslate"><span class="pre">dict</span></code>. If a
+<code class="docutils literal notranslate"><span class="pre">list</span></code> or <code class="docutils literal notranslate"><span class="pre">dict</span></code>, the data will be serialized as JSON.
+:param namespace: The Socket.IO namespace for the event. If this
+argument is omitted the event is emitted to the
+default namespace.
+:param callback: If given, this function will be called to acknowledge
+the the client has received the message. The arguments
+that will be passed to the function are those provided
+by the client. Callback functions can only be used
+when addressing an individual client.</p>
+<p>Note: this method is not designed to be used concurrently. If multiple
+tasks are emitting at the same time on the same client connection, then
+messages composed of multiple packets may end up being sent in an
+incorrect sequence. Use standard concurrency solutions (such as a Lock
+object) to prevent this situation.</p>
+<p>Note 2: this method is a coroutine.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.ext.socketio.client.AsyncClient.klass">
+<code class="sig-name descname">klass</code><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient.klass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">socketio.asyncio_client.AsyncClient</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-appyter.ext.socketio.priority_queued_emit">
+<span id="appyter-ext-socketio-priority-queued-emit-module"></span><h2>appyter.ext.socketio.priority_queued_emit module<a class="headerlink" href="#module-appyter.ext.socketio.priority_queued_emit" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.socketio.priority_queued_emit.</code><code class="sig-name descname">PriorityQueuedEmitMixin</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/priority_queued_emit.html#PriorityQueuedEmitMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit">
+<em class="property">async </em><code class="sig-name descname">emit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">evt</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">priority</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/priority_queued_emit.html#PriorityQueuedEmitMixin.emit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit_dispatcher">
+<em class="property">async </em><code class="sig-name descname">emit_dispatcher</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/priority_queued_emit.html#PriorityQueuedEmitMixin.emit_dispatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit_dispatcher" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-appyter.ext.socketio.server">
+<span id="appyter-ext-socketio-server-module"></span><h2>appyter.ext.socketio.server module<a class="headerlink" href="#module-appyter.ext.socketio.server" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.ext.socketio.server.AsyncServer">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.socketio.server.</code><code class="sig-name descname">AsyncServer</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/server.html#AsyncServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.server.AsyncServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin" title="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">socketio.asyncio_server.AsyncServer</span></code></p>
+<p>Server with packet forwarding</p>
+<dl class="py attribute">
+<dt id="appyter.ext.socketio.server.AsyncServer.klass">
+<code class="sig-name descname">klass</code><a class="headerlink" href="#appyter.ext.socketio.server.AsyncServer.klass" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">socketio.asyncio_server.AsyncServer</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-appyter.ext.socketio">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.ext.socketio" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">appyter.ext.socketio package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.socketio.client">appyter.ext.socketio.client module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.socketio.priority_queued_emit">appyter.ext.socketio.priority_queued_emit module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.socketio.server">appyter.ext.socketio.server module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.socketio">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/appyter.ext.socketio.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.socketio package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

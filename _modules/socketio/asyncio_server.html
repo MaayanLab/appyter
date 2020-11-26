@@ -1,0 +1,639 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>socketio.asyncio_server &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">socketio.asyncio_server</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for socketio.asyncio_server</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="kn">import</span> <span class="nn">engineio</span>
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">asyncio_manager</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">exceptions</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">packet</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">server</span>
+
+
+<span class="k">class</span> <span class="nc">AsyncServer</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">Server</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A Socket.IO server for asyncio.</span>
+
+<span class="sd">    This class implements a fully compliant Socket.IO web server with support</span>
+<span class="sd">    for websocket and long-polling transports, compatible with the asyncio</span>
+<span class="sd">    framework on Python 3.5 or newer.</span>
+
+<span class="sd">    :param client_manager: The client manager instance that will manage the</span>
+<span class="sd">                           client list. When this is omitted, the client list</span>
+<span class="sd">                           is stored in an in-memory structure, so the use of</span>
+<span class="sd">                           multiple connected servers is not possible.</span>
+<span class="sd">    :param logger: To enable logging set to ``True`` or pass a logger object to</span>
+<span class="sd">                   use. To disable logging set to ``False``. Note that fatal</span>
+<span class="sd">                   errors are logged even when ``logger`` is ``False``.</span>
+<span class="sd">    :param json: An alternative json module to use for encoding and decoding</span>
+<span class="sd">                 packets. Custom json modules must have ``dumps`` and ``loads``</span>
+<span class="sd">                 functions that are compatible with the standard library</span>
+<span class="sd">                 versions.</span>
+<span class="sd">    :param async_handlers: If set to ``True``, event handlers are executed in</span>
+<span class="sd">                           separate threads. To run handlers synchronously,</span>
+<span class="sd">                           set to ``False``. The default is ``True``.</span>
+<span class="sd">    :param kwargs: Connection parameters for the underlying Engine.IO server.</span>
+
+<span class="sd">    The Engine.IO configuration supports the following settings:</span>
+
+<span class="sd">    :param async_mode: The asynchronous model to use. See the Deployment</span>
+<span class="sd">                       section in the documentation for a description of the</span>
+<span class="sd">                       available options. Valid async modes are &quot;aiohttp&quot;. If</span>
+<span class="sd">                       this argument is not given, an async mode is chosen</span>
+<span class="sd">                       based on the installed packages.</span>
+<span class="sd">    :param ping_timeout: The time in seconds that the client waits for the</span>
+<span class="sd">                         server to respond before disconnecting.</span>
+<span class="sd">    :param ping_interval: The interval in seconds at which the client pings</span>
+<span class="sd">                          the server.</span>
+<span class="sd">    :param max_http_buffer_size: The maximum size of a message when using the</span>
+<span class="sd">                                 polling transport.</span>
+<span class="sd">    :param allow_upgrades: Whether to allow transport upgrades or not.</span>
+<span class="sd">    :param http_compression: Whether to compress packages when using the</span>
+<span class="sd">                             polling transport.</span>
+<span class="sd">    :param compression_threshold: Only compress messages when their byte size</span>
+<span class="sd">                                  is greater than this value.</span>
+<span class="sd">    :param cookie: Name of the HTTP cookie that contains the client session</span>
+<span class="sd">                   id. If set to ``None``, a cookie is not sent to the client.</span>
+<span class="sd">    :param cors_allowed_origins: Origin or list of origins that are allowed to</span>
+<span class="sd">                                 connect to this server. Only the same origin</span>
+<span class="sd">                                 is allowed by default. Set this argument to</span>
+<span class="sd">                                 ``&#39;*&#39;`` to allow all origins, or to ``[]`` to</span>
+<span class="sd">                                 disable CORS handling.</span>
+<span class="sd">    :param cors_credentials: Whether credentials (cookies, authentication) are</span>
+<span class="sd">                             allowed in requests to this server.</span>
+<span class="sd">    :param monitor_clients: If set to ``True``, a background task will ensure</span>
+<span class="sd">                            inactive clients are closed. Set to ``False`` to</span>
+<span class="sd">                            disable the monitoring task (not recommended). The</span>
+<span class="sd">                            default is ``True``.</span>
+<span class="sd">    :param engineio_logger: To enable Engine.IO logging set to ``True`` or pass</span>
+<span class="sd">                            a logger object to use. To disable logging set to</span>
+<span class="sd">                            ``False``. Note that fatal errors are logged even</span>
+<span class="sd">                            when ``engineio_logger`` is ``False``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">async_handlers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">client_manager</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client_manager</span> <span class="o">=</span> <span class="n">asyncio_manager</span><span class="o">.</span><span class="n">AsyncManager</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">client_manager</span><span class="o">=</span><span class="n">client_manager</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
+                         <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">json</span><span class="p">,</span>
+                         <span class="n">async_handlers</span><span class="o">=</span><span class="n">async_handlers</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_asyncio_based</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">attach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">socketio_path</span><span class="o">=</span><span class="s1">&#39;socket.io&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Attach the Socket.IO server to an application.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">socketio_path</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">room</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_sid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Emit a custom event to one or more connected clients.</span>
+
+<span class="sd">        :param event: The event name. It can be any string. The event names</span>
+<span class="sd">                      ``&#39;connect&#39;``, ``&#39;message&#39;`` and ``&#39;disconnect&#39;`` are</span>
+<span class="sd">                      reserved and should not be used.</span>
+<span class="sd">        :param data: The data to send to the client or clients. Data can be of</span>
+<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. If a</span>
+<span class="sd">                     ``list`` or ``dict``, the data will be serialized as JSON.</span>
+<span class="sd">        :param to: The recipient of the message. This can be set to the</span>
+<span class="sd">                   session ID of a client to address only that client, or to</span>
+<span class="sd">                   to any custom room created by the application to address all</span>
+<span class="sd">                   the clients in that room, If this argument is omitted the</span>
+<span class="sd">                   event is broadcasted to all connected clients.</span>
+<span class="sd">        :param room: Alias for the ``to`` parameter.</span>
+<span class="sd">        :param skip_sid: The session ID of a client to skip when broadcasting</span>
+<span class="sd">                         to a room or to all clients. This can be used to</span>
+<span class="sd">                         prevent a message from being sent to the sender.</span>
+<span class="sd">        :param namespace: The Socket.IO namespace for the event. If this</span>
+<span class="sd">                          argument is omitted the event is emitted to the</span>
+<span class="sd">                          default namespace.</span>
+<span class="sd">        :param callback: If given, this function will be called to acknowledge</span>
+<span class="sd">                         the the client has received the message. The arguments</span>
+<span class="sd">                         that will be passed to the function are those provided</span>
+<span class="sd">                         by the client. Callback functions can only be used</span>
+<span class="sd">                         when addressing an individual client.</span>
+<span class="sd">        :param ignore_queue: Only used when a message queue is configured. If</span>
+<span class="sd">                             set to ``True``, the event is emitted to the</span>
+<span class="sd">                             clients directly, without going through the queue.</span>
+<span class="sd">                             This is more efficient, but only works when a</span>
+<span class="sd">                             single server process is used. It is recommended</span>
+<span class="sd">                             to always leave this parameter with its default</span>
+<span class="sd">                             value of ``False``.</span>
+
+<span class="sd">        Note: this method is not designed to be used concurrently. If multiple</span>
+<span class="sd">        tasks are emitting at the same time to the same client connection, then</span>
+<span class="sd">        messages composed of multiple packets may end up being sent in an</span>
+<span class="sd">        incorrect sequence. Use standard concurrency solutions (such as a Lock</span>
+<span class="sd">        object) to prevent this situation.</span>
+
+<span class="sd">        Note 2: this method is a coroutine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
+        <span class="n">room</span> <span class="o">=</span> <span class="n">to</span> <span class="ow">or</span> <span class="n">room</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;emitting event &quot;</span><span class="si">%s</span><span class="s1">&quot; to </span><span class="si">%s</span><span class="s1"> [</span><span class="si">%s</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span>
+                         <span class="n">room</span> <span class="ow">or</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">room</span><span class="o">=</span><span class="n">room</span><span class="p">,</span>
+                                <span class="n">skip_sid</span><span class="o">=</span><span class="n">skip_sid</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">room</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_sid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send a message to one or more connected clients.</span>
+
+<span class="sd">        This function emits an event with the name ``&#39;message&#39;``. Use</span>
+<span class="sd">        :func:`emit` to issue custom event names.</span>
+
+<span class="sd">        :param data: The data to send to the client or clients. Data can be of</span>
+<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. If a</span>
+<span class="sd">                     ``list`` or ``dict``, the data will be serialized as JSON.</span>
+<span class="sd">        :param to: The recipient of the message. This can be set to the</span>
+<span class="sd">                   session ID of a client to address only that client, or to</span>
+<span class="sd">                   to any custom room created by the application to address all</span>
+<span class="sd">                   the clients in that room, If this argument is omitted the</span>
+<span class="sd">                   event is broadcasted to all connected clients.</span>
+<span class="sd">        :param room: Alias for the ``to`` parameter.</span>
+<span class="sd">        :param skip_sid: The session ID of a client to skip when broadcasting</span>
+<span class="sd">                         to a room or to all clients. This can be used to</span>
+<span class="sd">                         prevent a message from being sent to the sender.</span>
+<span class="sd">        :param namespace: The Socket.IO namespace for the event. If this</span>
+<span class="sd">                          argument is omitted the event is emitted to the</span>
+<span class="sd">                          default namespace.</span>
+<span class="sd">        :param callback: If given, this function will be called to acknowledge</span>
+<span class="sd">                         the the client has received the message. The arguments</span>
+<span class="sd">                         that will be passed to the function are those provided</span>
+<span class="sd">                         by the client. Callback functions can only be used</span>
+<span class="sd">                         when addressing an individual client.</span>
+<span class="sd">        :param ignore_queue: Only used when a message queue is configured. If</span>
+<span class="sd">                             set to ``True``, the event is emitted to the</span>
+<span class="sd">                             clients directly, without going through the queue.</span>
+<span class="sd">                             This is more efficient, but only works when a</span>
+<span class="sd">                             single server process is used. It is recommended</span>
+<span class="sd">                             to always leave this parameter with its default</span>
+<span class="sd">                             value of ``False``.</span>
+
+<span class="sd">        Note: this method is a coroutine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">to</span><span class="p">,</span> <span class="n">room</span><span class="o">=</span><span class="n">room</span><span class="p">,</span>
+                        <span class="n">skip_sid</span><span class="o">=</span><span class="n">skip_sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span>
+                        <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Emit a custom event to a client and wait for the response.</span>
+
+<span class="sd">        :param event: The event name. It can be any string. The event names</span>
+<span class="sd">                      ``&#39;connect&#39;``, ``&#39;message&#39;`` and ``&#39;disconnect&#39;`` are</span>
+<span class="sd">                      reserved and should not be used.</span>
+<span class="sd">        :param data: The data to send to the client or clients. Data can be of</span>
+<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. If a</span>
+<span class="sd">                     ``list`` or ``dict``, the data will be serialized as JSON.</span>
+<span class="sd">        :param to: The session ID of the recipient client.</span>
+<span class="sd">        :param sid: Alias for the ``to`` parameter.</span>
+<span class="sd">        :param namespace: The Socket.IO namespace for the event. If this</span>
+<span class="sd">                          argument is omitted the event is emitted to the</span>
+<span class="sd">                          default namespace.</span>
+<span class="sd">        :param timeout: The waiting timeout. If the timeout is reached before</span>
+<span class="sd">                        the client acknowledges the event, then a</span>
+<span class="sd">                        ``TimeoutError`` exception is raised.</span>
+<span class="sd">        :param ignore_queue: Only used when a message queue is configured. If</span>
+<span class="sd">                             set to ``True``, the event is emitted to the</span>
+<span class="sd">                             client directly, without going through the queue.</span>
+<span class="sd">                             This is more efficient, but only works when a</span>
+<span class="sd">                             single server process is used. It is recommended</span>
+<span class="sd">                             to always leave this parameter with its default</span>
+<span class="sd">                             value of ``False``.</span>
+
+<span class="sd">        Note: this method is not designed to be used concurrently. If multiple</span>
+<span class="sd">        tasks are emitting at the same time to the same client connection, then</span>
+<span class="sd">        messages composed of multiple packets may end up being sent in an</span>
+<span class="sd">        incorrect sequence. Use standard concurrency solutions (such as a Lock</span>
+<span class="sd">        object) to prevent this situation.</span>
+
+<span class="sd">        Note 2: this method is a coroutine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">to</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">sid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot use call() to broadcast.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_handlers</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s1">&#39;Cannot use call() when async_handlers is False.&#39;</span><span class="p">)</span>
+        <span class="n">callback_event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">create_event</span><span class="p">()</span>
+        <span class="n">callback_args</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="nf">event_callback</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="n">callback_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">callback_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">room</span><span class="o">=</span><span class="n">to</span> <span class="ow">or</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span>
+                        <span class="n">callback</span><span class="o">=</span><span class="n">event_callback</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="n">callback_event</span><span class="o">.</span><span class="n">wait</span><span class="p">(),</span> <span class="n">timeout</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
+            <span class="n">six</span><span class="o">.</span><span class="n">raise_from</span><span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">callback_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">callback_args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span> \
+            <span class="k">else</span> <span class="n">callback_args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">callback_args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span> \
+            <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">close_room</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">room</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close a room.</span>
+
+<span class="sd">        This function removes all the clients from the given room.</span>
+
+<span class="sd">        :param room: Room name.</span>
+<span class="sd">        :param namespace: The Socket.IO namespace for the event. If this</span>
+<span class="sd">                          argument is omitted the default namespace is used.</span>
+
+<span class="sd">        Note: this method is a coroutine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;room </span><span class="si">%s</span><span class="s1"> is closing [</span><span class="si">%s</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="n">room</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">close_room</span><span class="p">(</span><span class="n">room</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the user session for a client.</span>
+
+<span class="sd">        :param sid: The session id of the client.</span>
+<span class="sd">        :param namespace: The Socket.IO namespace. If this argument is omitted</span>
+<span class="sd">                          the default namespace is used.</span>
+
+<span class="sd">        The return value is a dictionary. Modifications made to this</span>
+<span class="sd">        dictionary are not guaranteed to be preserved. If you want to modify</span>
+<span class="sd">        the user session, use the ``session`` context manager instead.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
+        <span class="n">eio_session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">eio_session</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">namespace</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">save_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store the user session for a client.</span>
+
+<span class="sd">        :param sid: The session id of the client.</span>
+<span class="sd">        :param session: The session dictionary.</span>
+<span class="sd">        :param namespace: The Socket.IO namespace. If this argument is omitted</span>
+<span class="sd">                          the default namespace is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
+        <span class="n">eio_session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
+        <span class="n">eio_session</span><span class="p">[</span><span class="n">namespace</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span>
+
+    <span class="k">def</span> <span class="nf">session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the user session for a client with context manager syntax.</span>
+
+<span class="sd">        :param sid: The session id of the client.</span>
+
+<span class="sd">        This is a context manager that returns the user session dictionary for</span>
+<span class="sd">        the client. Any changes that are made to this dictionary inside the</span>
+<span class="sd">        context manager block are saved back to the session. Example usage::</span>
+
+<span class="sd">            @eio.on(&#39;connect&#39;)</span>
+<span class="sd">            def on_connect(sid, environ):</span>
+<span class="sd">                username = authenticate_user(environ)</span>
+<span class="sd">                if not username:</span>
+<span class="sd">                    return False</span>
+<span class="sd">                with eio.session(sid) as session:</span>
+<span class="sd">                    session[&#39;username&#39;] = username</span>
+
+<span class="sd">            @eio.on(&#39;message&#39;)</span>
+<span class="sd">            def on_message(sid, msg):</span>
+<span class="sd">                async with eio.session(sid) as session:</span>
+<span class="sd">                    print(&#39;received message from &#39;, session[&#39;username&#39;])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">class</span> <span class="nc">_session_context_manager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">server</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sid</span> <span class="o">=</span> <span class="n">sid</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">async</span> <span class="k">def</span> <span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span>
+                    <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+
+            <span class="k">async</span> <span class="k">def</span> <span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">save_session</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span>
+                                               <span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_session_context_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ignore_queue</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Disconnect a client.</span>
+
+<span class="sd">        :param sid: Session ID of the client.</span>
+<span class="sd">        :param namespace: The Socket.IO namespace to disconnect. If this</span>
+<span class="sd">                          argument is omitted the default namespace is used.</span>
+<span class="sd">        :param ignore_queue: Only used when a message queue is configured. If</span>
+<span class="sd">                             set to ``True``, the disconnect is processed</span>
+<span class="sd">                             locally, without broadcasting on the queue. It is</span>
+<span class="sd">                             recommended to always leave this parameter with</span>
+<span class="sd">                             its default value of ``False``.</span>
+
+<span class="sd">        Note: this method is a coroutine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
+        <span class="k">if</span> <span class="n">ignore_queue</span><span class="p">:</span>
+            <span class="n">delete_it</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">delete_it</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">can_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">delete_it</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Disconnecting </span><span class="si">%s</span><span class="s1"> [</span><span class="si">%s</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">pre_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span><span class="n">packet</span><span class="o">.</span><span class="n">DISCONNECT</span><span class="p">,</span>
+                                                       <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_event</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">namespace</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">handle_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle an HTTP request from the client.</span>
+
+<span class="sd">        This is the entry point of the Socket.IO application. This function</span>
+<span class="sd">        returns the HTTP response body to deliver to the client.</span>
+
+<span class="sd">        Note: this method is a coroutine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">handle_request</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">start_background_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start a background task using the appropriate async model.</span>
+
+<span class="sd">        This is a utility function that applications can use to start a</span>
+<span class="sd">        background task using the method that is compatible with the</span>
+<span class="sd">        selected async mode.</span>
+
+<span class="sd">        :param target: the target function to execute. Must be a coroutine.</span>
+<span class="sd">        :param args: arguments to pass to the function.</span>
+<span class="sd">        :param kwargs: keyword arguments to pass to the function.</span>
+
+<span class="sd">        The return value is a ``asyncio.Task`` object.</span>
+
+<span class="sd">        Note: this method is a coroutine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">start_background_task</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">sleep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sleep for the requested amount of time using the appropriate async</span>
+<span class="sd">        model.</span>
+
+<span class="sd">        This is a utility function that applications can use to put a task to</span>
+<span class="sd">        sleep without having to worry about using the correct call for the</span>
+<span class="sd">        selected async mode.</span>
+
+<span class="sd">        Note: this method is a coroutine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">seconds</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_emit_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send a message to a client.&quot;&quot;&quot;</span>
+        <span class="c1"># tuples are expanded to multiple arguments, everything else is sent</span>
+        <span class="c1"># as a single argument</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span>
+            <span class="n">packet</span><span class="o">.</span><span class="n">EVENT</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">event</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+            <span class="n">binary</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_send_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send a Socket.IO packet to a client.&quot;&quot;&quot;</span>
+        <span class="n">encoded_packet</span> <span class="o">=</span> <span class="n">pkt</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encoded_packet</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">binary</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">ep</span> <span class="ow">in</span> <span class="n">encoded_packet</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="n">binary</span><span class="p">)</span>
+                <span class="n">binary</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">encoded_packet</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle a client connection request.&quot;&quot;&quot;</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">always_connect</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span><span class="n">packet</span><span class="o">.</span><span class="n">CONNECT</span><span class="p">,</span>
+                                                       <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
+        <span class="n">fail_reason</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_event</span><span class="p">(</span><span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">sid</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionRefusedError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">fail_reason</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_args</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">success</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">always_connect</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">pre_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span>
+                    <span class="n">packet</span><span class="o">.</span><span class="n">DISCONNECT</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">fail_reason</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">namespace</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span>
+                    <span class="n">packet</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">fail_reason</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">namespace</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span> <span class="ow">and</span> <span class="n">sid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">fail_reason</span> <span class="ow">or</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">always_connect</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span><span class="n">packet</span><span class="o">.</span><span class="n">CONNECT</span><span class="p">,</span>
+                                                       <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle a client disconnect.&quot;&quot;&quot;</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
+        <span class="k">if</span> <span class="n">namespace</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+            <span class="n">namespace_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">get_namespaces</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">namespace_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">namespace</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">namespace_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">pre_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_event</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">namespace</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">pre_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_event</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle an incoming client event.&quot;&quot;&quot;</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;received event &quot;</span><span class="si">%s</span><span class="s1">&quot; from </span><span class="si">%s</span><span class="s1"> [</span><span class="si">%s</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sid</span><span class="p">,</span>
+                         <span class="n">namespace</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not connected to namespace </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                                <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_handlers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_background_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_event_internal</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span>
+                                       <span class="n">data</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_event_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_event_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">_trigger_event</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="o">*</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># send ACK packet with the response returned by the handler</span>
+            <span class="c1"># tuples are expanded as multiple arguments</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">]</span>
+            <span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span><span class="n">packet</span><span class="o">.</span><span class="n">ACK</span><span class="p">,</span>
+                                                         <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span>
+                                                         <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                                                         <span class="n">binary</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_ack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle ACK packets from the client.&quot;&quot;&quot;</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;received ack from </span><span class="si">%s</span><span class="s1"> [</span><span class="si">%s</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">trigger_callback</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_trigger_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Invoke an application event handler.&quot;&quot;&quot;</span>
+        <span class="c1"># first see if we have an explicit handler for the event</span>
+        <span class="k">if</span> <span class="n">namespace</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span> <span class="ow">and</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="n">namespace</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">iscoroutinefunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="n">event</span><span class="p">])</span> \
+                    <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="n">event</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="n">namespace</span><span class="p">][</span><span class="n">event</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span>
+
+        <span class="c1"># or else, forward the event to a namepsace handler if one exists</span>
+        <span class="k">elif</span> <span class="n">namespace</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace_handlers</span><span class="p">:</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace_handlers</span><span class="p">[</span><span class="n">namespace</span><span class="p">]</span><span class="o">.</span><span class="n">trigger_event</span><span class="p">(</span>
+                <span class="n">event</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_eio_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">environ</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle the Engine.IO connection event.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager_initialized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manager_initialized</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="n">environ</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_connect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_eio_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dispatch Engine.IO messages.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_packet</span><span class="p">:</span>
+            <span class="n">pkt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_packet</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">pkt</span><span class="o">.</span><span class="n">add_attachment</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_packet</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">BINARY_EVENT</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_event</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                             <span class="n">pkt</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_ack</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                           <span class="n">pkt</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pkt</span> <span class="o">=</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span><span class="n">encoded_packet</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">CONNECT</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_connect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">DISCONNECT</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">EVENT</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_event</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">ACK</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_ack</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">BINARY_EVENT</span> <span class="ow">or</span> \
+                    <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">BINARY_ACK</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_binary_packet</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkt</span>
+            <span class="k">elif</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">ERROR</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unexpected ERROR packet.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown packet type.&#39;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_eio_disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle Engine.IO disconnect event.&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_engineio_server_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">engineio</span><span class="o">.</span><span class="n">AsyncServer</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">socketio.asyncio_server</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

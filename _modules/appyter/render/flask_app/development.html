@@ -80,28 +80,14 @@
       <span class="n">backoff</span> <span class="o">*=</span> <span class="mi">2</span></div>
 
 <div class="viewcode-block" id="app_messager"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.development.app_messager">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">app_messager</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-  <span class="kn">import</span> <span class="nn">socketio</span>
   <span class="kn">import</span> <span class="nn">asyncio</span>
   <span class="kn">from</span> <span class="nn">appyter.util</span> <span class="kn">import</span> <span class="n">join_routes</span>
-  <span class="n">sio</span> <span class="o">=</span> <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span>
-  <span class="n">connected</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.socketio</span> <span class="kn">import</span> <span class="n">AsyncClient</span>
+  <span class="n">sio</span> <span class="o">=</span> <span class="n">AsyncClient</span><span class="p">()</span>
   <span class="c1">#</span>
-  <span class="nd">@sio</span><span class="o">.</span><span class="n">event</span>
-  <span class="k">async</span> <span class="k">def</span> <span class="nf">connect</span><span class="p">():</span>
-    <span class="n">connected</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Connected to appyter server&#39;</span><span class="p">)</span>
-  <span class="nd">@sio</span><span class="o">.</span><span class="n">event</span>
-  <span class="k">async</span> <span class="k">def</span> <span class="nf">connect_error</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
-    <span class="n">connected</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-  <span class="nd">@sio</span><span class="o">.</span><span class="n">event</span>
-  <span class="k">async</span> <span class="k">def</span> <span class="nf">disconnect</span><span class="p">():</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Disconnected from appyter server&#39;</span><span class="p">)</span>
-    <span class="n">connected</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
   <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;livereload&#39;</span><span class="p">)</span>
   <span class="k">async</span> <span class="k">def</span> <span class="nf">livereload</span><span class="p">(</span><span class="n">changes</span><span class="p">):</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LiveReload </span><span class="si">{</span><span class="n">changes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">connected</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
     <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;livereload&#39;</span><span class="p">,</span> <span class="p">{})</span>
   <span class="c1">#</span>
   <span class="n">origin</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;HOST&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PORT&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
