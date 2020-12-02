@@ -2,9 +2,11 @@
 This module enables you to turn your jupyter notebook into a jinja2 template-driven web application. Or just parse for other purposes.
 
 ## Installation
+NOTE: This application uses modern python features including async await (3.5) and fstrings (3.6), to ensure you have the best experience please use python >= 3.8.
+
 ```bash
 # Install package from github repository master
-pip3 install --user --upgrade git+https://github.com/Maayanlab/appyter.git
+pip3 install --upgrade git+https://github.com/Maayanlab/appyter.git
 ```
 
 ## Usage
