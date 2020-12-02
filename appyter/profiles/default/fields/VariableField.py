@@ -1,6 +1,7 @@
 import re
 from appyter.fields import Field
 from appyter.util import secure_filepath, join_routes
+from appyter.util import try_json_loads
 
 class VariableField(Field):
   ''' Represing a variable number of instances of a given Field
@@ -34,9 +35,35 @@ class VariableField(Field):
       **kwargs,
     )
 
+  @property
+  def raw_value(self):
+    value = try_json_loads(self.args['value'])
+    if value is None:
+      return []
+    elif type(value) == list:
+      return value
+    elif type(value) == str:
+      return [value]
+    else:
+      return [self.args['value']]
+
   def constraint(self):
-    return self.raw_value is not None and all(self.args['field'](value=v).constraint() for v in self.raw_value)
+    return self.args['min'] <= len(self.raw_value) <= self.args['max'] and all(
+      v.startswith(self.args['field']['args']['name'])
+      for v in self.raw_value
+    )
+
+  @property
+  def value(self):
+    assert self.constraint(), '%s[%s] (%s) does not satisfy constraints' % (
+      self.field, self.args.get('name', ''), self.raw_value
+    )
+    # TODO: grab fields from environment
+    return [
+      self._env.globals[name]
+      for name in self.raw_value
+    ]
 
   def render(self, **kwargs):
-    self.args['field_render'] = str(self.args['field'].render())
+    self.args['field']['js_url'] = self.args['field'].js_url
     return super().render(**kwargs)
