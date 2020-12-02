@@ -45,12 +45,12 @@
 <span class="n">template_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\{[\{%](?P&lt;inner&gt;.+?)[%\}]\}&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
 <span class="n">field_match</span> <span class="o">=</span> <span class="n">FunctionCallMatcher</span><span class="p">()</span>
 
-<div class="viewcode-block" id="parse_fields_from_cell"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nbtemplate.parse_fields_from_cell">[docs]</a><span class="k">def</span> <span class="nf">parse_fields_from_cell</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">cell</span><span class="p">):</span>
+<div class="viewcode-block" id="parse_fields_from_cell"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nbtemplate.parse_fields_from_cell">[docs]</a><span class="k">def</span> <span class="nf">parse_fields_from_cell</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
   <span class="n">cell_m</span> <span class="o">=</span> <span class="n">cell_match</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
   <span class="k">if</span> <span class="n">cell_m</span><span class="p">:</span>
     <span class="n">cell_source</span> <span class="o">=</span> <span class="n">cell_m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">template_m</span> <span class="ow">in</span> <span class="n">template_match</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">cell_source</span><span class="p">):</span>
-      <span class="k">for</span> <span class="n">field_m</span> <span class="ow">in</span> <span class="n">field_match</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">template_m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;inner&#39;</span><span class="p">)):</span>
+      <span class="k">for</span> <span class="n">field_m</span> <span class="ow">in</span> <span class="n">field_match</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">template_m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;inner&#39;</span><span class="p">),</span> <span class="n">deep</span><span class="o">=</span><span class="n">deep</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
           <span class="n">result</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">field_m</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="p">)</span>
           <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
@@ -58,11 +58,11 @@
         <span class="k">except</span><span class="p">:</span>
           <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="parse_fields_from_nbtemplate"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nbtemplate.parse_fields_from_nbtemplate">[docs]</a><span class="k">def</span> <span class="nf">parse_fields_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nb</span><span class="p">):</span>
+<div class="viewcode-block" id="parse_fields_from_nbtemplate"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nbtemplate.parse_fields_from_nbtemplate">[docs]</a><span class="k">def</span> <span class="nf">parse_fields_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nb</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
   <span class="k">return</span> <span class="p">[</span>
     <span class="n">field</span>
     <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">nb</span><span class="o">.</span><span class="n">cells</span>
-    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">parse_fields_from_cell</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">cell</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">parse_fields_from_cell</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="n">deep</span><span class="p">)</span>
   <span class="p">]</span></div>
 </pre></div>
 
