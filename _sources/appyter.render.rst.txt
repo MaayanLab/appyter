@@ -12,14 +12,6 @@ Subpackages
 Submodules
 ----------
 
-appyter.render.dockerize module
--------------------------------
-
-.. automodule:: appyter.render.dockerize
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 appyter.render.form module
 --------------------------
 
