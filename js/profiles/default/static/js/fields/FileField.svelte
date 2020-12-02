@@ -185,7 +185,7 @@
   <div class="col-lg-3 bold text-lg-right my-auto">
     {args.label}
     {#if args.description}
-      <sup  data-toggle="tooltip" title={args.description}><i class="far fa-question-circle"></i></sup>
+      <sup data-toggle="tooltip" title={args.description}><i class="far fa-question-circle"></i></sup>
     {/if}:
   </div>
   <div class="col-lg-6 pt-2 pt-lg-0">
@@ -234,7 +234,7 @@
       {/if}
     </div>
     {/if}
-    {#if args.examples}
+    {#if args.examples && Object.keys(args.examples).length > 0}
       <ul style="list-style-type: none">
         <span>Load example:</span>
         {#each Object.keys(args.examples) as example_name}
