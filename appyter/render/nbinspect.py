@@ -14,7 +14,7 @@ def render_nbtemplate_json_from_nbtemplate(env, nb):
   '''
   return [
     { 'field': field.field, 'args': field.args }
-    for field in parse_fields_from_nbtemplate(env, nb)
+    for field in parse_fields_from_nbtemplate(env, nb, deep=True)
   ]
 
 @cli.command(help='Inspect appyter for arguments (fields)')

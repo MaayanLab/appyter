@@ -45,7 +45,7 @@ class FunctionCallMatcher:
     if end is not None:
       return (val[start:end], cur_ind)
 
-  def finditer(self, val):
+  def finditer(self, val, deep=False):
     cur_ind = 0
     max_ind = len(val)
     end = None
@@ -69,3 +69,6 @@ class FunctionCallMatcher:
           call, last_ind = ret
           cur_ind += last_ind
           yield name + call
+          if deep:
+            for el in self.finditer(call):
+              yield el
