@@ -30,12 +30,6 @@ def sanitize_uuid(val):
   except:
     return None
 
-def collapse(L):
-  if len(L) == 1:
-    return L[0]
-  else:
-    return L
-
 def route_join_with_or_without_slash(blueprint, *routes, **kwargs):
   ''' Like @app.route but doesn't care about trailing slash or not
   '''

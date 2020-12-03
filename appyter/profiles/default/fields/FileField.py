@@ -1,6 +1,9 @@
 import re
+import logging
+logger = logging.getLogger(__name__)
+
 from appyter.fields import Field
-from appyter.util import secure_filepath, join_routes
+from appyter.util import secure_filepath, join_routes, collapse
 
 class FileField(Field):
   ''' Represing a uploadable File and facilitating that file upload.
@@ -27,6 +30,48 @@ class FileField(Field):
       examples=examples,
       **kwargs,
     )
+
+  def prepare(self, req):
+    logger.debug(f"prepare")
+    # TODO: maybe we should be turning the contents of the field into a file?
+    if type(req) == dict:
+      return {self.args['name']: req.get(self.args['name'])}
+    elif req.json:
+      return {self.args['name']: req.json.get(self.args['name'])}
+    elif req.form:
+      from appyter.render.flask_app.download import upload_from_request
+      return dict(
+        {self.args['name']: collapse(req.form.getlist(self.args['name']))},
+        **upload_from_request(req, self.args['name'])
+      )
+    else:
+      raise NotImplementedError
+
+  def pre_construct(self, ctx, **kwargs):
+    logger.debug(f"pre_construct")
+    from appyter.render.flask_app.util import sanitize_sha1sum
+    if fdata := ctx.get(self.args['name']):
+      content_hash, filename = fdata.split('/', maxsplit=1)
+      content_hash = sanitize_sha1sum(content_hash)
+      filename = secure_filepath(filename)
+      return {
+        self.args['name']: filename,
+        f"__{self.args['name']}__orig": fdata,
+      }
+    #
+    return {}
+
+  def post_construct(self, ctx, data_fs=None, results_path=None, **kwargs):
+    logger.debug(f"post_construct")
+    from appyter.ext.fs import Filesystem
+    from appyter.render.flask_app.util import sanitize_sha1sum
+    if fdata := ctx.get(f"__{self.args['name']}__orig"):
+      content_hash, filename = fdata.split('/', maxsplit=1)
+      content_hash = sanitize_sha1sum(content_hash)
+      data_fs.link(
+        Filesystem.join('input', content_hash),
+        Filesystem.join(results_path, filename)
+      )
 
   @property
   def raw_value(self):

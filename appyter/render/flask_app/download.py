@@ -140,17 +140,16 @@ async def siofu_done(sid, evt):
   ), room=sid)
 
 # upload from client with POST
-def upload_from_request(req, fnames):
+def upload_from_request(req, fname):
   from flask import current_app
   data_fs = Filesystem(current_app.config['DATA_DIR'])
   data = dict()
-  for fname in fnames:
-    fh = req.files.get(fname)
-    if fh:
-      filename = secure_filepath(fh.filename)
-      path = generate_uuid()
-      with Filesystem('tmpfs://') as tmp_fs:
-        with tmp_fs.open(path, 'w') as fw:
-          fh.save(fw)
-        data[fname] = '/'.join((organize_file_content(data_fs, tmp_fs, path), filename))
+  fh = req.files.get(fname)
+  if fh:
+    filename = secure_filepath(fh.filename)
+    path = generate_uuid()
+    with Filesystem('tmpfs://') as tmp_fs:
+      with tmp_fs.open(path, 'w') as fw:
+        fh.save(fw)
+      data[fname] = '/'.join((organize_file_content(data_fs, tmp_fs, path), filename))
   return data

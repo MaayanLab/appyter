@@ -21,6 +21,12 @@ def try_json_dumps(v):
 def dict_filter_none(d):
   return { k: v for k, v in d.items() if v }
 
+def collapse(L):
+  if len(L) == 1:
+    return L[0]
+  else:
+    return L
+
 def join_routes(*routes):
   ''' Utility function for joining routes while striping extraneous slashes
   '''

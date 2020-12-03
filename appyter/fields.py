@@ -9,6 +9,7 @@ import json
 from copy import copy
 from flask import Markup
 from appyter.context import get_jinja2_env
+from appyter.util import collapse
 
 def build_fields(fields, context={}, env=None):
   ''' INTERNAL: Build a dictionary of Field instances
@@ -110,6 +111,22 @@ class Field(dict):
     '''
     from appyter.profiles.default.filters.url_for import url_for
     return url_for('static', filename='js/fields/' + self.field + '.js')
+
+  def prepare(self, req):
+    if type(req) == dict:
+      return {self.args['name']: req.get(self.args['name'])}
+    elif req.json:
+      return {self.args['name']: req.json.get(self.args['name'])}
+    elif req.form:
+      return {self.args['name']: collapse(req.form.getlist(self.args['name']))}
+    else:
+      raise NotImplementedError
+
+  def pre_construct(self, ctx, **kwargs):
+    return {}
+
+  def post_construct(self, ctx, **kwargs):
+    pass
 
   @property
   def choices(self):
