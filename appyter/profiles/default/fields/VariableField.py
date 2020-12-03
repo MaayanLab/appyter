@@ -1,7 +1,9 @@
 import re
+import logging
+logger = logging.getLogger(__name__)
+
 from appyter.fields import Field
-from appyter.util import secure_filepath, join_routes
-from appyter.util import try_json_loads
+from appyter.util import collapse, try_json_loads
 
 class VariableField(Field):
   ''' Represing a variable number of instances of a given Field
@@ -35,6 +37,61 @@ class VariableField(Field):
       **kwargs,
     )
 
+  def prepare(self, req):
+    logger.debug(f"prepare")
+    if type(req) == dict:
+      data = {}
+      data[self.args['name']] = self.args['value'] = req.get(self.args['name'])
+      assert self.constraint(), '%s[%s] (%s) does not satisfy constraints' % (self.field, self.args.get('name', ''), self.raw_value)
+      orig_name = self.args['field'].args['name']
+      for name in self.raw_value:
+        self.args['field'].args['name'] = name
+        data.update(self.args['field'].prepare(req))
+      self.args['field'].args['name'] = orig_name
+      return data
+    elif req.json:
+      data = {}
+      data[self.args['name']] = self.args['value'] = req.json.get(self.args['name'])
+      assert self.constraint(), '%s[%s] (%s) does not satisfy constraints' % (self.field, self.args.get('name', ''), self.raw_value)
+      orig_name = self.args['field'].args['name']
+      for name in self.raw_value:
+        self.args['field'].args['name'] = name
+        data.update(self.args['field'].prepare(req))
+      self.args['field'].args['name'] = orig_name
+      return data
+    elif req.form:
+      data = {}
+      data[self.args['name']] = self.args['value'] = collapse(req.form.getlist(self.args['name']))
+      assert self.constraint(), '%s[%s] (%s) does not satisfy constraints' % (self.field, self.args.get('name', ''), self.raw_value)
+      orig_name = self.args['field'].args['name']
+      for name in self.raw_value:
+        self.args['field'].args['name'] = name
+        data.update(self.args['field'].prepare(req))
+      self.args['field'].args['name'] = orig_name
+      return data
+    else:
+      raise NotImplementedError
+
+  def pre_construct(self, ctx, **kwargs):
+    logger.debug(f"pre_construct")
+    self.args['value'] = ctx.get(self.args['name'])
+    ctx_update = {}
+    orig_name = self.args['field'].args['name']
+    for name in self.raw_value:
+      self.args['field'].args['name'] = name
+      ctx_update.update(self.args['field'].pre_construct(ctx, **kwargs))
+    self.args['field'].args['name'] = orig_name
+    return ctx_update
+
+  def post_construct(self, ctx, **kwargs):
+    logger.debug(f"post_construct")
+    self.args['value'] = ctx.get(self.args['name'])
+    orig_name = self.args['field'].args['name']
+    for name in self.raw_value:
+      self.args['field'].args['name'] = name
+      self.args['field'].post_construct(ctx, **kwargs)
+    self.args['field'].args['name'] = orig_name
+
   @property
   def raw_value(self):
     value = try_json_loads(self.args['value'])
@@ -49,7 +106,7 @@ class VariableField(Field):
 
   def constraint(self):
     return self.args['min'] <= len(self.raw_value) <= self.args['max'] and all(
-      v.startswith(self.args['field']['args']['name'])
+      v.startswith(self.args['field'].args['name'])
       for v in self.raw_value
     )
 
@@ -58,9 +115,8 @@ class VariableField(Field):
     assert self.constraint(), '%s[%s] (%s) does not satisfy constraints' % (
       self.field, self.args.get('name', ''), self.raw_value
     )
-    # TODO: grab fields from environment
     return [
-      self._env.globals[name]
+      self._context[name]
       for name in self.raw_value
     ]
 
