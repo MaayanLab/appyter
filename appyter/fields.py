@@ -20,6 +20,7 @@ def build_fields(fields, context={}, env=None):
         value=_context.get(name),
       ),
       _env=env,
+      _context=context,
     )
     for field_name, field in fields.items()
   }
@@ -39,6 +40,7 @@ class Field(dict):
       value=None,
       section=None,
       _env=None,
+      _context=None,
       **kwargs):
     '''
     :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
@@ -65,6 +67,7 @@ class Field(dict):
     )
     assert name is not None, "Name should be defined and unique"
     self._env = _env
+    self._context = _context
   
   @property
   def args(self):
