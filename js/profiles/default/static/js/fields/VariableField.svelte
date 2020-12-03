@@ -51,7 +51,7 @@
     type="text"
     class="hidden"
     name={args.name}
-    value={JSON.stringify(Object.keys(values).map((v) => v.args.name))}
+    value={JSON.stringify(Object.values(values).map((v) => v.args.name))}
   />
   <AppyterField
     data={{...args.field, args: {...args.field.args, value: ''}}}
