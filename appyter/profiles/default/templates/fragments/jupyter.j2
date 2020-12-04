@@ -1,5 +1,5 @@
 {# Derived from nbconvert output #}
-<style type="text/css">
+<style type="text/css" scoped>
 /*!
 *
 * Twitter Bootstrap
@@ -11,11 +11,6 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
-html {
-  font-family: sans-serif;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-}
 body {
   margin: 0;
 }
@@ -1071,17 +1066,6 @@ th {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-}
-html {
-  font-size: 10px;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 13px;
-  line-height: 1.42857143;
-  color: #000;
-  background-color: #fff;
 }
 input,
 button,
@@ -9371,56 +9355,6 @@ div.traceback-wrapper pre.traceback {
  *
  * Author: Jupyter Development Team
  */
-body {
-  background-color: #fff;
-  /* This makes sure that the body covers the entire window and needs to
-       be in a different element than the display: box in wrapper below */
-  position: absolute;
-  left: 0px;
-  right: 0px;
-  top: 0px;
-  bottom: 0px;
-  overflow: visible;
-}
-body > #header {
-  /* Initially hidden to prevent FLOUC */
-  display: none;
-  background-color: #fff;
-  /* Display over codemirror */
-  position: relative;
-  z-index: 100;
-}
-body > #header #header-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 5px;
-  padding-bottom: 5px;
-  padding-top: 5px;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-}
-body > #header .header-bar {
-  width: 100%;
-  height: 1px;
-  background: #e7e7e7;
-  margin-bottom: -1px;
-}
-@media print {
-  body > #header {
-    display: none !important;
-  }
-}
-#header-spacer {
-  width: 100%;
-  visibility: hidden;
-}
-@media print {
-  #header-spacer {
-    display: none;
-  }
-}
 #ipython_notebook {
   padding-left: 0px;
   padding-top: 1px;
@@ -12936,7 +12870,7 @@ ul.typeahead-list  > li > a.pull-right {
 }
 /*# sourceMappingURL=style.min.css.map */
     </style>
-<style type="text/css">
+<style type="text/css" scoped>
     .highlight .hll { background-color: #ffffcc }
 .highlight  { background: #f8f8f8; }
 .highlight .c { color: #408080; font-style: italic } /* Comment */
@@ -13007,7 +12941,7 @@ ul.typeahead-list  > li > a.pull-right {
 .highlight .vm { color: #19177C } /* Name.Variable.Magic */
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
     </style>
-<style type="text/css">
+<style type="text/css" scoped>
 /* Overrides of notebook CSS for static HTML export */
 body {
   overflow: visible;
