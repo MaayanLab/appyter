@@ -48,7 +48,9 @@
   {% endblock %}
 </head>
 <body>
+  {% block header %}{% endblock %}
   {% block body %}{% endblock %}
+  {% block footer %}{% endblock %}
   {% block script %}
     {% if _config.DEBUG %}
     <script>
