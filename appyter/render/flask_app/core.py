@@ -58,17 +58,15 @@ def prepare_formdata(req):
   data = {}
   if req.form:
     data.update({
-      field['args']['name']: collapse(V)
+      field['args']['name']: collapse(req.form.getlist(field['args']['name']))
       for field in fields
-      for V in req.form.getlist(field['args']['name'])
       if field['args']['name'] in req.form
     })
     data.update(upload_from_request(req, file_fields))
   elif req.json:
     data.update({
-      field['args']['name']: v
+      field['args']['name']: req.json.get(field['args']['name'])
       for field in fields
-      for v in req.json.get(field['args']['name'])
       if field['args']['name'] in req.json
     })
   return prepare_data(data)
