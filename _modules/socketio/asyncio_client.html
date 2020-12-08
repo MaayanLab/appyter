@@ -178,17 +178,17 @@
 <span class="sd">        :param event: The event name. It can be any string. The event names</span>
 <span class="sd">                      ``&#39;connect&#39;``, ``&#39;message&#39;`` and ``&#39;disconnect&#39;`` are</span>
 <span class="sd">                      reserved and should not be used.</span>
-<span class="sd">        :param data: The data to send to the server. Data can be of</span>
-<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. To send</span>
-<span class="sd">                     multiple arguments, use a tuple where each element is of</span>
-<span class="sd">                     one of the types indicated above.</span>
+<span class="sd">        :param data: The data to send to the client or clients. Data can be of</span>
+<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. If a</span>
+<span class="sd">                     ``list`` or ``dict``, the data will be serialized as JSON.</span>
 <span class="sd">        :param namespace: The Socket.IO namespace for the event. If this</span>
 <span class="sd">                          argument is omitted the event is emitted to the</span>
 <span class="sd">                          default namespace.</span>
 <span class="sd">        :param callback: If given, this function will be called to acknowledge</span>
-<span class="sd">                         the the server has received the message. The arguments</span>
+<span class="sd">                         the the client has received the message. The arguments</span>
 <span class="sd">                         that will be passed to the function are those provided</span>
-<span class="sd">                         by the server.</span>
+<span class="sd">                         by the client. Callback functions can only be used</span>
+<span class="sd">                         when addressing an individual client.</span>
 
 <span class="sd">        Note: this method is not designed to be used concurrently. If multiple</span>
 <span class="sd">        tasks are emitting at the same time on the same client connection, then</span>
@@ -229,17 +229,17 @@
 <span class="sd">        This function emits an event with the name ``&#39;message&#39;``. Use</span>
 <span class="sd">        :func:`emit` to issue custom event names.</span>
 
-<span class="sd">        :param data: The data to send to the server. Data can be of</span>
-<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. To send</span>
-<span class="sd">                     multiple arguments, use a tuple where each element is of</span>
-<span class="sd">                     one of the types indicated above.</span>
+<span class="sd">        :param data: The data to send to the client or clients. Data can be of</span>
+<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. If a</span>
+<span class="sd">                     ``list`` or ``dict``, the data will be serialized as JSON.</span>
 <span class="sd">        :param namespace: The Socket.IO namespace for the event. If this</span>
 <span class="sd">                          argument is omitted the event is emitted to the</span>
 <span class="sd">                          default namespace.</span>
 <span class="sd">        :param callback: If given, this function will be called to acknowledge</span>
-<span class="sd">                         the the server has received the message. The arguments</span>
+<span class="sd">                         the the client has received the message. The arguments</span>
 <span class="sd">                         that will be passed to the function are those provided</span>
-<span class="sd">                         by the server.</span>
+<span class="sd">                         by the client. Callback functions can only be used</span>
+<span class="sd">                         when addressing an individual client.</span>
 
 <span class="sd">        Note: this method is a coroutine.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -252,10 +252,9 @@
 <span class="sd">        :param event: The event name. It can be any string. The event names</span>
 <span class="sd">                      ``&#39;connect&#39;``, ``&#39;message&#39;`` and ``&#39;disconnect&#39;`` are</span>
 <span class="sd">                      reserved and should not be used.</span>
-<span class="sd">        :param data: The data to send to the server. Data can be of</span>
-<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. To send</span>
-<span class="sd">                     multiple arguments, use a tuple where each element is of</span>
-<span class="sd">                     one of the types indicated above.</span>
+<span class="sd">        :param data: The data to send to the client or clients. Data can be of</span>
+<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. If a</span>
+<span class="sd">                     ``list`` or ``dict``, the data will be serialized as JSON.</span>
 <span class="sd">        :param namespace: The Socket.IO namespace for the event. If this</span>
 <span class="sd">                          argument is omitted the event is emitted to the</span>
 <span class="sd">                          default namespace.</span>

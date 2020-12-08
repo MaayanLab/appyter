@@ -130,9 +130,8 @@
 <span class="sd">                      ``&#39;connect&#39;``, ``&#39;message&#39;`` and ``&#39;disconnect&#39;`` are</span>
 <span class="sd">                      reserved and should not be used.</span>
 <span class="sd">        :param data: The data to send to the client or clients. Data can be of</span>
-<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. To send</span>
-<span class="sd">                     multiple arguments, use a tuple where each element is of</span>
-<span class="sd">                     one of the types indicated above.</span>
+<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. If a</span>
+<span class="sd">                     ``list`` or ``dict``, the data will be serialized as JSON.</span>
 <span class="sd">        :param to: The recipient of the message. This can be set to the</span>
 <span class="sd">                   session ID of a client to address only that client, or to</span>
 <span class="sd">                   to any custom room created by the application to address all</span>
@@ -182,9 +181,8 @@
 <span class="sd">        :func:`emit` to issue custom event names.</span>
 
 <span class="sd">        :param data: The data to send to the client or clients. Data can be of</span>
-<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. To send</span>
-<span class="sd">                     multiple arguments, use a tuple where each element is of</span>
-<span class="sd">                     one of the types indicated above.</span>
+<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. If a</span>
+<span class="sd">                     ``list`` or ``dict``, the data will be serialized as JSON.</span>
 <span class="sd">        :param to: The recipient of the message. This can be set to the</span>
 <span class="sd">                   session ID of a client to address only that client, or to</span>
 <span class="sd">                   to any custom room created by the application to address all</span>
@@ -224,9 +222,8 @@
 <span class="sd">                      ``&#39;connect&#39;``, ``&#39;message&#39;`` and ``&#39;disconnect&#39;`` are</span>
 <span class="sd">                      reserved and should not be used.</span>
 <span class="sd">        :param data: The data to send to the client or clients. Data can be of</span>
-<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. To send</span>
-<span class="sd">                     multiple arguments, use a tuple where each element is of</span>
-<span class="sd">                     one of the types indicated above.</span>
+<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. If a</span>
+<span class="sd">                     ``list`` or ``dict``, the data will be serialized as JSON.</span>
 <span class="sd">        :param to: The session ID of the recipient client.</span>
 <span class="sd">        :param sid: Alias for the ``to`` parameter.</span>
 <span class="sd">        :param namespace: The Socket.IO namespace for the event. If this</span>
