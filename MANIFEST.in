@@ -9,3 +9,4 @@ recursive-include * *.svg
 recursive-include * *.ttf
 recursive-include * *.woff
 recursive-include * *.woff2
+recursive-include * VERSION
