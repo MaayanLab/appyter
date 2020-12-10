@@ -83,9 +83,17 @@ http {
     sendfile on;
     keepalive_timeout 0;
 
+    set $parsed_method "${request_method}:${http_accept}";
+
     location = {{ _config.PREFIX.rstrip('/') }}/ {
-      if ($request_method = GET) {
+      if ($parsed_method = 'GET:text/html') {
         rewrite ^(.*)/$ $1/index.html;
+      }
+      if ($parsed_method = 'GET:application/json') {
+        rewrite ^(.*)/$ $1/index.json;
+      }
+      if ($parsed_method = 'GET:application/vnd.jupyter') {
+        rewrite ^(.*)/$ $1/{{ _config.IPYNB }};
       }
       {{ proxy('http://appyter', False, 'appyter-core') }}
     }
@@ -93,6 +101,16 @@ http {
     location = {{ join_routes(_config.PREFIX, 'index.html') }} {
       root {{ _tmp_fs.path() }};
       try_files /index.html =404;
+    }
+
+    location = {{ join_routes(_config.PREFIX, 'index.json') }} {
+      root {{ _tmp_fs.path() }};
+      try_files /index.json =404;
+    }
+
+    location = {{ join_routes(_config.PREFIX, _config.IPYNB) }} {
+      root {{ _config.CWD }};
+      try_files /{{ _config.IPYNB }} =404;
     }
 
     location = {{ join_routes(_config.PREFIX, 'favicon.ico') }} {
@@ -124,6 +142,12 @@ http {
     }
 
     location ~ ^{{ join_routes(_config.PREFIX, '[^/]+') }}/$ {
+      if ($parsed_method = 'GET:application/vnd.jupyter') {
+        rewrite ^(.*)/$ $1/{{ _config.IPYNB }};
+      }
+      if ($parsed_method = 'GET:application/json') {
+        rewrite ^(.*)/$ $1/{{ _config.IPYNB }};
+      }
       root {{ _tmp_fs.path() }};
       try_files /landing.html =404;
     }

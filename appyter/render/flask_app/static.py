@@ -18,8 +18,8 @@ from appyter.context import get_jinja2_env
 def get_index():
   mimetype = request.accept_mimetypes.best_match([
     'text/html',
-    'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json',
     'application/json',
+    'application/vnd.jupyter',
   ], 'text/html')
   fs = Filesystem(current_app.config['CWD'])
   if mimetype in {'text/html'}:
@@ -32,7 +32,7 @@ def get_index():
       env = get_jinja2_env(config=current_app.config)
       nbtemplate = nb_from_ipynb_io(fr)
     return jsonify(render_nbtemplate_json_from_nbtemplate(env, nbtemplate))
-  elif mimetype in {'application/vnd.jupyter', 'application/vnd.jupyter.cells', 'application/x-ipynb+json'}:
+  elif mimetype in {'application/vnd.jupyter'}:
     return send_file(fs.open(current_app.config['IPYNB'], 'rb'), attachment_filename=current_app.config['IPYNB'], mimetype=mimetype)
   else:
     abort(404)
@@ -58,11 +58,22 @@ def static(filename):
 @route_join_with_or_without_slash(core, '<path:path>', methods=['GET'])
 def data_files(path):
   if path.endswith('/'):
-    fs = Filesystem(current_app.config['CWD'])
-    env = get_jinja2_env(config=current_app.config)
-    return env.get_template('landing.j2').render(
-      _nb=os.path.basename(current_app.config['IPYNB']),
-    )
+    mimetype = request.accept_mimetypes.best_match([
+      'text/html',
+      'application/json',
+      'application/vnd.jupyter',
+    ], 'text/html')
+    if mimetype == 'text/html':
+      fs = Filesystem(current_app.config['CWD'])
+      env = get_jinja2_env(config=current_app.config)
+      return env.get_template('landing.j2').render(
+        _nb=os.path.basename(current_app.config['IPYNB']),
+      )
+    else:
+      data_fs = Filesystem(Filesystem.join(current_app.config['DATA_DIR'], 'output'))
+      path += current_app.config['IPYNB']
+      if data_fs.exists(path):
+        return send_file(data_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
   else:
     data_fs = Filesystem(Filesystem.join(current_app.config['DATA_DIR'], 'output'))
     if data_fs.exists(path):
