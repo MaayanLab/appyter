@@ -11,14 +11,16 @@ from appyter.util import click_option_setenv, click_argument_setenv, join_routes
     ignore_unknown_options=True,
   ),
 )
-@click_option_setenv('--data-dir', envvar='APPYTER_DATA_DIR', default='data', help='The directory to store data of executions')
+@click_option_setenv('--data-dir', envvar='APPYTER_DATA_DIR', default=None, help='The directory to store data of executions')
 @click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
-@click_option_setenv('--port', envvar='APPYTER_PORT', type=int, default=5000, help='The port this flask server should run on')
+@click_option_setenv('--host', envvar='APPYTER_HOST', default='0.0.0.0', help='The host to bind to')
+@click_option_setenv('--port', envvar='APPYTER_PORT', type=int, default=5000, help='The port this server should run on')
 @click.argument('args', nargs=-1, type=click.UNPROCESSED)
 @click_argument_setenv('uri', envvar='APPYTER_URI', nargs=1, type=str)
 @click.pass_context
-def fetch_and_serve(ctx, data_dir, cwd, port, args, uri):
+def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
   import json
+  import tempfile
   import urllib.request
   import nbformat as nbf
   # fetch the actual notebook
@@ -54,7 +56,9 @@ def fetch_and_serve(ctx, data_dir, cwd, port, args, uri):
     click.echo(f"Appyter ran from {metadata['nbexecute']['started']} to {metadata['nbexecute']['completed']}")
   else:
     click.echo('WARNING: this appyter seems old, this may not work properly, please contact us and we can update it')
-  #
+  # if tmpdir doesn't exist, create it
+  if data_dir is None:
+    data_dir = tempfile.mkdtemp()
   # write notebook to data_dir
   os.makedirs(data_dir, exist_ok=True)
   filename = metadata.get('nbconstruct', {}).get('filename', 'appyter.ipynb')
@@ -74,4 +78,4 @@ def fetch_and_serve(ctx, data_dir, cwd, port, args, uri):
   click.echo(f"Done. Starting `appyter serve`...")
   # serve the bundle in jupyter notebook
   from appyter.helpers.serve import serve
-  ctx.invoke(serve, cwd=cwd, data_dir=data_dir, port=port, args=[*args, filename])
+  ctx.invoke(serve, cwd=cwd, data_dir=data_dir, host=host, port=port, args=[*args, filename])
