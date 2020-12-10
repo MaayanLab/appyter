@@ -20,6 +20,7 @@
 
   let nb
   let show_code = false
+  let local_run_url
 
   // get deps with requirejs
   let socket
@@ -152,13 +153,10 @@
       if (value.metadata.appyter === undefined) {
         console.warn('Converting legacy metadata')
         value.metadata.appyter = {
-          nbconstruct: {
-            version: 'unknown (v <= 0.10.0)',
-          },
+          nbconstruct: {},
         }
         if (value.metadata.execution_info !== undefined) {
           value.metadata.appyter.nbexecute = {
-            version: 'unknown (0.8.0 <= v <= 0.10.0)',
             started: value.metadata.execution_info.started,
             completed: value.metadata.execution_info.completed,
           }
@@ -181,6 +179,18 @@
         await tick()
         status = undefined
         nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
+      }
+
+      if (extras.indexOf('catalog-integration') !== -1) {
+        const P = window.location.pathname.split('/').filter(p => p)
+        const slug = P[P.length - 2] || ''
+        const id = P[P.length - 1] || ''
+
+        let version = ''
+        if (nb.metadata.appyter.nbexecute !== undefined) version = nb.metadata.appyter.nbexecute.version
+        else if (nb.metadata.appyter.nbconstruct !== undefined) version = nb.metadata.appyter.nbconstruct.version
+
+        local_run_url = `${window.location.origin}/#/running-appyters/?slug=${slug}&id=${id}&version=${version}`
       }
     } catch (e) {
       await tick()
@@ -321,6 +331,15 @@
       >
         Toggle Code
       </a>
+    {/if}
+    {#if extras.indexOf('catalog-integration') !== -1}
+    <a
+      id="run-notebook-locally"
+      class="btn btn-primary"
+      role="button"
+      class:disabled={local_run_url === undefined}
+      href={local_run_url}
+    >Run Locally</a>
     {/if}
   </div>
   <div class="w-100">&nbsp;</div>
