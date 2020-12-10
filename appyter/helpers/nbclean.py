@@ -4,9 +4,10 @@ import nbformat
 from appyter.ext.fs import Filesystem
 from appyter.cli import cli
 from appyter.context import get_env, get_jinja2_env
+from appyter.util import click_argument_setenv
 
 @cli.command(help='Clean an appyters output & metadata to minimize unnecessary data transfers in production')
-@click.argument('ipynb', type=str, envvar='APPYTER_IPYNB')
+@click_argument_setenv('ipynb', type=str, envvar='APPYTER_IPYNB')
 def nbclean(ipynb, **kwargs):
   nb = nbformat.read(open(ipynb, 'r'), as_version=4)
   for cell in nb.cells:
