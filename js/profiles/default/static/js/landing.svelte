@@ -149,14 +149,29 @@
         throw new Error('Notebook not found')
       }
       const value = await req.json()
+      if (value.metadata.appyter === undefined) {
+        console.warn('Converting legacy metadata')
+        value.metadata.appyter = {
+          nbconstruct: {
+            version: 'unknown (v <= 0.10.0)',
+          },
+        }
+        if (value.metadata.execution_info !== undefined) {
+          value.metadata.appyter.nbexecute = {
+            version: 'unknown (0.8.0 <= v <= 0.10.0)',
+            started: value.metadata.execution_info.started,
+            completed: value.metadata.execution_info.completed,
+          }
+        }
+      }
       if (nb === undefined) {
         nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
       }
 
-      if (value.metadata.execution_info === undefined) {
+      if (value.metadata.appyter.nbexecute === undefined) {
         // Execute notebook if it hasn't already been executed
         await connect(true)
-      } else if (value.metadata.execution_info.completed === undefined) {
+      } else if (value.metadata.appyter.nbexecute.completed === undefined) {
         // Notebook started but hasn't completed
         await connect(false)
         await tick()

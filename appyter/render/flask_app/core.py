@@ -83,6 +83,7 @@ def prepare_results(data):
       if field['field'] == 'FileField'
     }
     links = []
+    files = {}
     for file_field in file_fields:
       if fdata := data.get(file_field):
         content_hash, filename = fdata.split('/', maxsplit=1)
@@ -92,6 +93,7 @@ def prepare_results(data):
           Filesystem.join('input', content_hash),
           Filesystem.join(results_path, filename)
         ))
+        files[filename] = filename
         data[file_field] = filename
     # construct notebook
     env = get_jinja2_env(config=current_app.config, context=data)
@@ -99,7 +101,7 @@ def prepare_results(data):
     with fs.open(current_app.config['IPYNB'], 'r') as fr:
       nbtemplate = nb_from_ipynb_io(fr)
     # in case of constraint failures, we'll fail here
-    nb = render_nb_from_nbtemplate(env, nbtemplate)
+    nb = render_nb_from_nbtemplate(env, nbtemplate, files=files)
     # actually link all input files into output directory
     for src, dest in links:
       data_fs.link(src, dest)

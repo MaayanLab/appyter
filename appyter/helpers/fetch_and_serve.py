@@ -32,32 +32,37 @@ def fetch_and_serve(ctx, data_dir, cwd, port, args, uri):
     traceback.print_exc()
     click.echo('Error fetching appyter instance, is the url right?')
   #
-  metadata = nb.get('metadata', {})
+  metadata = nb.get('metadata', {}).get('appyter', {})
   #
-  version = metadata.get('appyter_version')
-  if version and version == __version__:
+  nbconstruct_version = metadata.get('nbconstruct', {}).get('version', 'unknown')
+  if nbconstruct_version and nbconstruct_version == __version__:
     pass
   else:
-    click.echo(f"WARNING: this appyter was not created with this version, instance version was {version} and our version is {__version__}. Proceed with caution")
+    click.echo(f"WARNING: this appyter was not created with this version, instance version was {nbconstruct_version} and our version is {__version__}. Proceed with caution")
   #
-  execution_info = metadata.get('execution_info', {})
-  if not execution_info:
+  nbexecute_version = metadata.get('nbexecute', {}).get('version', 'unknown')
+  if nbexecute_version and nbexecute_version == __version__:
+    pass
+  else:
+    click.echo(f"WARNING: this appyter was not executed with this version, instance version was {nbexecute_version} and our version is {__version__}. Proceed with caution")
+  #
+  if 'nbexecute' not in metadata:
     click.echo('WARNING: this appyter instance has not been executed, no results will be available')
-  elif execution_info.get('started') and not execution_info.get('completed'):
+  elif 'started' in metadata['nbexecute'] and 'completed' not in metadata['nbexecute']:
     click.echo('WARNING: this appyter is not finished running, no results will be available')
-  elif execution_info.get('started') and execution_info.get('completed'):
-    click.echo(f"Appyter ran from {execution_info['started']} to {execution_info['completed']}")
+  elif 'started' in metadata['nbexecute'] and 'completed' in metadata['nbexecute']:
+    click.echo(f"Appyter ran from {metadata['nbexecute']['started']} to {metadata['nbexecute']['completed']}")
   else:
     click.echo('WARNING: this appyter seems old, this may not work properly, please contact us and we can update it')
   #
   # write notebook to data_dir
   os.makedirs(data_dir, exist_ok=True)
-  filename = metadata.get('filename', 'appyter.ipynb')
+  filename = metadata.get('nbconstruct', {}).get('filename', 'appyter.ipynb')
   with open(os.path.join(data_dir, filename), 'w') as fw:
     nbf.write(nb, fw)
   #
-  # download all files to data_dir
-  files = metadata.get('files', {})
+  # download all files to data_dir (get files from nbexecute if available otherwise fall back to nbconstruct input-files)
+  files = metadata.get('nbexecute', {}).get('files', metadata.get('nbconstruct', {}).get('files', {}))
   for file, fileurl in files.items():
     # relative file paths (those without schemes) are relative to the base uri
     # TODO: in the future we might be able to mount these paths as we do in the job

@@ -9,6 +9,7 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
+from appyter import __version__
 from appyter.cli import cli
 from appyter.ext.fs import Filesystem
 from appyter.ext.nbclient import NotebookClientIOPubHook
@@ -39,26 +40,42 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
   with Filesystem(cwd, asynchronous=True) as fs:
     with fs.open(ipynb, 'r') as fr:
       nb = nb_from_ipynb_io(fr)
-    # early stop if we already have execution_info
-    if 'execution_info' in nb.metadata:
-      if 'completed' in nb.metadata['execution_info']:
-        await emit({ 'type': 'error', 'data': f"Execution already completed at {nb.metadata['execution_info']['completed']}" })
-      elif 'started' in nb.metadata['execution_info']:
-        await emit({ 'type': 'error', 'data': f"Execution already started at {nb.metadata['execution_info']['started']}" })
-      else:
-        await emit({ 'type': 'error', 'data': 'Execution already in progress' })
-      return
+  #
+  if 'appyter' not in nb.metadata:
+    logger.warn('detected legacy format, upgrading..')
+    nb.metadata['appyter'] = {
+      'nbconstruct': {
+        'version': 'unknown',
+      }
+    }
+  #
+  if 'nbexecute' not in nb.metadata['appyter']:
+    nb.metadata['appyter']['nbexecute'] = {
+      'version': __version__,
+    }
+  #
+  if 'execution_info' in nb.metadata:
+    logger.warn('detected legacy format, upgrading..')
+    nb.metadata['appyter']['nbexecute'].update(
+      version='unknown',
+      started=nb.metadata['execution_info'].get('started'),
+      completed=nb.metadata['execution_info'].get('completed'),
+    )
+    del nb.metadata['execution_info']
+  #
+  if 'completed' in nb.metadata['appyter']['nbexecute']:
+    await emit({ 'type': 'error', 'data': f"Execution already completed at {nb.metadata['appyter']['nbexecute']['completed']}" })
+    return
+  elif 'started' in nb.metadata['appyter']['nbexecute']:
+    await emit({ 'type': 'error', 'data': f"Execution already started at {nb.metadata['appyter']['nbexecute']['started']}" })
+    return
   #
   await emit({ 'type': 'status', 'data': 'Starting' })
   #
   try:
     with Filesystem(cwd, with_path=True, asynchronous=True) as fs:
       # setup execution_info with start time
-      nb.metadata['execution_info'] = {
-        'started': datetime.datetime.now().replace(
-          tzinfo=datetime.timezone.utc
-        ).isoformat()
-      }
+      nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
       with fs.open(ipynb, 'w') as fw:
         nb_to_ipynb_io(nb, fw)
       #
@@ -114,9 +131,14 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
         await emit({ 'type': 'error', 'data': str(e) })
       # Save execution completion time
       logger.info('nbexecute saving')
-      nb.metadata['execution_info']['completed'] = datetime.datetime.now().replace(
-        tzinfo=datetime.timezone.utc
-      ).isoformat()
+      nb.metadata['appyter']['nbexecute']['completed'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
+      # save additional files
+      # TODO: in the future we should individual files and include the original urls here
+      nb.metadata['appyter']['nbexecute']['files'] = {
+        path: path
+        for path in fs.ls()
+        if path != ipynb
+      }
       #
       with fs.open(ipynb, 'w') as fw:
         nb_to_ipynb_io(nb, fw)

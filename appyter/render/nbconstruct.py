@@ -4,6 +4,7 @@ import click
 import nbformat as nbf
 from copy import deepcopy
 
+from appyter import __version__
 from appyter.cli import cli
 from appyter.ext.fs import Filesystem
 from appyter.context import get_env, get_jinja2_env
@@ -53,7 +54,7 @@ def render_cell(env, cell):
   return cell
 
 
-def render_nb_from_nbtemplate(env, nb):
+def render_nb_from_nbtemplate(env, nb, files={}):
   ''' Render the notebook by rendering the jinja2 templates using the context in env.
   '''
   nb = deepcopy(nb)
@@ -64,6 +65,13 @@ def render_nb_from_nbtemplate(env, nb):
     )
     for cell in nb.cells
   ]))
+  if 'appyter' not in nb.metadata:
+    nb.metadata['appyter'] = {}
+  nb.metadata['appyter']['nbconstruct'] = dict(
+    version=__version__,
+    filename=env.globals['_config']['IPYNB'],
+    files=files,
+  )
   return nb
 
 @cli.command(help='Construct jupyter notebook from appyter and arguments')
