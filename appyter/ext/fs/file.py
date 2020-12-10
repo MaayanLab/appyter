@@ -1,4 +1,5 @@
 import os
+import glob
 import shutil
 import urllib.parse
 import logging
@@ -41,6 +42,13 @@ class Filesystem:
     except Exception:
       logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to access {path}")
+  #
+  def ls(self, path=''):
+    ls_path = FS.join(self._prefix, path) if path else self._prefix
+    return [
+      f[len(ls_path)+1:]
+      for f in glob.glob(ls_path + '/*') + glob.glob(ls_path + '/**/*')
+    ]
   #
   def cp(self, src, dst):
     try:

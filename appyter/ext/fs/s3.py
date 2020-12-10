@@ -4,6 +4,7 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
+from appyter.ext.fs import Filesystem as FS
 
 class Filesystem:
   def __init__(self, uri, asynchronous=False):
@@ -57,6 +58,13 @@ class Filesystem:
     except Exception:
       logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to access {path}")
+  #
+  def ls(self, path=''):
+    ls_path = FS.join(self._prefix, path) if path else self._prefix
+    return [
+      f[len(ls_path)+1:]
+      for f in self._fs.glob(ls_path + '/*') + self._fs.glob(ls_path + '/**/*')
+    ]
   #
   def cp(self, src, dst):
     try:
