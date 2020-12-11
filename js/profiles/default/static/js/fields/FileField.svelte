@@ -235,20 +235,38 @@
     </div>
     {/if}
     {#if args.examples && Object.keys(args.examples).length > 0}
-      <div class="d-flex">
-        <span class="mr-1 my-1 p-1" style="white-space: nowrap">Example{#if Object.keys(args.examples).length > 1}s{/if}:</span>
-        <div class="flex-grow d-flex flex-wrap justify-content-start align-items-center">
-          {#each Object.keys(args.examples) as example_name}
-            <span class="text-sm m-1 p-1" style="white-space: nowrap;">
-              {example_name}
-              (<small><a
-                href="javascript:"
-                on:click={() => load_file(args.name, args.examples[example_name], example_name)}
-              >load</a>, <a
-                href={args.examples[example_name]}
-              >download</a></small>)
-            </span>
-          {/each}
+      <div class="d-table">
+        <div class="d-table-row">
+          <span class="d-table-cell mr-1 my-1 p-1 text-right" style="white-space: nowrap">
+            Load example{#if Object.keys(args.examples).length > 1}s{/if}
+            <sup data-toggle="tooltip" title="Load the example file directly into the appyter"><i class="far fa-question-circle"></i></sup>:
+          </span>
+          <div class="d-table-cell table-grow d-flex flex-wrap justify-content-start align-items-center">
+            {#each Object.keys(args.examples) as example_name}
+              <span class="text-sm m-1 p-1" style="white-space: nowrap;">
+                <a
+                  href="javascript:"
+                  on:click={() => load_file(args.name, args.examples[example_name], example_name)}
+                >{example_name}</a>
+              </span>
+            {/each}
+          </div>
+        </div>
+        <div class="d-table-row">
+          <span class="d-table-cell mr-1 my-1 p-1 text-right" style="white-space: nowrap">
+            Download example{#if Object.keys(args.examples).length > 1}s{/if}
+            <sup data-toggle="tooltip" title="Download the example file for inspection"><i class="far fa-question-circle"></i></sup>:
+          </span>
+          <div class="d-table-cell table-grow d-flex flex-wrap justify-content-start align-items-center">
+            {#each Object.keys(args.examples) as example_name}
+              <span class="text-sm m-1 p-1" style="white-space: nowrap;">
+                <a
+                  href={args.examples[example_name]}
+                  target="_blank"
+                >{example_name}</a>
+              </span>
+            {/each}
+          </div>
         </div>
       </div>
     {/if}
