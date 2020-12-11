@@ -14,6 +14,7 @@ from appyter.cli import cli
 from appyter.ext.fs import Filesystem
 from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io, nb_to_json
+from appyter.util import click_option_setenv, click_argument_setenv
 
 
 def cell_is_code(cell):
@@ -153,8 +154,8 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
   #
 
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')
-@click.option('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
-@click.argument('ipynb', envvar='APPYTER_IPYNB')
+@click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def nbexecute(ipynb, cwd):
   import asyncio
   loop = asyncio.get_event_loop()
