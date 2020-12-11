@@ -235,19 +235,22 @@
     </div>
     {/if}
     {#if args.examples && Object.keys(args.examples).length > 0}
-      <ul style="list-style-type: none">
-        <span>Load example:</span>
-        {#each Object.keys(args.examples) as example_name}
-          <li style="display: inline">
-            &nbsp;
-            <a
-              href="javascript:"
-              on:click={() => load_file(args.name, args.examples[example_name], example_name)}
-            >{example_name}</a>
-            &nbsp;
-          </li>
-        {/each}
-      </ul>
+      <div class="d-flex">
+        <span class="mr-1 my-1 p-1" style="white-space: nowrap">Example{#if Object.keys(args.examples).length > 1}s{/if}:</span>
+        <div class="flex-grow d-flex flex-wrap justify-content-start align-items-center">
+          {#each Object.keys(args.examples) as example_name}
+            <span class="text-sm m-1 p-1" style="white-space: nowrap;">
+              {example_name}
+              (<small><a
+                href="javascript:"
+                on:click={() => load_file(args.name, args.examples[example_name], example_name)}
+              >load</a>, <a
+                href={args.examples[example_name]}
+              >download</a></small>)
+            </span>
+          {/each}
+        </div>
+      </div>
     {/if}
   </div>
 </div>
