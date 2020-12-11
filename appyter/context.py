@@ -4,7 +4,7 @@ import click
 import logging
 logger = logging.getLogger(__name__)
 from appyter.cli import cli
-from appyter.util import importdir_deep, join_routes, try_json_loads
+from appyter.util import importdir_deep, join_routes, try_json_loads, click_option_setenv, click_argument_setenv
 
 def find_fields_dir_mappings(config=None):
   assert config is not None
@@ -32,7 +32,7 @@ def find_fields(config=None):
   return ctx
 
 @cli.command(help='List the available fields')
-@click.option('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 def list_fields(**kwargs):
   fields = find_fields(get_env(ipynb='app.ipynb', **kwargs))
   field_name_max_size = max(map(len, fields.keys()))
@@ -45,8 +45,8 @@ def list_fields(**kwargs):
     print(field.ljust(field_name_max_size+1), doc_first_line)
 
 @cli.command(help='Describe a field using its docstring')
-@click.option('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
-@click.argument('field', envvar='APPYTER_FIELD', type=str)
+@click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click_argument_setenv('field', envvar='APPYTER_FIELD', type=str)
 def describe_field(field, **kwargs):
   fields = find_fields(get_env(ipynb='app.ipynb', **kwargs))
   assert field in fields, 'Please choose a valid field name, see list-fields for options'
