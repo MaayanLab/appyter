@@ -19,7 +19,7 @@ def render_nbtemplate_json_from_nbtemplate(env, nb):
   ]
 
 @cli.command(help='Inspect appyter for arguments (fields)')
-@click.option('--output', default='-', type=click.File('w'), help='The output location of the inspection json')
+@click.option('-o', '--output', default='-', type=click.File('w'), help='The output location of the inspection json')
 @click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def nbinspect(cwd, ipynb, output, **kwargs):
