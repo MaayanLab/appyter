@@ -30,11 +30,13 @@ def iopub_hook_factory(nb, emit):
     await emit({ 'type': 'cell', 'data': [cell, cell_index] })
   return iopub_hook
 
-async def json_emitter(obj):
-  import json
-  print(json.dumps(obj))
+def json_emitter_factory(output):
+  async def json_emitter(obj):
+    import json
+    print(json.dumps(obj), file=output)
+  return json_emitter
 
-async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
+async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='', subscribe=None):
   logger.info('nbexecute starting')
   assert callable(emit), 'Emit must be callable'
   with Filesystem(cwd, asynchronous=True) as fs:
@@ -153,10 +155,11 @@ async def nbexecute_async(ipynb='', emit=json_emitter, cwd='', subscribe=None):
   #
 
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')
+@click.option('--output', default='-', type=click.File('w'), help='The output location to write dynamic updates')
 @click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
-def nbexecute(ipynb, cwd):
+def nbexecute(ipynb, output, cwd):
   import asyncio
   loop = asyncio.get_event_loop()
-  loop.run_until_complete(nbexecute_async(ipynb=ipynb, emit=json_emitter, cwd=cwd))
+  loop.run_until_complete(nbexecute_async(ipynb=ipynb, emit=json_emitter_factory(output), cwd=cwd))
   loop.close()
