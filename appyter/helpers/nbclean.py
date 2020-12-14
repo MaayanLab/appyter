@@ -4,7 +4,7 @@ import nbformat
 from appyter.ext.fs import Filesystem
 from appyter.cli import cli
 from appyter.context import get_env, get_jinja2_env
-from appyter.util import click_argument_setenv
+from appyter.ext.click import click_argument_setenv
 
 @cli.command(help='Clean an appyters output & metadata to minimize unnecessary data transfers in production')
 @click_argument_setenv('ipynb', type=str, envvar='APPYTER_IPYNB')

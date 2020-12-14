@@ -1,6 +1,5 @@
-import json
 from appyter.fields import Field
-from appyter.util import try_json_loads
+from appyter.ext.json import try_json_loads
 
 class MultiCheckboxField(Field):
   ''' Represing a set of independently selectable check boxes.

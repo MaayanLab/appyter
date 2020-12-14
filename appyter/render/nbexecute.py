@@ -14,8 +14,7 @@ from appyter.cli import cli
 from appyter.ext.fs import Filesystem
 from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io, nb_to_json
-from appyter.util import click_option_setenv, click_argument_setenv
-
+from appyter.ext.click import click_option_setenv, click_argument_setenv
 
 def cell_is_code(cell):
     return cell.get('cell_type') == 'code'

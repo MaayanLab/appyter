@@ -4,7 +4,9 @@ import click
 import logging
 logger = logging.getLogger(__name__)
 from appyter.cli import cli
-from appyter.util import importdir_deep, join_routes, try_json_loads, click_option_setenv, click_argument_setenv
+from appyter.ext.click import click_option_setenv, click_argument_setenv
+from appyter.ext.json import try_json_loads
+from appyter.util import importdir_deep, join_routes
 
 def find_fields_dir_mappings(config=None):
   assert config is not None
