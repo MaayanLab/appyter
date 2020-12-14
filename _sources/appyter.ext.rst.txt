@@ -8,10 +8,22 @@ Subpackages
    :maxdepth: 4
 
    appyter.ext.asyncio
+   appyter.ext.click
    appyter.ext.fs
    appyter.ext.nbclient
    appyter.ext.socketio
    appyter.ext.watchgod
+
+Submodules
+----------
+
+appyter.ext.json module
+-----------------------
+
+.. automodule:: appyter.ext.json
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------

@@ -37,9 +37,8 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.profiles.default.fields.MultiCheckboxField</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">appyter.fields</span> <span class="kn">import</span> <span class="n">Field</span>
-<span class="kn">from</span> <span class="nn">appyter.util</span> <span class="kn">import</span> <span class="n">try_json_loads</span>
+<span></span><span class="kn">from</span> <span class="nn">appyter.fields</span> <span class="kn">import</span> <span class="n">Field</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.json</span> <span class="kn">import</span> <span class="n">try_json_loads</span>
 
 <div class="viewcode-block" id="MultiCheckboxField"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField">[docs]</a><span class="k">class</span> <span class="nc">MultiCheckboxField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Represing a set of independently selectable check boxes.</span>

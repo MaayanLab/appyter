@@ -1,0 +1,10 @@
+appyter.ext.click package
+=========================
+
+Module contents
+---------------
+
+.. automodule:: appyter.ext.click
+   :members:
+   :undoc-members:
+   :show-inheritance:

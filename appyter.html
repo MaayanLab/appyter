@@ -49,6 +49,10 @@
 <li class="toctree-l4"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.ext.click.html">appyter.ext.click package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.click.html#module-appyter.ext.click">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="appyter.ext.fs.html">appyter.ext.fs package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="appyter.ext.fs.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.ext.fs.html#module-appyter.ext.fs.file">appyter.ext.fs.file module</a></li>
@@ -78,6 +82,8 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext.json">appyter.ext.json module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext">Module contents</a></li>
 </ul>
 </li>
@@ -88,7 +94,9 @@
 <li class="toctree-l1"><a class="reference internal" href="appyter.helpers.html">appyter.helpers package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="appyter.helpers.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.helpers.html#module-appyter.helpers.dockerize">appyter.helpers.dockerize module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.helpers.html#module-appyter.helpers.fetch_and_serve">appyter.helpers.fetch_and_serve module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.helpers.html#module-appyter.helpers.nbclean">appyter.helpers.nbclean module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.helpers.html#module-appyter.helpers.serve">appyter.helpers.serve module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.helpers.html#module-appyter.helpers">Module contents</a></li>
 </ul>
 </li>
@@ -396,18 +404,6 @@ for import.</p>
 <div class="section" id="module-appyter.util">
 <span id="appyter-util-module"></span><h2>appyter.util module<a class="headerlink" href="#module-appyter.util" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.util.click_argument_setenv">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">click_argument_setenv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">var</span></em>, <em class="sig-param"><span class="n">envvar</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#click_argument_setenv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.click_argument_setenv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Like click.argument but explicitly set os.environ as well.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="appyter.util.click_option_setenv">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">click_option_setenv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spec</span></em>, <em class="sig-param"><span class="n">envvar</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#click_option_setenv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.click_option_setenv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Like click.option but explicitly set os.environ as well.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt id="appyter.util.dict_filter_none">
 <code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">dict_filter_none</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#dict_filter_none"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.dict_filter_none" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -447,16 +443,6 @@ for import.</p>
 <dl class="py function">
 <dt id="appyter.util.secure_url">
 <code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">secure_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#secure_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.secure_url" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="appyter.util.try_json_dumps">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">try_json_dumps</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#try_json_dumps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.try_json_dumps" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="appyter.util.try_json_loads">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">try_json_loads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#try_json_loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.try_json_loads" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

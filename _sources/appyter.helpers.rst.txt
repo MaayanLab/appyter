@@ -12,10 +12,26 @@ appyter.helpers.dockerize module
    :undoc-members:
    :show-inheritance:
 
+appyter.helpers.fetch\_and\_serve module
+----------------------------------------
+
+.. automodule:: appyter.helpers.fetch_and_serve
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.helpers.nbclean module
 ------------------------------
 
 .. automodule:: appyter.helpers.nbclean
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.helpers.serve module
+----------------------------
+
+.. automodule:: appyter.helpers.serve
    :members:
    :undoc-members:
    :show-inheritance:

@@ -83,7 +83,7 @@ to markdown / removing them as necessary.</p>
 
 <dl class="py function">
 <dt id="appyter.render.nbconstruct.render_nb_from_nbtemplate">
-<code class="sig-prename descclassname">appyter.render.nbconstruct.</code><code class="sig-name descname">render_nb_from_nbtemplate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">nb</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbconstruct.html#render_nb_from_nbtemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbconstruct.render_nb_from_nbtemplate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">appyter.render.nbconstruct.</code><code class="sig-name descname">render_nb_from_nbtemplate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">nb</span></em>, <em class="sig-param"><span class="n">files</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbconstruct.html#render_nb_from_nbtemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbconstruct.render_nb_from_nbtemplate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render the notebook by rendering the jinja2 templates using the context in env.</p>
 </dd></dl>
 
@@ -106,13 +106,13 @@ to markdown / removing them as necessary.</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.nbexecute.json_emitter">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.nbexecute.</code><code class="sig-name descname">json_emitter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecute.html#json_emitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecute.json_emitter" title="Permalink to this definition">¶</a></dt>
+<dt id="appyter.render.nbexecute.json_emitter_factory">
+<code class="sig-prename descclassname">appyter.render.nbexecute.</code><code class="sig-name descname">json_emitter_factory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">output</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecute.html#json_emitter_factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecute.json_emitter_factory" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt id="appyter.render.nbexecute.nbexecute_async">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.nbexecute.</code><code class="sig-name descname">nbexecute_async</code><span class="sig-paren">(</span><em class="sig-param">ipynb=''</em>, <em class="sig-param">emit=&lt;function json_emitter&gt;</em>, <em class="sig-param">cwd=''</em>, <em class="sig-param">subscribe=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecute.html#nbexecute_async"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecute.nbexecute_async" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-prename descclassname">appyter.render.nbexecute.</code><code class="sig-name descname">nbexecute_async</code><span class="sig-paren">(</span><em class="sig-param">ipynb=''</em>, <em class="sig-param">emit=&lt;function json_emitter_factory.&lt;locals&gt;.json_emitter&gt;</em>, <em class="sig-param">cwd=''</em>, <em class="sig-param">subscribe=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/nbexecute.html#nbexecute_async"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.nbexecute.nbexecute_async" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

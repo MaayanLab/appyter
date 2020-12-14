@@ -123,6 +123,7 @@
       <span class="k">if</span> <span class="n">field</span><span class="p">[</span><span class="s1">&#39;field&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;FileField&#39;</span>
     <span class="p">}</span>
     <span class="n">links</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">file_field</span> <span class="ow">in</span> <span class="n">file_fields</span><span class="p">:</span>
       <span class="k">if</span> <span class="n">fdata</span> <span class="o">:=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">file_field</span><span class="p">):</span>
         <span class="n">content_hash</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">fdata</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -132,14 +133,16 @@
           <span class="n">Filesystem</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="n">content_hash</span><span class="p">),</span>
           <span class="n">Filesystem</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
         <span class="p">))</span>
+        <span class="n">files</span><span class="p">[</span><span class="n">filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
         <span class="n">data</span><span class="p">[</span><span class="n">file_field</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
     <span class="c1"># construct notebook</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_session</span><span class="o">=</span><span class="n">results_hash</span><span class="p">)</span>
     <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
     <span class="n">fs</span> <span class="o">=</span> <span class="n">Filesystem</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;CWD&#39;</span><span class="p">])</span>
     <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fr</span><span class="p">:</span>
       <span class="n">nbtemplate</span> <span class="o">=</span> <span class="n">nb_from_ipynb_io</span><span class="p">(</span><span class="n">fr</span><span class="p">)</span>
     <span class="c1"># in case of constraint failures, we&#39;ll fail here</span>
-    <span class="n">nb</span> <span class="o">=</span> <span class="n">render_nb_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nbtemplate</span><span class="p">)</span>
+    <span class="n">nb</span> <span class="o">=</span> <span class="n">render_nb_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nbtemplate</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">)</span>
     <span class="c1"># actually link all input files into output directory</span>
     <span class="k">for</span> <span class="n">src</span><span class="p">,</span> <span class="n">dest</span> <span class="ow">in</span> <span class="n">links</span><span class="p">:</span>
       <span class="n">data_fs</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
