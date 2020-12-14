@@ -96,6 +96,7 @@ def prepare_results(data):
         files[filename] = filename
         data[file_field] = filename
     # construct notebook
+    data.update(_session=results_hash)
     env = get_jinja2_env(config=current_app.config, context=data)
     fs = Filesystem(current_app.config['CWD'])
     with fs.open(current_app.config['IPYNB'], 'r') as fr:
