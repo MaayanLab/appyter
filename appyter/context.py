@@ -151,7 +151,7 @@ def get_extra_files(config=None):
 def get_appyter_directory(path):
   return os.path.abspath(os.path.join(os.path.dirname(__file__), path))
 
-def get_jinja2_env(context={}, config=None, session=None):
+def get_jinja2_env(context={}, config=None, session=''):
   assert config is not None
   #
   import sys
