@@ -21,7 +21,7 @@ def url_for(directory, public=False, **kwargs):
   if public:
     try:
       from flask import request
-      url = join_routes(request.url_root, url)
+      url = join_routes(request.url_root, url)[1:]
     except:
       pass
   #
