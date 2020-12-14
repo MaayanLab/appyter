@@ -151,7 +151,7 @@ def get_extra_files(config=None):
 def get_appyter_directory(path):
   return os.path.abspath(os.path.join(os.path.dirname(__file__), path))
 
-def get_jinja2_env(context={}, config=None):
+def get_jinja2_env(context={}, config=None, session=None):
   assert config is not None
   #
   import sys
@@ -166,7 +166,7 @@ def get_jinja2_env(context={}, config=None):
   )
   env.filters.update(**find_filters(config=config))
   env.globals.update(**find_filters(config=config))
-  env.globals.update(_config=config, _os=os)
+  env.globals.update(_config=config, _session=session, _os=os)
   env.globals.update(**build_fields(find_fields(config=config), context=context, env=env))
   return env
 
