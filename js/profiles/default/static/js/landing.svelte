@@ -187,11 +187,11 @@
         const id = P[P.length - 1] || ''
 
         let appyter_version = ''
-        if (nb.metadata.appyter.info !== undefined) appyter_version = nb.metadata.appyter.info.version
+        if (nb.metadata.appyter.info !== undefined) appyter_version = nb.metadata.appyter.info.version || ''
 
         let library_version = ''
-        if (nb.metadata.appyter.nbexecute !== undefined) library_version = nb.metadata.appyter.nbexecute.version
-        else if (nb.metadata.appyter.nbconstruct !== undefined) library_version = nb.metadata.appyter.nbconstruct.version
+        if (nb.metadata.appyter.nbexecute !== undefined) library_version = nb.metadata.appyter.nbexecute.version || ''
+        else if (nb.metadata.appyter.nbconstruct !== undefined) library_version = nb.metadata.appyter.nbconstruct.version || ''
 
         local_run_url = `${window.location.origin}/#/running-appyters/?slug=${slug}&appyter_version=${appyter_version}&library_version=${library_version}&id=${id}`
       }
