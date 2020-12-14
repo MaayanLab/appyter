@@ -1,5 +1,5 @@
 {%- macro cache(name) -%}
-  proxy_cache_path {{ _os.path.join(_tmp_fs.path(), name + '.cache.d') }}
+  proxy_cache_path "{{ _os.path.join(_tmp_fs.path(), name + '.cache.d') }}"
     levels=1:2 keys_zone={{ name }}:10m max_size=1g
     inactive=60m use_temp_path=off;
 {%- endmacro -%}
@@ -62,7 +62,7 @@ http {
   upstream appyter {
     {#- {% for n in range(1, _config.N_PROCS+1) %} #}
     {%- with n=1 %}
-    server unix:{{ _tmp_fs.path() }}appyter_{{ n }}.sock fail_timeout=0;
+    server "unix:{{ _tmp_fs.path() }}appyter_{{ n }}.sock" fail_timeout=0;
     {%- endwith %}
     {#- {% endfor %} #}
   }
@@ -87,30 +87,30 @@ http {
 
     location = {{ _config.PREFIX.rstrip('/') }}/ {
       if ($parsed_method = 'GET:text/html') {
-        rewrite ^(.*)/$ $1/index.html;
+        rewrite ^(.*)/$ "$1/index.html";
       }
       if ($parsed_method = 'GET:application/json') {
-        rewrite ^(.*)/$ $1/index.json;
+        rewrite ^(.*)/$ "$1/index.json";
       }
       if ($parsed_method = 'GET:application/vnd.jupyter') {
-        rewrite ^(.*)/$ $1/{{ _config.IPYNB }};
+        rewrite ^(.*)/$ "$1/{{ _config.IPYNB }}";
       }
       {{ proxy('http://appyter', False, 'appyter-core') }}
     }
 
     location = {{ join_routes(_config.PREFIX, 'index.html') }} {
-      root {{ _tmp_fs.path() }};
+      root "{{ _tmp_fs.path() }}";
       try_files /index.html =404;
     }
 
     location = {{ join_routes(_config.PREFIX, 'index.json') }} {
-      root {{ _tmp_fs.path() }};
+      root "{{ _tmp_fs.path() }}";
       try_files /index.json =404;
     }
 
-    location = {{ join_routes(_config.PREFIX, _config.IPYNB) }} {
-      root {{ _config.CWD }};
-      try_files /{{ _config.IPYNB }} =404;
+    location = "{{ join_routes(_config.PREFIX, _config.IPYNB) }}" {
+      root "{{ _config.CWD }}";
+      try_files "/{{ _config.IPYNB }}" =404;
     }
 
     location = {{ join_routes(_config.PREFIX, 'favicon.ico') }} {
@@ -123,39 +123,39 @@ http {
     }
 
     location ~ ^{{ join_routes(_config.PREFIX, 'static') }}/(.*)$ {
-      root {{ _config.STATIC_DIR }};
-      try_files /$1 @profile_static;
+      root "{{ _config.STATIC_DIR }}";
+      try_files "/$1" @profile_static;
     }
 
     location @profile_static {
-      rewrite ^{{ join_routes(_config.PREFIX, 'static') }}/(.*)$ {{ join_routes(_config.PREFIX, 'profile', 'static') }}/$1;
+      rewrite ^{{ join_routes(_config.PREFIX, 'static') }}/(.*)$ "{{ join_routes(_config.PREFIX, 'profile', 'static') }}/$1";
     }
 
     location ~ ^{{ join_routes(_config.PREFIX, 'profile') }}/(.*)$ {
-      root {{ get_appyter_directory('profiles') }};
+      root "{{ get_appyter_directory('profiles') }}";
       try_files
         {%- if _config.PROFILE != 'default' %}
-        /{{ _config.PROFILE }}/$1
+        "/{{ _config.PROFILE }}/$1"
         {%- endif %}
-        /default/$1
+        "/default/$1"
         =404;
     }
 
     location ~ ^{{ join_routes(_config.PREFIX, '[^/]+') }}/$ {
       if ($parsed_method = 'GET:application/vnd.jupyter') {
-        rewrite ^(.*)/$ $1/{{ _config.IPYNB }};
+        rewrite ^(.*)/$ "$1/{{ _config.IPYNB }}";
       }
       if ($parsed_method = 'GET:application/json') {
-        rewrite ^(.*)/$ $1/{{ _config.IPYNB }};
+        rewrite ^(.*)/$ "$1/{{ _config.IPYNB }}";
       }
-      root {{ _tmp_fs.path() }};
+      root "{{ _tmp_fs.path() }}";
       try_files /landing.html =404;
     }
 
     location ~ ^{{ join_routes(_config.PREFIX, '([^/]+)', '(.+)') }}$ {
       {%- if _config.DATA_DIR.startswith('/') %}
-      root {{ join_routes(_config.DATA_DIR, 'output') }};
-      try_files /$1/$2 =404;
+      root "{{ join_routes(_config.DATA_DIR, 'output') }}";
+      try_files "/$1/$2" =404;
       {%- elif _config.DATA_DIR.startswith('s3://') %}
       {%- with s3_url = s3_to_url(_config.DATA_DIR) %}
       rewrite ^{{ join_routes(_config.PREFIX, '([^/]+)', '(.+)') }}$ {{ join_routes(s3_url.path, 'output', '$1', '$2') }} break;
