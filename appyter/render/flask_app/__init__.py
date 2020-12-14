@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from appyter.cli import cli
-from appyter.util import click_option_setenv, click_argument_setenv
+from appyter.ext.click import click_option_setenv, click_argument_setenv
 
 def create_app(**kwargs):
   ''' Completely initialize the flask application

@@ -2,7 +2,7 @@ import os
 import sys
 import click
 from appyter.cli import cli
-from appyter.util import click_option_setenv
+from appyter.ext.click import click_option_setenv
 
 @cli.command(
   help='A simple alias for jupyter notebook which re-uses appyter environment config',

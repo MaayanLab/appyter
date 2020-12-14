@@ -8,7 +8,7 @@ from appyter.ext.fs import Filesystem
 from appyter.parse.nb import nb_from_ipynb_io
 from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
 from appyter.context import get_env, get_jinja2_env
-from appyter.util import click_option_setenv, click_argument_setenv
+from appyter.ext.click import click_option_setenv, click_argument_setenv
 
 def render_nbtemplate_json_from_nbtemplate(env, nb):
   ''' Render a json representing the relevant Fields throughout the notebook.

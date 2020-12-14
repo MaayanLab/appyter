@@ -3,7 +3,7 @@ import click
 from appyter.ext.fs import Filesystem
 from appyter.cli import cli
 from appyter.context import get_env, get_jinja2_env
-from appyter.util import click_option_setenv, click_argument_setenv
+from appyter.ext.click import click_option_setenv, click_argument_setenv
 
 @cli.command(help='Dockerize an appyter for maximum reproducibility')
 @click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')

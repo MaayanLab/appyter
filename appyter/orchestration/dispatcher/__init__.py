@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from appyter.orchestration.cli import orchestration
-from appyter.util import click_option_setenv
+from appyter.ext.click import click_option_setenv
 
 
 def create_app(**kwargs):
