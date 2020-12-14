@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from appyter.cli import cli
-from appyter.ext.click import click_option_setenv, click_argument_setenv
+from appyter.ext.click import Json, click_option_setenv, click_argument_setenv
 
 def create_app(**kwargs):
   ''' Completely initialize the flask application
@@ -85,7 +85,7 @@ def create_app(**kwargs):
 @click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click_option_setenv('--prefix', envvar='APPYTER_PREFIX', default='/', help='Specify the prefix for which to mount the webserver onto')
 @click_option_setenv('--profile', envvar='APPYTER_PROFILE', default='default', help='Specify the profile to use for rendering')
-@click_option_setenv('--extras', envvar='APPYTER_EXTRAS', default=[], type=str, multiple=True, help='Specify extras flags')
+@click_option_setenv('--extras', envvar='APPYTER_EXTRAS', default=[], type=Json(), multiple=True, help='Specify extras flags')
 @click_option_setenv('--host', envvar='APPYTER_HOST', default='127.0.0.1', help='The host the flask server should run on')
 @click_option_setenv('--socket', envvar='APPYTER_SOCKET', default=None, help='The socket to mount to (when running in production)')
 @click_option_setenv('--port', envvar='APPYTER_PORT', type=int, default=5000, help='The port this flask server should run on')

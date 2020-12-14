@@ -1,5 +1,15 @@
 import click
-from appyter.ext.json import try_json_dumps
+from appyter.ext.json import try_json_loads, try_json_dumps
+
+class Json(click.ParamType):
+  name = 'Json'
+
+  def convert(self, value, param, ctx):
+    return try_json_loads(value)
+
+  def split_envvar_value(self, rv):
+    v = try_json_loads(rv)
+    return v if type(v) == list else [v]
 
 def click_option_setenv(spec, envvar=None, **kwargs):
   ''' Like click.option but explicitly set os.environ as well.
