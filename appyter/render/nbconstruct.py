@@ -75,8 +75,8 @@ def render_nb_from_nbtemplate(env, nb, files={}):
   return nb
 
 @cli.command(help='Construct jupyter notebook from appyter and arguments')
-@click_option_setenv('--context', envvar='APPYTER_CONTEXT', default='-', type=click.File('r'), help='JSON serialized context mapping field names to values')
-@click_option_setenv('--output', envvar='APPYTER_OUTPUT', default='-', type=click.File('w'), help='The output location of the serialized jupyter notebook')
+@click.option('--context', envvar='APPYTER_CONTEXT', default='-', type=click.File('r'), help='JSON serialized context mapping field names to values')
+@click.option('--output', envvar='APPYTER_OUTPUT', default='-', type=click.File('w'), help='The output location of the serialized jupyter notebook')
 @click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def nbconstruct(cwd, ipynb, context, output, **kwargs):
