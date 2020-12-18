@@ -85,6 +85,7 @@
         ...state,
         bg: 'success',
         animated: false,
+        striped: false,
         progress: 100,
       }
       filename = evt.filename
@@ -98,6 +99,8 @@
           url: evt.url,
           bg: 'danger',
           error: evt.error,
+          striped: false,
+          animated: false,
         }
       } else {
         state = {
@@ -105,6 +108,8 @@
           url: evt.url,
           bg: 'warning',
           error: evt.error,
+          striped: false,
+          animated: false,
         }
       }
     })
@@ -116,7 +121,6 @@
     siofu.addEventListener('start', function (evt) {
       state = {
         striped: true,
-        animated: true,
         bg: 'primary',
         progress: 0,
       }
@@ -125,12 +129,15 @@
       state = {
         ...state,
         progress: ((evt.bytesLoaded / evt.file.size) * 100) | 0,
+        animated: true,
       }
     })
     siofu.addEventListener('complete', function (evt) {
       state = {
         progress: 100,
         bg: 'success',
+        striped: false,
+        animated: false,
       }
       filename = evt.file.name
       full_filename = evt.detail.full_filename
@@ -141,6 +148,8 @@
         progress: 100,
         bg: 'danger',
         error: evt.error,
+        striped: false,
+        animated: false,
       }
     })
   }
