@@ -12,7 +12,6 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
@@ -40,7 +39,6 @@
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
 
 <span class="kn">import</span> <span class="nn">engineio</span>
-<span class="kn">import</span> <span class="nn">six</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">asyncio_manager</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">exceptions</span>
@@ -53,7 +51,7 @@
 
 <span class="sd">    This class implements a fully compliant Socket.IO web server with support</span>
 <span class="sd">    for websocket and long-polling transports, compatible with the asyncio</span>
-<span class="sd">    framework on Python 3.5 or newer.</span>
+<span class="sd">    framework.</span>
 
 <span class="sd">    :param client_manager: The client manager instance that will manage the</span>
 <span class="sd">                           client list. When this is omitted, the client list</span>
@@ -66,54 +64,82 @@
 <span class="sd">                 packets. Custom json modules must have ``dumps`` and ``loads``</span>
 <span class="sd">                 functions that are compatible with the standard library</span>
 <span class="sd">                 versions.</span>
-<span class="sd">    :param async_handlers: If set to ``True``, event handlers are executed in</span>
-<span class="sd">                           separate threads. To run handlers synchronously,</span>
-<span class="sd">                           set to ``False``. The default is ``True``.</span>
+<span class="sd">    :param async_handlers: If set to ``True``, event handlers for a client are</span>
+<span class="sd">                           executed in separate threads. To run handlers for a</span>
+<span class="sd">                           client synchronously, set to ``False``. The default</span>
+<span class="sd">                           is ``True``.</span>
+<span class="sd">    :param always_connect: When set to ``False``, new connections are</span>
+<span class="sd">                           provisory until the connect handler returns</span>
+<span class="sd">                           something other than ``False``, at which point they</span>
+<span class="sd">                           are accepted. When set to ``True``, connections are</span>
+<span class="sd">                           immediately accepted, and then if the connect</span>
+<span class="sd">                           handler returns ``False`` a disconnect is issued.</span>
+<span class="sd">                           Set to ``True`` if you need to emit events from the</span>
+<span class="sd">                           connect handler and your client is confused when it</span>
+<span class="sd">                           receives events before the connection acceptance.</span>
+<span class="sd">                           In any other case use the default of ``False``.</span>
 <span class="sd">    :param kwargs: Connection parameters for the underlying Engine.IO server.</span>
 
 <span class="sd">    The Engine.IO configuration supports the following settings:</span>
 
 <span class="sd">    :param async_mode: The asynchronous model to use. See the Deployment</span>
 <span class="sd">                       section in the documentation for a description of the</span>
-<span class="sd">                       available options. Valid async modes are &quot;aiohttp&quot;. If</span>
-<span class="sd">                       this argument is not given, an async mode is chosen</span>
-<span class="sd">                       based on the installed packages.</span>
+<span class="sd">                       available options. Valid async modes are &quot;threading&quot;,</span>
+<span class="sd">                       &quot;eventlet&quot;, &quot;gevent&quot; and &quot;gevent_uwsgi&quot;. If this</span>
+<span class="sd">                       argument is not given, &quot;eventlet&quot; is tried first, then</span>
+<span class="sd">                       &quot;gevent_uwsgi&quot;, then &quot;gevent&quot;, and finally &quot;threading&quot;.</span>
+<span class="sd">                       The first async mode that has all its dependencies</span>
+<span class="sd">                       installed is then one that is chosen.</span>
+<span class="sd">    :param ping_interval: The interval in seconds at which the server pings</span>
+<span class="sd">                          the client. The default is 25 seconds. For advanced</span>
+<span class="sd">                          control, a two element tuple can be given, where</span>
+<span class="sd">                          the first number is the ping interval and the second</span>
+<span class="sd">                          is a grace period added by the server.</span>
 <span class="sd">    :param ping_timeout: The time in seconds that the client waits for the</span>
-<span class="sd">                         server to respond before disconnecting.</span>
-<span class="sd">    :param ping_interval: The interval in seconds at which the client pings</span>
-<span class="sd">                          the server.</span>
+<span class="sd">                         server to respond before disconnecting. The default</span>
+<span class="sd">                         is 5 seconds.</span>
 <span class="sd">    :param max_http_buffer_size: The maximum size of a message when using the</span>
-<span class="sd">                                 polling transport.</span>
-<span class="sd">    :param allow_upgrades: Whether to allow transport upgrades or not.</span>
+<span class="sd">                                 polling transport. The default is 1,000,000</span>
+<span class="sd">                                 bytes.</span>
+<span class="sd">    :param allow_upgrades: Whether to allow transport upgrades or not. The</span>
+<span class="sd">                           default is ``True``.</span>
 <span class="sd">    :param http_compression: Whether to compress packages when using the</span>
-<span class="sd">                             polling transport.</span>
+<span class="sd">                             polling transport. The default is ``True``.</span>
 <span class="sd">    :param compression_threshold: Only compress messages when their byte size</span>
-<span class="sd">                                  is greater than this value.</span>
-<span class="sd">    :param cookie: Name of the HTTP cookie that contains the client session</span>
-<span class="sd">                   id. If set to ``None``, a cookie is not sent to the client.</span>
+<span class="sd">                                  is greater than this value. The default is</span>
+<span class="sd">                                  1024 bytes.</span>
+<span class="sd">    :param cookie: If set to a string, it is the name of the HTTP cookie the</span>
+<span class="sd">                   server sends back tot he client containing the client</span>
+<span class="sd">                   session id. If set to a dictionary, the ``&#39;name&#39;`` key</span>
+<span class="sd">                   contains the cookie name and other keys define cookie</span>
+<span class="sd">                   attributes, where the value of each attribute can be a</span>
+<span class="sd">                   string, a callable with no arguments, or a boolean. If set</span>
+<span class="sd">                   to ``None`` (the default), a cookie is not sent to the</span>
+<span class="sd">                   client.</span>
 <span class="sd">    :param cors_allowed_origins: Origin or list of origins that are allowed to</span>
 <span class="sd">                                 connect to this server. Only the same origin</span>
 <span class="sd">                                 is allowed by default. Set this argument to</span>
 <span class="sd">                                 ``&#39;*&#39;`` to allow all origins, or to ``[]`` to</span>
 <span class="sd">                                 disable CORS handling.</span>
 <span class="sd">    :param cors_credentials: Whether credentials (cookies, authentication) are</span>
-<span class="sd">                             allowed in requests to this server.</span>
+<span class="sd">                             allowed in requests to this server. The default is</span>
+<span class="sd">                             ``True``.</span>
 <span class="sd">    :param monitor_clients: If set to ``True``, a background task will ensure</span>
 <span class="sd">                            inactive clients are closed. Set to ``False`` to</span>
 <span class="sd">                            disable the monitoring task (not recommended). The</span>
 <span class="sd">                            default is ``True``.</span>
 <span class="sd">    :param engineio_logger: To enable Engine.IO logging set to ``True`` or pass</span>
 <span class="sd">                            a logger object to use. To disable logging set to</span>
-<span class="sd">                            ``False``. Note that fatal errors are logged even</span>
-<span class="sd">                            when ``engineio_logger`` is ``False``.</span>
+<span class="sd">                            ``False``. The default is ``False``. Note that</span>
+<span class="sd">                            fatal errors are logged even when</span>
+<span class="sd">                            ``engineio_logger`` is ``False``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">async_handlers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">client_manager</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">client_manager</span> <span class="o">=</span> <span class="n">asyncio_manager</span><span class="o">.</span><span class="n">AsyncManager</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">client_manager</span><span class="o">=</span><span class="n">client_manager</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
-                         <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">json</span><span class="p">,</span>
-                         <span class="n">async_handlers</span><span class="o">=</span><span class="n">async_handlers</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                         <span class="n">json</span><span class="o">=</span><span class="n">json</span><span class="p">,</span> <span class="n">async_handlers</span><span class="o">=</span><span class="n">async_handlers</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_asyncio_based</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">True</span>
@@ -130,8 +156,9 @@
 <span class="sd">                      ``&#39;connect&#39;``, ``&#39;message&#39;`` and ``&#39;disconnect&#39;`` are</span>
 <span class="sd">                      reserved and should not be used.</span>
 <span class="sd">        :param data: The data to send to the client or clients. Data can be of</span>
-<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. If a</span>
-<span class="sd">                     ``list`` or ``dict``, the data will be serialized as JSON.</span>
+<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. To send</span>
+<span class="sd">                     multiple arguments, use a tuple where each element is of</span>
+<span class="sd">                     one of the types indicated above.</span>
 <span class="sd">        :param to: The recipient of the message. This can be set to the</span>
 <span class="sd">                   session ID of a client to address only that client, or to</span>
 <span class="sd">                   to any custom room created by the application to address all</span>
@@ -181,8 +208,9 @@
 <span class="sd">        :func:`emit` to issue custom event names.</span>
 
 <span class="sd">        :param data: The data to send to the client or clients. Data can be of</span>
-<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. If a</span>
-<span class="sd">                     ``list`` or ``dict``, the data will be serialized as JSON.</span>
+<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. To send</span>
+<span class="sd">                     multiple arguments, use a tuple where each element is of</span>
+<span class="sd">                     one of the types indicated above.</span>
 <span class="sd">        :param to: The recipient of the message. This can be set to the</span>
 <span class="sd">                   session ID of a client to address only that client, or to</span>
 <span class="sd">                   to any custom room created by the application to address all</span>
@@ -222,8 +250,9 @@
 <span class="sd">                      ``&#39;connect&#39;``, ``&#39;message&#39;`` and ``&#39;disconnect&#39;`` are</span>
 <span class="sd">                      reserved and should not be used.</span>
 <span class="sd">        :param data: The data to send to the client or clients. Data can be of</span>
-<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. If a</span>
-<span class="sd">                     ``list`` or ``dict``, the data will be serialized as JSON.</span>
+<span class="sd">                     type ``str``, ``bytes``, ``list`` or ``dict``. To send</span>
+<span class="sd">                     multiple arguments, use a tuple where each element is of</span>
+<span class="sd">                     one of the types indicated above.</span>
 <span class="sd">        :param to: The session ID of the recipient client.</span>
 <span class="sd">        :param sid: Alias for the ``to`` parameter.</span>
 <span class="sd">        :param namespace: The Socket.IO namespace for the event. If this</span>
@@ -265,7 +294,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="n">callback_event</span><span class="o">.</span><span class="n">wait</span><span class="p">(),</span> <span class="n">timeout</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
-            <span class="n">six</span><span class="o">.</span><span class="n">raise_from</span><span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">()</span> <span class="kn">from</span> <span class="bp">None</span>
         <span class="k">return</span> <span class="n">callback_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">callback_args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span> \
             <span class="k">else</span> <span class="n">callback_args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">callback_args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span> \
             <span class="k">else</span> <span class="kc">None</span>
@@ -297,7 +326,8 @@
 <span class="sd">        the user session, use the ``session`` context manager instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
-        <span class="n">eio_session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
+        <span class="n">eio_sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">eio_sid_from_sid</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="n">eio_session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">eio_session</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">namespace</span><span class="p">,</span> <span class="p">{})</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">save_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -309,7 +339,8 @@
 <span class="sd">                          the default namespace is used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
-        <span class="n">eio_session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
+        <span class="n">eio_sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">eio_sid_from_sid</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="n">eio_session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">)</span>
         <span class="n">eio_session</span><span class="p">[</span><span class="n">namespace</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span>
 
     <span class="k">def</span> <span class="nf">session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -373,13 +404,11 @@
             <span class="n">delete_it</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">can_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">delete_it</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Disconnecting </span><span class="si">%s</span><span class="s1"> [</span><span class="si">%s</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">pre_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">)</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span><span class="n">packet</span><span class="o">.</span><span class="n">DISCONNECT</span><span class="p">,</span>
-                                                       <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
+            <span class="n">eio_sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">pre_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span>
+                <span class="n">packet</span><span class="o">.</span><span class="n">DISCONNECT</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_event</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">namespace</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">handle_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Handle an HTTP request from the client.</span>
@@ -431,31 +460,28 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span>
-            <span class="n">packet</span><span class="o">.</span><span class="n">EVENT</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">event</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
-            <span class="n">binary</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+            <span class="n">packet</span><span class="o">.</span><span class="n">EVENT</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">event</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">))</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_send_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_send_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eio_sid</span><span class="p">,</span> <span class="n">pkt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send a Socket.IO packet to a client.&quot;&quot;&quot;</span>
         <span class="n">encoded_packet</span> <span class="o">=</span> <span class="n">pkt</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encoded_packet</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">binary</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">for</span> <span class="n">ep</span> <span class="ow">in</span> <span class="n">encoded_packet</span><span class="p">:</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="n">binary</span><span class="p">)</span>
-                <span class="n">binary</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">ep</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">encoded_packet</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">encoded_packet</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eio_sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Handle a client connection request.&quot;&quot;&quot;</span>
         <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="n">sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">always_connect</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span><span class="n">packet</span><span class="o">.</span><span class="n">CONNECT</span><span class="p">,</span>
-                                                       <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
-        <span class="n">fail_reason</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span>
+                <span class="n">packet</span><span class="o">.</span><span class="n">CONNECT</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;sid&#39;</span><span class="p">:</span> <span class="n">sid</span><span class="p">},</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
+        <span class="n">fail_reason</span> <span class="o">=</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionRefusedError</span><span class="p">()</span><span class="o">.</span><span class="n">error_args</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_event</span><span class="p">(</span><span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span>
-                                                <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">sid</span><span class="p">])</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">eio_sid</span><span class="p">])</span>
         <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionRefusedError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
             <span class="n">fail_reason</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_args</span>
             <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
@@ -463,39 +489,31 @@
         <span class="k">if</span> <span class="n">success</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">always_connect</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">pre_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span>
                     <span class="n">packet</span><span class="o">.</span><span class="n">DISCONNECT</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">fail_reason</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">namespace</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span>
-                    <span class="n">packet</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">fail_reason</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span>
+                    <span class="n">packet</span><span class="o">.</span><span class="n">CONNECT_ERROR</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">fail_reason</span><span class="p">,</span>
+                    <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">namespace</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span> <span class="ow">and</span> <span class="n">sid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">fail_reason</span> <span class="ow">or</span> <span class="kc">False</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">always_connect</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span><span class="n">packet</span><span class="o">.</span><span class="n">CONNECT</span><span class="p">,</span>
-                                                       <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span>
+                <span class="n">packet</span><span class="o">.</span><span class="n">CONNECT</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;sid&#39;</span><span class="p">:</span> <span class="n">sid</span><span class="p">},</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">))</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eio_sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Handle a client disconnect.&quot;&quot;&quot;</span>
         <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
-        <span class="k">if</span> <span class="n">namespace</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
-            <span class="n">namespace_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">get_namespaces</span><span class="p">())</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">namespace_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">namespace</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">namespace_list</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">pre_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_event</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">namespace</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">pre_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_event</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="n">sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">sid_from_eio_sid</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">pre_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_event</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">sid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eio_sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Handle an incoming client event.&quot;&quot;&quot;</span>
         <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
+        <span class="n">sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">sid_from_eio_sid</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;received event &quot;</span><span class="si">%s</span><span class="s1">&quot; from </span><span class="si">%s</span><span class="s1"> [</span><span class="si">%s</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sid</span><span class="p">,</span>
                          <span class="n">namespace</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
@@ -504,11 +522,13 @@
             <span class="k">return</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_handlers</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">start_background_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_handle_event_internal</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span>
-                                       <span class="n">data</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+                                       <span class="n">eio_sid</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_event_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_event_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">eio_sid</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
+                                              <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_event_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_event_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">eio_sid</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
+                                     <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
         <span class="n">r</span> <span class="o">=</span> <span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">_trigger_event</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="o">*</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
         <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># send ACK packet with the response returned by the handler</span>
@@ -519,16 +539,15 @@
                 <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">]</span>
-            <span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span><span class="n">packet</span><span class="o">.</span><span class="n">ACK</span><span class="p">,</span>
-                                                         <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span>
-                                                         <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-                                                         <span class="n">binary</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+            <span class="k">await</span> <span class="n">server</span><span class="o">.</span><span class="n">_send_packet</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span>
+                <span class="n">packet</span><span class="o">.</span><span class="n">ACK</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">))</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_ack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_ack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eio_sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Handle ACK packets from the client.&quot;&quot;&quot;</span>
         <span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span> <span class="ow">or</span> <span class="s1">&#39;/&#39;</span>
+        <span class="n">sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">sid_from_eio_sid</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;received ack from </span><span class="si">%s</span><span class="s1"> [</span><span class="si">%s</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">trigger_callback</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">trigger_callback</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_trigger_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Invoke an application event handler.&quot;&quot;&quot;</span>
@@ -549,49 +568,51 @@
             <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace_handlers</span><span class="p">[</span><span class="n">namespace</span><span class="p">]</span><span class="o">.</span><span class="n">trigger_event</span><span class="p">(</span>
                 <span class="n">event</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_eio_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">environ</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_eio_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eio_sid</span><span class="p">,</span> <span class="n">environ</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Handle the Engine.IO connection event.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager_initialized</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">manager_initialized</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="n">environ</span>
-        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_connect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">eio_sid</span><span class="p">]</span> <span class="o">=</span> <span class="n">environ</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_eio_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_eio_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eio_sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Dispatch Engine.IO messages.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">sid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_packet</span><span class="p">:</span>
-            <span class="n">pkt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_packet</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">eio_sid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_packet</span><span class="p">:</span>
+            <span class="n">pkt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_packet</span><span class="p">[</span><span class="n">eio_sid</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">pkt</span><span class="o">.</span><span class="n">add_attachment</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_packet</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_packet</span><span class="p">[</span><span class="n">eio_sid</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">BINARY_EVENT</span><span class="p">:</span>
-                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_event</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_event</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                                              <span class="n">pkt</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_ack</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_ack</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                                            <span class="n">pkt</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">pkt</span> <span class="o">=</span> <span class="n">packet</span><span class="o">.</span><span class="n">Packet</span><span class="p">(</span><span class="n">encoded_packet</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">CONNECT</span><span class="p">:</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_connect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_connect</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">DISCONNECT</span><span class="p">:</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_disconnect</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">EVENT</span><span class="p">:</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_event</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_event</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                         <span class="n">pkt</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">ACK</span><span class="p">:</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_ack</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_ack</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">pkt</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                       <span class="n">pkt</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">BINARY_EVENT</span> <span class="ow">or</span> \
                     <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">BINARY_ACK</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_binary_packet</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkt</span>
-            <span class="k">elif</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">ERROR</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unexpected ERROR packet.&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_binary_packet</span><span class="p">[</span><span class="n">eio_sid</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkt</span>
+            <span class="k">elif</span> <span class="n">pkt</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">packet</span><span class="o">.</span><span class="n">CONNECT_ERROR</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unexpected CONNECT_ERROR packet.&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown packet type.&#39;</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_eio_disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_handle_eio_disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eio_sid</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Handle Engine.IO disconnect event.&quot;&quot;&quot;</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_disconnect</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">sid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
-            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">get_namespaces</span><span class="p">())</span><span class="o">.</span><span class="n">copy</span><span class="p">():</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_disconnect</span><span class="p">(</span><span class="n">eio_sid</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">eio_sid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">eio_sid</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_engineio_server_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">engineio</span><span class="o">.</span><span class="n">AsyncServer</span>
@@ -633,7 +654,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
     </div>
   </body>
 </html>
