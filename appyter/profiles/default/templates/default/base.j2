@@ -18,7 +18,7 @@
       require.config({
         paths: {
           'jquery': {{ url_for('static', filename='js/lib/jquery/jquery.min')|jsonify }},
-          'socketio': {{ url_for('static', filename='js/lib/socket.io/socket.io.slim')|jsonify }},
+          'socketio': {{ url_for('static', filename='js/lib/socket.io/socket.io.min')|jsonify }},
         },
         shim: {
           'socketio': {

@@ -46,7 +46,7 @@ const cp_files = [
     dest: path.join(root, 'appyter/profiles/bootstrap/static/js/lib/bootstrap'),
   },
   {
-    src: path.join(root, 'js/node_modules/socket.io-client/dist/socket.io.slim.js'),
+    src: path.join(root, 'js/node_modules/socket.io-client/dist/socket.io.min.js'),
     dest: path.join(root, 'appyter/profiles/default/static/js/lib/socket.io'),
   },
   {
@@ -88,7 +88,7 @@ gulp.task('build_js', function () {
         debug: true,
         standalone: file.basename,
         transform: [
-          [babelify, { presets: ['@babel/preset-env'] }],
+          [babelify, {presets: ['@babel/preset-env']}],
         ],
         plugin: [
           tinyify,
