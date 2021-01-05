@@ -11,6 +11,7 @@
   import slugify from '../../../../utils/slugify'
   import any from '../../../../utils/any'
   import hash from '../../../../utils/hash'
+  import get_require from '../../../../utils/get_require'
   import { setup_chunking } from '../../../../lib/socketio'
 
   export let window
@@ -21,26 +22,6 @@
   let nb
   let show_code = false
   let local_run_url
-
-  // get deps with requirejs
-  let socket
-  let _deps = undefined
-  async function ensure_deps() {
-    if (_deps === undefined) {
-      _deps = await new Promise(
-        (resolve, reject) =>
-          window.require(['socket'], function (socket) {
-            resolve({ socket })
-          }, reject)
-      )
-      socket = _deps.socket
-    }
-  }
-  async function ensure_connected() {
-    if (!socket.connected) {
-      await new Promise((resolve, reject) => socket.on('connect', resolve))
-    }
-  }
 
   // table of contents
   function *get_md_headers(md) {
@@ -71,7 +52,7 @@
   let statusBg = 'primary'
   var current_code_cell
 
-  async function setup_async_exec() {
+  async function setup_async_exec(socket) {
     socket.on('connect', async () => {
       await tick()
       status = `Connected to server, re-initializing...`
@@ -126,11 +107,15 @@
 
   let connect_init = false
   async function connect(execute) {
+    const socket = await get_require(window, 'socket')
     if (!connect_init) {
       connect_init = true
-      await ensure_deps()
-      await ensure_connected()
-      await setup_async_exec()
+      // ensure we're connected
+      await new Promise((resolve, reject) => {
+        if (socket.connected) resolve()
+        else socket.on('connect', resolve)
+      })
+      await setup_async_exec(socket)
     }
     const paths = window.location.pathname.split('/').filter(p => p)
     if (execute) {

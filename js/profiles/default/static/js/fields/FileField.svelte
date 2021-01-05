@@ -1,38 +1,9 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount } from "svelte"
+  import get_require from '../../../../../utils/get_require'
 
   export let window
   export let args
-
-  // get deps with requirejs
-  window.require.config({
-    paths: {
-      'socketio-file-upload': `${window._config.STATIC_URL}js/lib/socketio-file-upload/client.min`,
-    },
-    shim: {
-      'socketio-file-upload': {
-        exports: 'SocketIOFileUpload'
-      },
-    }
-  })
-  let socket
-  let siofu
-  let _deps = undefined
-  async function ensure_deps() {
-    if (_deps === undefined) {
-      _deps = await new Promise(
-        (resolve, reject) =>
-          window.require(['socket', 'socketio-file-upload'], function (socket, SocketIOFileUpload) {
-            resolve({
-              socket,
-              siofu: new SocketIOFileUpload(socket),
-            })
-          }, reject)
-      )
-      socket = _deps.socket
-      siofu = _deps.siofu
-    }
-  }
 
   // file field DOM element
   let fileField
@@ -43,7 +14,7 @@
   let full_filename
 
   // setup example downloading event handlers
-  async function setup_download() {
+  async function setup_download(socket) {
     socket.on('download_queued', function (evt) {
       if (evt.name !== args.name) return
       state = {
@@ -116,7 +87,7 @@
   }
 
   // setup uploading event handlers
-  async function setup_upload() {
+  async function setup_upload(siofu) {
     siofu.listenOnInput(fileField)
     siofu.addEventListener('start', function (evt) {
       state = {
@@ -159,7 +130,7 @@
     if (url.indexOf('://') === -1) {
       url = new URL(url, document.baseURI).href
     }
-    await ensure_deps()
+    const socket = await get_require(window, 'socket')
     socket.emit('download_start', {
       name: name,
       url: new URL(url).href,
@@ -168,9 +139,20 @@
   }
 
   onMount(async () => {
-    await ensure_deps()
-    await setup_download()
-    await setup_upload()
+    window.require.config({
+      paths: {
+        'socketio-file-upload': `${window._config.STATIC_URL}js/lib/socketio-file-upload/client.min`,
+      },
+      shim: {
+        'socketio-file-upload': {
+          exports: 'SocketIOFileUpload'
+        },
+      }
+    })
+
+    const [socket, SocketIOFileUpload] = await get_require(window, ['socket', 'socketio-file-upload'])
+    await setup_download(socket)
+    await setup_upload(new SocketIOFileUpload(socket))
   })
 </script>
 
