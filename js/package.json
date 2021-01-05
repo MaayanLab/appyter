@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/maayanlab/appyter#readme",
   "devDependencies": {
-    "@babel/core": "^7.11.4",
-    "@babel/preset-env": "^7.11.0",
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
     "babelify": "^10.0.0",
     "browserify": "^16.5.2",
     "gulp": "^4.0.2",
@@ -30,23 +30,23 @@
     "gulp-tap": "^2.0.0",
     "gulplog": "^1.0.0",
     "merge-stream": "^2.0.0",
-    "svelte": "^3.24.1",
+    "svelte": "^3.31.2",
     "sveltify": "^3.0.0",
     "tinyify": "^3.0.0"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.14.0",
+    "@fortawesome/fontawesome-free": "^5.15.1",
     "ansi_up": "^4.0.4",
-    "bootstrap": "^4.5.2",
+    "bootstrap": "^4.5.3",
     "canonical-json": "0.0.4",
     "gulp-rename": "^2.0.0",
-    "highlight.js": "^10.1.2",
+    "highlight.js": "^10.5.0",
     "jquery": "^3.5.1",
-    "markdown-it": "^11.0.0",
+    "markdown-it": "^11.0.1",
     "markdown-it-anchor": "^5.3.0",
     "requirejs": "^2.3.6",
     "select2": "^4.0.13",
     "socket.io-client": "^3.0.5",
-    "socketio-file-upload": "^0.7.0"
+    "socketio-file-upload": "^0.7.3"
   }
 }
