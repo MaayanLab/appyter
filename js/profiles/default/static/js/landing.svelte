@@ -170,9 +170,15 @@
         }
         pagehit_type = 'view'
       }
+    } catch (e) {
+      await tick()
+      status = `${e}`
+      statusBg = 'danger'
+    }
 
-      if (extras.indexOf('catalog-integration') !== -1) {
-        // setup local run appyter link
+    if (extras.indexOf('catalog-integration') !== -1) {
+      // setup local run appyter link
+      try {
         const P = window.location.pathname.split('/').filter(p => p)
         const slug = P[P.length - 2] || ''
         const id = P[P.length - 1] || ''
@@ -185,20 +191,19 @@
         else if (nb.metadata.appyter.nbconstruct !== undefined) library_version = nb.metadata.appyter.nbconstruct.version || ''
 
         local_run_url = `${window.location.origin}/#/running-appyters/?slug=${slug}&appyter_version=${appyter_version}&library_version=${library_version}&id=${id}`
-
-        // trigger pagehit
-        try {
-          const pagehit = await get_require(window, 'pagehit')
-          pagehit(pagehit_type)
-        } catch (e) {
-          console.error('catalog-integration: pagehit error')
-          console.error(e)
-        }
+      } catch (e) {
+        console.error('catalog-integration: local_run_url setup error')
+        console.error(e)
       }
-    } catch (e) {
-      await tick()
-      status = `${e}`
-      statusBg = 'danger'
+
+      // trigger pagehit
+      try {
+        const pagehit = await get_require(window, 'pagehit')
+        pagehit(pagehit_type)
+      } catch (e) {
+        console.error('catalog-integration: pagehit error')
+        console.error(e)
+      }
     }
   }
 
