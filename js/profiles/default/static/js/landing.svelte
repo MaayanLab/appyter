@@ -151,22 +151,28 @@
         nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
       }
 
+      let pagehit_type
       if (value.metadata.appyter.nbexecute === undefined) {
         // Execute notebook if it hasn't already been executed
         await connect(true)
-      } else if (value.metadata.appyter.nbexecute.completed === undefined) {
-        // Notebook started but hasn't completed
-        await connect(false)
-        await tick()
-        status = 'Notebook is currently executing, joining session...'
-        statusBg = 'primary'
+        pagehit_type = 'execute'
       } else {
-        await tick()
-        status = undefined
-        nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
+        if (value.metadata.appyter.nbexecute.completed === undefined) {
+          // Notebook started but hasn't completed
+          await connect(false)
+          await tick()
+          status = 'Notebook is currently executing, joining session...'
+          statusBg = 'primary'
+        } else {
+          await tick()
+          status = undefined
+          nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
+        }
+        pagehit_type = 'view'
       }
 
       if (extras.indexOf('catalog-integration') !== -1) {
+        // setup local run appyter link
         const P = window.location.pathname.split('/').filter(p => p)
         const slug = P[P.length - 2] || ''
         const id = P[P.length - 1] || ''
@@ -179,6 +185,15 @@
         else if (nb.metadata.appyter.nbconstruct !== undefined) library_version = nb.metadata.appyter.nbconstruct.version || ''
 
         local_run_url = `${window.location.origin}/#/running-appyters/?slug=${slug}&appyter_version=${appyter_version}&library_version=${library_version}&id=${id}`
+
+        // trigger pagehit
+        try {
+          const pagehit = await get_require(window, 'pagehit')
+          pagehit(pagehit_type)
+        } catch (e) {
+          console.error('catalog-integration: pagehit error')
+          console.error(e)
+        }
       }
     } catch (e) {
       await tick()
