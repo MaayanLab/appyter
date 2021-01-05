@@ -126,6 +126,7 @@
   }
 
   async function init() {
+    let pagehit_type = 'view'
     try {
       // Load notebook
       // https://developer.mozilla.org/en-US/docs/Web/API/Request/cache
@@ -151,7 +152,6 @@
         nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
       }
 
-      let pagehit_type
       if (value.metadata.appyter.nbexecute === undefined) {
         // Execute notebook if it hasn't already been executed
         await connect(true)
@@ -168,7 +168,6 @@
           status = undefined
           nb = {...value, cells: value.cells.map((cell, index) => ({ ...cell, index })) }
         }
-        pagehit_type = 'view'
       }
     } catch (e) {
       await tick()
