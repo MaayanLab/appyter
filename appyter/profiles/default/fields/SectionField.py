@@ -17,3 +17,6 @@ class SectionField(Field):
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
     self['type'] = 'section'
+
+  def value(self):
+    raise Exception('SectionField cannot be rendered')
