@@ -7,6 +7,7 @@
   import * as Source from '../../../../components/jupyter/Source.svelte'
   import * as Outputs from '../../../../components/jupyter/Outputs.svelte'
   import * as Markdown from '../../../../components/Markdown.svelte'
+  import * as HTML from '../../../../components/HTML.svelte'
   import collapse from '../../../../utils/collapse'
   import slugify from '../../../../utils/slugify'
   import any from '../../../../utils/any'
@@ -427,6 +428,9 @@
           {/if}
         {/each}
       </Cells>
+      {#if nb.metadata.widgets !== undefined}
+        <HTML data="<script type='application/vnd.jupyter.widget-state+json'>{JSON.stringify(nb.metadata.widgets['application/vnd.jupyter.widget-state+json'])}</script>" />
+      {/if}
     {/if}
   </div>
 </div>

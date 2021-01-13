@@ -48,6 +48,11 @@
         <div class="output_stream output_{data.name} output_markdown">
           <Markdown data={collapse(data.data['text/markdown'])} />
         </div>
+      {:else if data.data['application/vnd.jupyter.widget-view+json']}
+        <HTML
+          classes="output_subarea output_widget_view"
+          data='<script type="application/vnd.jupyter.widget-view+json">{JSON.stringify(collapse(data.data['application/vnd.jupyter.widget-view+json']))}</script>'
+        />
       {:else if data.data['text/plain']}
         <div class="output_stream output_{data.name} output_text">
           <Ansi data={collapse(data.data['text/plain'])} />
