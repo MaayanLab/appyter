@@ -1,8 +1,8 @@
 <script>
-  import * as Prompt from './Prompt.svelte'
-  import * as Markdown from '../Markdown.svelte'
-  import * as Ansi from '../Ansi.svelte'
-  import * as HTML from '../HTML.svelte'
+  import Prompt from './Prompt.svelte'
+  import Markdown from '../Markdown.svelte'
+  import Ansi from '../Ansi.svelte'
+  import HTML from '../HTML.svelte'
   import collapse from '../../utils/collapse.js'
 
   export let index

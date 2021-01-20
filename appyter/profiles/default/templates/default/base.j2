@@ -35,7 +35,7 @@
             require([file], function (Component) {
               Object.assign(props, { window: window })
               self.children[0].remove()
-              var component = new Component({
+              var component = new Component.default({
                 target: self,
                 props: props,
               })
