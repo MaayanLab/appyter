@@ -1,5 +1,5 @@
 <script>
-  import * as Markdown from '../Markdown.svelte'
+  import Markdown from '../Markdown.svelte'
 
   export let language
   export let source

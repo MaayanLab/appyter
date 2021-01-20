@@ -1,5 +1,5 @@
 <script>
-  import * as Ansi from '../../Ansi.svelte'
+  import Ansi from '../../Ansi.svelte'
   import collapse from '../../../utils/collapse.js'
   export let data
   let _data

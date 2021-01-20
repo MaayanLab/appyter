@@ -1,7 +1,7 @@
 <script>
-  import * as Output from './Output.svelte'
-  import * as Loader from '../Loader.svelte'
-  import * as Prompt from './Prompt.svelte'
+  import Output from './Output.svelte'
+  import Loader from '../Loader.svelte'
+  import Prompt from './Prompt.svelte'
   import collapse from '../../utils/collapse.js'
   import hash from '../../utils/hash.js'
 

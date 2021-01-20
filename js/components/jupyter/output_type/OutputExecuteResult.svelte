@@ -1,5 +1,5 @@
 <script>
-  import * as OutputMimetype from '../OutputMimetype.svelte'
+  import OutputMimetype from '../OutputMimetype.svelte'
   export let data
 </script>
 
