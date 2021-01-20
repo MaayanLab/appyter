@@ -1,4 +1,6 @@
 <script>
+  import { IPYWidgetManager } from '../lib/ipywidget'
+
   export let classes = ""
   export let data = ""
   
@@ -22,16 +24,20 @@
       const el = scripts[i]
       const type = el.getAttribute('type') || 'application/javascript'
       if (type === 'application/vnd.jupyter.widget-view+json') {
-        require(['@jupyter-widgets/html-manager/dist/libembed-amd'], (embed) => {
-        // require(['@jupyter-widgets/html-manager'], async ({ HTMLManager }) => {
-            embed.renderWidgets(el);
-            // const manager = new HTMLManager()
-            // const model = manager.new_model(JSON.parse(el.innerHTML))
-            // await manager.display_view(manager.create_view(model), widgetTag)
-
-            // manager.display_view(el.parentNode)
-          }
-        )
+        const manager = new IPYWidgetManager()
+        const model = JSON.parse(el.innerHTML)
+        manager.new_model(model)
+          .then((model) => {
+            console.log('create view')
+            // get state
+            return model.create_view(model)
+          })
+          .then((view) => {
+            console.log('display view')
+            manager.display_view(null, view)
+            return view
+          })
+          .catch(console.error)
         continue
       }
       const types = type.split('+')

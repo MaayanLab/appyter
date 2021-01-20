@@ -39,6 +39,10 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
+    "@jupyter-widgets/base": "^4.0.0",
+    "@jupyter-widgets/base-manager": "^1.0.0-alpha.0",
+    "@jupyter-widgets/controls": "^3.0.0",
+    "@jupyter-widgets/html-manager": "^0.20.0",
     "ansi_up": "^4.0.4",
     "bootstrap": "^4.5.3",
     "canonical-json": "0.0.4",
