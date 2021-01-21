@@ -126,6 +126,8 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
             else:
               state['status'] = 'Success'
               await emit({ 'type': 'status', 'data': state['status'] })
+          #
+          client.set_widgets_metadata()
       except asyncio.CancelledError:
         raise
       except Exception as e:
