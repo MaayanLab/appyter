@@ -1,5 +1,5 @@
 <script>
-  import { IPYWidgetManager } from '../lib/ipywidget'
+  import get_require from '../utils/get_require'
 
   export let classes = ""
   export let data = ""
@@ -23,28 +23,39 @@
     for (let i = 0; i < scripts.length; i++) {
       const el = scripts[i]
       const type = el.getAttribute('type') || 'application/javascript'
-      if (type === 'application/vnd.jupyter.widget-view+json') {
-        const manager = new IPYWidgetManager()
-        const model = JSON.parse(el.innerHTML)
-        manager.new_model(model)
-          .then((model) => {
-            console.log('create view')
-            // get state
-            return model.create_view(model)
-          })
-          .then((view) => {
-            console.log('display view')
-            manager.display_view(null, view)
-            return view
-          })
-          .catch(console.error)
-        continue
-      }
       const types = type.split('+')
       if (types.indexOf('json') >= 0) {
-        continue
+        if (type === 'application/vnd.jupyter.widget-view+json') {
+          const metadata = JSON.parse(el.innerHTML)
+          get_require(window, 'ipywidget-manager').then(async (manager) => {
+            console.log(metadata)
+            if (manager.__models === undefined) {
+              manager.__models = {}
+            }
+            if (manager.__models[metadata.model_id] === undefined) {
+              manager.__models[metadata.model_id] = { metadata, el }
+            }
+          }).catch(console.error)
+        } else if (type === 'application/vnd.jupyter.widget-state+json') {
+          const metadata = JSON.parse(el.innerHTML)
+          get_require(window, 'ipywidget-manager').then(async (manager) => {
+            console.log(manager)
+            console.log(metadata)
+            if (manager.__models !== undefined) {
+              for (const model_id in manager.__models) {
+                const model = await manager.new_model(manager.__models[model_id].metadata, metadata.state[model_id])
+                const view = await model.create_view(model)
+                await manager.display_view(manager.__models[model_id].el, view)
+              }
+              await manager.set_state(metadata)
+            }
+          }).catch(console.error)
+        } else {
+          console.warn(`Unhandled script type ${type}`)
+        }
+      } else {
+        try_eval_once(el.innerHTML)
       }
-      try_eval_once(el.innerHTML)
     }
   }
 </script>

@@ -1,7 +1,7 @@
 // https://github.com/jupyter-widgets/ipywidgets/blob/master/examples/web1/manager.js
-import base from '@jupyter-widgets/base'
+import * as base from '@jupyter-widgets/base'
 import { ManagerBase } from '@jupyter-widgets/base-manager'
-import controls from '@jupyter-widgets/controls'
+import * as controls from '@jupyter-widgets/controls'
 import { Widget as LuminoWidget } from '@lumino/widgets'
 
 export class IPYWidgetManager extends ManagerBase {

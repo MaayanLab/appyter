@@ -213,6 +213,15 @@
     status = 'Loading...'
     statusBg = 'primary'
     show_code = extras.indexOf('hide-code') === -1
+    if (extras.indexOf('ipywidgets') !== -1) {
+      import('../../../../lib/ipywidget').then(
+        ({ IPYWidgetManager }) => {
+          window.define('ipywidget-manager', function () {
+            return new IPYWidgetManager()
+          })
+        }
+      ).catch(console.error)
+    }
     await init()
   })
 </script>
