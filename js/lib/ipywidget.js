@@ -8,34 +8,20 @@ export class IPYWidgetManager extends ManagerBase {
   constructor(el) {
     super();
     this.el = el;
+    window.define('@jupyter-widgets/controls', function () { return controls })
+    window.define('@jupyter-widgets/base', function () { return base })
   }
 
   loadClass(className, moduleName, moduleVersion) {
     return new Promise(function(resolve, reject) {
-      if (moduleName === '@jupyter-widgets/controls') {
-        resolve(controls);
-      } else if (moduleName === '@jupyter-widgets/base') {
-        resolve(base);
-      } else {
-        var fallback = function(err) {
-          let failedId = err.requireModules && err.requireModules[0];
-          if (failedId) {
-            console.log(
-              `Falling back to unpkg.com for ${moduleName}@${moduleVersion}`
-            );
-            window.require(
-              [
-                `https://unpkg.com/${moduleName}@${moduleVersion}/dist/index.js`
-              ],
-              resolve,
-              reject
-            );
-          } else {
-            throw err;
+      if (!window.require.defined(moduleName)) {
+        window.require.config({
+          paths: {
+            [moduleName]: `https://unpkg.com/${moduleName}@${moduleVersion}/dist/index`,
           }
-        };
-        window.require([`${moduleName}.js`], resolve, fallback);
+        })
       }
+      window.require([moduleName], resolve, reject)
     }).then(function(module) {
       if (module[className]) {
         return module[className];
@@ -47,11 +33,13 @@ export class IPYWidgetManager extends ManagerBase {
     });
   }
 
-  display_view(view) {
-    var that = this;
-    return Promise.resolve(view).then(view => {
-      LuminoWidget.attach(view.pWidget, that.el);
-      return view;
+  display_view(view, options) {
+    return Promise.resolve(view).then((view) => {
+        LuminoWidget.attach(view.pWidget, options.el);
+        view.on('remove', () => {
+            console.log('View removed', view);
+        });
+        return view;
     });
   }
 
@@ -59,7 +47,11 @@ export class IPYWidgetManager extends ManagerBase {
     return Promise.resolve({});
   }
 
-  _create_comm() {
-    return Promise.reject('no comms available');
+  _create_comm(comm_target_name, model_id, data, metadata, buffers) {
+    return Promise.resolve({
+      on_close: () => { return; },
+      on_msg: () => { return; },
+      close: () => { return; }
+    });
   }
 }

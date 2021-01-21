@@ -50,7 +50,7 @@
         </div>
       {:else if data.data['application/vnd.jupyter.widget-view+json']}
         <HTML
-          classes="output_subarea output_widget_view"
+          classes="output_widget_view"
           data='<script type="application/vnd.jupyter.widget-view+json">{JSON.stringify(collapse(data.data['application/vnd.jupyter.widget-view+json']))}</script>'
         />
       {:else if data.data['text/plain']}
@@ -63,7 +63,7 @@
         {JSON.stringify(data)}
       {/if}
     {:else if data.output_type === 'error'}
-      <div class="output_subarea output_test output_error">
+      <div class="output_test output_error">
         {#if data.traceback !== undefined}
           <Ansi data="{collapse(data.traceback, '\n')}" />
         {:else}

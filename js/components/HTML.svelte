@@ -28,26 +28,28 @@
         if (type === 'application/vnd.jupyter.widget-view+json') {
           const metadata = JSON.parse(el.innerHTML)
           get_require(window, 'ipywidget-manager').then(async (manager) => {
-            console.log(metadata)
             if (manager.__models === undefined) {
               manager.__models = {}
             }
             if (manager.__models[metadata.model_id] === undefined) {
-              manager.__models[metadata.model_id] = { metadata, el }
+              manager.__models[metadata.model_id] = { metadata, el: ref }
             }
           }).catch(console.error)
         } else if (type === 'application/vnd.jupyter.widget-state+json') {
           const metadata = JSON.parse(el.innerHTML)
           get_require(window, 'ipywidget-manager').then(async (manager) => {
-            console.log(manager)
-            console.log(metadata)
+            const models = {}
+            for (const model of (await manager.set_state(metadata))) {
+              models[model.model_id] = model
+            }
             if (manager.__models !== undefined) {
-              for (const model_id in manager.__models) {
-                const model = await manager.new_model(manager.__models[model_id].metadata, metadata.state[model_id])
-                const view = await model.create_view(model)
-                await manager.display_view(manager.__models[model_id].el, view)
+              for (const model in manager.__models) {
+                if (models[model] !== undefined) {
+                  const viewTag = manager.__models[model].el
+                  const view = await manager.create_view(models[model])
+                  manager.display_view(view, { el: viewTag })
+                }
               }
-              await manager.set_state(metadata)
             }
           }).catch(console.error)
         } else {
