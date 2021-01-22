@@ -4,6 +4,14 @@ appyter.profiles.default.fields package
 Submodules
 ----------
 
+appyter.profiles.default.fields.AutocompleteField module
+--------------------------------------------------------
+
+.. automodule:: appyter.profiles.default.fields.AutocompleteField
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.profiles.default.fields.BoolField module
 ------------------------------------------------
 

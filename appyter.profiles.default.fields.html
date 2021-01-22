@@ -39,6 +39,44 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-appyter.profiles.default.fields.AutocompleteField">
+<span id="appyter-profiles-default-fields-autocompletefield-module"></span><h2>appyter.profiles.default.fields.AutocompleteField module<a class="headerlink" href="#module-appyter.profiles.default.fields.AutocompleteField" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.profiles.default.fields.AutocompleteField.AutocompleteField">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.AutocompleteField.</code><code class="sig-name descname">AutocompleteField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">'.*'</span></em>, <em class="sig-param"><span class="n">hint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/AutocompleteField.html#AutocompleteField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.AutocompleteField.AutocompleteField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<p>Representing a field that accepts a string with autocomplete.
+Auto complete will use <code class="docutils literal notranslate"><span class="pre">choices</span></code> or alternatively <code class="docutils literal notranslate"><span class="pre">file_path</span></code> – a url to load the choices as an array.</p>
+<p>Be careful with this field, consider defining a constraint regex. Note that it is equivalent to
+a string field, and still accepts choices not being autocompleted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>constraint</strong> – A regular expression for validating the file name.</p></li>
+<li><p><strong>hint</strong> – A hint to put in the field prior to content.</p></li>
+<li><p><strong>file_path</strong> – (Optional[str]) A remote url to download the autocomplete list. Should resolve to a json list of terms.</p></li>
+<li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
+<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
+<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.AutocompleteField.AutocompleteField.constraint">
+<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/AutocompleteField.html#AutocompleteField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.AutocompleteField.AutocompleteField.constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if the received args.value satisfies constraints.
+Should be overridden by subclasses.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-appyter.profiles.default.fields.BoolField">
 <span id="appyter-profiles-default-fields-boolfield-module"></span><h2>appyter.profiles.default.fields.BoolField module<a class="headerlink" href="#module-appyter.profiles.default.fields.BoolField" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -175,7 +213,7 @@ The field ends up being a string of the file path, for example:</p>
 <p>paths can be relative i.e. <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">&quot;my_file.txt&quot;:</span> <span class="pre">url_for('static',</span> <span class="pre">filename='my_file.txt')</span> <span class="pre">}</span></code>, or a remote url.
 :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
 :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-:param <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs: Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
+:param <a href="#id9"><span class="problematic" id="id10">**</span></a>kwargs: Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.FileField.FileField.constraint">
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.constraint" title="Permalink to this definition">¶</a></dt>
@@ -610,6 +648,7 @@ can be used to extend or override those definitions.</p>
   <ul>
 <li><a class="reference internal" href="#">appyter.profiles.default.fields package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.AutocompleteField">appyter.profiles.default.fields.AutocompleteField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.BoolField">appyter.profiles.default.fields.BoolField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.ChoiceField">appyter.profiles.default.fields.ChoiceField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.DescriptionField">appyter.profiles.default.fields.DescriptionField module</a></li>
