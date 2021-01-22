@@ -96,13 +96,14 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
           resources={ 'metadata': {'path': fs.path()} },
           iopub_hook=iopub_hook,
         )
-        await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
         async with client.async_setup_kernel(
           env=dict(
             PYTHONPATH=':'.join(sys.path),
             PATH=os.environ['PATH'],
           ),
         ):
+          client.set_widgets_metadata()
+          await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
           logger.info('nbexecute executing')
           state.update(status='Executing...', progress=0)
           await emit({ 'type': 'status', 'data': state['status'] })

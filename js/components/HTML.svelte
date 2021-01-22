@@ -18,7 +18,7 @@
     }
   }
 
-  $: if (ref) {
+  $: if (ref && data) {
     const scripts = ref.querySelectorAll('script')
     for (let i = 0; i < scripts.length; i++) {
       const el = scripts[i]
@@ -28,29 +28,12 @@
         if (type === 'application/vnd.jupyter.widget-view+json') {
           const metadata = JSON.parse(el.innerHTML)
           get_require(window, 'ipywidget-manager').then(async (manager) => {
-            if (manager.__models === undefined) {
-              manager.__models = {}
-            }
-            if (manager.__models[metadata.model_id] === undefined) {
-              manager.__models[metadata.model_id] = { metadata, el: ref }
-            }
+            await manager.register_view({ metadata, el: ref })
           }).catch(console.error)
         } else if (type === 'application/vnd.jupyter.widget-state+json') {
           const metadata = JSON.parse(el.innerHTML)
           get_require(window, 'ipywidget-manager').then(async (manager) => {
-            const models = {}
-            for (const model of (await manager.set_state(metadata))) {
-              models[model.model_id] = model
-            }
-            if (manager.__models !== undefined) {
-              for (const model in manager.__models) {
-                if (models[model] !== undefined) {
-                  const viewTag = manager.__models[model].el
-                  const view = await manager.create_view(models[model])
-                  manager.display_view(view, { el: viewTag })
-                }
-              }
-            }
+            await manager.register_state(metadata)
           }).catch(console.error)
         } else {
           console.warn(`Unhandled script type ${type}`)

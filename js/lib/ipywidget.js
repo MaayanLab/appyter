@@ -8,6 +8,12 @@ export class IPYWidgetManager extends ManagerBase {
   constructor(el) {
     super();
     this.el = el;
+    this.__lock = { lock: false, callbacks: [] }
+    this.__models_state = {}
+    this.__models_view = {}
+    this.create_and_display_views = this.create_and_display_views.bind(this)
+    this.register_view = this.register_view.bind(this)
+    this.register_state = this.register_state.bind(this)
     window.define('@jupyter-widgets/controls', function () { return controls })
     window.define('@jupyter-widgets/base', function () { return base })
   }
@@ -31,6 +37,44 @@ export class IPYWidgetManager extends ManagerBase {
         );
       }
     });
+  }
+
+  async create_and_display_views() {
+    // TODO: simplify/cleanup
+    if (this.__lock.lock || this.__lock.callbacks.length > 0) {
+      await new Promise((resolve, reject) => this.__lock.callbacks.push(resolve))
+    }
+    this.__lock.lock = true
+
+    const add_state = {...this.__models_state, state: {}}
+    for (const model_id in this.__models_state.state) {
+      const model_view = this.__models_view[model_id]
+      if (model_view === undefined || model_view.view !== undefined) continue
+      add_state.state[model_id] = this.__models_state.state[model_id]
+    }
+    if (Object.keys(add_state.state).length > 0) {
+      const model_list = await this.set_state(add_state)
+      for (const model of model_list) {
+        const viewTag = this.__models_view[model.model_id].el
+        this.__models_view[model.model_id].view = await this.create_view(model)
+        await this.display_view(this.__models_view[model.model_id].view, { el: viewTag })
+      }
+    }
+
+    this.__lock.lock = false
+    while (this.__lock.callbacks.length > 0) {
+      await this.__lock.callbacks.shift()()
+    }
+  }
+
+  async register_view({ metadata, el }) {
+    this.__models_view[metadata.model_id] = { metadata, el }
+    await this.create_and_display_views()
+  }
+
+  async register_state(state) {
+    this.__models_state = state
+    await this.create_and_display_views()
   }
 
   display_view(view, options) {
