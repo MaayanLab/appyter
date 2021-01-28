@@ -12,7 +12,7 @@
   
   $: if (items !== undefined) {
     relevant_items = items
-      .filter(item => item.substr(0, value.length) === value && item !== value)
+      .filter(item => item.toLowerCase().substr(0, value.length) === value.toLowerCase() && item !== value)
       .slice(0, 7)
     current_focus = -1
   }
