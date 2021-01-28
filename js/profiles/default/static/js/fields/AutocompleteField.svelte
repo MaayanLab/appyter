@@ -128,7 +128,7 @@
             {#each relevant_items as item, ind}
               <div
                 class:autocomplete-active={current_focus === ind}
-                on:click={() => value = item}
+                on:mousedown={() => value = item}
               >
                 <strong>{item.substr(0, value.length)}</strong>{item.substr(value.length)}
               </div>
