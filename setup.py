@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
   name='appyter',
+  python_requires='>=3.8.0',
   version=open('appyter/VERSION', 'r').read(),
   url='https://github.com/maayanLab/appyter/',
   author='Daniel J. B. Clarke',
