@@ -118,7 +118,11 @@ http {
       try_files /favicon.ico =404;
     }
 
-    location ^~ {{ join_routes(_config.PREFIX, 'socket.io') }} {
+    location ~ ^{{ join_routes(_config.PREFIX, '[^/]+') }}$ {
+      rewrite ^(.*)$ $1/ redirect;
+    }
+
+    location ^~ {{ join_routes(_config.PREFIX, 'socket.io') }}/ {
       {{ proxy('http://appyter', True) }}
     }
 
@@ -142,7 +146,7 @@ http {
     }
 
     {%- for blueprint_name in find_blueprints(config=_config).keys() %}
-    location  ~ ^{{ join_routes(_config.PREFIX, blueprint_name) }}/(.*)$ {
+    location ~ ^{{ join_routes(_config.PREFIX, blueprint_name) }}/(.*)$ {
       {{ proxy('http://appyter', False, False) }}
     }
     {%- endfor %}
