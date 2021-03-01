@@ -19,7 +19,7 @@ jobs:
     - name: Tweak version for dev-release
       if: startsWith(github.ref, 'refs/tags') != true
       run: |
-        echo -n $(cat appyter/VERSION).$(git rev-parse --short HEAD) > appyter/VERSION
+        echo -n $(cat appyter/VERSION)rc$(git rev-list $(git describe --tags --abbrev=0)..HEAD --count) > appyter/VERSION
     - name: Build binary wheel and source tarball
       run: |
         python -m build --sdist --wheel --outdir dist/ .
