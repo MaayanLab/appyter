@@ -19,6 +19,7 @@ jobs:
     - name: Tweak version for dev-release
       if: startsWith(github.ref, 'refs/tags') != true
       run: |
+        git fetch --prune --unshallow --tags
         git describe --tags | python -c 'import sys, re; m=re.match("v(\d+\.\d+\.\d+)-(\d+)-(.+)$", sys.stdin.read()).groups(); print(m[0]+"rc"+m[1])' > appyter/VERSION
     - name: Build binary wheel and source tarball
       run: |
