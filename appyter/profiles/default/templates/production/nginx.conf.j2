@@ -141,6 +141,12 @@ http {
         =404;
     }
 
+    {%- for blueprint_name in find_blueprints(config=_config).keys() %}
+    location  ~ ^{{ join_routes(_config.PREFIX, blueprint_name) }}/(.*)$ {
+      {{ proxy('http://appyter', False, False) }}
+    }
+    {%- endfor %}
+
     location ~ ^{{ join_routes(_config.PREFIX, '[^/]+') }}/$ {
       if ($parsed_method = 'GET:application/vnd.jupyter') {
         rewrite ^(.*)/$ "$1/{{ _config.IPYNB }}";
