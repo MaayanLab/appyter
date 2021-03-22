@@ -191,11 +191,11 @@ http {
 
     {%- if _config.PREFIX != '/' %}
     location / {
-      {% if _config.PROXY %}
-      return 301 $http_x_forwarded_proto://$http_x_forwarded_host:$http_x_forwarded_port{{ _config.PREFIX.rstrip('/') }}$request_uri;
+      {%- if _config.PROXY %}
+      rewrite ^/?(.*)$ $http_x_forwarded_proto://$http_x_forwarded_host:$http_x_forwarded_port{{ _config.PREFIX }}$1 redirect;
       {% else %}
-      return 301 {{ _config.PREFIX.rstrip('/') }}$request_uri;
-      {% endif %}
+      rewrite ^/?(.*)$ {{ _config.PREFIX }}$1 redirect;
+      {%- endif %}
     }
     {%- endif %}
   }
