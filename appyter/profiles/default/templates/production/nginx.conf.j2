@@ -80,6 +80,18 @@ http {
   {%- endwith %}
   {%- endif %}
 
+
+  {%- if _config.PROXY %}
+  map $http_x_forwarded_for_proto $proxied_proto {
+    default $http_x_forwarded_for_proto;
+    ''      "http";
+  }
+  map $http_x_forwarded_host $proxied_host {
+    default $http_x_forwarded_host;
+    ''      $http_host;
+  }
+  {%- endif %}
+
   server {
     listen {{ _config.PORT }};
     server_name {{ _config.HOST }};
@@ -87,6 +99,7 @@ http {
     charset utf-8;
     sendfile on;
     keepalive_timeout 0;
+    absolute_redirect off;
 
     set $parsed_method "${request_method}:${http_accept}";
 
@@ -125,7 +138,7 @@ http {
 
     location ~ ^{{ join_routes(_config.PREFIX, '[^/]+') }}$ {
       {% if _config.PROXY %}
-      rewrite ^(.*)$ $http_x_forwarded_proto://$http_x_forwarded_host:$http_x_forwarded_port$1/ redirect;
+      rewrite ^(.*)$ $proxied_proto://$proxied_host$1/ redirect;
       {% else %}
       rewrite ^(.*)$ $1/ redirect;
       {% endif %}
@@ -192,7 +205,7 @@ http {
     {%- if _config.PREFIX != '/' %}
     location / {
       {%- if _config.PROXY %}
-      rewrite ^/?(.*)$ $http_x_forwarded_proto://$http_x_forwarded_host:$http_x_forwarded_port{{ _config.PREFIX }}$1 redirect;
+      rewrite ^/?(.*)$ $proxied_proto://$proxied_host{{ _config.PREFIX }}$1 redirect;
       {% else %}
       rewrite ^/?(.*)$ {{ _config.PREFIX }}$1 redirect;
       {%- endif %}
