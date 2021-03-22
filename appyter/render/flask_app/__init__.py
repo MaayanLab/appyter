@@ -12,6 +12,7 @@ def create_app(**kwargs):
   '''
   from aiohttp import web
   from aiohttp_wsgi import WSGIHandler
+  from aiohttp_remotes import setup, XForwardedRelaxed
   #
   from flask import Flask, Blueprint, current_app, redirect
   from flask_cors import CORS
@@ -53,32 +54,31 @@ def create_app(**kwargs):
   flask_app.config.update(config)
   flask_app.debug = config['DEBUG']
   #
-  if flask_app.config['PROXY']:
-    logger.info('wsgi proxy fix...')
-    from werkzeug.middleware.proxy_fix import ProxyFix
-    flask_app.wsgi_app = ProxyFix(flask_app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
-  #
   logger.info('Registering blueprints...')
-  flask_app.register_blueprint(core, url_prefix=flask_app.config['PREFIX'])
+  flask_app.register_blueprint(core)
   for blueprint_name, blueprint in find_blueprints(config=flask_app.config).items():
     if isinstance(blueprint, Blueprint):
-      flask_app.register_blueprint(blueprint, url_prefix=join_routes(flask_app.config['PREFIX'], blueprint_name))
+      flask_app.register_blueprint(blueprint, url_prefix='/'+blueprint_name.strip('/'))
     elif callable(blueprint):
-      blueprint(flask_app, url_prefix=join_routes(flask_app.config['PREFIX'], blueprint_name), DATA_DIR=flask_app.config['DATA_DIR'])
+      blueprint(flask_app, url_prefix='/'+blueprint_name.strip('/'), DATA_DIR=flask_app.config['DATA_DIR'])
     else:
       raise Exception('Unrecognized blueprint type: ' + blueprint_name)
   #
-  if flask_app.config['PREFIX'].strip('/'):
+  if app['config']['PREFIX'].strip('/'):
     logger.info('Registering prefix redirect')
-    @flask_app.route('/')
-    @flask_app.route('/<string:path>')
-    def redirect_to_prefix(path=''):
-      if path == flask_app.config['PREFIX'].strip('/'): path = ''
-      return redirect(join_routes(flask_app.config['PREFIX'], path), code=302)
+    async def redirect_to_prefix(request):
+      path = request.match_info['path']
+      if path == app['config']['PREFIX'].strip('/'): path = ''
+      raise web.HTTPFound(join_routes(app['config']['PREFIX'], path) + '/')
+    app.router.add_get('/{path:[^/]*}', redirect_to_prefix)
   #
   logger.info('Registering flask with aiohttp...')
   wsgi_handler = WSGIHandler(flask_app)
-  app.router.add_route('*', '/{path_info:.*}', wsgi_handler)
+  app.router.add_route('*', join_routes(app['config']['PREFIX'], '{path_info:.*}'), wsgi_handler)
+  if flask_app.config['PROXY']:
+    logger.info('Applying proxy fix middleware...')
+    import asyncio
+    asyncio.get_event_loop().run_until_complete(setup(app, XForwardedRelaxed()))
   return app
 
 # register flask_app with CLI

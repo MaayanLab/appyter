@@ -1,4 +1,5 @@
 aiohttp
+aiohttp_remotes
 aiohttp-wsgi
 bs4
 click
