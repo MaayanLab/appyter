@@ -4,8 +4,13 @@
     inactive=60m use_temp_path=off;
 {%- endmacro -%}
 {%- macro proxy(remote, ws, cache) -%}
+      {%- if _config.PROXY %}
+      proxy_set_header Host $http_x_forwarded_host;
+      proxy_set_header X-Forwarded-For $http_x_forwarded_for;
+      {% else %}
       proxy_set_header Host $http_host;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      {%- endif %}
       {%- if ws %}
       proxy_http_version 1.1;
       proxy_set_header Upgrade $http_upgrade;
@@ -119,7 +124,11 @@ http {
     }
 
     location ~ ^{{ join_routes(_config.PREFIX, '[^/]+') }}$ {
+      {% if _config.PROXY %}
+      rewrite ^(.*)$ $http_x_forwarded_proto://$http_x_forwarded_host:$http_x_forwarded_port/$1/ redirect;
+      {% else %}
       rewrite ^(.*)$ $1/ redirect;
+      {% endif %}
     }
 
     location ^~ {{ join_routes(_config.PREFIX, 'socket.io') }}/ {
@@ -182,7 +191,11 @@ http {
 
     {%- if _config.PREFIX != '/' %}
     location / {
+      {% if _config.PROXY %}
+      return 301 $http_x_forwarded_proto://$http_x_forwarded_host:$http_x_forwarded_port{{ _config.PREFIX.rstrip('/') }}$request_uri;
+      {% else %}
       return 301 {{ _config.PREFIX.rstrip('/') }}$request_uri;
+      {% endif %}
     }
     {%- endif %}
   }
