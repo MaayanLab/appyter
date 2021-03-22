@@ -125,7 +125,7 @@ http {
 
     location ~ ^{{ join_routes(_config.PREFIX, '[^/]+') }}$ {
       {% if _config.PROXY %}
-      rewrite ^(.*)$ $http_x_forwarded_proto://$http_x_forwarded_host:$http_x_forwarded_port/$1/ redirect;
+      rewrite ^(.*)$ $http_x_forwarded_proto://$http_x_forwarded_host:$http_x_forwarded_port$1/ redirect;
       {% else %}
       rewrite ^(.*)$ $1/ redirect;
       {% endif %}
