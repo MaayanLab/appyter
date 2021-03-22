@@ -73,7 +73,8 @@ def create_app(**kwargs):
     @flask_app.route('/')
     @flask_app.route('/<string:path>')
     def redirect_to_prefix(path=''):
-      return redirect(join_routes(flask_app.config['PREFIX'], path))
+      if path == flask_app.config['PREFIX'].strip('/'): path = ''
+      return redirect(join_routes(flask_app.config['PREFIX'], path), code=302)
   #
   logger.info('Registering flask with aiohttp...')
   wsgi_handler = WSGIHandler(flask_app)
