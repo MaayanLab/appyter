@@ -1,5 +1,5 @@
 <script>
-  import { tick, onMount } from 'svelte'
+  import { tick, onMount, setContext } from 'svelte'
   import * as Cells from '../../../../components/jupyter/Cells.svelte'
   import * as Cell from '../../../../components/jupyter/Cell.svelte'
   import * as Input from '../../../../components/jupyter/Input.svelte'
@@ -13,11 +13,24 @@
   import hash from '../../../../utils/hash'
   import get_require from '../../../../utils/get_require'
   import { setup_chunking } from '../../../../lib/socketio'
+  import { report_error as report_error_ctx } from '../../../../lib/appyter_context'
 
   export let window
   export let nbdownload
   export let extras = []
   export let debug = false
+
+  setContext(report_error_ctx, async (error) => {
+    console.error(error)
+    if (extras.indexOf('catalog-integration') !== -1) {
+      try {
+        const report_error = await get_require(window, 'report_error')
+        report_error(error)
+      } catch (e) {
+        console.error('catalog-integration: failed to locate report_error handler')
+      }
+    }
+  })
 
   let nb
   let show_code = false
