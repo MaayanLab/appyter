@@ -1,7 +1,20 @@
 <script>
+  import { onMount, getContext } from 'svelte'
   import * as Ansi from '../../Ansi.svelte'
   import collapse from '../../../utils/collapse.js'
+  import { report_error as report_error_ctx } from '../../../lib/appyter_context.js'
+  const report_error = getContext(report_error_ctx)
+
   export let data
+
+  onMount(() => {
+    const error_data = {
+      type: 'runtime-error',
+      url: window.location.href,
+      data,
+    }
+    report_error(error_data)
+  })
 </script>
 
 <div class="output_subarea output_test output_error">

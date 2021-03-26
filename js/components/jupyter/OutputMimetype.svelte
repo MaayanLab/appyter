@@ -1,5 +1,8 @@
 <script>
   import output_mimetypes from './output_mimetype'
+  import { getContext } from 'svelte'
+  import { report_error as report_error_ctx } from '../../lib/appyter_context.js'
+  const report_error = getContext(report_error_ctx)
 
   export let data
   let mimetype
@@ -18,11 +21,13 @@
   }
 
   function error() {
-    console.error(data)
-    return JSON.stringify({
+    const error_data = {
+      type: 'output-mimetype',
       url: window.location.href,
       missing,
-    })
+    }
+    report_error(error_data)
+    return JSON.stringify(error_data)
   }
 </script>
 
