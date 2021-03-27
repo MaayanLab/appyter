@@ -9,10 +9,14 @@
   let missing = []
 
   $: if (data && data.data) {
+    let _available = {}
     let _missing = []
     for (const _mimetype in data.data) {
       if (!(_mimetype in output_mimetypes)) _missing.push(_mimetype)
-      else {
+      else _available[_mimetype] = 1
+    }
+    for (const _mimetype in output_mimetypes) {
+      if (_mimetype in _available) {
         mimetype = _mimetype
         break
       }
@@ -25,6 +29,7 @@
       type: 'output-mimetype',
       url: window.location.href,
       missing,
+      data_keys: Object.keys(data.data),
     }
     report_error(error_data)
     return JSON.stringify(error_data)
