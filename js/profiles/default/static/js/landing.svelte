@@ -20,21 +20,26 @@
   export let extras = []
   export let debug = false
 
-  setContext(report_error_ctx, async (error) => {
-    console.error(error)
+  let nb
+  let show_code = false
+  let local_run_url
+
+  setContext(report_error_ctx, async ({ type, error }) => {
+    console.error(`[${type}]`, error)
     if (extras.indexOf('catalog-integration') !== -1) {
       try {
         const report_error = await get_require(window, 'report_error')
-        report_error(error)
+        report_error({
+          appyter: ((nb || {}).metadata || {}).appyter || null,
+          url: window.location.href,
+          type,
+          error,
+        })
       } catch (e) {
         console.error('catalog-integration: failed to locate report_error handler')
       }
     }
   })
-
-  let nb
-  let show_code = false
-  let local_run_url
 
   // table of contents
   function *get_md_headers(md) {

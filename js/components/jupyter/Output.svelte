@@ -11,10 +11,11 @@
   function error() {
     const error_data = {
       type: 'output-type',
-      url: window.location.href,
-      keys: Object.keys(data),
-      output_type: data.output_type||null,
-      data_keys: Object.keys(data.data||{}),
+      error: {
+        keys: Object.keys(data),
+        output_type: data.output_type||null,
+        data_keys: Object.keys(data.data||{}),
+      },
     }
     report_error(error_data)
     return JSON.stringify(error_data)

@@ -10,8 +10,7 @@
   onMount(() => {
     const error_data = {
       type: 'runtime-error',
-      url: window.location.href,
-      data,
+      error: data,
     }
     report_error(error_data)
   })

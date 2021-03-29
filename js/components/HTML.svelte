@@ -17,7 +17,6 @@
       } catch (e) {
         const error_data = {
           type: 'javascript-cell',
-          url: window.location.href,
           error: e.toString(),
         }
         report_error(error_data)

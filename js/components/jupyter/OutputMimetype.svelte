@@ -27,9 +27,10 @@
   function error() {
     const error_data = {
       type: 'output-mimetype',
-      url: window.location.href,
-      missing,
-      data_keys: Object.keys(data.data),
+      error: {
+        missing,
+        data_keys: Object.keys(data.data),
+      },
     }
     report_error(error_data)
     return JSON.stringify(error_data)
