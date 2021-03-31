@@ -23,7 +23,10 @@
       }
     }
     for (const stream in streams) {
-      yield {...streams[stream], hash: hash(streams[stream])}
+      streams[stream].text = streams[stream].text.replace(/^\r/, '').replace(/(\r?\n)+$/, '')
+      if (streams[stream].text) {
+        yield {...streams[stream], hash: hash(streams[stream])}
+      }
     }
   }
 </script>
