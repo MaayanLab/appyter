@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
-    "ansi_up": "^4.0.4",
+    "ansi_up": "^5.0.0",
     "bootstrap": "^4.5.3",
     "canonical-json": "0.0.4",
     "gulp-rename": "^2.0.0",
