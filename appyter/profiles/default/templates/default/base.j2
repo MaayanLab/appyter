@@ -34,7 +34,7 @@
           render: function (self, file, props) {
             require([file], function (Component) {
               Object.assign(props, { window: window })
-              self.children[0].remove()
+              while (self.children.length > 0) self.children[0].remove()
               var component = new Component({
                 target: self,
                 props: props,
