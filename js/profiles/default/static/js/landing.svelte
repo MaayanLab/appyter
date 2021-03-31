@@ -7,6 +7,7 @@
   import * as Source from '../../../../components/jupyter/Source.svelte'
   import * as Outputs from '../../../../components/jupyter/Outputs.svelte'
   import * as Markdown from '../../../../components/Markdown.svelte'
+  import * as Loader from '../../../../components/Loader.svelte'
   import collapse from '../../../../utils/collapse'
   import slugify from '../../../../utils/slugify'
   import any from '../../../../utils/any'
@@ -227,6 +228,7 @@
   // initialization
   onMount(async () => {
     await tick()
+    loading = true
     status = 'Loading...'
     statusBg = 'primary'
     show_code = extras.indexOf('hide-code') === -1
@@ -393,6 +395,11 @@
           </div>
         </div>
       </div>
+    </div>
+  {/if}
+  {#if status === 'Loading...'}
+    <div class="col-sm-12 text-center">
+      <Loader />
     </div>
   {/if}
   <div
