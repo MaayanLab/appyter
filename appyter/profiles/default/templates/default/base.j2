@@ -24,7 +24,8 @@
           'socketio': {
             exports: 'io'
           },
-        }
+        },
+        waitSeconds: 200,
       })
       define('socket', ['socketio'], function (io) {
         return io({ path: {{ join_routes(_config.PREFIX, 'socket.io')|jsonify }} })
@@ -40,6 +41,12 @@
                 props: props,
               })
               self.classList.remove('loading')
+            }, function (err) {
+              while (self.children.length > 0) self.children[0].remove()
+              var el = document.createElement('div')
+              el.setAttribute('class', 'alert alert-danger')
+              el.textContent = err.toString()
+              self.append(el)
             })
           }
         }
