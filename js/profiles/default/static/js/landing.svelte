@@ -425,6 +425,7 @@
                 <Outputs
                   index={cell.index}
                   data={cell.outputs || []}
+                  loading={current_code_cell}
                 />
               </Cell>
             {:else if cell.cell_type === 'markdown'}

@@ -1,10 +1,13 @@
 <script>
   import * as Output from './Output.svelte'
+  import * as Loader from '../Loader.svelte'
+  import * as Prompt from './Prompt.svelte'
   import collapse from '../../utils/collapse.js'
   import hash from '../../utils/hash.js'
 
   export let data = []
   export let index
+  export let loading
 
   function *reduce_output_streams(outputs) {
     let streams = {}
@@ -33,11 +36,27 @@
 
 <div class="output_wrapper">
   <div class="output">
+    {#if index === loading}
+      <div class="output_area">
+        <Prompt
+          index="{index}-loader"
+          prompt_type="output"
+        />
+        <div class="output_subarea">
+          <Loader />
+        </div>
+      </div>
+    {/if}
     {#each [...reduce_output_streams(data)] as output, output_index (output.hash)}
-      <Output
-        index="{index}-{output_index}"
-        data={output}
-      />
+      <div class="output_area">
+        <Prompt
+          index="{index}-{output_index}"
+          prompt_type="output"
+        />
+        <div class="output_subarea">
+          <Output data={output} />
+        </div>
+      </div>
     {/each}
   </div>
 </div>

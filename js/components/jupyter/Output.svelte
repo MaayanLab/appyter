@@ -1,11 +1,9 @@
 <script>
-  import * as Prompt from './Prompt.svelte'
   import output_types from './output_type'
   import { getContext } from 'svelte'
   import { report_error as report_error_ctx } from '../../lib/appyter_context.js'
   const report_error = getContext(report_error_ctx)
 
-  export let index
   export let data
 
   function error() {
@@ -22,24 +20,16 @@
   }
 </script>
 
-<div class="output_area">
-  <Prompt
-    index={index}
-    prompt_type="output"
-  />
-  {#if data}
-  <div class="output_subarea">
-    {#if data.output_type in output_types}
-      <svelte:component
-        this={output_types[data.output_type]}
-        data={data}
-      />
-    {:else}
-      <div class="alert alert-danger">
-        <p>Unhandled output_type renderer, please report this on <a href="https://github.com/MaayanLab/appyter/issues">Appyter Issues</a> with this information:</p>
-        <code>{error()}</code>
-      </div>
-    {/if}
-  </div>
+{#if data}
+  {#if data.output_type in output_types}
+    <svelte:component
+      this={output_types[data.output_type]}
+      data={data}
+    />
+  {:else}
+    <div class="alert alert-danger">
+      <p>Unhandled output_type renderer, please report this on <a href="https://github.com/MaayanLab/appyter/issues">Appyter Issues</a> with this information:</p>
+      <code>{error()}</code>
+    </div>
   {/if}
-</div>
+{/if}
