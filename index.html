@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Welcome to Ma’ayanlab Appyter’s documentation! &#8212; Appyter 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
@@ -34,23 +35,23 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-ma-ayanlab-appyter-s-documentation">
+  <section id="welcome-to-ma-ayanlab-appyter-s-documentation">
 <h1>Welcome to Ma’ayanlab Appyter’s documentation!<a class="headerlink" href="#welcome-to-ma-ayanlab-appyter-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-</div>
-<div class="section" id="indices-and-tables">
+</section>
+<section id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-</div>
-<div class="section" id="appyter">
+</section>
+<section id="appyter">
 <h1>Appyter<a class="headerlink" href="#appyter" title="Permalink to this headline">¶</a></h1>
 <p>This module enables you to turn your jupyter notebook into a jinja2 template-driven web application. Or just parse for other purposes.</p>
-<div class="section" id="installation">
+<section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>NOTE: This application uses modern python features including async await (3.5) and fstrings (3.6), to ensure you have the best experience please use python &gt;= 3.8.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install package from pip</span>
@@ -60,8 +61,8 @@ pip3 install --upgrade appyter
 pip3 install --upgrade git+https://github.com/Maayanlab/appyter.git
 </pre></div>
 </div>
-</div>
-<div class="section" id="usage">
+</section>
+<section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>Appyter enables you to serve that notebook on an executable webapp.</p>
 <p><code class="docutils literal notranslate"><span class="pre">appyter</span> <span class="pre">jupyter_notebook.ipynb</span></code></p>
@@ -98,8 +99,8 @@ pip3 install --upgrade git+https://github.com/Maayanlab/appyter.git
 </ul>
 </li>
 </ul>
-</div>
-<div class="section" id="creating-an-appyter">
+</section>
+<section id="creating-an-appyter">
 <h2>Creating an Appyter<a class="headerlink" href="#creating-an-appyter" title="Permalink to this headline">¶</a></h2>
 <p>Create a standard python jupyter notebook, make the first cell:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#%%appyter init</span>
@@ -118,8 +119,8 @@ pip3 install --upgrade git+https://github.com/Maayanlab/appyter.git
 <li><p><code class="docutils literal notranslate"><span class="pre">code_exec</span></code>: Substitute jinja2 template variables, render as python, show it rendered in your notebook with the default values and execute it</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">code_eval</span></code>: Substitute jinja2 template variables, render as python, show it rendered in your notebook with the default values and execute it, “eval” the last line of the cell and display the result.</p></li>
 </ul>
-</div>
-<div class="section" id="discussion">
+</section>
+<section id="discussion">
 <h2>Discussion<a class="headerlink" href="#discussion" title="Permalink to this headline">¶</a></h2>
 <p>Consider the following notebook:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">appyter</span> <span class="n">markdown</span>
@@ -230,8 +231,8 @@ pip3 install --upgrade git+https://github.com/Maayanlab/appyter.git
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">appyter</span></code> can be used to get these conversions, it can also be used to host standalone webapps using these mechanisms.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
