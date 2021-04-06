@@ -14,7 +14,7 @@
   import hash from '../../../../utils/hash'
   import get_require from '../../../../utils/get_require'
   import { setup_chunking } from '../../../../lib/socketio'
-  import { report_error as report_error_ctx } from '../../../../lib/appyter_context'
+  import { report_error as report_error_ctx, debug as debug_ctx } from '../../../../lib/appyter_context'
 
   export let window
   export let nbdownload
@@ -24,6 +24,8 @@
   let nb
   let show_code = false
   let local_run_url
+
+  setContext(debug_ctx, debug)
 
   setContext(report_error_ctx, async ({ type, error }) => {
     console.error(`[${type}]`, error)

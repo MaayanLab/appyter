@@ -1,2 +1,3 @@
 const report_error = {}
-export { report_error }
+const debug = {}
+export { report_error, debug }
