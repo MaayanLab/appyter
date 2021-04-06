@@ -228,7 +228,6 @@
   // initialization
   onMount(async () => {
     await tick()
-    loading = true
     status = 'Loading...'
     statusBg = 'primary'
     show_code = extras.indexOf('hide-code') === -1
