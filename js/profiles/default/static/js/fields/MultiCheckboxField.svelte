@@ -1,12 +1,16 @@
 <script>
+  import ensure_list from '../../../../../utils/ensure_list'
+
   export let args
+
   let value = {}
   if (args.default) {
-    for (const k of args.default) {
+    for (const k of ensure_list(args.default)) {
       value[k] = true
     }
   }
-  $: args.value = JSON.stringify(Object.keys(value).filter(k => value[k]))
+
+$: args.value = JSON.stringify(Object.keys(value).filter(k => value[k]))
 </script>
 
 <style>
