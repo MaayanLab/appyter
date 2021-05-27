@@ -60,7 +60,7 @@ def create_app(**kwargs):
     if isinstance(blueprint, Blueprint):
       flask_app.register_blueprint(blueprint, url_prefix='/'+blueprint_name.strip('/'))
     elif callable(blueprint):
-      blueprint(flask_app, url_prefix='/'+blueprint_name.strip('/'), DATA_DIR=flask_app.config['DATA_DIR'])
+      blueprint(flask_app, url_prefix='/'+blueprint_name.strip('/'))
     else:
       raise Exception('Unrecognized blueprint type: ' + blueprint_name)
   #
