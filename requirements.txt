@@ -4,7 +4,7 @@ aiohttp-wsgi
 bs4
 click
 click-default-group
-flask
+flask==2.0.1
 flask_cors
 ipython
 jinja2

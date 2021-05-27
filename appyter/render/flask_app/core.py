@@ -1,7 +1,7 @@
 import os
 import uuid
 import json
-from flask import Blueprint, request, redirect, abort, send_file, send_from_directory, url_for, current_app, jsonify
+from flask import Blueprint, request, redirect, abort, send_file, url_for, current_app, jsonify
 from werkzeug.exceptions import BadRequest
 
 from appyter.context import get_jinja2_env
