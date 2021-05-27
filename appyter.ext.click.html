@@ -46,13 +46,31 @@
 <dl class="py method">
 <dt id="appyter.ext.click.Json.convert">
 <code class="sig-name descname">convert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">param</span></em>, <em class="sig-param"><span class="n">ctx</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/click.html#Json.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.click.Json.convert" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts the value.  This is not invoked for values that are
-<code class="docutils literal notranslate"><span class="pre">None</span></code> (the missing value).</p>
+<dd><p>Convert the value to the correct type. This is not called if
+the value is <code class="docutils literal notranslate"><span class="pre">None</span></code> (the missing value).</p>
+<p>This must accept string values from the command line, as well as
+values that are already the correct type. It may also convert
+other compatible types.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">param</span></code> and <code class="docutils literal notranslate"><span class="pre">ctx</span></code> arguments may be <code class="docutils literal notranslate"><span class="pre">None</span></code> in certain
+situations, such as when converting prompt input.</p>
+<p>If the value cannot be converted, call :meth:<code class="docutils literal notranslate"><span class="pre">fail</span></code> with a
+descriptive message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – The value to convert.</p></li>
+<li><p><strong>param</strong> – The parameter that is using this type to convert</p></li>
+</ul>
+</dd>
+</dl>
+<p>its value. May be <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+:param ctx: The current context that arrived at this value. May
+be <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="appyter.ext.click.Json.name">
-<code class="sig-name descname">name</code><em class="property"> = 'Json'</em><a class="headerlink" href="#appyter.ext.click.Json.name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">name</code><em class="property">: str</em><em class="property"> = 'Json'</em><a class="headerlink" href="#appyter.ext.click.Json.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
