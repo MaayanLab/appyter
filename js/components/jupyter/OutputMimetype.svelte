@@ -1,7 +1,7 @@
 <script>
   import output_mimetypes from './output_mimetype'
   import { getContext } from 'svelte'
-  import { report_error as report_error_ctx, debug as debug_ctx } from '../../lib/appyter_context.js'
+  import { report_error as report_error_ctx, debug as debug_ctx } from '@/lib/appyter_context.js'
   const report_error = getContext(report_error_ctx)
   const debug = getContext(debug_ctx)
 

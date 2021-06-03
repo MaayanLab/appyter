@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte'
-  import Loader from '../../../../../components/Loader.svelte'
+  import Loader from '@/components/Loader.svelte'
 
   export let args
   let focused

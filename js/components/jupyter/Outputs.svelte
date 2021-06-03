@@ -1,9 +1,9 @@
 <script>
-  import Output from './Output.svelte'
-  import Loader from '../Loader.svelte'
-  import Prompt from './Prompt.svelte'
-  import collapse from '../../utils/collapse.js'
-  import hash from '../../utils/hash.js'
+  import Output from '@/components/jupyter/Output.svelte'
+  import Loader from '@/components/Loader.svelte'
+  import Prompt from '@/components/jupyter/Prompt.svelte'
+  import collapse from '@/utils/collapse.js'
+  import hash from '@/utils/hash.js'
 
   export let data = []
   export let index

@@ -82,6 +82,9 @@ gulp.task('build_svelte', function () {
       resolve: {
         extensions: ['.js', '.svelte'],
         mainFields: ['svelte', 'browser', 'module', 'main'],
+        alias: {
+          '@': path.resolve(__dirname),
+        },
       },
       module: {
         rules: [

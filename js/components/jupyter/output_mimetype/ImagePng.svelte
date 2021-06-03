@@ -1,5 +1,5 @@
 <script>
-  import collapse from '../../../utils/collapse.js'
+  import collapse from '@/utils/collapse.js'
   export let data
 </script>
 

@@ -1,5 +1,5 @@
 <script>
-  import OutputMimetype from '../OutputMimetype.svelte'
+  import OutputMimetype from '@/components/jupyter/OutputMimetype.svelte'
   export let data
 </script>
 

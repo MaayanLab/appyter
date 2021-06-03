@@ -1,6 +1,6 @@
 <script>
-  import Markdown from '../../Markdown.svelte'
-  import collapse from '../../../utils/collapse.js'
+  import Markdown from '@/components/Markdown.svelte'
+  import collapse from '@/utils/collapse.js'
   export let data
 </script>
 

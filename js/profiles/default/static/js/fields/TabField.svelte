@@ -1,5 +1,5 @@
 <script>
-  import HTML from '../../../../../components/HTML.svelte';
+  import HTML from '@/components/HTML.svelte';
   export let args
 </script>
 

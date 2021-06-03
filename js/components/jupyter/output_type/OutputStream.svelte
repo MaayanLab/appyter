@@ -1,6 +1,6 @@
 <script>
-  import Ansi from '../../Ansi.svelte'
-  import collapse from '../../../utils/collapse.js'
+  import Ansi from '@/components/Ansi.svelte'
+  import collapse from '@/utils/collapse.js'
   export let data
 </script>
 

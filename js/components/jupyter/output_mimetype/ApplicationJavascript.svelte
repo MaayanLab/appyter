@@ -1,6 +1,6 @@
 <script>
-  import HTML from '../../HTML.svelte'
-  import collapse from '../../../utils/collapse.js'
+  import HTML from '@/components/HTML.svelte'
+  import collapse from '@/utils/collapse.js'
   export let data
 </script>
 

@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte"
-  import get_require from '../../../../../utils/get_require'
+  import get_require from '@/utils/get_require'
 
   export let window
   export let args

@@ -1,6 +1,6 @@
 <script>
   import { getContext } from 'svelte'
-  import { report_error as report_error_ctx } from '../lib/appyter_context.js'
+  import { report_error as report_error_ctx } from '@/lib/appyter_context.js'
   const report_error = getContext(report_error_ctx)
 
   export let classes = ""

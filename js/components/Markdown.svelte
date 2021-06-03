@@ -2,7 +2,7 @@
   import MarkdownIt from 'markdown-it'
   import MarkdownItAnchor from 'markdown-it-anchor'
   import hljs from 'highlight.js'
-  import slugify from '../utils/slugify'
+  import slugify from '@/utils/slugify'
 
   export let data
   let rendered

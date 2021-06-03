@@ -1,5 +1,5 @@
 <script>
-  import ensure_list from '../../../../../utils/ensure_list'
+  import ensure_list from '@/utils/ensure_list'
 
   export let args
 
