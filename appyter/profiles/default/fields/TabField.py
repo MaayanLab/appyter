@@ -29,9 +29,4 @@ class TabField(Field):
     return self.raw_value is not None and all(v in self.choices for v in self.raw_value)
 
   def render(self, **kwargs):
-    self.args['field_renders'] = {
-      field.args['name']: str(field.render())
-      for tab_fields in self.args['choices'].values()
-      for field in tab_fields
-    }
     return super().render(**kwargs)
