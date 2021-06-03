@@ -1,7 +1,7 @@
 import os
 import uuid
 import json
-from flask import Blueprint, request, redirect, abort, send_file, url_for, current_app, jsonify
+from flask import Blueprint, request, redirect, abort, send_file, url_for, current_app, jsonify, make_response
 from werkzeug.exceptions import BadRequest
 
 from appyter.context import get_jinja2_env
@@ -114,15 +114,23 @@ def prepare_results(data):
 
 @route_join_with_or_without_slash(core, methods=['POST'])
 def post_index():
-  data = prepare_formdata(request)
-  result_hash = prepare_results(data)
   mimetype = request.accept_mimetypes.best_match([
     'text/html',
     'application/json',
   ], 'text/html')
+  #
+  try:
+    data = prepare_formdata(request)
+    result_hash = prepare_results(data)
+    error = None
+  except Exception as e:
+    error = e
+  #
   if mimetype in {'text/html'}:
-    return redirect(url_for('__main__.data_files', path=result_hash + '/'), 303)
+    if error: abort(406)
+    else: return redirect(url_for('__main__.data_files', path=result_hash + '/'), 303)
   elif mimetype in {'application/json'}:
-    return jsonify(dict(session_id=result_hash))
+    if error is not None: return make_response(jsonify(error=str(error)), 406)
+    else: return make_response(jsonify(session_id=result_hash), 200)
   else:
     abort(404)
