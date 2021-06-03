@@ -137,9 +137,10 @@ def post_index():
 
 @route_join_with_or_without_slash(core, 'ssr', methods=['POST'])
 def post_ssr():
+  env = get_jinja2_env(config=current_app.config)
   try:
     ctx = request.get_json()
-    env = get_jinja2_env(context={ ctx['args']['name']: ctx['args'] }, config=current_app.config)
+    assert ctx['field'].endswith('Field'), 'Invalid field'
     return env.globals[ctx['field']](**ctx['args']).render()
   except Exception as e:
     return make_response(jsonify(error=str(e)), 406)
