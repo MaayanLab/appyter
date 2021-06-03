@@ -1,5 +1,4 @@
 <script>
-  import SSRField from '@/components/app/SSRField.svelte'
   import SectionField from './fields/SectionField.svelte'
   import Loader from '@/components/Loader.svelte'
   export let extras
@@ -46,7 +45,6 @@
 >
   {#if orphaned_fields.length > 0}
     <SectionField
-      field="SectionField"
       args={{
         name: '_primary',
         section: null,
@@ -58,8 +56,7 @@
   {/if}
   {#each fields.filter(field => field.type === 'section') as field}
     {#if field.field === 'SectionField'}
-      <SSRField
-        field={field.field}
+      <SectionField
         args={field.args}
         fields={fields.filter(_field => _field.args.section === field.args.name)}
       />
