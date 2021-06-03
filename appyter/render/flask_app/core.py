@@ -134,3 +134,12 @@ def post_index():
     else: return make_response(jsonify(session_id=result_hash), 200)
   else:
     abort(404)
+
+@route_join_with_or_without_slash(core, 'ssr', methods=['POST'])
+def post_ssr():
+  try:
+    ctx = request.get_json()
+    env = get_jinja2_env(context={ ctx['args']['name']: ctx['args'] }, config=current_app.config)
+    return env.globals[ctx['field']](**ctx['args']).render()
+  except Exception as e:
+    return make_response(jsonify(error=str(e)), 406)
