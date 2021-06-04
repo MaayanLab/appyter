@@ -10,6 +10,15 @@
   let orphaned_fields
   $: orphaned_fields = fields.filter(field => field.type !== 'section' && !field.args.section)
 
+  function with_error(field, error) {
+    if (error !== undefined && error.cls === 'FieldConstraintException') {
+      if (field.args.name === error.field_name) {
+        field.error = error
+      }
+    }
+    return field
+  }
+
   async function onSubmit(evt) {
     try {
       submitting = true
@@ -54,14 +63,14 @@
         title: 'Customize Your Notebook',
         subtitle: 'Customize your notebook',
       }}
-      fields={orphaned_fields}
+      fields={orphaned_fields.map(field => with_error(field, error))}
     />
   {/if}
   {#each fields.filter(field => field.type === 'section') as field}
     {#if field.field === 'SectionField'}
       <SectionField
         args={field.args}
-        fields={fields.filter(_field => _field.args.section === field.args.name)}
+        fields={fields.filter(_field => _field.args.section === field.args.name).map(field => with_error(field, error))}
       />
     {/if}
   {/each}
@@ -69,7 +78,7 @@
     <div class="col-sm-12">
       &nbsp;
     </div>
-    {#if error !== undefined}
+    {#if error !== undefined && error.cls !== 'FieldConstraintException'}
     <div class="col-sm-12 alert alert-danger">
       {error.message}
     </div>

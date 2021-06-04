@@ -27,6 +27,11 @@
       <div class="pt-3">
         {#each fields as field}
           <SSRField {...field} />
+          {#if field.error !== undefined}
+            <div class="alert alert-danger mx-4">
+              {field.error.message}
+            </div>
+          {/if}
         {/each}
       </div>
     </div>

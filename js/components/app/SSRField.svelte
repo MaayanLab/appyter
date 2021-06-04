@@ -37,5 +37,5 @@
     <Loader />
   </div>
 {:else}
-  <HTML data={rendered} />
+  <HTML classes="ssr" data={rendered} />
 {/if}
