@@ -19,5 +19,6 @@ class DescriptionField(Field):
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
 
-  def value(self):
-    raise Exception('DescriptionField cannot be rendered')
+  @property
+  def raw_value(self):
+    raise Exception('DescriptionField has no value')

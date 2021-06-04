@@ -9,6 +9,7 @@ class IntField(Field):
   :param min: (Optional[int]) the minimum valid value that the field can take on
   :param max: (Optional[int]) the maximum valid value that the field can take on
   :param step: (Optional[int]) the interval for which values are incremented or decremented
+  :param required: (Optional[bool]) Whether or not this field is required (defaults to false)
   :param default: (float) A default value as an example and for use during prototyping
   :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
@@ -24,17 +25,19 @@ class IntField(Field):
 
   @property
   def raw_value(self):
-    return int(self.args['value'])
-
-  @property
-  def choices(self):
-    return list(range(self.args['min'], self.args['max'])) if self.args['min'] is not None and self.args['max'] is not None else []
+    if self.args['value'] is None:
+      return None
+    else:
+      return int(self.args['value'])
 
   def constraint(self):
-    return (
-      self.args['min'] is None or self.raw_value >= self.args['min']
-    ) and (
-      self.args['max'] is None or self.raw_value <= self.args['max']
-    ) and (
-      self.args['step'] is None or (self.raw_value - self.args.get('min', 0)) % self.args['step'] == 0
-    )
+    if self.raw_value is None:
+      return not self.args.get('required')
+    else:
+      return (
+        self.args['min'] is None or self.raw_value >= self.args['min']
+      ) and (
+        self.args['max'] is None or self.raw_value <= self.args['max']
+      ) and (
+        self.args['step'] is None or (self.raw_value - self.args.get('min', 0)) % self.args['step'] == 0
+      )

@@ -18,5 +18,6 @@ class SectionField(Field):
     super().__init__(**kwargs)
     self['type'] = 'section'
 
-  def value(self):
-    raise Exception('SectionField cannot be rendered')
+  @property
+  def raw_value(self):
+    raise Exception('DescriptionField has no value')

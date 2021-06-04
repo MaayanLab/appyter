@@ -6,6 +6,7 @@ class FloatField(Field):
   :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
   :param label: (str) A human readable label for the field for the HTML form
   :param description: (Optional[str]) A long human readable description for the field for the HTML form
+  :param required: (Optional[bool]) Whether or not this field is required (defaults to false)
   :param default: (float) A default value as an example and for use during prototyping
   :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
@@ -16,8 +17,14 @@ class FloatField(Field):
 
   @property
   def raw_value(self):
-    return float(self.args['value'])
+    if self.args['value'] is None:
+      return None
+    else:
+      return float(self.args['value'])
 
   def constraint(self):
-    # Raw value would fail otherwise
-    return True
+    if self.raw_value is None:
+      return not self.args.get('required')
+    else:
+      # Raw value would fail otherwise
+      return True

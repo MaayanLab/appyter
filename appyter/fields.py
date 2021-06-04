@@ -24,6 +24,15 @@ def build_fields(fields, context={}, env=None):
     for field_name, field in fields.items()
   }
 
+class FieldConstraintException(Exception):
+  def __init__(self, field, field_name, value, message=None):
+    self.field = field
+    self.field_name = field_name
+    self.value = value
+    if message is None: message = "{}[{}]: {} does not satisfy constraints".format(field, field_name, repr(value))
+    self.message = message
+    super().__init__(message)
+
 class Field(dict):
   ''' Base field for which all fields derive
   ```eval_rst
@@ -35,6 +44,7 @@ class Field(dict):
       label=None,
       description=None,
       choices=[],
+      required=False,
       default=None,
       value=None,
       section=None,
@@ -45,6 +55,7 @@ class Field(dict):
     :param label: (str) A human readable label for the field for the HTML form
     :param description: (Optional[str]) A long human readable description for the field for the HTML form
     :param choices: (Optional[Union[List[str], Set[str], Dict[str, str]]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value
+    :param required: (Optional[bool]) Whether or not this field is required (defaults to false)
     :param default: (Any) A default value as an example and for use during prototyping
     :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
     :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
@@ -57,6 +68,7 @@ class Field(dict):
         label=label,
         description=description,
         choices=choices,
+        required=required,
         default=default,
         value=value if value is not None else default,
         section=section,
@@ -76,7 +88,7 @@ class Field(dict):
     ''' Return true if the received args.value satisfies constraints.
     Should be overridden by subclasses.
     '''
-    return self.raw_value in self.choices
+    return (self.raw_value is None and not self.args.get('required')) or (self.raw_value in self.choices)
 
   def render(self, **kwargs):
     ''' Return a rendered version of the field (form)
@@ -112,11 +124,7 @@ class Field(dict):
   def choices(self):
     ''' Potential values to choose from
     '''
-    choices = self.args.get('choices')
-    if type(choices) == dict:
-      return choices.keys()
-    else:
-      return choices
+    return self.args['choices']
 
   @property
   def raw_value(self):
@@ -129,13 +137,25 @@ class Field(dict):
     ''' (SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
     When instantiating code, you should use safe_value.
     '''
-    choices = self.args.get('choices')
-    if type(choices) == dict:
-      return choices[self.raw_value]
-    else:
-      assert self.constraint(), '%s[%s] (%s) does not satisfy constraints' % (
-        self.field, self.args.get('name', ''), self.raw_value
+    choices = self.choices
+    if self.raw_value is None and not self.args.get('required'):
+      return None
+    elif type(choices) == dict:
+      if self.raw_value in choices:
+        return choices[self.raw_value]
+      else:
+        raise FieldConstraintException(
+          field=self.field,
+          field_name=self.args['name'],
+          value=self.raw_value,
+        )
+    elif not self.constraint():
+      raise FieldConstraintException(
+        field=self.field,
+        field_name=self.args['name'],
+        value=self.raw_value,
       )
+    else:
       return self.raw_value
 
   @property

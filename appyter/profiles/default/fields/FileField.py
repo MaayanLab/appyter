@@ -14,6 +14,7 @@ class FileField(Field):
   :param label: (str) A human readable label for the field for the HTML form
   :param description: (Optional[str]) A long human readable description for the field for the HTML form
   :param constraint: A regular expression for validating the file name.
+  :param required: (Optional[bool]) Whether or not this field is required (defaults to false)
   :param default: (str) A default value as an example and for use during prototyping
   :param examples: (Optional[Dict[str, str]]) Named url paths to example files to upload
     paths can be relative i.e. `{ "my_file.txt": url_for('static', filename='my_file.txt') }`, or a remote url.
@@ -36,7 +37,10 @@ class FileField(Field):
       return None
 
   def constraint(self):
-    return self.raw_value is not None and re.match(self.args['constraint'], self.raw_value)
+    if self.raw_value is None:
+      return not self.args.get('required')
+    else:
+      return re.match(self.args['constraint'], self.raw_value)
 
   @property
   def public_url(self):

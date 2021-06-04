@@ -10,6 +10,7 @@ class TextField(Field):
   :param label: (str) A human readable label for the field for the HTML form
   :param description: (Optional[str]) A long human readable description for the field for the HTML form
   :param constraint: (Regex[str]) A regular expression for validating the file name.
+  :param required: (Optional[bool]) Whether or not this field is required (defaults to false)
   :param default: (str) A default value as an example and for use during prototyping
   :param hint: (Optional[str]) A hint to put in the field prior to content.
   :param rows: (Optional[int]) The number of rows (lines) in the textarea
@@ -26,7 +27,10 @@ class TextField(Field):
     )
 
   def constraint(self):
-    return self.raw_value is not None and re.match(self.args['constraint'], self.raw_value)
+    if self.raw_value is None:
+      return not self.args.get('required')
+    else:
+      return re.match(self.args['constraint'], self.raw_value)
 
   @property
   def safe_value(self):

@@ -12,6 +12,7 @@ class StringField(Field):
   :param constraint: A regular expression for validating the file name.
   :param hint: A hint to put in the field prior to content.
   :param choices: (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value
+  :param required: (Optional[bool]) Whether or not this field is required (defaults to false)
   :param default: (str) A default value as an example and for use during prototyping
   :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
@@ -25,4 +26,7 @@ class StringField(Field):
     )
 
   def constraint(self):
-    return self.raw_value is not None and re.match(self.args['constraint'], self.raw_value)
+    if self.raw_value is None:
+      return not self.args.get('required')
+    else:
+      return re.match(self.args['constraint'], self.raw_value)

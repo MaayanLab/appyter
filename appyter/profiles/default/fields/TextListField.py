@@ -1,5 +1,5 @@
 import re
-from appyter.fields import Field
+from appyter.fields import Field, FieldConstraintException
 
 class TextListField(Field):
   ''' Representing a field that accepts a set of strings separated by newlines
@@ -15,6 +15,7 @@ class TextListField(Field):
   :param description: (Optional[str]) A long human readable description for the field for the HTML form
   :param choices: (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value
   :param constraint: (Regex[str]) A regular expression for validating the file name.
+  :param required: (Optional[bool]) Whether or not this field is required (defaults to false)
   :param default: (str) A default value as an example and for use during prototyping
   :param hint: (Optional[str]) A hint to put in the field prior to content.
   :param rows: (Optional[int]) The number of rows (lines) in the textarea
@@ -47,18 +48,24 @@ class TextListField(Field):
     else:
       return None
 
+  def constraint(self):
+    if not self.raw_value:
+      return not self.args.get('required')
+    else:
+      return all([
+        re.match(self.args['constraint'], val)
+        for val in self.raw_value
+      ])
+
   @property
   def value(self):
-    if type(self.choices) == dict:
+    if not self.constraint():
+      raise FieldConstraintException(
+        field=self.field,
+        field_name=self.args['name'],
+        value=self.raw_value,
+      )
+    elif type(self.choices) == dict:
       return [self.choices[v] for v in self.raw_value]
     else:
-      assert self.constraint(), '%s[%s] (%s) does not satisfy constraints' % (
-        self.field, self.args.get('name', ''), self.raw_value
-      )
       return self.raw_value
-
-  def constraint(self):
-    return all([self.raw_value is not None] + [
-      re.match(self.args['constraint'], val) is not None
-      for val in self.raw_value
-    ])
