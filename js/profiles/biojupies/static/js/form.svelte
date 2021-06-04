@@ -30,10 +30,13 @@
         window.location.href = `${window.location.href.replace(/\/$/, '')}/${session_id}/`
       }
     } catch (e) {
-      error = e.toString()
+      error = { cls: 'FrontendException', message: e.toString() }
     } finally {
       submitting = false
     }
+  }
+  $: if (error) {
+    console.error(error)
   }
 </script>
 
@@ -68,7 +71,7 @@
     </div>
     {#if error !== undefined}
     <div class="col-sm-12 alert alert-danger">
-      {error}
+      {error.message}
     </div>
     {/if}
     <div class="col-sm-12 text-center">

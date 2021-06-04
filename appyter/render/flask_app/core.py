@@ -7,7 +7,7 @@ from werkzeug.exceptions import BadRequest
 from appyter.context import get_jinja2_env
 from appyter.ext.fs import Filesystem
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
-from appyter.util import secure_filepath
+from appyter.util import secure_filepath, exception_as_dict
 from appyter.render.form import render_form_from_nbtemplate
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.render.nbinspect import render_nbtemplate_json_from_nbtemplate
@@ -124,14 +124,16 @@ def post_index():
     result_hash = prepare_results(data)
     error = None
   except Exception as e:
-    error = e
+    error = exception_as_dict(e)
   #
   if mimetype in {'text/html'}:
     if error: abort(406)
     else: return redirect(url_for('__main__.data_files', path=result_hash + '/'), 303)
   elif mimetype in {'application/json'}:
-    if error is not None: return make_response(jsonify(error=str(error)), 406)
-    else: return make_response(jsonify(session_id=result_hash), 200)
+    if error is not None:
+      return make_response(jsonify(error=error), 406)
+    else:
+      return make_response(jsonify(session_id=result_hash), 200)
   else:
     abort(404)
 
@@ -143,4 +145,4 @@ def post_ssr():
     assert ctx['field'].endswith('Field'), 'Invalid field'
     return env.globals[ctx['field']](**ctx['args']).render()
   except Exception as e:
-    return make_response(jsonify(error=str(e)), 406)
+    return make_response(jsonify(error=exception_as_dict(e)), 406)

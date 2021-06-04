@@ -32,6 +32,14 @@ class FieldConstraintException(Exception):
     if message is None: message = "{}[{}]: {} does not satisfy constraints".format(field, field_name, repr(value))
     self.message = message
     super().__init__(message)
+  
+  def as_dict(self):
+    return dict(
+      field=self.field,
+      field_name=self.field_name,
+      value=self.value,
+      message=self.message,
+    )
 
 class Field(dict):
   ''' Base field for which all fields derive
