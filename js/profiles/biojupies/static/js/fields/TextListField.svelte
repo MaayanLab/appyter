@@ -5,7 +5,7 @@
 
   let value
   $: if (args !== undefined && value === undefined) {
-    value = args.default
+    value = args.default.join('\n')
   }
 
   let constraint
