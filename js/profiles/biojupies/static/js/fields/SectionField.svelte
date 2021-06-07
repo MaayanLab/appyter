@@ -19,7 +19,7 @@
         </div>
         <div class="d-table-cell align-middle">
           <div class="very-small regular pb-2 pr-5">{args.title}</div>
-          <div class="tiny light text-muted">{args.subtitle}</div>
+          {#if args.subtitle}<div class="tiny light text-muted">{args.subtitle}</div>{/if}
         </div>
       </div>
     </div>
