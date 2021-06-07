@@ -1,17 +1,1 @@
-<div class="row px-4 px-lg-3 pb-4">
-  <div class="col-lg-3 bold text-lg-right my-auto">
-    {{ this.args.label }}
-    {%- if this.args.description %}
-      <sup data-toggle="tooltip" title="{{ this.args.description }}"><i class="far fa-question-circle"></i></sup>
-    {% endif -%}:
-  </div>
-  <div class="col-lg-6 pt-2 pt-lg-0">
-    <textarea
-      name="{{ this.args.name }}"
-      placeholder="{{ this.args.hint }}"
-      rows="{{ this.args.rows }}"
-      cols="{{ this.args.cols }}"
-      class="form-control nodecoration tiny"
-    >{{ this.args.default }}</textarea>
-  </div>
-</div>
+{% include "fragments/svelte-field.j2" %}
