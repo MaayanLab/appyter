@@ -36,5 +36,22 @@
     <div class="invalid-feedback">
       String contains unsupported characters (should match `{args.constraint}`).
     </div>
+    {#if args.examples && Object.keys(args.examples).length > 0}
+      <div class="d-table-row">
+        <span class="d-table-cell mr-1 my-1 p-1 text-right" style="white-space: nowrap">
+          Try example{#if Object.keys(args.examples).length > 1}s{/if}:
+        </span>
+        <div class="d-table-cell table-grow d-flex flex-wrap justify-content-start align-items-center">
+          {#each Object.keys(args.examples) as example_name}
+            <span class="text-sm m-1 p-1" style="white-space: nowrap;">
+              <a
+                href="javascript:"
+                on:click={() => value = args.examples[example_name]}
+              >{example_name}</a>
+            </span>
+          {/each}
+        </div>
+      </div>
+    {/if}
   </div>
 </div>

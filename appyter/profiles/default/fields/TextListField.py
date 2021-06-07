@@ -17,7 +17,8 @@ class TextListField(Field):
   :param choices: (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value
   :param constraint: (Regex[str]) A regular expression for validating the file name.
   :param required: (Optional[bool]) Whether or not this field is required (defaults to false)
-  :param default: (str) A default value as an example and for use during prototyping
+  :param default: (List[str]) A default value as an example and for use during prototyping
+  :param examples: (Optional[Dict[str, List[str]]]) Named lists to provide as clickable examples
   :param hint: (Optional[str]) A hint to put in the field prior to content.
   :param rows: (Optional[int]) The number of rows (lines) in the textarea
   :param cols: (Optional[int]) The number of cols (horizontal characters) in the textarea
