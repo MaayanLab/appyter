@@ -32,7 +32,7 @@ class TextField(Field):
     if self.raw_value is None:
       return not self.args.get('required')
     else:
-      return re.match(re_full(self.args['constraint']), self.raw_value, re.MULTILINE)
+      return re.match(re_full(self.args['constraint']), self.raw_value, re.MULTILINE | re.DOTALL)
 
   @property
   def safe_value(self):

@@ -10,7 +10,7 @@
 
   let constraint
   $: if (args !== undefined) {
-    constraint = re_full(args.constraint)
+    constraint = re_full(args.constraint, 's')
   }
 
   let valid = true
