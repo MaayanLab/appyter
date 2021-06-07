@@ -22,3 +22,7 @@ class ChoiceField(Field):
       return not self.args.get('required')
     else:
       return self.raw_value in self.choices
+
+  @property
+  def safe_value(self):
+    return self.value
