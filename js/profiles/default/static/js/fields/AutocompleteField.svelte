@@ -11,10 +11,16 @@
   let relevant_items
   
   $: if (items !== undefined) {
-    relevant_items = items
+    relevant_items = Object.keys(items)
       .filter(item => item.toLowerCase().substr(0, value.length) === value.toLowerCase() && item !== value)
       .slice(0, 7)
     current_focus = -1
+  }
+
+  function set(arr) {
+    const s = {}
+    for (const v of arr) s[v]=true
+    return s
   }
 
   onMount(async () => {
@@ -25,25 +31,24 @@
         if (typeof result !== 'object') {
           throw new Error('Unrecognized type for downloaded file')
         } else if (Array.isArray(result)) {
-          items = result
+          items = set(result)
         } else {
           console.warn('Legacy mode... please use an array')
-          items = result[Object.keys(result)[0]]
+          items = set(result[Object.keys(result)[0]])
         }
       } else if (args.choices !== undefined) {
         if (typeof args.choices !== 'object') {
           throw new Error('Unrecognized type for choices')
         } else if (Array.isArray(args.choices)) {
-          items = args.choices
+          items = set(args.choices)
         } else {
-          items = Object.keys(args.choices)
+          items = args.choices
         }
       } else {
         throw new Error('No autocomplete item source')
       }
     } catch(e) {
       error = 'Failed to load autocomplete items'
-      items = []
       console.error(e)
     }
   })
@@ -98,6 +103,8 @@
       id={args.name}
       name={args.name}
       class="form-control nodecoration tiny bg-white px-2 py-1 mb-0"
+      class:is-valid={items !== undefined && items[value] !== undefined}
+      class:is-invalid={focused === false && items !== undefined && items[value] === undefined}
       autocomplete="off"
       placeholder={args.hint}
       bind:value={value}
@@ -117,6 +124,11 @@
         }
       }}
     />
+    {#if items !== undefined}
+      <div class="invalid-feedback">
+        Value should be selected from autocomplete results.
+      </div>
+    {/if}
     {#if error === undefined}
       {#if focused && value}
         <div class="autocomplete-items">
