@@ -14,6 +14,11 @@ def join_routes(*routes):
   '''
   return '/' + '/'.join([route.strip('/') for route in routes if route.strip('/')])
 
+def re_full(expr):
+  if not expr.startswith('^'): expr = '^' + expr
+  if not expr.endswith('$'): expr = expr + '$'
+  return expr
+
 def secure_filepath(filepath):
   ''' Ensures this will be a sanitized relative path
   '''

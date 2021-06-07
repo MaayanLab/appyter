@@ -1,5 +1,6 @@
 import re
 from appyter.fields import Field
+from appyter.util import re_full
 
 class AutocompleteField(Field):
   ''' Representing a field that accepts a string with autocomplete.
@@ -35,4 +36,4 @@ class AutocompleteField(Field):
     elif self.choices:
       return self.raw_value in self.choices
     else:
-      return re.match(self.args['constraint'], self.raw_value)
+      return re.match(re_full(self.args['constraint']), self.raw_value)

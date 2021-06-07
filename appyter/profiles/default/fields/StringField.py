@@ -1,5 +1,6 @@
 import re
 from appyter.fields import Field
+from appyter.util import re_full
 
 class StringField(Field):
   ''' Representing a field that accepts a string
@@ -29,4 +30,4 @@ class StringField(Field):
     if self.raw_value is None:
       return not self.args.get('required')
     else:
-      return re.match(self.args['constraint'], self.raw_value)
+      return re.match(re_full(self.args['constraint']), self.raw_value)

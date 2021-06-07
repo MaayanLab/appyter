@@ -1,6 +1,6 @@
 import re
 from appyter.fields import Field
-from appyter.util import secure_filepath, join_routes
+from appyter.util import secure_filepath, join_routes, re_full
 
 class FileField(Field):
   ''' Represing a uploadable File and facilitating that file upload.
@@ -40,7 +40,7 @@ class FileField(Field):
     if self.raw_value is None:
       return not self.args.get('required')
     else:
-      return re.match(self.args['constraint'], self.raw_value)
+      return re.match(re_full(self.args['constraint']), self.raw_value)
 
   @property
   def public_url(self):

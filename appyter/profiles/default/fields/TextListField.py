@@ -1,5 +1,6 @@
 import re
 from appyter.fields import Field, FieldConstraintException
+from appyter.util import re_full
 
 class TextListField(Field):
   ''' Representing a field that accepts a set of strings separated by newlines
@@ -53,7 +54,7 @@ class TextListField(Field):
       return not self.args.get('required')
     else:
       return all([
-        re.match(self.args['constraint'], val)
+        re.match(re_full(self.args['constraint']), val)
         for val in self.raw_value
       ])
 
