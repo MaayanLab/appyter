@@ -62,6 +62,23 @@
     <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
   <span class="p">}</span></div>
 
+<div class="viewcode-block" id="FieldConstraintException"><a class="viewcode-back" href="../../appyter.html#appyter.fields.FieldConstraintException">[docs]</a><span class="k">class</span> <span class="nc">FieldConstraintException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="n">field</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">field_name</span> <span class="o">=</span> <span class="n">field_name</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">if</span> <span class="n">message</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">[</span><span class="si">{}</span><span class="s2">]: </span><span class="si">{}</span><span class="s2"> does not satisfy constraints&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+  
+<div class="viewcode-block" id="FieldConstraintException.as_dict"><a class="viewcode-back" href="../../appyter.html#appyter.fields.FieldConstraintException.as_dict">[docs]</a>  <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+      <span class="n">field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="p">,</span>
+      <span class="n">field_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field_name</span><span class="p">,</span>
+      <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+      <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span>
+    <span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="Field"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field">[docs]</a><span class="k">class</span> <span class="nc">Field</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Base field for which all fields derive</span>
 <span class="sd">  ```eval_rst</span>
@@ -73,6 +90,7 @@
       <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
       <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
       <span class="n">choices</span><span class="o">=</span><span class="p">[],</span>
+      <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
       <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
       <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
       <span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -83,6 +101,7 @@
 <span class="sd">    :param label: (str) A human readable label for the field for the HTML form</span>
 <span class="sd">    :param description: (Optional[str]) A long human readable description for the field for the HTML form</span>
 <span class="sd">    :param choices: (Optional[Union[List[str], Set[str], Dict[str, str]]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</span>
+<span class="sd">    :param required: (Optional[bool]) Whether or not this field is required (defaults to false)</span>
 <span class="sd">    :param default: (Any) A default value as an example and for use during prototyping</span>
 <span class="sd">    :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</span>
 <span class="sd">    :param value: (INTERNAL Any) The raw value of the field (from the form for instance)</span>
@@ -95,6 +114,7 @@
         <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
         <span class="n">choices</span><span class="o">=</span><span class="n">choices</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span>
         <span class="n">value</span><span class="o">=</span><span class="n">value</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">default</span><span class="p">,</span>
         <span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="p">,</span>
@@ -114,7 +134,7 @@
     <span class="sd">&#39;&#39;&#39; Return true if the received args.value satisfies constraints.</span>
 <span class="sd">    Should be overridden by subclasses.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span></div>
+    <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Field.render"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.render">[docs]</a>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Return a rendered version of the field (form)</span>
@@ -150,11 +170,7 @@
   <span class="k">def</span> <span class="nf">choices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Potential values to choose from</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">choices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;choices&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">choices</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
-      <span class="k">return</span> <span class="n">choices</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="k">return</span> <span class="n">choices</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;choices&#39;</span><span class="p">]</span>
 
   <span class="nd">@property</span>
   <span class="k">def</span> <span class="nf">raw_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -167,13 +183,25 @@
     <span class="sd">&#39;&#39;&#39; (SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.</span>
 <span class="sd">    When instantiating code, you should use safe_value.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">choices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;choices&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">choices</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
-      <span class="k">return</span> <span class="n">choices</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraint</span><span class="p">(),</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">] (</span><span class="si">%s</span><span class="s1">) does not satisfy constraints&#39;</span> <span class="o">%</span> <span class="p">(</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span>
+    <span class="n">choices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">):</span>
+      <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">choices</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">in</span> <span class="n">choices</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">choices</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">FieldConstraintException</span><span class="p">(</span>
+          <span class="n">field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="p">,</span>
+          <span class="n">field_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+          <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraint</span><span class="p">():</span>
+      <span class="k">raise</span> <span class="n">FieldConstraintException</span><span class="p">(</span>
+        <span class="n">field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="p">,</span>
+        <span class="n">field_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+        <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">,</span>
       <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span>
 
   <span class="nd">@property</span>

@@ -44,6 +44,7 @@
 <span class="sd">  :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.</span>
 <span class="sd">  :param label: (str) A human readable label for the field for the HTML form</span>
 <span class="sd">  :param description: (Optional[str]) A long human readable description for the field for the HTML form</span>
+<span class="sd">  :param required: (Optional[bool]) Whether or not this field is required (defaults to false)</span>
 <span class="sd">  :param default: (float) A default value as an example and for use during prototyping</span>
 <span class="sd">  :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</span>
 <span class="sd">  :param value: (INTERNAL Any) The raw value of the field (from the form for instance)</span>
@@ -54,11 +55,17 @@
 
   <span class="nd">@property</span>
   <span class="k">def</span> <span class="nf">raw_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="FloatField.constraint"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.FloatField.FloatField.constraint">[docs]</a>  <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="c1"># Raw value would fail otherwise</span>
-    <span class="k">return</span> <span class="kc">True</span></div></div>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="c1"># Raw value would fail otherwise</span>
+      <span class="k">return</span> <span class="kc">True</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

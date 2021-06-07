@@ -45,6 +45,7 @@
 <span class="sd">  :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.</span>
 <span class="sd">  :param label: (str) A human readable label for the field for the HTML form</span>
 <span class="sd">  :param description: (Optional[str]) A long human readable description for the field for the HTML form</span>
+<span class="sd">  :param required: (Optional[bool]) Whether or not this field is required (defaults to false)</span>
 <span class="sd">  :param default: (bool) A default value as an example and for use during prototyping</span>
 <span class="sd">  :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</span>
 <span class="sd">  :param value: (INTERNAL Any) The raw value of the field (from the form for instance)</span>
@@ -59,6 +60,8 @@
       <span class="k">return</span> <span class="kc">True</span>
     <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;off&#39;</span><span class="p">,</span> <span class="s1">&#39;unchecked&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">}:</span>
       <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">):</span>
+      <span class="k">return</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Invalid value for bool field&#39;</span><span class="p">)</span>
 

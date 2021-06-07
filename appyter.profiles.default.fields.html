@@ -60,6 +60,7 @@ a string field, and still accepts choices not being autocompleted.</p>
 <li><p><strong>hint</strong> – A hint to put in the field prior to content.</p></li>
 <li><p><strong>file_path</strong> – (Optional[str]) A remote url to download the autocomplete list. Should resolve to a json list of terms.</p></li>
 <li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
@@ -91,6 +92,7 @@ Should be overridden by subclasses.</p>
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (bool) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
@@ -127,6 +129,7 @@ Should be overridden by subclasses.</p>
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
@@ -141,12 +144,6 @@ Should be overridden by subclasses.</p>
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/ChoiceField.html#ChoiceField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField.constraint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.ChoiceField.ChoiceField.safe_value">
-<em class="property">property </em><code class="sig-name descname">safe_value</code><a class="headerlink" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField.safe_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>(SAFE) Effective safe value for use in code, we use <code class="docutils literal notranslate"><span class="pre">repr</span></code> to escape values as necessary</p>
 </dd></dl>
 
 </dd></dl>
@@ -178,10 +175,9 @@ Should be overridden by subclasses.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.DescriptionField.DescriptionField.value">
-<code class="sig-name descname">value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/DescriptionField.html#DescriptionField.value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.value" title="Permalink to this definition">¶</a></dt>
-<dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
-When instantiating code, you should use safe_value.</p>
+<dt id="appyter.profiles.default.fields.DescriptionField.DescriptionField.raw_value">
+<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
 </dd></dl>
@@ -206,6 +202,7 @@ The field ends up being a string of the file path, for example:</p>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
 <li><p><strong>constraint</strong> – A regular expression for validating the file name.</p></li>
+<li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>examples</strong> – (Optional[Dict[str, str]]) Named url paths to example files to upload</p></li>
 </ul>
@@ -249,6 +246,7 @@ Should be overridden by subclasses.</p>
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
@@ -289,6 +287,7 @@ Should be overridden by subclasses.</p>
 <li><p><strong>min</strong> – (Optional[int]) the minimum valid value that the field can take on</p></li>
 <li><p><strong>max</strong> – (Optional[int]) the maximum valid value that the field can take on</p></li>
 <li><p><strong>step</strong> – (Optional[int]) the interval for which values are incremented or decremented</p></li>
+<li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
@@ -297,12 +296,6 @@ Should be overridden by subclasses.</p>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.IntField.IntField.choices">
-<em class="property">property </em><code class="sig-name descname">choices</code><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.choices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Potential values to choose from</p>
-</dd></dl>
-
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.IntField.IntField.constraint">
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/IntField.html#IntField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.constraint" title="Permalink to this definition">¶</a></dt>
@@ -338,6 +331,7 @@ Like <a class="reference internal" href="#module-appyter.profiles.default.fields
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form to appear as a tooltip</p></li>
 <li><p><strong>descriptions</strong> – (Optional[Dict[str, str]]) A long human readable description for each choice to appear as a tooltip</p></li>
 <li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
@@ -384,6 +378,7 @@ The resulting selection is represented with a list of strings that were chosen.<
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
 <li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
@@ -440,10 +435,9 @@ When instantiating code, you should use safe_value.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.SectionField.SectionField.value">
-<code class="sig-name descname">value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/SectionField.html#SectionField.value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField.value" title="Permalink to this definition">¶</a></dt>
-<dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
-When instantiating code, you should use safe_value.</p>
+<dt id="appyter.profiles.default.fields.SectionField.SectionField.raw_value">
+<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
 </dd></dl>
@@ -466,6 +460,7 @@ When instantiating code, you should use safe_value.</p>
 <li><p><strong>constraint</strong> – A regular expression for validating the file name.</p></li>
 <li><p><strong>hint</strong> – A hint to put in the field prior to content.</p></li>
 <li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
@@ -490,23 +485,30 @@ Should be overridden by subclasses.</p>
 <dt id="appyter.profiles.default.fields.TabField.TabField">
 <em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.TabField.</code><code class="sig-name descname">TabField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
-<p>Usage:</p>
-<div class="highlight-j2 notranslate"><div class="highlight"><pre><span></span>{{ TabField(
-  choices={
-    &quot;A&quot;: [
-      StringField(
-        name=&quot;A&quot;,
-        default=&quot;a&quot;
-      ),
-    ],
-    &quot;B&quot;: [
-      StringField(
-        name=&quot;B&quot;,
-        default=&quot;b&quot;
-      )
-    ]
-  }
-) }}
+<p>Representing a tab field which contains inner fields to choose from.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">appyter</span> <span class="n">hide_code</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">myfield</span> <span class="o">=</span> <span class="n">TabField</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;my_field&#39;</span><span class="p">,</span>
+  <span class="n">choices</span><span class="o">=</span><span class="p">{</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="n">StringField</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_field_A&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;a&quot;</span>
+      <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="n">StringField</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_field_B&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;b&quot;</span>
+      <span class="p">)</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">)</span> <span class="o">%</span><span class="p">}</span>
+
+<span class="p">:</span><span class="n">param</span> <span class="n">name</span><span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="n">A</span> <span class="n">name</span> <span class="n">that</span> <span class="n">will</span> <span class="n">be</span> <span class="n">used</span> <span class="n">to</span> <span class="n">refer</span> <span class="n">to</span> <span class="n">the</span> <span class="nb">object</span> <span class="k">as</span> <span class="n">a</span> <span class="n">variable</span> <span class="ow">and</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">HTML</span> <span class="n">form</span><span class="o">.</span>
+<span class="p">:</span><span class="n">param</span> <span class="n">label</span><span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="n">A</span> <span class="n">human</span> <span class="n">readable</span> <span class="n">label</span> <span class="k">for</span> <span class="n">the</span> <span class="n">field</span> <span class="k">for</span> <span class="n">the</span> <span class="n">HTML</span> <span class="n">form</span>
+<span class="p">:</span><span class="n">param</span> <span class="n">description</span><span class="p">:</span> <span class="p">(</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="n">A</span> <span class="n">long</span> <span class="n">human</span> <span class="n">readable</span> <span class="n">description</span> <span class="k">for</span> <span class="n">the</span> <span class="n">field</span> <span class="k">for</span> <span class="n">the</span> <span class="n">HTML</span> <span class="n">form</span>
+<span class="p">:</span><span class="n">param</span> \<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Additional</span> <span class="n">keyword</span> <span class="n">arguments</span> <span class="n">used</span> <span class="n">by</span> <span class="n">other</span> <span class="n">fields</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -514,18 +516,6 @@ Should be overridden by subclasses.</p>
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField.constraint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.TabField.TabField.render">
-<code class="sig-name descname">render</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField.render" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a rendered version of the field (form)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> – <p>The instance values of the form e.g. <code class="docutils literal notranslate"><span class="pre">Field.render(**field.args)</span></code></p>
-</p>
-</dd>
-</dl>
 </dd></dl>
 
 </dd></dl>
@@ -546,6 +536,7 @@ Should be overridden by subclasses.</p>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
 <li><p><strong>constraint</strong> – (Regex[str]) A regular expression for validating the file name.</p></li>
+<li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>hint</strong> – (Optional[str]) A hint to put in the field prior to content.</p></li>
 <li><p><strong>rows</strong> – (Optional[int]) The number of rows (lines) in the textarea</p></li>
@@ -593,6 +584,7 @@ Unlike <a class="reference internal" href="#module-appyter.profiles.default.fiel
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
 <li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
 <li><p><strong>constraint</strong> – (Regex[str]) A regular expression for validating the file name.</p></li>
+<li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>hint</strong> – (Optional[str]) A hint to put in the field prior to content.</p></li>
 <li><p><strong>rows</strong> – (Optional[int]) The number of rows (lines) in the textarea</p></li>

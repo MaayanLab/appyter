@@ -281,7 +281,7 @@
 defined in <a class="reference internal" href="appyter.profiles.default.fields.html#module-appyter.profiles.default.fields" title="appyter.profiles.default.fields"><code class="xref py py-mod docutils literal notranslate"><span class="pre">appyter.profiles.default.fields</span></code></a>.</p>
 <dl class="py class">
 <dt id="appyter.fields.Field">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.fields.</code><code class="sig-name descname">Field</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">_env</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/fields.html#Field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.fields.Field" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">appyter.fields.</code><code class="sig-name descname">Field</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">description</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">required</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">_env</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/fields.html#Field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.fields.Field" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
 <p>Base field for which all fields derive
 Base class for all Field objects representing a value that will later be provided via a front-end form.
@@ -362,6 +362,17 @@ When instantiating code, you should use safe_value.</p>
 
 </dd></dl>
 
+<dl class="py exception">
+<dt id="appyter.fields.FieldConstraintException">
+<em class="property">exception </em><code class="sig-prename descclassname">appyter.fields.</code><code class="sig-name descname">FieldConstraintException</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">field</span></em>, <em class="sig-param"><span class="n">field_name</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">message</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/fields.html#FieldConstraintException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.fields.FieldConstraintException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py method">
+<dt id="appyter.fields.FieldConstraintException.as_dict">
+<code class="sig-name descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/fields.html#FieldConstraintException.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.fields.FieldConstraintException.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt id="appyter.fields.build_fields">
 <code class="sig-prename descclassname">appyter.fields.</code><code class="sig-name descname">build_fields</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fields</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">env</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/fields.html#build_fields"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.fields.build_fields" title="Permalink to this definition">¶</a></dt>
@@ -409,6 +420,11 @@ for import.</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt id="appyter.util.exception_as_dict">
+<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">exception_as_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">exc</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#exception_as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.exception_as_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="appyter.util.importdir">
 <code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">importdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_dirname_</span></em>, <em class="sig-param"><span class="n">_package_</span></em>, <em class="sig-param"><span class="n">_globals_</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#importdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.importdir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -428,6 +444,11 @@ for import.</p>
 <code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">join_routes</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">routes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#join_routes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.join_routes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utility function for joining routes while striping extraneous slashes</p>
 </dd></dl>
+
+<dl class="py function">
+<dt id="appyter.util.re_full">
+<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">re_full</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">expr</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#re_full"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.re_full" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt id="appyter.util.run_in_executor">

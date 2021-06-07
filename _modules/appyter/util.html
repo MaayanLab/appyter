@@ -52,6 +52,11 @@
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">return</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">route</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">routes</span> <span class="k">if</span> <span class="n">route</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)])</span></div>
 
+<div class="viewcode-block" id="re_full"><a class="viewcode-back" href="../../appyter.html#appyter.util.re_full">[docs]</a><span class="k">def</span> <span class="nf">re_full</span><span class="p">(</span><span class="n">expr</span><span class="p">):</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">expr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;^&#39;</span><span class="p">):</span> <span class="n">expr</span> <span class="o">=</span> <span class="s1">&#39;^&#39;</span> <span class="o">+</span> <span class="n">expr</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">expr</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">):</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span> <span class="o">+</span> <span class="s1">&#39;$&#39;</span>
+  <span class="k">return</span> <span class="n">expr</span></div>
+
 <div class="viewcode-block" id="secure_filepath"><a class="viewcode-back" href="../../appyter.html#appyter.util.secure_filepath">[docs]</a><span class="k">def</span> <span class="nf">secure_filepath</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Ensures this will be a sanitized relative path</span>
 <span class="sd">  &#39;&#39;&#39;</span>
@@ -114,6 +119,12 @@
     <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">inner</span></div>
+
+<div class="viewcode-block" id="exception_as_dict"><a class="viewcode-back" href="../../appyter.html#appyter.util.exception_as_dict">[docs]</a><span class="k">def</span> <span class="nf">exception_as_dict</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
+  <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="s1">&#39;as_dict&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="o">**</span><span class="n">exc</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span></div>
 </pre></div>
 
             <div class="clearer"></div>
