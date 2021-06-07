@@ -1,6 +1,7 @@
 import os
 import uuid
 import json
+import traceback
 from flask import Blueprint, request, redirect, abort, send_file, url_for, current_app, jsonify, make_response
 from werkzeug.exceptions import BadRequest
 
@@ -124,6 +125,7 @@ def post_index():
     result_hash = prepare_results(data)
     error = None
   except Exception as e:
+    traceback.print_exc()
     error = exception_as_dict(e)
   #
   if mimetype in {'text/html'}:
