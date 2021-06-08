@@ -10,17 +10,25 @@ from copy import copy
 from flask import Markup
 from appyter.context import get_jinja2_env
 
+class PartialField:
+  ''' Partial instantiation of a field
+  Replaces a decorator so that we can still identify it as
+   a callable which will produce a field.
+  '''
+  def __init__(self, field, **kwargs):
+    self._field = field
+    self._kwargs = kwargs
+
+  def __call__(self, name=None, value=None, **kwargs):
+    kwargs = dict(self._kwargs, **kwargs)
+    value = kwargs.get('context', {}).get(name)
+    return self._field(name=name, value=value, **kwargs)
+
 def build_fields(fields, context={}, env=None):
   ''' INTERNAL: Build a dictionary of Field instances
   '''
   return {
-    field_name: lambda name=None, _field=field, _context=context, _env=env, **kwargs: _field(
-      **dict(kwargs,
-        name=name,
-        value=_context.get(name),
-      ),
-      _env=env,
-    )
+    field_name: PartialField(field, context=context, _env=env)
     for field_name, field in fields.items()
   }
 

@@ -1,4 +1,4 @@
-from appyter.fields import Field
+from appyter.fields import Field, PartialField
 
 class TabField(Field):
   ''' Representing a tab field which contains inner fields to choose from.
@@ -31,6 +31,9 @@ class TabField(Field):
   def __init__(self, choices={}, **kwargs):
     super(TabField, self).__init__(choices=choices, **kwargs)
     assert self.choices and type(self.choices) == dict, 'TabField requires choices'
+    for section, fields in self.choices.items():
+      for field in fields:
+        field['_parent'] = self.args['name']
 
   def constraint(self):
     if not self.raw_value:

@@ -1,27 +1,39 @@
 import re
-from appyter.fields import Field
-from appyter.parse.function_call import FunctionCallMatcher
+from appyter.fields import Field, PartialField
 
 cell_match = re.compile(r'^(# *)?%%appyter(?P<type>.*?\n)(?P<source>.+)$', re.MULTILINE | re.DOTALL)
-template_match = re.compile(r'\{[\{%](?P<inner>.+?)[%\}]\}', re.MULTILINE | re.DOTALL)
-field_match = FunctionCallMatcher()
-
-def parse_fields_from_cell(env, cell, deep=False):
-  cell_m = cell_match.match(cell.source)
-  if cell_m:
-    cell_source = cell_m.group('source')
-    for template_m in template_match.finditer(cell_source):
-      for field_m in field_match.finditer(template_m.group('inner'), deep=deep):
-        try:
-          result = eval(field_m, env.globals)
-          if isinstance(result, Field):
-            yield result
-        except:
-          pass
 
 def parse_fields_from_nbtemplate(env, nb, deep=False):
-  return [
-    field
+  # catch instanciations of a field into the fields array
+  fields = []
+  def field_wapper(field):
+    def wrapper(**kwargs):
+      _field = field(**kwargs)
+      fields.append(_field)
+      return _field
+    return wrapper
+  ctx = {
+    key: field_wapper(field)
+    for key, field in env.globals.items()
+    if isinstance(field, Field) or isinstance(field, PartialField)
+  }
+  # collect jinja2 sources from throughout the entire notebook
+  source = '\n'.join(
+    cell_m.group('source')
     for cell in nb.cells
-    for field in parse_fields_from_cell(env, cell, deep=deep)
-  ]
+    for cell_m in [cell_match.match(cell.source)]
+    if cell_m
+  )
+  # render the source for its side-effect of instantiating
+  #  relevant fields, thus populating the fields array
+  env.from_string(source).render(ctx)
+  if not deep:
+    # by convention, fields which accept fields as arguments
+    #  will register a `_parent` field with their name allowing
+    #  us to filter out these sub-fields when necessary
+    fields = [
+      field
+      for field in fields
+      if '_parent' not in field
+    ]
+  return fields
