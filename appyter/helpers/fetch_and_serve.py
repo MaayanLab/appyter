@@ -1,6 +1,7 @@
 import os
 import sys
 import click
+import traceback
 from appyter import __version__
 from appyter.cli import cli
 from appyter.ext.click import click_option_setenv, click_argument_setenv
@@ -31,7 +32,6 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
     ) as fr:
       nb = nbf.read(fr, as_version=4)
   except:
-    import traceback
     traceback.print_exc()
     click.echo('Error fetching appyter instance, is the url right?')
   #
@@ -74,7 +74,11 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
     if '://' not in fileurl:
       fileurl = join_routes(uri, fileurl)[1:]
     click.echo(f"Fetching {file} from {fileurl}...")
-    urllib.request.urlretrieve(fileurl, os.path.join(data_dir, file))
+    try:
+      urllib.request.urlretrieve(fileurl, os.path.join(data_dir, file))
+    except:
+      traceback.print_exc()
+      click.echo(f"WARNING: Error fetching '{file}' exported by the appyter")
   #
   click.echo(f"Done. Starting `appyter serve`...")
   # serve the bundle in jupyter notebook
