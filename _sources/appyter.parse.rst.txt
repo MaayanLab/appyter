@@ -4,14 +4,6 @@ appyter.parse package
 Submodules
 ----------
 
-appyter.parse.function\_call module
------------------------------------
-
-.. automodule:: appyter.parse.function_call
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 appyter.parse.nb module
 -----------------------
 

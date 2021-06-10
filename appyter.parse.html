@@ -40,41 +40,6 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </section>
-<section id="module-appyter.parse.function_call">
-<span id="appyter-parse-function-call-module"></span><h2>appyter.parse.function_call module<a class="headerlink" href="#module-appyter.parse.function_call" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="appyter.parse.function_call.FunctionCallMatcher">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.parse.function_call.</code><code class="sig-name descname">FunctionCallMatcher</code><a class="reference internal" href="_modules/appyter/parse/function_call.html#FunctionCallMatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Function call parser since regex isn’t good at nested structures.</p>
-<dl class="py attribute">
-<dt id="appyter.parse.function_call.FunctionCallMatcher.controlChars">
-<code class="sig-name descname">controlChars</code><em class="property"> = {'(': ')', '[': ']', '{': '}'}</em><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher.controlChars" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="appyter.parse.function_call.FunctionCallMatcher.finditer">
-<code class="sig-name descname">finditer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em>, <em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/function_call.html#FunctionCallMatcher.finditer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher.finditer" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="appyter.parse.function_call.FunctionCallMatcher.finditer_inner">
-<code class="sig-name descname">finditer_inner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/function_call.html#FunctionCallMatcher.finditer_inner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher.finditer_inner" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="appyter.parse.function_call.FunctionCallMatcher.ignoreControlChars">
-<code class="sig-name descname">ignoreControlChars</code><em class="property"> = {'&quot;': '&quot;', '#': '\n', &quot;'&quot;: &quot;'&quot;}</em><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher.ignoreControlChars" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="appyter.parse.function_call.FunctionCallMatcher.outer_pattern">
-<code class="sig-name descname">outer_pattern</code><em class="property"> = re.compile('([A-Za-z_-]+)\\(')</em><a class="headerlink" href="#appyter.parse.function_call.FunctionCallMatcher.outer_pattern" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</section>
 <section id="module-appyter.parse.nb">
 <span id="appyter-parse-nb-module"></span><h2>appyter.parse.nb module<a class="headerlink" href="#module-appyter.parse.nb" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
@@ -111,11 +76,6 @@
 <section id="module-appyter.parse.nbtemplate">
 <span id="appyter-parse-nbtemplate-module"></span><h2>appyter.parse.nbtemplate module<a class="headerlink" href="#module-appyter.parse.nbtemplate" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.parse.nbtemplate.parse_fields_from_cell">
-<code class="sig-prename descclassname">appyter.parse.nbtemplate.</code><code class="sig-name descname">parse_fields_from_cell</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">cell</span></em>, <em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/nbtemplate.html#parse_fields_from_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.nbtemplate.parse_fields_from_cell" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt id="appyter.parse.nbtemplate.parse_fields_from_nbtemplate">
 <code class="sig-prename descclassname">appyter.parse.nbtemplate.</code><code class="sig-name descname">parse_fields_from_nbtemplate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">nb</span></em>, <em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/parse/nbtemplate.html#parse_fields_from_nbtemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.parse.nbtemplate.parse_fields_from_nbtemplate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -137,7 +97,6 @@
   <ul>
 <li><a class="reference internal" href="#">appyter.parse package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-appyter.parse.function_call">appyter.parse.function_call module</a></li>
 <li><a class="reference internal" href="#module-appyter.parse.nb">appyter.parse.nb module</a></li>
 <li><a class="reference internal" href="#module-appyter.parse.nbtemplate">appyter.parse.nbtemplate module</a></li>
 <li><a class="reference internal" href="#module-appyter.parse">Module contents</a></li>

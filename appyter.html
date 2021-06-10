@@ -132,7 +132,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appyter.parse.html">appyter.parse package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="appyter.parse.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.parse.html#module-appyter.parse.function_call">appyter.parse.function_call module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.parse.html#module-appyter.parse.nb">appyter.parse.nb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.parse.html#module-appyter.parse.nbtemplate">appyter.parse.nbtemplate module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.parse.html#module-appyter.parse">Module contents</a></li>
@@ -371,6 +370,15 @@ When instantiating code, you should use safe_value.</p>
 <code class="sig-name descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/fields.html#FieldConstraintException.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.fields.FieldConstraintException.as_dict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt id="appyter.fields.PartialField">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.fields.</code><code class="sig-name descname">PartialField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">field</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/fields.html#PartialField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.fields.PartialField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Partial instantiation of a field
+Replaces a decorator so that we can still identify it as
+a callable which will produce a field.</p>
 </dd></dl>
 
 <dl class="py function">
