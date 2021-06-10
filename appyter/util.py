@@ -26,7 +26,7 @@ def secure_filepath(filepath):
   assert secured_filepath is not None, "Filepath wasn't secure"
   secured_filepath = secured_filepath[2:]
   if not secured_filepath:
-    logger.warn("Filepath became empty while securing")
+    logger.debug("Filepath became empty while securing")
     return ''
   return secured_filepath
 
