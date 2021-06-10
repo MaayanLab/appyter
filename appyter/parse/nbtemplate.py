@@ -29,11 +29,11 @@ def parse_fields_from_nbtemplate(env, nb, deep=False):
   env.from_string(source).render(ctx)
   if not deep:
     # by convention, fields which accept fields as arguments
-    #  will register a `_parent` field with their name allowing
+    #  will register a `parent` field with their name allowing
     #  us to filter out these sub-fields when necessary
     fields = [
       field
       for field in fields
-      if '_parent' not in field
+      if 'parent' not in field['args']
     ]
   return fields
