@@ -48,6 +48,7 @@ class Filesystem:
     return [
       f[len(ls_path)+1:]
       for f in glob.glob(ls_path + '/*') + glob.glob(ls_path + '/**/*')
+      if os.path.isfile(f)
     ]
   #
   def cp(self, src, dst):

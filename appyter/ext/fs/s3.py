@@ -64,6 +64,7 @@ class Filesystem:
     return [
       f[len(ls_path)+1:]
       for f in self._fs.glob(ls_path + '/*') + self._fs.glob(ls_path + '/**/*')
+      # note S3 only reports files anyway
     ]
   #
   def cp(self, src, dst):
