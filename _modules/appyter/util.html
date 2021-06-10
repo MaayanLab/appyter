@@ -64,7 +64,7 @@
   <span class="k">assert</span> <span class="n">secured_filepath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Filepath wasn&#39;t secure&quot;</span>
   <span class="n">secured_filepath</span> <span class="o">=</span> <span class="n">secured_filepath</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
   <span class="k">if</span> <span class="ow">not</span> <span class="n">secured_filepath</span><span class="p">:</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Filepath became empty while securing&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Filepath became empty while securing&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="s1">&#39;&#39;</span>
   <span class="k">return</span> <span class="n">secured_filepath</span></div>
 

@@ -87,6 +87,7 @@
     <span class="k">return</span> <span class="p">[</span>
       <span class="n">f</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">ls_path</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
       <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">ls_path</span> <span class="o">+</span> <span class="s1">&#39;/*&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">ls_path</span> <span class="o">+</span> <span class="s1">&#39;/**/*&#39;</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="p">]</span></div>
   <span class="c1">#</span>
 <div class="viewcode-block" id="Filesystem.cp"><a class="viewcode-back" href="../../../../appyter.ext.fs.html#appyter.ext.fs.file.Filesystem.cp">[docs]</a>  <span class="k">def</span> <span class="nf">cp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">):</span>
