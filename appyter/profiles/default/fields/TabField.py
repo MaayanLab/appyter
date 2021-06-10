@@ -33,7 +33,7 @@ class TabField(Field):
     assert self.choices and type(self.choices) == dict, 'TabField requires choices'
     for section, fields in self.choices.items():
       for field in fields:
-        field.args['parent'] = self.args['name']
+        field['args']['parent'] = self.args['name']
 
   def constraint(self):
     if not self.raw_value:
