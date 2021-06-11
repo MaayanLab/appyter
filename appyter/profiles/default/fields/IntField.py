@@ -41,3 +41,9 @@ class IntField(Field):
       ) and (
         self.args['step'] is None or (self.raw_value - self.args.get('min', 0)) % self.args['step'] == 0
       )
+
+  def to_jsonschema(self):
+    schema = dict(super().to_jsonschema(), type='integer')
+    if self.args.get('min') is not None: schema['minimum'] = self.args['min']
+    if self.args.get('max') is not None: schema['maximum'] = self.args['max']
+    return schema

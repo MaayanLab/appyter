@@ -49,3 +49,11 @@ class MultiChoiceField(Field):
       return [self.choices[v] for v in self.raw_value]
     else:
       return self.raw_value
+
+  def to_jsonschema(self):
+    schema = {'type': 'array', 'items': { 'type': 'string' } }
+    if self.args.get('label'): schema['title'] = self.args['label']
+    if self.args.get('description'): schema['description'] = self.args['description']
+    if self.args.get('choices'): schema['items']['enum'] = list(self.args['choices'])
+    if self.args.get('default'): schema['default'] = self.args['default']
+    return schema
