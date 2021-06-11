@@ -30,3 +30,6 @@ class BoolField(Field):
   @property
   def choices(self):
     return [True, False]
+
+  def to_jsonschema(self):
+    return dict(super().to_jsonschema(), type='boolean')

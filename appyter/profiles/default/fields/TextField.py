@@ -40,3 +40,8 @@ class TextField(Field):
     v = repr(self.value).replace('\\r', '\r').replace('\\n', '\n')
     # convert single to triple quotes
     return v[0] + v[0] + v + v[0] + v[0]
+
+  def to_jsonschema(self):
+    schema = super().to_jsonschema()
+    if self.args.get('constraint'): schema['pattern'] = re_full(self.args['constraint'])
+    return schema

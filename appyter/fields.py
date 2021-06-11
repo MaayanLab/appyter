@@ -117,6 +117,14 @@ class Field(dict):
       ).render(dict(**kwargs, this=self))
     )
 
+  def to_jsonschema(self):
+    schema = {'type': 'string'}
+    if self.args.get('label'): schema['title'] = self.args['label']
+    if self.args.get('description'): schema['description'] = self.args['description']
+    if self.args.get('choices'): schema['enum'] = list(self.args['choices'])
+    if self.args.get('default'): schema['default'] = self.args['default']
+    return schema
+
   @property
   def field(self):
     ''' Field name
