@@ -2,6 +2,7 @@ import os
 import uuid
 import click
 import logging
+import traceback
 logger = logging.getLogger(__name__)
 
 from appyter.cli import cli
@@ -10,9 +11,12 @@ from appyter.ext.click import Json, click_option_setenv, click_argument_setenv
 def create_app(**kwargs):
   ''' Completely initialize the flask application
   '''
+  import asyncio
   from aiohttp import web
   from aiohttp_wsgi import WSGIHandler
   from aiohttp_remotes import setup, XForwardedRelaxed
+  from aiohttp.web_exceptions import HTTPException
+  from aiohttp.web_middlewares import middleware
   #
   from flask import Flask, Blueprint, current_app, redirect
   from flask_cors import CORS
@@ -44,6 +48,20 @@ def create_app(**kwargs):
   logger.info('Initializing aiohttp...')
   app = web.Application()
   app['config'] = config
+  #
+  if config['DEBUG']:
+    logger.info('Initializing error handler middleware...')
+    @middleware
+    async def error_handler(request, handler):
+      try:
+        return await handler(request)
+      except HTTPException as e:
+        raise e
+      except Exception as e:
+        traceback.print_exc()
+        await asyncio.sleep(1)
+        raise web.HTTPFound(location=request.url)
+    app.middlewares.append(error_handler)
   #
   logger.info('Initializing socketio...')
   socketio.attach(app, join_routes(config['PREFIX'], 'socket.io'))
@@ -77,7 +95,6 @@ def create_app(**kwargs):
   app.router.add_route('*', join_routes(app['config']['PREFIX'], '{path_info:.*}'), wsgi_handler)
   if flask_app.config['PROXY']:
     logger.info('Applying proxy fix middleware...')
-    import asyncio
     asyncio.get_event_loop().run_until_complete(setup(app, XForwardedRelaxed()))
   return app
 
