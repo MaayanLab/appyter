@@ -60,7 +60,7 @@
 <div class="viewcode-block" id="secure_filepath"><a class="viewcode-back" href="../../appyter.html#appyter.util.secure_filepath">[docs]</a><span class="k">def</span> <span class="nf">secure_filepath</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Ensures this will be a sanitized relative path</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="n">secured_filepath</span> <span class="o">=</span> <span class="n">safe_join</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
+  <span class="n">secured_filepath</span> <span class="o">=</span> <span class="n">safe_join</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">filepath</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span>
   <span class="k">assert</span> <span class="n">secured_filepath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Filepath wasn&#39;t secure&quot;</span>
   <span class="n">secured_filepath</span> <span class="o">=</span> <span class="n">secured_filepath</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
   <span class="k">if</span> <span class="ow">not</span> <span class="n">secured_filepath</span><span class="p">:</span>

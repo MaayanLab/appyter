@@ -153,7 +153,6 @@
               <span class="n">cell</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span>
               <span class="n">execution_count</span><span class="o">=</span><span class="n">exec_count</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="k">await</span> <span class="n">iopub_hook</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">cell_is_code</span><span class="p">(</span><span class="n">cell</span><span class="p">):</span>
               <span class="k">if</span> <span class="n">cell_has_error</span><span class="p">(</span><span class="n">cell</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Cell execution error on cell </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">exec_count</span><span class="p">))</span>
