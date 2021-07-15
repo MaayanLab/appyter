@@ -57,7 +57,7 @@
                 h: e.tagName.slice(1),
                 textContent: e.textContent.replace(/ ¶$/, ''),
                 id: e.id,
-              }))
+              })).filter(({ id }) => id)
               return
             }
           }
