@@ -11,7 +11,6 @@
   import collapse from '@/utils/collapse'
   import slugify from '@/utils/slugify'
   import any from '@/utils/any'
-  import hash from '@/utils/hash'
   import get_require from '@/utils/get_require'
   import { setup_chunking } from '@/lib/socketio'
   import { report_error as report_error_ctx, debug as debug_ctx } from '@/lib/appyter_context'
@@ -410,7 +409,7 @@
   >
     {#if nb}
       <Cells>
-        {#each nb.cells as cell (hash(cell))}
+        {#each nb.cells as cell (cell.index)}
           {#if collapse(cell.source) !== ''}
             {#if cell.cell_type === 'code'}
               <Cell type="code">
