@@ -44,7 +44,7 @@
   })
 
   // table of contents
-  let toc = []
+  let toc
   onMount(() => {
     if (extras.indexOf('toc') !== -1 && notebookRef !== undefined) {
       const observer = new MutationObserver(mutations => {
