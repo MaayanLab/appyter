@@ -9,7 +9,6 @@
   import Markdown from '@/components/Markdown.svelte'
   import Loader from '@/components/Loader.svelte'
   import collapse from '@/utils/collapse'
-  import slugify from '@/utils/slugify'
   import any from '@/utils/any'
   import get_require from '@/utils/get_require'
   import { setup_chunking } from '@/lib/socketio'
@@ -21,6 +20,7 @@
   export let debug = false
 
   let nb
+  let notebookRef
   let show_code = false
   let local_run_url
 
@@ -44,28 +44,28 @@
   })
 
   // table of contents
-  function *get_md_headers(md) {
-    const parser = new DOMParser()
-    let re = /^(#+)\s*(.+?)\s*$/gm
-    let m
-    while ((m = re.exec(md)) !== null) {
-      // in the case of HTML embedded into the label, we want only the text
-      const stripped_label = parser.parseFromString(m[2], 'text/html').body.innerText
-      yield { h: m[1].length, label: stripped_label }
+  let toc = []
+  onMount(() => {
+    if (extras.indexOf('toc') !== -1 && notebookRef !== undefined) {
+      const observer = new MutationObserver(mutations => {
+        // look through mutations and update update toc iff a header element was added/removed
+        for (const mutation of mutations) {
+          if (mutation.type !== 'childList') continue
+          for (const e of [...mutation.addedNodes, ...mutation.removedNodes]) {
+            if (e.tagName !== undefined && e.tagName.startsWith('H')) {
+              toc = [...notebookRef.querySelectorAll('h1,h2,h3,h4,h5,h6')].map(e => ({
+                h: e.tagName.slice(1),
+                textContent: e.textContent.replace(/ ¶$/, ''),
+                id: e.id,
+              }))
+              return
+            }
+          }
+        }
+      })
+      observer.observe(notebookRef, { childList: true, subtree: true })
     }
-  }
-
-  let toc
-  $: {
-    if (nb !== undefined && nb.cells !== undefined && extras.indexOf('toc') !== -1) {
-      toc = nb.cells
-        .filter(({ cell_type }) => cell_type === 'markdown')
-        .reduce((headers, { source }) => [
-          ...headers,
-          ...get_md_headers(collapse(source, '\n'))
-        ], [])
-    }
-  }
+  })
 
   // dynamic notebook
   let status
@@ -384,12 +384,9 @@
         <div class="offset-sm-2 col-sm-8 col-md-12">
           <div class="mt-5">
             <legend>Table Of Contents</legend>
-            {#each toc as {h, label}}
-              <a
-                href="#{slugify(label)}"
-                class="toc h{h}"
-              >
-                <Markdown data={label} />
+            {#each toc as {h, id, textContent}}
+              <a href="#{id}" class="toc h{h}">
+                {textContent}
               </a>
             {/each}
           </div>
@@ -403,6 +400,7 @@
     </div>
   {/if}
   <div
+    bind:this={notebookRef}
     class="col-sm-12"
     class:col-md-9={toc !== undefined}
     class:col-xl-10={toc !== undefined}
