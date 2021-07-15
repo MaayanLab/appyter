@@ -240,29 +240,30 @@
   <style>
     .toc {
       display: block;
+      font-weight: bold;
     }
     .toc.h1 {
-      font-size: 150%;
+      font-size: 100%;
       text-indent: 0em;
     }
     .toc.h2 {
-      font-size: 140%;
+      font-size: 90%;
       text-indent: 1em;
     }
     .toc.h3 {
-      font-size: 130%;
+      font-size: 80%;
       text-indent: 1.5em;
     }
     .toc.h4 {
-      font-size: 120%;
+      font-size: 70%;
       text-indent: 1.75em;
     }
     .toc.h5 {
-      font-size: 110%;
+      font-size: 60%;
       text-indent: 1.85em;
     }
     .toc.h6 {
-      font-size: 100%;
+      font-size: 50%;
       text-indent: 2em;
     }
   </style>
