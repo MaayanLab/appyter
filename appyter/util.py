@@ -22,7 +22,7 @@ def re_full(expr):
 def secure_filepath(filepath):
   ''' Ensures this will be a sanitized relative path
   '''
-  secured_filepath = safe_join('.', filepath)
+  secured_filepath = safe_join('.', filepath.lstrip('/'))
   assert secured_filepath is not None, "Filepath wasn't secure"
   secured_filepath = secured_filepath[2:]
   if not secured_filepath:
