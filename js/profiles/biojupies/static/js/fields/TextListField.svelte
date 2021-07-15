@@ -1,11 +1,12 @@
 <script>
+  import ensure_list from '@/utils/ensure_list'
   import re_full from '@/utils/re_full'
 
   export let args
 
   let value
   $: if (args !== undefined && value === undefined) {
-    value = args.default.join('\n')
+    value = ensure_list(args.default).join('\n')
   }
 
   let constraint
