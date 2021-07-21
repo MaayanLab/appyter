@@ -58,8 +58,8 @@ http {
                     application/x-javascript
                     application/atom+xml;
 
-  client_body_buffer_size     10M;
-  client_max_body_size        10M;
+  client_body_buffer_size     16k;
+  client_max_body_size        200M;
 
   {{ cache('appyter-core') }}
   {{ cache('appyter-data') }}
