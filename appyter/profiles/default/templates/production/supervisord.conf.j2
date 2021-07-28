@@ -1,4 +1,6 @@
 [supervisord]
+logfile = {{ _tmp_fs.path('supervisord.log') }}
+pidfile = {{ _tmp_fs.path('supervisord.pid') }}
 
 [program:nginx]
 process_name=%(program_name)s_%(process_num)d
