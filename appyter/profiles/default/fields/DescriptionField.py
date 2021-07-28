@@ -25,3 +25,6 @@ class DescriptionField(Field):
 
   def to_jsonschema(self):
     return None
+
+  def to_cwl(self):
+    return None
