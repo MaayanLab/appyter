@@ -47,3 +47,6 @@ class IntField(Field):
     if self.args.get('min') is not None: schema['minimum'] = self.args['min']
     if self.args.get('max') is not None: schema['maximum'] = self.args['max']
     return schema
+
+  def to_cwl(self):
+    return dict(super().to_cwl(), type='int')

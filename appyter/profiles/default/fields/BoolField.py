@@ -33,3 +33,6 @@ class BoolField(Field):
 
   def to_jsonschema(self):
     return dict(super().to_jsonschema(), type='boolean')
+
+  def to_cwl(self):
+    return dict(super().to_cwl(), type='boolean')

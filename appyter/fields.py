@@ -137,6 +137,14 @@ class Field(dict):
     if self.args.get('default'): schema['default'] = self.args['default']
     return schema
 
+  def to_cwl(self):
+    return {
+      'type': 'string',
+      'inputBinding': {
+        'prefix': f"--{self.args['name']}"
+      }
+    }
+
   @property
   def field(self):
     ''' Field name
