@@ -47,7 +47,7 @@ class Filesystem:
     ls_path = FS.join(self._prefix, path) if path else self._prefix
     return [
       f[len(ls_path)+1:]
-      for f in glob.glob(ls_path + '/*') + glob.glob(ls_path + '/**/*')
+      for f in glob.glob(ls_path + '/**/*', recursive=True)
       if os.path.isfile(f)
     ]
   #

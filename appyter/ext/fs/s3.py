@@ -63,7 +63,7 @@ class Filesystem:
     ls_path = FS.join(self._prefix, path) if path else self._prefix
     return [
       f[len(ls_path)+1:]
-      for f in self._fs.glob(ls_path + '/*') + self._fs.glob(ls_path + '/**/*')
+      for f in self._fs.glob(ls_path + '/**/*')
       # note S3 only reports files anyway
     ]
   #
