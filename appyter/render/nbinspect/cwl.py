@@ -22,11 +22,25 @@ def render_cwl_from_nbtemplate(env, nb, ipynb=None, cwd=None):
       field.args['name']: field.to_cwl()
       for field in fields
     }),
+    'stderr': 'stderr.jsonl',
+    'stdout': 'stdout.ipynb',
     'outputs': {
+      'status': {
+        'type': 'File',
+        'streamable': True,
+        'label': 'Realtime updates',
+        'outputBinding': {
+          'glob': 'stderr.jsonl',
+        },
+      },
       'report': {
-        'type': 'stdout',
+        'type': 'File',
+        'streamable': True,
         # 'format': '',
         'label': 'A jupyter notebook',
+        'outputBinding': {
+          'glob': 'stdout.ipynb',
+        },
       },
     },
     # TODO: extract from appyter.json/section
