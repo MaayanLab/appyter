@@ -23,7 +23,6 @@ def nbinspect(cwd, ipynb, output, format='appyter', **kwargs):
   env = get_jinja2_env(config=get_env(cwd=cwd, ipynb=ipynb, mode='inspect',  **kwargs))
   with fsspec.open(join_url(cwd, ipynb), 'r') as fr:
     nbtemplate = nb_from_ipynb_io(fr)
-  fields = render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
   if format == 'appyter':
     json.dump(render_nbtemplate_json_from_nbtemplate(env, nbtemplate), output)
   elif format == 'jsonschema':
