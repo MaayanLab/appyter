@@ -23,21 +23,31 @@ from appyter.render.nbexecute import nbexecute_async, json_emitter_factory
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 @click.argument('args', nargs=-1)
 def cwl_runner(ipynb, args):
-  # convert arguments into context
-  context = dict([
-    re.match(r'^--([^=]+)=(.+)$', arg).groups()
-    for arg in args
-  ])
   # prepare cwd/ipynb
   cwd = os.path.realpath(os.path.dirname(ipynb))
   ipynb = os.path.basename(ipynb)
-  # nbconstruct
+  # nbinspect
+  env = get_jinja2_env(
+    config=get_env_from_kwargs(cwd=cwd, ipynb=ipynb, mode='inspect'),
+  )
+  nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
+  fields = render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
+  # convert arguments into context
+  kwargs = dict([
+    re.match(r'^--([^=]+)=(.+)$', arg).groups()
+    for arg in args
+  ])
+  context = {}
+  for field in fields:
+    if field['args']['name'] in kwargs or field['args'].get('required') == True:
+      context[field['args']['name']] = kwargs[field['args']['name']]
+      if field['field'] == 'FileField':
+        context[field['args']['name']] = os.path.basename(context[field['args']['name']])
+  # nbconstruct with context
   env = get_jinja2_env(
     config=get_env_from_kwargs(cwd=cwd, ipynb=ipynb, mode='construct'),
     context=context,
   )
-  nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
-  fields = render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   # prepare tmpfs with notebook & symlinks to files
   with Filesystem('tmpfs://') as tmp_fs:
@@ -47,8 +57,8 @@ def cwl_runner(ipynb, args):
       if field['field'] == 'FileField' and field['args']['name'] in context:
         # TODO: integrate with ext.fs
         os.symlink(
-          os.path.realpath(context[field['args']['name']]),
-          tmp_fs.path(os.path.basename(context[field['args']['name']])),
+          os.path.realpath(kwargs[field['args']['name']]),
+          tmp_fs.path(context[field['args']['name']]),
         )
     # nbexecute in tmpfs
     import asyncio
