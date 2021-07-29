@@ -18,7 +18,8 @@ from appyter.render.nbinspect.cwl import render_cwl_from_nbtemplate
 @click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def nbinspect(cwd, ipynb, output, format='appyter', **kwargs):
-  env = get_jinja2_env(config=get_env(cwd=cwd, ipynb=ipynb, mode='inspect',  **kwargs))
+  cwd = os.path.realpath(cwd)
+  env = get_jinja2_env(config=get_env(cwd=cwd, ipynb=ipynb, mode='inspect', **kwargs))
   nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
   if format == 'appyter':
     json.dump(render_nbtemplate_json_from_nbtemplate(env, nbtemplate), output)
