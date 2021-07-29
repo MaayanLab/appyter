@@ -62,3 +62,23 @@ class MultiCheckboxField(Field):
     if self.args.get('choices'): schema['items']['enum'] = list(self.args['choices'])
     if self.args.get('default'): schema['default'] = self.args['default']
     return schema
+
+  def to_cwl(self):
+    schema = super().to_cwl()
+    if self.args.get('required') == True:
+      schema['type'] = {
+        'type': 'array',
+        'items': {
+          'type': 'enum',
+          'symbols': list(self.args['choices'])
+        },
+      }
+    else:
+      schema['type'] = ['null', {
+        'type': 'array',
+        'items': {
+          'type': 'enum',
+          'symbols': list(self.args['choices'])
+        },
+      }]
+    return schema

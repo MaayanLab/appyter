@@ -9,7 +9,7 @@ def render_cwl_from_nbtemplate(env, nb, ipynb=None, cwd=None):
   '''
   fields = list(parse_fields_from_nbtemplate(env, nb, deep=True))
   return {
-    'cwlVersion': 'v1.0',
+    'cwlVersion': 'v1.2',
     'class': 'CommandLineTool',
     #
     'baseCommand': [

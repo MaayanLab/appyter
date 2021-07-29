@@ -44,7 +44,7 @@ class FileField(Field):
 
   def to_cwl(self):
     schema = super().to_cwl()
-    schema['type'] = 'File'
+    schema['type'] = f"File{'' if self.args.get('required') == True else '?'}"
     return schema
 
   @property
