@@ -9,9 +9,8 @@ from appyter.context import get_jinja2_env
 from appyter.ext.fs import Filesystem
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.util import secure_filepath, exception_as_dict
-from appyter.render.form import render_form_from_nbtemplate
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
-from appyter.render.nbinspect import render_nbtemplate_json_from_nbtemplate
+from appyter.render.nbinspect.nbtemplate_json import render_nbtemplate_json_from_nbtemplate
 from appyter.render.flask_app.download import upload_from_request
 from appyter.render.flask_app.util import sanitize_sha1sum, sanitize_uuid, route_join_with_or_without_slash, collapse, sha1sum_io, sha1sum_dict
 

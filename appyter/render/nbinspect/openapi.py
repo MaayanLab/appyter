@@ -1,3 +1,12 @@
+import os
+import json
+import click
+
+from appyter.context import get_env, get_jinja2_env
+from appyter.ext.click import click_option_setenv, click_argument_setenv
+from appyter.ext.fs import Filesystem
+from appyter.parse.nb import nb_from_ipynb_io
+from appyter.render.nbinspect.cli import nbinspect
 from appyter.render.nbinspect.jsonschema import render_jsonschema_from_nbtemplate
 
 def render_openapi_from_nbtemplate(env, nb):
@@ -318,3 +327,13 @@ def render_openapi_from_nbtemplate(env, nb):
     },
   }
   return schema
+
+@nbinspect.command(help='Create OpenAPI spec for appyter')
+@click.option('-o', '--output', default='-', type=click.File('w'), help='The output location of the inspection json')
+@click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
+def openapi(cwd, ipynb, output, **kwargs):
+  cwd = os.path.realpath(cwd)
+  env = get_jinja2_env(config=get_env(cwd=cwd, ipynb=ipynb, mode='inspect', **kwargs))
+  nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
+  json.dump(render_openapi_from_nbtemplate(env, nbtemplate), output)
