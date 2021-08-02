@@ -15,18 +15,20 @@ def render_jsonschema_from_nbtemplate(env, nb):
   TODO: branch with tabs
   '''
   fields = list(parse_fields_from_nbtemplate(env, nb, deep=True))
-  return {
+  schema = {
     'type': 'object',
     'properties': dict_filter_none({
       field.args['name']: field.to_jsonschema()
       for field in fields
     }),
-    'required': [
-      field.args['name']
-      for field in fields
-      if field.args.get('required')
-    ],
   }
+  required = [
+    field.args['name']
+    for field in fields
+    if field.args.get('required')
+  ]
+  if required: schema['required'] = required
+  return schema
 
 @nbinspect.command(help='Create JSON Schema for appyter input')
 @click.option('-o', '--output', default='-', type=click.File('w'), help='The output location of the inspection json')
