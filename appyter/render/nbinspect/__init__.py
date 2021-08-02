@@ -10,11 +10,12 @@ from appyter.ext.click import click_option_setenv, click_argument_setenv
 
 from appyter.render.nbinspect.nbtemplate_json import render_nbtemplate_json_from_nbtemplate
 from appyter.render.nbinspect.jsonschema import render_jsonschema_from_nbtemplate
+from appyter.render.nbinspect.openapi import render_openapi_from_nbtemplate
 from appyter.render.nbinspect.cwl import render_cwl_from_nbtemplate
 
 @cli.command(help='Inspect appyter for arguments (fields)')
 @click.option('-o', '--output', default='-', type=click.File('w'), help='The output location of the inspection json')
-@click.option('-f', '--format', default='appyter', type=click.Choice(['appyter', 'jsonschema', 'cwl'], case_sensitive=False), help='The format of the inspect results')
+@click.option('-f', '--format', default='appyter', type=click.Choice(['appyter', 'jsonschema', 'openapi', 'cwl'], case_sensitive=False), help='The format of the inspect results')
 @click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def nbinspect(cwd, ipynb, output, format='appyter', **kwargs):
@@ -25,6 +26,8 @@ def nbinspect(cwd, ipynb, output, format='appyter', **kwargs):
     json.dump(render_nbtemplate_json_from_nbtemplate(env, nbtemplate), output)
   elif format == 'jsonschema':
     json.dump(render_jsonschema_from_nbtemplate(env, nbtemplate), output)
+  elif format == 'openapi':
+    json.dump(render_openapi_from_nbtemplate(env, nbtemplate), output)
   elif format == 'cwl':
     json.dump(render_cwl_from_nbtemplate(env, nbtemplate, cwd=cwd, ipynb=ipynb), output)
   else:
