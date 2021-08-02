@@ -9,7 +9,7 @@ from appyter.ext.fs import Filesystem
 from appyter.context import get_env_from_kwargs, get_jinja2_env
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.ext.click import click_argument_setenv
-from appyter.render.nbinspect import render_nbtemplate_json_from_nbtemplate
+from appyter.render.nbinspect.nbtemplate_json import render_nbtemplate_json_from_nbtemplate
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.render.nbexecute import nbexecute_async, json_emitter_factory
 

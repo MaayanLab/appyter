@@ -26,7 +26,7 @@ def serve(app_path, **kwargs):
       fw.write(render_form_from_nbtemplate(env, nbtemplate))
     with (tmp_dir/'index.json').open('w') as fw:
       import json
-      from appyter.render.nbinspect import render_nbtemplate_json_from_nbtemplate
+      from appyter.render.nbinspect.nbtemplate_json import render_nbtemplate_json_from_nbtemplate
       json.dump(render_nbtemplate_json_from_nbtemplate(env, nbtemplate), fw)
     with (tmp_dir/'landing.html').open('w') as fw:
       env.get_template('landing.j2').stream(
