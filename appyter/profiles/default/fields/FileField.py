@@ -31,7 +31,7 @@ class FileField(Field):
 
   @property
   def raw_value(self):
-    if type(self.args['value']) == str:
+    if type(self.args['value']) == str and self.args['value']:
       return secure_filepath(self.args['value'])
     else:
       return None
@@ -41,6 +41,12 @@ class FileField(Field):
       return not self.args.get('required')
     else:
       return re.match(re_full(self.args['constraint']), self.raw_value)
+
+  @property
+  def value(self):
+    ret = super().value
+    if ret is None: return ''
+    else: return ret
 
   @property
   def public_url(self):
