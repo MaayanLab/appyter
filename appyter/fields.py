@@ -154,8 +154,16 @@ class Field(dict):
     When instantiating code, you should use safe_value.
     '''
     choices = self.choices
-    if self.raw_value is None and not self.args.get('required'):
-      return None
+    if self.raw_value is None:
+      if not self.args.get('required'):
+        return None
+      else:
+        raise FieldConstraintException(
+          field=self.field,
+          field_name=self.args['name'],
+          value=self.raw_value,
+          message='{}[{}] is required'.format(self.field, self.args['name']),
+        )
     elif type(choices) == dict:
       if self.raw_value in choices:
         return choices[self.raw_value]
