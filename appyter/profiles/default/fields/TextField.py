@@ -21,10 +21,12 @@ class TextField(Field):
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
   :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
-  def __init__(self, constraint=r'.*', hint=None, **kwargs):
+  def __init__(self, constraint=None, hint=None, required=None, **kwargs):
+    if constraint is None: constraint = r'.+' if required else r'.*'
     super().__init__(
       constraint=constraint,
       hint=hint,
+      required=required,
       **kwargs,
     )
 
