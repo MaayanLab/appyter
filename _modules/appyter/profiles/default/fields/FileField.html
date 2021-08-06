@@ -69,7 +69,7 @@
 
   <span class="nd">@property</span>
   <span class="k">def</span> <span class="nf">raw_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]:</span>
       <span class="k">return</span> <span class="n">secure_filepath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="k">return</span> <span class="kc">None</span>
@@ -79,6 +79,12 @@
       <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">re_full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;constraint&#39;</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">)</span></div>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">ret</span>
 
   <span class="nd">@property</span>
   <span class="k">def</span> <span class="nf">public_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

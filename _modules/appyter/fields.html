@@ -192,8 +192,16 @@
 <span class="sd">    When instantiating code, you should use safe_value.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">choices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">):</span>
-      <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">FieldConstraintException</span><span class="p">(</span>
+          <span class="n">field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="p">,</span>
+          <span class="n">field_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+          <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">,</span>
+          <span class="n">message</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">[</span><span class="si">{}</span><span class="s1">] is required&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]),</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">choices</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
       <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">in</span> <span class="n">choices</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">choices</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">]</span>

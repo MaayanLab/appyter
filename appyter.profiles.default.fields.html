@@ -237,6 +237,13 @@ Should be overridden by subclasses.</p>
 <dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.FileField.FileField.value">
+<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
+When instantiating code, you should use safe_value.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -454,7 +461,7 @@ When instantiating code, you should use safe_value.</p>
 <span id="appyter-profiles-default-fields-stringfield-module"></span><h2>appyter.profiles.default.fields.StringField module<a class="headerlink" href="#module-appyter.profiles.default.fields.StringField" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="appyter.profiles.default.fields.StringField.StringField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.StringField.</code><code class="sig-name descname">StringField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">'.*'</span></em>, <em class="sig-param"><span class="n">hint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/StringField.html#StringField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.StringField.StringField" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.StringField.</code><code class="sig-name descname">StringField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">required</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/StringField.html#StringField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.StringField.StringField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Representing a field that accepts a string</p>
 <p>Be careful with this field, consider defining a constraint regex.</p>
@@ -533,7 +540,7 @@ Should be overridden by subclasses.</p>
 <span id="appyter-profiles-default-fields-textfield-module"></span><h2>appyter.profiles.default.fields.TextField module<a class="headerlink" href="#module-appyter.profiles.default.fields.TextField" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="appyter.profiles.default.fields.TextField.TextField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.TextField.</code><code class="sig-name descname">TextField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">'.*'</span></em>, <em class="sig-param"><span class="n">hint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextField.html#TextField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextField.TextField" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.TextField.</code><code class="sig-name descname">TextField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">required</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextField.html#TextField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextField.TextField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Representing a field that accepts a multi-line string</p>
 <p>Be careful with this field, consider defining a constraint regex.</p>
