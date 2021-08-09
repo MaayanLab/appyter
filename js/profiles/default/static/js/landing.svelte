@@ -345,12 +345,28 @@
 
 <div class="row">
   <div class="col-sm-12 text-center">
-    <a
-      id="download-notebook"
-      class="btn btn-primary"
-      role="button"
-      href="{nbdownload}"
-    >Download Notebook</a>
+    <div class="dropdown show">
+      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Download Notebook
+      </button>
+      <div class="dropdown-menu">
+        <a
+          class="dropdown-item"
+          href="{nbdownload}"
+          title="The standalone jupyter notebook as shown"
+        >Jupyter Notebook (.ipynb)</a>
+        <a
+          class="dropdown-item"
+          href="../export/{session_id}/?format=html"
+          title="An nbconvert HTML export of the notebook for easy viewing in browser"
+        >HTML Export (.html)</a>
+        <a
+          class="dropdown-item"
+          href="../export/{session_id}/?format=zip"
+          title="An archive with the notebook and dependent files for running it"
+        >Notebook Bundle (.zip)</a>
+      </div>
+    </div>
     {#if extras.indexOf('toggle-code') !== -1}
       <a
         href="javascript:"
