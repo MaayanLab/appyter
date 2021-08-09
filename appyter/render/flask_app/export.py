@@ -50,12 +50,12 @@ def export(path):
       elif format == 'zip':
         metadata = nb.get('metadata', {}).get('appyter', {})
         files = metadata.get('nbexecute', {}).get('files', metadata.get('nbconstruct', {}).get('files', {}))
-        out = io.BytesIO()
-        with zipfile.ZipFile(out, 'a', zipfile.ZIP_DEFLATED, False) as zf:
-          for f, b in get_base_files().items():
-            zf.writestr(f, b)
-          for f, p in ([(os.path.basename(nbpath), nbpath)] + [(f, path+f) for f in files]):
-            if data_fs.exists(p):
-              zf.writestr(f, data_fs.open(p, 'rb').read())
-        return send_file(io.BytesIO(out.getbuffer()), mimetype='application/zip', attachment_filename='output.zip')
+        with Filesystem('tmpfs://') as tmp_fs:
+          with zipfile.ZipFile(tmp_fs.path('output.zip'), 'a', zipfile.ZIP_DEFLATED, False) as zf:
+            for f, b in get_base_files().items():
+              zf.writestr(f, b)
+            for f, p in ([(os.path.basename(nbpath), nbpath)] + [(f, path+f) for f in files]):
+              if data_fs.exists(p):
+                zf.writestr(f, data_fs.open(p, 'rb').read())
+          return send_file(tmp_fs.path('output.zip'), mimetype='application/zip', attachment_filename='output.zip')
   abort(404)
