@@ -171,6 +171,10 @@ http {
         =404;
     }
 
+    location ~ ^{{ join_routes(_config.PREFIX, 'export') }}/(.*)$ {
+      {{ proxy('http://appyter', False, 'appyter-export') }}
+    }
+
     {%- for blueprint_name in find_blueprints(config=_config).keys() %}
     location ~ ^{{ join_routes(_config.PREFIX, blueprint_name) }}/(.*)$ {
       {{ proxy('http://appyter', False, False) }}
