@@ -63,6 +63,7 @@ http {
 
   {{ cache('appyter-core') }}
   {{ cache('appyter-data') }}
+  {{ cache('appyter-export') }}
 
   upstream appyter {
     {#- {% for n in range(1, _config.N_PROCS+1) %} #}
