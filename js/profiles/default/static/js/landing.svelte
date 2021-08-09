@@ -19,6 +19,9 @@
   export let extras = []
   export let debug = false
 
+  const paths = window.location.pathname.split('/').filter(p => p)
+  const session_id = paths[paths.length - 1]
+
   let nb
   let notebookRef
   let show_code = false
@@ -137,11 +140,10 @@
       })
       await setup_async_exec(socket)
     }
-    const paths = window.location.pathname.split('/').filter(p => p)
     if (execute) {
-      socket.emit('submit', paths[paths.length - 1])
+      socket.emit('submit', session_id)
     } else {
-      socket.emit('join', paths[paths.length - 1])
+      socket.emit('join', session_id)
     }
   }
 
@@ -198,9 +200,7 @@
     if (extras.indexOf('catalog-integration') !== -1) {
       // setup local run appyter link
       try {
-        const P = window.location.pathname.split('/').filter(p => p)
-        const slug = P[P.length - 2] || ''
-        const id = P[P.length - 1] || ''
+        const slug = paths[paths.length - 2] || ''
 
         let appyter_version = ''
         if (nb.metadata.appyter.info !== undefined) appyter_version = nb.metadata.appyter.info.version || ''
@@ -209,7 +209,7 @@
         if (nb.metadata.appyter.nbexecute !== undefined) library_version = nb.metadata.appyter.nbexecute.version || ''
         else if (nb.metadata.appyter.nbconstruct !== undefined) library_version = nb.metadata.appyter.nbconstruct.version || ''
 
-        local_run_url = `${window.location.origin}/#/running-appyters/?slug=${slug}&appyter_version=${appyter_version}&library_version=${library_version}&id=${id}`
+        local_run_url = `${window.location.origin}/#/running-appyters/?slug=${slug}&appyter_version=${appyter_version}&library_version=${library_version}&id=${session_id}`
       } catch (e) {
         console.error('catalog-integration: local_run_url setup error')
         console.error(e)
