@@ -12,7 +12,12 @@
   import any from '@/utils/any'
   import get_require from '@/utils/get_require'
   import { setup_chunking } from '@/lib/socketio'
-  import { report_error as report_error_ctx, debug as debug_ctx } from '@/lib/appyter_context'
+  import MarkdownItFactory from '@/lib/markdown_it'
+  import {
+    markdown_it as markdown_it_ctx,
+    report_error as report_error_ctx,
+    debug as debug_ctx,
+  } from '@/lib/appyter_context'
 
   export let window
   export let nbdownload
@@ -26,6 +31,8 @@
   let notebookRef
   let show_code = false
   let local_run_url
+
+  setContext(markdown_it_ctx, MarkdownItFactory())
 
   setContext(debug_ctx, debug)
 

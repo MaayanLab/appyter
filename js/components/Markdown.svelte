@@ -1,27 +1,12 @@
 <script>
-  import MarkdownIt from 'markdown-it'
-  import MarkdownItAnchor from 'markdown-it-anchor'
-  import hljs from 'highlight.js'
-  import slugify from '@/utils/slugify'
+  import { getContext } from 'svelte'
+  import { markdown_it as markdown_it_ctx } from '@/lib/appyter_context.js'
+  const markdown_it = getContext(markdown_it_ctx)
 
   export let data
   let rendered
 
-  const md = new MarkdownIt({
-    html: true,
-    highlight: function (code, language) {
-      if (language && hljs.getLanguage(language)) {
-        try {
-          return hljs.highlight(code, { language }).value
-        } catch (__) {}
-      }
-      return ''
-    }
-  }).use(MarkdownItAnchor, {
-    permalink: true,
-    slugify,
-  })
-  $: rendered = md.render(data)
+  $: rendered = markdown_it.render(data)
 </script>
 
 {@html rendered}

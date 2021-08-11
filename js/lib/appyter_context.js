@@ -1,3 +1,4 @@
+const markdown_it = {}
 const report_error = {}
 const debug = {}
-export { report_error, debug }
+export { markdown_it, report_error, debug }
