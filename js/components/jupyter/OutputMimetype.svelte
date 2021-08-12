@@ -40,9 +40,9 @@
 
 {#if data.data}
   <div class="output_display_data">
-    {#if missing.length > 0}
-      <div class="alert" class:alert-danger={!mimetype} class:alert-warning={mimetype} class:d-none={!debug}>
-        <p>Unhandled output_mimetype renderer, please report this on <a href="https://github.com/MaayanLab/appyter/issues">Appyter Issues</a> with this information:</p>
+    {#if missing.length > 0 && debug}
+      <div class="alert" class:alert-danger={!mimetype} class:alert-warning={mimetype}>
+        <p>Unhandled output_mimetype renderer. This message only appears in development, if there is a rendering issue, please report this on <a href="https://github.com/MaayanLab/appyter/issues">Appyter Issues</a> with this information:</p>
         <code>{error()}</code>
       </div>
     {/if}
