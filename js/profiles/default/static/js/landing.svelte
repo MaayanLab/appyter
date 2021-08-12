@@ -273,6 +273,13 @@
       font-size: 50%;
       text-indent: 2em;
     }
+    /* ensure menu appears over toc */
+    .sticky-top {
+      z-index: 1020;
+    }
+    .dropdown-menu {
+      z-index: 1021;
+    }
   </style>
 {/if}
 
