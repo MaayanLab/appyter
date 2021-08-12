@@ -1,5 +1,6 @@
 <script>
   import { tick, onMount, setContext } from 'svelte'
+  import { hash } from '@/lib/stores'
   import Cells from '@/components/jupyter/Cells.svelte'
   import Cell from '@/components/jupyter/Cell.svelte'
   import Input from '@/components/jupyter/Input.svelte'
@@ -29,7 +30,6 @@
 
   let nb
   let notebookRef
-  let show_code = false
   let local_run_url
 
   setContext(markdown_it_ctx, MarkdownItFactory())
@@ -233,13 +233,29 @@
     }
   }
 
+  let show_code = undefined
+  $: if ($hash.params.show_code) {
+    show_code = JSON.parse($hash.params.show_code)
+  }
+
+  let path = $hash.path // defer scroll handling for init
+  $: if ($hash.path && $hash.path !== path) { // debounce scroll handling
+    path = $hash.path+''
+    const el = document.getElementById(path)
+    if (el) el.scrollIntoView()
+  }
+
   // initialization
   onMount(async () => {
     await tick()
     status = 'Loading...'
     statusBg = 'primary'
-    show_code = extras.indexOf('hide-code') === -1
+    if (show_code === undefined) {
+      show_code = extras.indexOf('hide-code') === -1
+    }
     await init()
+    // trigger scroll handler
+    path = undefined
   })
 </script>
 
@@ -387,7 +403,10 @@
       <a
         href="javascript:"
         class="btn btn-secondary white"
-        on:click={() => show_code = !show_code}
+        on:click={() => {
+          $hash.params.show_code = JSON.stringify(!show_code)
+          $hash.path = ''
+        }}
       >
         Toggle Code
       </a>
