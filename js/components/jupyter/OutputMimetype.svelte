@@ -1,5 +1,5 @@
 <script>
-  import output_mimetypes from './output_mimetype'
+  import { output_mimetypes, ignored_mimetypes } from './output_mimetype'
   import { getContext } from 'svelte'
   import { report_error as report_error_ctx, debug as debug_ctx } from '@/lib/appyter_context.js'
   const report_error = getContext(report_error_ctx)
@@ -13,7 +13,7 @@
     let _available = {}
     let _missing = []
     for (const _mimetype in data.data) {
-      if (!(_mimetype in output_mimetypes)) _missing.push(_mimetype)
+      if (!(_mimetype in output_mimetypes) && !(_mimetype in ignored_mimetypes)) _missing.push(_mimetype)
       else _available[_mimetype] = 1
     }
     for (const _mimetype in output_mimetypes) {

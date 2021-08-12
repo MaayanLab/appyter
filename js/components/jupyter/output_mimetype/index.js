@@ -14,4 +14,11 @@ const output_mimetypes = {
   'text/markdown': TextMarkdown,
   'text/plain': TextPlain,
 }
-export default output_mimetypes
+
+// These mimetypes can be safely ignored
+const ignored_mimetypes = {
+  'application/vnd.bokehjs_load.v0+json': true,
+  'application/vnd.bokehjs_exec.v0+json': true,
+}
+
+export { output_mimetypes, ignored_mimetypes }
