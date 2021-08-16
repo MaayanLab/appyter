@@ -54,6 +54,24 @@
     }
   })
 
+  if (extras.indexOf('ipywidgets') !== -1) {
+    const ctx = {}
+    window.define('ipywidget-manager', function () {
+      if (ctx.manager !== undefined) {
+        return Promise.resolve(ctx.manager)
+      } else if (ctx.promise !== undefined) {
+        return ctx.promise
+      } else {
+        ctx.promise = (async () => {
+          const { IPYWidgetManager } = await import('@/lib/ipywidget')
+          ctx.manager = new IPYWidgetManager()
+          return ctx.manager
+        })()
+        return ctx.promise
+      }
+    })
+  }
+
   // table of contents
   let toc
   onMount(() => {
@@ -263,15 +281,6 @@
     await tick()
     status = 'Loading...'
     statusBg = 'primary'
-    if (extras.indexOf('ipywidgets') !== -1) {
-      import('@/lib/ipywidget').then(
-        ({ IPYWidgetManager }) => {
-          window.define('ipywidget-manager', function () {
-            return new IPYWidgetManager()
-          })
-        }
-      ).catch(console.error)
-    }
     if (show_code === undefined) {
       show_code = extras.indexOf('hide-code') === -1
     }

@@ -1,7 +1,10 @@
-export default function get_require(window, required) {
+export default async function get_require(window, required) {
+  let ret
   if (Array.isArray(required)) {
-    return new Promise((resolve, reject) => window.require(required, (...args) => resolve(args), reject))
+    ret = new Promise((resolve, reject) => window.require(required, (...args) => resolve(args), reject))
   } else {
-    return new Promise((resolve, reject) => window.require([required], resolve, reject))
+    ret = new Promise((resolve, reject) => window.require([required], resolve, reject))
   }
+  while (ret instanceof Promise) ret = await ret
+  return ret
 }
