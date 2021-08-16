@@ -1,6 +1,7 @@
 <script>
   import { tick, onMount, setContext } from 'svelte'
   import { hash } from '@/lib/stores'
+  import HTML from '@/components/HTML.svelte'
   import Cells from '@/components/jupyter/Cells.svelte'
   import Cell from '@/components/jupyter/Cell.svelte'
   import Input from '@/components/jupyter/Input.svelte'
@@ -131,6 +132,18 @@
       let cell_index = value_index[1]
       await tick()
       nb.cells[cell_index] = {...nb.cells[cell_index], ...value}
+      if (extras.indexOf('ipywidgets') !== -1) {
+        if ((value.metadata || {}).widgets !== undefined) {
+          if (nb.metadata === undefined) nb.metadata = {}
+          if (nb.metadata.widgets === undefined) nb.metadata.widgets = {}
+          if (nb.metadata.widgets['application/vnd.jupyter.widget-state+json'] === undefined) {
+            nb.metadata.widgets['application/vnd.jupyter.widget-state+json'] = value.metadata.widgets
+          } else {
+            Object.assign(nb.metadata.widgets['application/vnd.jupyter.widget-state+json'].state, (value.metadata.widgets.state || {}))
+          }
+          nb.metadata.widgets = nb.metadata.widgets
+        }
+      }
     })
     setup_chunking(socket)
   }
@@ -503,6 +516,9 @@
           {/if}
         {/each}
       </Cells>
+      {#if extras.indexOf('ipywidgets') !== -1 && nb.metadata.widgets !== undefined && nb.metadata.widgets['application/vnd.jupyter.widget-state+json'] !== undefined}
+        <HTML data="<script type='application/vnd.jupyter.widget-state+json'>{JSON.stringify(nb.metadata.widgets['application/vnd.jupyter.widget-state+json'])}</script>" />
+      {/if}
     {/if}
   </div>
 </div>
