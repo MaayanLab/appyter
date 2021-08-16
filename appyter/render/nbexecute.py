@@ -96,13 +96,14 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
           resources={ 'metadata': {'path': fs.path()} },
           iopub_hook=iopub_hook,
         )
-        await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
         async with client.async_setup_kernel(
           env=dict(
             PYTHONPATH=':'.join(sys.path),
             PATH=os.environ['PATH'],
           ),
         ):
+          client.set_widgets_metadata()
+          await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
           logger.info('nbexecute executing')
           state.update(status='Executing...', progress=0)
           await emit({ 'type': 'status', 'data': state['status'] })
@@ -130,6 +131,11 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
       except Exception as e:
         logger.info(f"nbexecute execution error")
         await emit({ 'type': 'error', 'data': str(e) })
+      finally:
+        try:
+          client.set_widgets_metadata()
+        except Exception as e:
+          logger.error(traceback.format_exc())
       # Save execution completion time
       logger.info('nbexecute saving')
       nb.metadata['appyter']['nbexecute']['completed'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
