@@ -8,10 +8,20 @@ const webpack = require('webpack-stream')
 const named = require('vinyl-named')
 const root = path.join(__dirname, '..')
 
-const svelte_files = {
-  src: path.join(root, 'js/profiles/**/*.svelte'),
-  dest: path.join(root, 'appyter', 'profiles'),
-}
+const svelte_files = [
+  {
+    src: path.join(root, 'js/profiles/default/**/*.svelte'),
+    dest: path.join(root, 'appyter', 'profiles', 'default', 'static'),
+  },
+  {
+    src: path.join(root, 'js/profiles/biojupies/**/*.svelte'),
+    dest: path.join(root, 'appyter', 'profiles', 'biojupies', 'static'),
+  },
+  // {
+  //   src: path.join(root, 'js/profiles/bootstrap/**/*.svelte'),
+  //   dest: path.join(root, 'appyter', 'profiles', 'bootstrap', 'static'),
+  // },
+]
 
 const css_files = {
   src: path.join(root, 'js/profiles/**/*.scss'),
@@ -70,43 +80,48 @@ gulp.task('copy_files', function () {
 })
 
 gulp.task('build_svelte', function () {
-  return gulp
-    .src(svelte_files.src, { since: gulp.lastRun('build_svelte') })
-    .pipe(named(function (file) {
-      const [_0, profile, path] = /profiles\/([^\/]+)\/(.+)\.svelte$/.exec(file.history[0])
-      return `${profile}/${path}`
-    }))
-    .pipe(webpack({
-      mode: 'production',
-      devtool: 'production',
-      resolve: {
-        extensions: ['.js', '.svelte'],
-        mainFields: ['svelte', 'browser', 'module', 'main'],
-        alias: {
-          '@': path.resolve(__dirname),
-        },
-      },
-      module: {
-        rules: [
-          {
-            test: /\.svelte$/,
-            use: {
-              loader: 'svelte-loader',
-              options: {
-                emitCss: false,
-                hotReload: true,
-              },
+  return merge(
+    svelte_files.map(
+      function ({ src, dest }) {
+        return gulp
+        .src(src, { since: gulp.lastRun('build_svelte') })
+        .pipe(named(function (file) {
+          const [_0, profile, path, filename] = /profiles\/([^\/]+)\/static\/(.*)\/([^\/]+)\.svelte$/.exec(file.history[0])
+          return `${path}/${filename}`
+        }))
+        .pipe(webpack({
+          mode: 'production',
+          devtool: 'production',
+          resolve: {
+            extensions: ['.js', '.svelte'],
+            mainFields: ['svelte', 'browser', 'module', 'main'],
+            alias: {
+              '@': path.resolve(__dirname),
             },
           },
-        ],
-      },
-      output: {
-        publicPath: '/static/',
-        chunkFilename: 'default/static/js/chunks/[name].js',
-        libraryTarget: 'umd',
-      }
-    }))
-    .pipe(gulp.dest(svelte_files.dest))
+          module: {
+            rules: [
+              {
+                test: /\.svelte$/,
+                use: {
+                  loader: 'svelte-loader',
+                  options: {
+                    emitCss: false,
+                    hotReload: true,
+                  },
+                },
+              },
+            ],
+          },
+          output: {
+            publicPath: '/static/',
+            chunkFilename: 'js/chunks/[name].js',
+            libraryTarget: 'umd',
+          }
+        }))
+        .pipe(gulp.dest(dest))
+      })
+  )
 })
 
 gulp.task('build_css', function () {
