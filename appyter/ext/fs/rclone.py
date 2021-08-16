@@ -65,7 +65,7 @@ class Filesystem(FSFilesystem):
     self._tmpdir = tempfile.mkdtemp()
     logger.debug(f"Mounting {self._remote}:{self._uri.path[1:]} on {self._tmpdir}")
     self._mount = sh([
-      'rclone', 'mount', f"{self._remote}:{self._uri.path[1:]}", self._tmpdir,
+      'rclone', 'mount', '--vfs-cache-mode', 'writes', f"{self._remote}:{self._uri.path[1:]}", self._tmpdir,
     ])
     sync_async_sleep(0.1, asynchronous=asynchronous)
     while not os.path.ismount(self._tmpdir):

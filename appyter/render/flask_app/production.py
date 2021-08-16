@@ -14,7 +14,7 @@ def serve(app_path, **kwargs):
   logger = logging.getLogger(__name__)
   from subprocess import Popen
   from appyter.ext.fs import Filesystem
-  from appyter.context import get_env, get_jinja2_env, get_appyter_directory
+  from appyter.context import get_env, get_jinja2_env, find_blueprints, get_appyter_directory
   from appyter.util import join_routes
   from appyter.profiles.default.filters.url_for import url_for
   config = get_env(**kwargs)
@@ -47,6 +47,7 @@ def serve(app_path, **kwargs):
         _tmp_fs=tmp_fs, os=os,
         s3_to_url=s3_to_url,
         get_appyter_directory=get_appyter_directory,
+        find_blueprints=find_blueprints,
       ).dump(fw)
     logger.info(f"Starting production instance at http://{config['HOST']}:{config['PORT']}{config['PREFIX']} ...")
     with Popen(['supervisord', '-n', '-c', tmp_fs.path('supervisord.conf')]) as proc:

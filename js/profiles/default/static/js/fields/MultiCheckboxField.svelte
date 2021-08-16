@@ -1,12 +1,16 @@
 <script>
+  import ensure_list from '@/utils/ensure_list'
+
   export let args
+
   let value = {}
   if (args.default) {
-    for (const k of args.default) {
+    for (const k of ensure_list(args.default)) {
       value[k] = true
     }
   }
-  $: args.value = JSON.stringify(Object.keys(value).filter(k => value[k]))
+
+$: args.value = JSON.stringify(Object.keys(value).filter(k => value[k]))
 </script>
 
 <style>
@@ -34,12 +38,14 @@
               id="{args.name}-{choice}-checkbox"
               type="checkbox"
               class="form-check-input"
-              bind:checked={value[choice]}
+              checked={value[choice]}
             />
-            <label
-              class="form-check-label"
-              for="{args.name}-{choice}-checkbox"
-            >{choice}</label>
+            <span class="form-check-label">
+              {choice}
+              {#if args.descriptions && args.descriptions[choice]}
+                <sup><i class="far fa-question-circle" data-toggle="tooltip" title="" data-original-title={args.descriptions[choice]}></i></sup>
+              {/if}
+            </span>
           </div>
         </li>
       {/each}

@@ -1,5 +1,6 @@
 <script>
-  import HTML from '../../../../../components/HTML.svelte';
+  import SSRField from '@/components/app/SSRField.svelte'
+
   export let args
 </script>
 
@@ -38,7 +39,10 @@
           role="tabpanel"
         >
           {#each args.choices[choice_name] as item (item.args.name)}
-            <HTML data={args.field_renders[item.args.name]} />
+            <SSRField
+              field={item.field}
+              args={item.args}
+            />
           {/each}
         </div>
       {/each}

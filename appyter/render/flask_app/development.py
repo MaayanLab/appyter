@@ -1,20 +1,22 @@
 import logging
 logger = logging.getLogger(__name__)
 
-def run_app(config):
+async def run_app(config):
   import os
   import sys
-  from subprocess import Popen
-  # TODO: use aio
-  return Popen([
+  import asyncio
+  return await asyncio.create_subprocess_exec(
     sys.executable, '-u', '-m', 'appyter',
     f"--socket={config['HOST']}:{config['PORT']}",
-  ], env=os.environ)
+    stdout=sys.stdout,
+    stderr=sys.stderr,
+    env=os.environ,
+  )
 
 async def app_runner(emitter, config):
   import asyncio
   state_lock = asyncio.Lock()
-  state = dict(proc=run_app(config))
+  state = dict(proc=await run_app(config))
   #
   @emitter.on('reload')
   async def reload(changes):
@@ -22,7 +24,13 @@ async def app_runner(emitter, config):
     async with state_lock:
       proc = state.pop('proc')
       proc.kill()
-      state['proc'] = run_app(config)
+      state['proc'] = await run_app(config)
+  #
+  @emitter.on('quit')
+  async def quit():
+    logger.info('Stopping app..')
+    if 'proc' in state:
+      state.pop('proc').kill()
 
 async def try_n_times(n, coro, *args, **kwargs):
   import asyncio
@@ -49,6 +57,11 @@ async def app_messager(emitter, config):
   async def livereload(changes):
     logger.info(f"LiveReload {changes}")
     await sio.emit('livereload', {})
+  #
+  @emitter.on('quit')
+  async def quit():
+    logger.info('Disconnecting..')
+    await sio.disconnect()
   #
   origin = f"http://{config['HOST']}:{config['PORT']}"
   path = join_routes(config['PREFIX'], "socket.io")
@@ -125,3 +138,5 @@ def serve(app_path, **kwargs):
   )
   loop.create_task(app_messager(emitter, config))
   loop.run_forever()
+  loop.run_until_complete(emitter.emit('quit'))
+  loop.run_until_complete(emitter.flush())

@@ -1,78 +1,35 @@
 <script>
-  import Prompt from './Prompt.svelte'
-  import Markdown from '../Markdown.svelte'
-  import Ansi from '../Ansi.svelte'
-  import HTML from '../HTML.svelte'
-  import collapse from '../../utils/collapse.js'
+  import output_types from './output_type'
+  import { getContext } from 'svelte'
+  import { report_error as report_error_ctx } from '@/lib/appyter_context.js'
+  const report_error = getContext(report_error_ctx)
 
-  export let index
   export let data
+
+  function error() {
+    const error_data = {
+      type: 'output-type',
+      error: {
+        keys: Object.keys(data),
+        output_type: data.output_type||null,
+        data_keys: Object.keys(data.data||{}),
+      },
+    }
+    report_error(error_data)
+    return JSON.stringify(error_data)
+  }
 </script>
 
-<div class="output_area">
-  <Prompt
-    index={index}
-    prompt_type="output"
-  />
-  {#if data}
-  <div class="output_subarea">
-    {#if data.output_type === 'stream'}
-      <div class="output_stream output_{data.name} output_text">
-        <Ansi data={collapse(data.text)} />
-      </div>
-    {:else if data.output_type === 'execute_result'}
-      {#if data.data['text/html']}
-        <HTML
-          classes="output_html rendered_html output_execute_result"
-          data={collapse(data.data['text/html'])}
-        />
-      {:else}
-        <div class="output_text output_execute_result">
-          <Ansi data={collapse(data.data['text/plain'])} />
-        </div>
-      {/if}
-    {:else if data.output_type === 'display_data'}
-      {#if data.data['image/png']}
-        <div class="output_png">
-          <img
-            class="img-fluid"
-            src="data:img/png;base64,{collapse(data.data['image/png'])}"
-          />
-        </div>
-      {:else if data.data['text/html']}
-        <HTML
-          classes="output_html rendered_html output_execute_result"
-          data={collapse(data.data['text/html'])}
-        />
-      {:else if data.data['text/markdown']}
-        <div class="output_stream output_{data.name} output_markdown">
-          <Markdown data={collapse(data.data['text/markdown'])} />
-        </div>
-      {:else if data.data['application/vnd.jupyter.widget-view+json']}
-        <HTML
-          classes="output_widget_view"
-          data='<script type="application/vnd.jupyter.widget-view+json">{JSON.stringify(collapse(data.data['application/vnd.jupyter.widget-view+json']))}</script>'
-        />
-      {:else if data.data['text/plain']}
-        <div class="output_stream output_{data.name} output_text">
-          <Ansi data={collapse(data.data['text/plain'])} />
-        </div>
-      {:else if data.data['application/javascript']}
-        <HTML data="<script>{collapse(data.data['application/javascript'])}</script>" />
-      {:else}
-        {JSON.stringify(data)}
-      {/if}
-    {:else if data.output_type === 'error'}
-      <div class="output_test output_error">
-        {#if data.traceback !== undefined}
-          <Ansi data="{collapse(data.traceback, '\n')}" />
-        {:else}
-          <Ansi data="{data.ename}: {data.evalue}" />
-        {/if}
-      </div>
-    {:else}
-      {JSON.stringify(data)}
-    {/if}
-  </div>
+{#if data}
+  {#if data.output_type in output_types}
+    <svelte:component
+      this={output_types[data.output_type]}
+      data={data}
+    />
+  {:else}
+    <div class="alert alert-danger">
+      <p>Unhandled output_type renderer, please report this on <a href="https://github.com/MaayanLab/appyter/issues">Appyter Issues</a> with this information:</p>
+      <code>{error()}</code>
+    </div>
   {/if}
-</div>
+{/if}

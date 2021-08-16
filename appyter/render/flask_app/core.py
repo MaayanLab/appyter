@@ -1,13 +1,14 @@
 import os
 import uuid
 import json
-from flask import Blueprint, request, redirect, abort, send_file, send_from_directory, url_for, current_app, jsonify
+import traceback
+from flask import Blueprint, request, redirect, abort, send_file, url_for, current_app, jsonify, make_response
 from werkzeug.exceptions import BadRequest
 
 from appyter.context import get_jinja2_env
 from appyter.ext.fs import Filesystem
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
-from appyter.util import secure_filepath
+from appyter.util import secure_filepath, exception_as_dict
 from appyter.render.form import render_form_from_nbtemplate
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.render.nbinspect import render_nbtemplate_json_from_nbtemplate
@@ -114,15 +115,36 @@ def prepare_results(data):
 
 @route_join_with_or_without_slash(core, methods=['POST'])
 def post_index():
-  data = prepare_formdata(request)
-  result_hash = prepare_results(data)
   mimetype = request.accept_mimetypes.best_match([
     'text/html',
     'application/json',
   ], 'text/html')
+  #
+  try:
+    data = prepare_formdata(request)
+    result_hash = prepare_results(data)
+    error = None
+  except Exception as e:
+    traceback.print_exc()
+    error = exception_as_dict(e)
+  #
   if mimetype in {'text/html'}:
-    return redirect(url_for('__main__.data_files', path=result_hash + '/'), 303)
+    if error: abort(406)
+    else: return redirect(url_for('__main__.data_files', path=result_hash + '/'), 303)
   elif mimetype in {'application/json'}:
-    return jsonify(dict(session_id=result_hash))
+    if error is not None:
+      return make_response(jsonify(error=error), 406)
+    else:
+      return make_response(jsonify(session_id=result_hash), 200)
   else:
     abort(404)
+
+@route_join_with_or_without_slash(core, 'ssr', methods=['POST'])
+def post_ssr():
+  env = get_jinja2_env(config=current_app.config)
+  try:
+    ctx = request.get_json()
+    assert ctx['field'].endswith('Field'), 'Invalid field'
+    return env.globals[ctx['field']](**ctx['args']).render()
+  except Exception as e:
+    return make_response(jsonify(error=exception_as_dict(e)), 406)

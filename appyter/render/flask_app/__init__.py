@@ -2,6 +2,7 @@ import os
 import uuid
 import click
 import logging
+import traceback
 logger = logging.getLogger(__name__)
 
 from appyter.cli import cli
@@ -10,8 +11,12 @@ from appyter.ext.click import Json, click_option_setenv, click_argument_setenv
 def create_app(**kwargs):
   ''' Completely initialize the flask application
   '''
+  import asyncio
   from aiohttp import web
   from aiohttp_wsgi import WSGIHandler
+  from aiohttp_remotes import setup, XForwardedRelaxed
+  from aiohttp.web_exceptions import HTTPException
+  from aiohttp.web_middlewares import middleware
   #
   from flask import Flask, Blueprint, current_app, redirect
   from flask_cors import CORS
@@ -19,6 +24,7 @@ def create_app(**kwargs):
   from appyter.render.flask_app.socketio import socketio
   from appyter.render.flask_app.core import core
   import appyter.render.flask_app.static
+  import appyter.render.flask_app.export
   import appyter.render.flask_app.download
   import appyter.render.flask_app.execution
   if kwargs['debug']:
@@ -44,6 +50,20 @@ def create_app(**kwargs):
   app = web.Application()
   app['config'] = config
   #
+  if config['DEBUG']:
+    logger.info('Initializing error handler middleware...')
+    @middleware
+    async def error_handler(request, handler):
+      try:
+        return await handler(request)
+      except HTTPException as e:
+        raise e
+      except Exception as e:
+        traceback.print_exc()
+        await asyncio.sleep(1)
+        raise web.HTTPFound(location=request.url)
+    app.middlewares.append(error_handler)
+  #
   logger.info('Initializing socketio...')
   socketio.attach(app, join_routes(config['PREFIX'], 'socket.io'))
   #
@@ -53,31 +73,30 @@ def create_app(**kwargs):
   flask_app.config.update(config)
   flask_app.debug = config['DEBUG']
   #
-  if flask_app.config['PROXY']:
-    logger.info('wsgi proxy fix...')
-    from werkzeug.middleware.proxy_fix import ProxyFix
-    flask_app.wsgi_app = ProxyFix(flask_app.wsgi_app, x_for=1, x_proto=1)
-  #
   logger.info('Registering blueprints...')
-  flask_app.register_blueprint(core, url_prefix=flask_app.config['PREFIX'])
+  flask_app.register_blueprint(core)
   for blueprint_name, blueprint in find_blueprints(config=flask_app.config).items():
     if isinstance(blueprint, Blueprint):
-      flask_app.register_blueprint(blueprint, url_prefix=join_routes(flask_app.config['PREFIX'], blueprint_name))
+      flask_app.register_blueprint(blueprint, url_prefix='/'+blueprint_name.strip('/'))
     elif callable(blueprint):
-      blueprint(flask_app, url_prefix=join_routes(flask_app.config['PREFIX'], blueprint_name), DATA_DIR=flask_app.config['DATA_DIR'])
+      blueprint(flask_app, url_prefix='/'+blueprint_name.strip('/'))
     else:
       raise Exception('Unrecognized blueprint type: ' + blueprint_name)
   #
-  if flask_app.config['PREFIX'].strip('/'):
+  if app['config']['PREFIX'].strip('/'):
     logger.info('Registering prefix redirect')
-    @flask_app.route('/')
-    @flask_app.route('/<string:path>')
-    def redirect_to_prefix(path=''):
-      return redirect(join_routes(flask_app.config['PREFIX'], path))
+    async def redirect_to_prefix(request):
+      path = request.match_info['path']
+      if path == app['config']['PREFIX'].strip('/'): path = ''
+      raise web.HTTPFound(join_routes(app['config']['PREFIX'], path) + '/')
+    app.router.add_get('/{path:[^/]*}', redirect_to_prefix)
   #
   logger.info('Registering flask with aiohttp...')
   wsgi_handler = WSGIHandler(flask_app)
-  app.router.add_route('*', '/{path_info:.*}', wsgi_handler)
+  app.router.add_route('*', join_routes(app['config']['PREFIX'], '{path_info:.*}'), wsgi_handler)
+  if flask_app.config['PROXY']:
+    logger.info('Applying proxy fix middleware...')
+    asyncio.get_event_loop().run_until_complete(setup(app, XForwardedRelaxed()))
   return app
 
 # register flask_app with CLI

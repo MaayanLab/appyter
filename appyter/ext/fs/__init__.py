@@ -45,6 +45,9 @@ class Filesystem:
   def exists(self, path):
     return self._fs.exists(path)
   #
+  def glob(self, path=''):
+    return self._fs.glob(path=path)
+  #
   def ls(self, path=''):
     return self._fs.ls(path=path)
   #

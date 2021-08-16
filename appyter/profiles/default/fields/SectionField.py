@@ -17,3 +17,7 @@ class SectionField(Field):
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
     self['type'] = 'section'
+
+  @property
+  def raw_value(self):
+    raise Exception('DescriptionField has no value')

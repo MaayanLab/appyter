@@ -17,7 +17,7 @@ class AsyncServer(PriorityQueuedEmitMixin, socketio.AsyncServer):
     @self.on('forward')
     async def forward(sid, data):
       logger.debug('Server forward')
-      if 'to' in data:
+      if data.get('to'):
         await this.emit(data['event'], data['data'], priority=max(0, data.get('priority', 0)) + 1, to=data['to'])
-      elif 'room' in data:
+      elif data.get('room'):
         await this.emit(data['event'], data['data'], priority=max(0, data.get('priority', 0)) + 1, room=data['room'])

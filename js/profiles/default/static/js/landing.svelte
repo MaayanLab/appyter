@@ -1,52 +1,82 @@
 <script>
-  import { tick, onMount } from 'svelte'
-  import Cells from '../../../../components/jupyter/Cells.svelte'
-  import Cell from '../../../../components/jupyter/Cell.svelte'
-  import Input from '../../../../components/jupyter/Input.svelte'
-  import Prompt from '../../../../components/jupyter/Prompt.svelte'
-  import Source from '../../../../components/jupyter/Source.svelte'
-  import Outputs from '../../../../components/jupyter/Outputs.svelte'
-  import Markdown from '../../../../components/Markdown.svelte'
-  import HTML from '../../../../components/HTML.svelte'
-  import collapse from '../../../../utils/collapse'
-  import slugify from '../../../../utils/slugify'
-  import any from '../../../../utils/any'
-  import hash from '../../../../utils/hash'
-  import get_require from '../../../../utils/get_require'
-  import { setup_chunking } from '../../../../lib/socketio'
+  import { tick, onMount, setContext } from 'svelte'
+  import { hash } from '@/lib/stores'
+  import HTML from '@/components/HTML.svelte'
+  import Cells from '@/components/jupyter/Cells.svelte'
+  import Cell from '@/components/jupyter/Cell.svelte'
+  import Input from '@/components/jupyter/Input.svelte'
+  import Prompt from '@/components/jupyter/Prompt.svelte'
+  import Source from '@/components/jupyter/Source.svelte'
+  import Outputs from '@/components/jupyter/Outputs.svelte'
+  import Markdown from '@/components/Markdown.svelte'
+  import Loader from '@/components/Loader.svelte'
+  import collapse from '@/utils/collapse'
+  import any from '@/utils/any'
+  import get_require from '@/utils/get_require'
+  import { setup_chunking } from '@/lib/socketio'
+  import MarkdownItFactory from '@/lib/markdown_it'
+  import {
+    markdown_it as markdown_it_ctx,
+    report_error as report_error_ctx,
+    debug as debug_ctx,
+  } from '@/lib/appyter_context'
 
   export let window
   export let nbdownload
   export let extras = []
   export let debug = false
 
+  const paths = window.location.pathname.split('/').filter(p => p)
+  const session_id = paths[paths.length - 1]
+
   let nb
-  let show_code = false
+  let notebookRef
   let local_run_url
 
-  // table of contents
-  function *get_md_headers(md) {
-    const parser = new DOMParser()
-    let re = /^(#+)\s*(.+?)\s*$/gm
-    let m
-    while ((m = re.exec(md)) !== null) {
-      // in the case of HTML embedded into the label, we want only the text
-      const stripped_label = parser.parseFromString(m[2], 'text/html').body.innerText
-      yield { h: m[1].length, label: stripped_label }
-    }
-  }
+  setContext(markdown_it_ctx, MarkdownItFactory())
 
-  let toc
-  $: {
-    if (nb !== undefined && nb.cells !== undefined && extras.indexOf('toc') !== -1) {
-      toc = nb.cells
-        .filter(({ cell_type }) => cell_type === 'markdown')
-        .reduce((headers, { source }) => [
-          ...headers,
-          ...get_md_headers(collapse(source, '\n'))
-        ], [])
+  setContext(debug_ctx, debug)
+
+  setContext(report_error_ctx, async ({ type, error }) => {
+    console.error(`[${type}]`, error)
+    if (extras.indexOf('catalog-integration') !== -1) {
+      try {
+        const report_error = await get_require(window, 'report_error')
+        report_error({
+          appyter: ((nb || {}).metadata || {}).appyter || null,
+          url: window.location.href,
+          type,
+          error,
+        })
+      } catch (e) {
+        console.error('catalog-integration: failed to locate report_error handler')
+      }
     }
-  }
+  })
+
+  // table of contents
+  let toc
+  onMount(() => {
+    if (extras.indexOf('toc') !== -1 && notebookRef !== undefined) {
+      const observer = new MutationObserver(mutations => {
+        // look through mutations and update update toc iff a header element was added/removed
+        for (const mutation of mutations) {
+          if (mutation.type !== 'childList') continue
+          for (const e of [...mutation.addedNodes, ...mutation.removedNodes]) {
+            if (e.tagName !== undefined && e.tagName.startsWith('H')) {
+              toc = [...notebookRef.querySelectorAll('h1,h2,h3,h4,h5,h6')].map(e => ({
+                h: e.tagName.slice(1),
+                textContent: e.textContent.replace(/ ¶$/, ''),
+                id: e.id,
+              })).filter(({ id }) => id)
+              return
+            }
+          }
+        }
+      })
+      observer.observe(notebookRef, { childList: true, subtree: true })
+    }
+  })
 
   // dynamic notebook
   let status
@@ -130,11 +160,10 @@
       })
       await setup_async_exec(socket)
     }
-    const paths = window.location.pathname.split('/').filter(p => p)
     if (execute) {
-      socket.emit('submit', paths[paths.length - 1])
+      socket.emit('submit', session_id)
     } else {
-      socket.emit('join', paths[paths.length - 1])
+      socket.emit('join', session_id)
     }
   }
 
@@ -191,9 +220,7 @@
     if (extras.indexOf('catalog-integration') !== -1) {
       // setup local run appyter link
       try {
-        const P = window.location.pathname.split('/').filter(p => p)
-        const slug = P[P.length - 2] || ''
-        const id = P[P.length - 1] || ''
+        const slug = paths[paths.length - 2] || ''
 
         let appyter_version = ''
         if (nb.metadata.appyter.info !== undefined) appyter_version = nb.metadata.appyter.info.version || ''
@@ -202,7 +229,7 @@
         if (nb.metadata.appyter.nbexecute !== undefined) library_version = nb.metadata.appyter.nbexecute.version || ''
         else if (nb.metadata.appyter.nbconstruct !== undefined) library_version = nb.metadata.appyter.nbconstruct.version || ''
 
-        local_run_url = `${window.location.origin}/#/running-appyters/?slug=${slug}&appyter_version=${appyter_version}&library_version=${library_version}&id=${id}`
+        local_run_url = `${window.location.origin}/#/running-appyters/?slug=${slug}&appyter_version=${appyter_version}&library_version=${library_version}&id=${session_id}`
       } catch (e) {
         console.error('catalog-integration: local_run_url setup error')
         console.error(e)
@@ -219,14 +246,25 @@
     }
   }
 
+  let show_code = undefined
+  $: if ($hash.params.show_code) {
+    show_code = JSON.parse($hash.params.show_code)
+  }
+
+  let path = $hash.path // defer scroll handling for init
+  $: if ($hash.path && $hash.path !== path) { // debounce scroll handling
+    path = $hash.path+''
+    const el = document.getElementById(path)
+    if (el) el.scrollIntoView()
+  }
+
   // initialization
   onMount(async () => {
     await tick()
     status = 'Loading...'
     statusBg = 'primary'
-    show_code = extras.indexOf('hide-code') === -1
     if (extras.indexOf('ipywidgets') !== -1) {
-      import('../../../../lib/ipywidget').then(
+      import('@/lib/ipywidget').then(
         ({ IPYWidgetManager }) => {
           window.define('ipywidget-manager', function () {
             return new IPYWidgetManager()
@@ -234,7 +272,12 @@
         }
       ).catch(console.error)
     }
+    if (show_code === undefined) {
+      show_code = extras.indexOf('hide-code') === -1
+    }
     await init()
+    // trigger scroll handler
+    path = undefined
   })
 </script>
 
@@ -242,30 +285,38 @@
   <style>
     .toc {
       display: block;
+      font-weight: bold;
     }
     .toc.h1 {
-      font-size: 150%;
+      font-size: 100%;
       text-indent: 0em;
     }
     .toc.h2 {
-      font-size: 140%;
+      font-size: 90%;
       text-indent: 1em;
     }
     .toc.h3 {
-      font-size: 130%;
+      font-size: 80%;
       text-indent: 1.5em;
     }
     .toc.h4 {
-      font-size: 120%;
+      font-size: 70%;
       text-indent: 1.75em;
     }
     .toc.h5 {
-      font-size: 110%;
+      font-size: 60%;
       text-indent: 1.85em;
     }
     .toc.h6 {
-      font-size: 100%;
+      font-size: 50%;
       text-indent: 2em;
+    }
+    /* ensure menu appears over toc */
+    .sticky-top {
+      z-index: 1020;
+    }
+    .dropdown-menu {
+      z-index: 1021;
     }
   </style>
 {/if}
@@ -346,17 +397,38 @@
 
 <div class="row">
   <div class="col-sm-12 text-center">
-    <a
-      id="download-notebook"
-      class="btn btn-primary"
-      role="button"
-      href="{nbdownload}"
-    >Download Notebook</a>
+    <div class="d-inline-block">
+      <div class="dropdown">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download Notebook
+        </button>
+        <div class="dropdown-menu">
+          <a
+            class="dropdown-item"
+            href="{nbdownload}"
+            title="The standalone jupyter notebook as shown"
+          >Jupyter Notebook (.ipynb)</a>
+          <a
+            class="dropdown-item"
+            href="../export/{session_id}/?format=html"
+            title="An nbconvert HTML export of the notebook for easy viewing in browser"
+          >HTML Export (.html)</a>
+          <a
+            class="dropdown-item"
+            href="../export/{session_id}/?format=zip"
+            title="An archive with the notebook and dependent files for running it"
+          >Notebook Bundle (.zip)</a>
+        </div>
+      </div>
+    </div>
     {#if extras.indexOf('toggle-code') !== -1}
       <a
         href="javascript:"
         class="btn btn-secondary white"
-        on:click={() => show_code = !show_code}
+        on:click={() => {
+          $hash.params.show_code = JSON.stringify(!show_code)
+          $hash.path = ''
+        }}
       >
         Toggle Code
       </a>
@@ -386,12 +458,9 @@
         <div class="offset-sm-2 col-sm-8 col-md-12">
           <div class="mt-5">
             <legend>Table Of Contents</legend>
-            {#each toc as {h, label}}
-              <a
-                href="#{slugify(label)}"
-                class="toc h{h}"
-              >
-                <Markdown data={label} />
+            {#each toc as {h, id, textContent}}
+              <a href="#{id}" class="toc h{h}">
+                {textContent}
               </a>
             {/each}
           </div>
@@ -399,14 +468,20 @@
       </div>
     </div>
   {/if}
+  {#if status === 'Loading...'}
+    <div class="col-sm-12 text-center">
+      <Loader />
+    </div>
+  {/if}
   <div
+    bind:this={notebookRef}
     class="col-sm-12"
     class:col-md-9={toc !== undefined}
     class:col-xl-10={toc !== undefined}
   >
     {#if nb}
       <Cells>
-        {#each nb.cells as cell (hash(cell))}
+        {#each nb.cells as cell (cell.index)}
           {#if collapse(cell.source) !== ''}
             {#if cell.cell_type === 'code'}
               <Cell type="code">
@@ -429,6 +504,7 @@
                 <Outputs
                   index={cell.index}
                   data={cell.outputs || []}
+                  loading={current_code_cell}
                 />
               </Cell>
             {:else if cell.cell_type === 'markdown'}

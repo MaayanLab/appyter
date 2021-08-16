@@ -51,9 +51,9 @@ def static(filename):
     return send_file(static.open(filename, 'rb'), attachment_filename=filename)
   #
   try:
-    return send_from_directory(get_appyter_directory(f"profiles/{current_app.config['PROFILE']}/static"), filename=filename)
+    return send_from_directory(get_appyter_directory(f"profiles/{current_app.config['PROFILE']}/static"), path=filename)
   except NotFound:
-    return send_from_directory(get_appyter_directory('profiles/default/static'), filename=filename)
+    return send_from_directory(get_appyter_directory('profiles/default/static'), path=filename)
 
 @route_join_with_or_without_slash(core, '<path:path>', methods=['GET'])
 def data_files(path):

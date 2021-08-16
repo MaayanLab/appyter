@@ -1,5 +1,8 @@
 <script>
-  import get_require from '../utils/get_require'
+  import { getContext } from 'svelte'
+  import get_require from '@/utils/get_require'
+  import { report_error as report_error_ctx } from '@/lib/appyter_context.js'
+  const report_error = getContext(report_error_ctx)
 
   export let classes = ""
   export let data = ""
@@ -13,7 +16,11 @@
       try {
         (new Function(src))()
       } catch (e) {
-        console.error(e)
+        const error_data = {
+          type: 'javascript-cell',
+          error: e.toString(),
+        }
+        report_error(error_data)
       }
     }
   }

@@ -116,7 +116,6 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
               cell, index,
               execution_count=exec_count,
             )
-            await iopub_hook(cell, index)
             if cell_is_code(cell):
               if cell_has_error(cell):
                 raise Exception('Cell execution error on cell %d' % (exec_count))

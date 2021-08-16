@@ -5,7 +5,10 @@ This module enables you to turn your jupyter notebook into a jinja2 template-dri
 NOTE: This application uses modern python features including async await (3.5) and fstrings (3.6), to ensure you have the best experience please use python >= 3.8.
 
 ```bash
-# Install package from github repository master
+# Install package from pip
+pip3 install --upgrade appyter
+
+# OR Install package from github repository master
 pip3 install --upgrade git+https://github.com/Maayanlab/appyter.git
 ```
 

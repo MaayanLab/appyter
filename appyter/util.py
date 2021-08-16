@@ -14,14 +14,19 @@ def join_routes(*routes):
   '''
   return '/' + '/'.join([route.strip('/') for route in routes if route.strip('/')])
 
+def re_full(expr):
+  if not expr.startswith('^'): expr = '^' + expr
+  if not expr.endswith('$'): expr = expr + '$'
+  return expr
+
 def secure_filepath(filepath):
   ''' Ensures this will be a sanitized relative path
   '''
-  secured_filepath = safe_join('.', filepath)
+  secured_filepath = safe_join('.', filepath.lstrip('/'))
   assert secured_filepath is not None, "Filepath wasn't secure"
   secured_filepath = secured_filepath[2:]
   if not secured_filepath:
-    logger.warn("Filepath became empty while securing")
+    logger.debug("Filepath became empty while securing")
     return ''
   return secured_filepath
 
@@ -76,3 +81,9 @@ def run_in_executor(f):
     loop = asyncio.get_running_loop()
     return loop.run_in_executor(None, lambda: f(*args, **kwargs))
   return inner
+
+def exception_as_dict(exc):
+  if getattr(exc, 'as_dict', None) is None:
+    return dict(cls=exc.__class__.__name__, message=str(exc))
+  else:
+    return dict(cls=exc.__class__.__name__, **exc.as_dict())

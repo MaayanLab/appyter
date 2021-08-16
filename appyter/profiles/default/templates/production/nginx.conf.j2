@@ -4,8 +4,13 @@
     inactive=60m use_temp_path=off;
 {%- endmacro -%}
 {%- macro proxy(remote, ws, cache) -%}
+      {%- if _config.PROXY %}
+      proxy_set_header Host $http_x_forwarded_host;
+      proxy_set_header X-Forwarded-For $http_x_forwarded_for;
+      {% else %}
       proxy_set_header Host $http_host;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      {%- endif %}
       {%- if ws %}
       proxy_http_version 1.1;
       proxy_set_header Upgrade $http_upgrade;
@@ -53,11 +58,12 @@ http {
                     application/x-javascript
                     application/atom+xml;
 
-  client_body_buffer_size     10M;
-  client_max_body_size        10M;
+  client_body_buffer_size     16k;
+  client_max_body_size        200M;
 
   {{ cache('appyter-core') }}
   {{ cache('appyter-data') }}
+  {{ cache('appyter-export') }}
 
   upstream appyter {
     {#- {% for n in range(1, _config.N_PROCS+1) %} #}
@@ -75,6 +81,18 @@ http {
   {%- endwith %}
   {%- endif %}
 
+
+  {%- if _config.PROXY %}
+  map $http_x_forwarded_for_proto $proxied_proto {
+    default $http_x_forwarded_for_proto;
+    ''      "http";
+  }
+  map $http_x_forwarded_host $proxied_host {
+    default $http_x_forwarded_host;
+    ''      $http_host;
+  }
+  {%- endif %}
+
   server {
     listen {{ _config.PORT }};
     server_name {{ _config.HOST }};
@@ -82,6 +100,7 @@ http {
     charset utf-8;
     sendfile on;
     keepalive_timeout 0;
+    absolute_redirect off;
 
     set $parsed_method "${request_method}:${http_accept}";
 
@@ -118,8 +137,20 @@ http {
       try_files /favicon.ico =404;
     }
 
-    location ^~ {{ join_routes(_config.PREFIX, 'socket.io') }} {
+    location ~ ^{{ join_routes(_config.PREFIX, '[^/]+') }}$ {
+      {% if _config.PROXY %}
+      rewrite ^(.*)$ $proxied_proto://$proxied_host$1/ redirect;
+      {% else %}
+      rewrite ^(.*)$ $1/ redirect;
+      {% endif %}
+    }
+
+    location ^~ {{ join_routes(_config.PREFIX, 'socket.io') }}/ {
       {{ proxy('http://appyter', True) }}
+    }
+
+    location ^~ {{ join_routes(_config.PREFIX, 'ssr') }}/ {
+      {{ proxy('http://appyter', False) }}
     }
 
     location ~ ^{{ join_routes(_config.PREFIX, 'static') }}/(.*)$ {
@@ -140,6 +171,16 @@ http {
         "/default/$1"
         =404;
     }
+
+    location ~ ^{{ join_routes(_config.PREFIX, 'export') }}/(.*)$ {
+      {{ proxy('http://appyter', False, 'appyter-export') }}
+    }
+
+    {%- for blueprint_name in find_blueprints(config=_config).keys() %}
+    location ~ ^{{ join_routes(_config.PREFIX, blueprint_name) }}/(.*)$ {
+      {{ proxy('http://appyter', False, False) }}
+    }
+    {%- endfor %}
 
     location ~ ^{{ join_routes(_config.PREFIX, '[^/]+') }}/$ {
       if ($parsed_method = 'GET:application/vnd.jupyter') {
@@ -172,7 +213,11 @@ http {
 
     {%- if _config.PREFIX != '/' %}
     location / {
-      return 301 {{ _config.PREFIX.rstrip('/') }}$request_uri;
+      {%- if _config.PROXY %}
+      rewrite ^/?(.*)$ $proxied_proto://$proxied_host{{ _config.PREFIX }}$1 redirect;
+      {% else %}
+      rewrite ^/?(.*)$ {{ _config.PREFIX }}$1 redirect;
+      {%- endif %}
     }
     {%- endif %}
   }

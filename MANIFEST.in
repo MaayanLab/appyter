@@ -1,12 +1,3 @@
-include LICENSE README.md requirements.txt
-recursive-exclude * __pycache__
-recursive-exclude * *.pyc
-recursive-include * *.j2
-recursive-include * *.js
-recursive-include * *.css
-recursive-include * *.eot
-recursive-include * *.svg
-recursive-include * *.ttf
-recursive-include * *.woff
-recursive-include * *.woff2
-recursive-include * VERSION
+include README.md LICENSE appyter/VERSION requirements.txt requirements.production.txt
+recursive-exclude * __pycache__ *.pyc *.vscode
+recursive-include appyter *.j2 *.js *.css *.eot *.svg *.ttf *.woff *.woff2

@@ -150,7 +150,7 @@ def upload_from_request(req, fnames):
       filename = secure_filepath(fh.filename)
       path = generate_uuid()
       with Filesystem('tmpfs://') as tmp_fs:
-        with tmp_fs.open(path, 'w') as fw:
+        with tmp_fs.open(path, 'wb') as fw:
           fh.save(fw)
         data[fname] = '/'.join((organize_file_content(data_fs, tmp_fs, path), filename))
   return data
