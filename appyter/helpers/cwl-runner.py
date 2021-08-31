@@ -14,6 +14,13 @@ from appyter.render.nbinspect.nbtemplate_json import render_nbtemplate_json_from
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.render.nbexecute import nbexecute_async, json_emitter_factory
 
+def parse_cli(arg):
+  m = re.match(r'^--([^=]+)(=(.*))?$', arg)
+  if m and m.group(2) is not None:
+    return (m.group(1), try_json_loads(m.group(3)))
+  else:
+    return (m.group(1), True)
+
 @cli.command(
   help='Construct and execute an appyter given arguments',
   context_settings=dict(
@@ -34,15 +41,11 @@ def cwl_runner(ipynb, args):
   nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
   fields = render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
   # convert arguments into context
-  kwargs = {
-    k: try_json_loads(v)
-    for k, v in [
-      re.match(r'^--([^=]+)=(.*)$', arg).groups()
-      for arg in args
-    ]
-  }
+  kwargs = dict(map(parse_cli, args))
   context = {}
   for field in fields:
+    if field['field'] == 'BoolField' and field['args']['name'] not in kwargs:
+      kwargs[field['args']['name']] = False
     if field['args']['name'] in kwargs or field['args'].get('required') == True:
       context[field['args']['name']] = kwargs[field['args']['name']]
       if field['field'] == 'FileField':
