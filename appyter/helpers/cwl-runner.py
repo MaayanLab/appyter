@@ -6,6 +6,7 @@ import shutil
 
 from appyter.cli import cli
 from appyter.ext.fs import Filesystem
+from appyter.ext.json import try_json_loads
 from appyter.context import get_env_from_kwargs, get_jinja2_env
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.ext.click import click_argument_setenv
@@ -33,10 +34,13 @@ def cwl_runner(ipynb, args):
   nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
   fields = render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
   # convert arguments into context
-  kwargs = dict([
-    re.match(r'^--([^=]+)=(.+)$', arg).groups()
-    for arg in args
-  ])
+  kwargs = {
+    k: try_json_loads(v)
+    for k, v in [
+      re.match(r'^--([^=]+)=(.*)$', arg).groups()
+      for arg in args
+    ]
+  }
   context = {}
   for field in fields:
     if field['args']['name'] in kwargs or field['args'].get('required') == True:
