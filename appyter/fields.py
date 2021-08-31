@@ -142,7 +142,8 @@ class Field(dict):
       'id': self.args['name'],
       'inputBinding': {
         'prefix': f"--{self.args['name']}=",
-        'separate': False
+        'separate': False,
+        'shellQuote': True,
       }
     }
     if self.args.get('choices'):
