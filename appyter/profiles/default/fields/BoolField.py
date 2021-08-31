@@ -35,4 +35,7 @@ class BoolField(Field):
     return dict(super().to_jsonschema(), type='boolean')
 
   def to_cwl(self):
-    return dict(super().to_cwl(), type='boolean')
+    schema = super().to_cwl()
+    schema['type'] = 'boolean'
+    schema['inputBinding']['prefix'] = f"--{self.args['name']}"
+    return schema
