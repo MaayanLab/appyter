@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json",
+  "name": "{{ cookiecutter.project_slug }}",
+  "title": "{{ cookiecutter.project_name }}",
+  "version": "{{ cookiecutter.version }}",
+  "description": "{{ cookiecutter.project_description }}",
+  "image": "TODO",
+  "authors": [
+    {
+      "name": "{{ cookiecutter.project_author_name }}",
+      "email": "{{ cookiecutter.project_author_email }}"
+    }
+  ],
+  "url": "https://github.com/MaayanLab/Harmonizome-Data-Processing-Appyters",
+  "tags": [
+    "TODO"
+  ],
+  "license": "{{ cookiecutter.license }}",
+  "appyter": {
+    "file": "{{ cookiecutter.project_slug }}.ipynb",
+    "profile": "biojupies"
+  }
+}

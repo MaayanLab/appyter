@@ -21,6 +21,7 @@ setup(
   ],
   install_requires=list(map(str.strip, open('requirements.txt', 'r').readlines())),
   extras_require={
+    'appyter_init': 'cookiecutter',
     'production': list(map(str.strip, open('requirements.production.txt', 'r').readlines())),
   },
   packages=find_packages(exclude=('example',)),
