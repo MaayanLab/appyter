@@ -52,6 +52,11 @@
   <span class="k">return</span> <span class="n">nbf</span><span class="o">.</span><span class="n">writes</span><span class="p">(</span><span class="n">nb</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="nb_to_ipynb_io"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_to_ipynb_io">[docs]</a><span class="k">def</span> <span class="nf">nb_to_ipynb_io</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="n">io</span><span class="p">):</span>
+  <span class="c1"># remove `id` when writing, this is added by nbclient</span>
+  <span class="c1">#  but causes nbformat validation errors when reading.</span>
+  <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">nb</span><span class="o">.</span><span class="n">cells</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s1">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">cell</span><span class="p">:</span>
+      <span class="k">del</span> <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
   <span class="k">return</span> <span class="n">nbf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="n">io</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="nb_to_json"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_to_json">[docs]</a><span class="k">def</span> <span class="nf">nb_to_json</span><span class="p">(</span><span class="n">nb</span><span class="p">):</span>
