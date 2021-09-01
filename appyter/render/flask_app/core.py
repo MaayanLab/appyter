@@ -86,7 +86,8 @@ def prepare_results(data):
     links = []
     files = {}
     for file_field in file_fields:
-      if fdata := data.get(file_field):
+      fdata = data.get(file_field)
+      if fdata:
         content_hash, filename = fdata.split('/', maxsplit=1)
         content_hash = sanitize_sha1sum(content_hash)
         filename = secure_filepath(filename)

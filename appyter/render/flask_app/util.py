@@ -6,7 +6,9 @@ from appyter.util import join_routes, safe_join, secure_url, secure_filepath
 def sha1sum_io(io, chunk_size=65536):
   import hashlib
   sha1 = hashlib.sha1()
-  while buf := io.read(chunk_size):
+  while True:
+    buf = io.read(chunk_size)
+    if not buf: break
     sha1.update(buf)
   return sha1.hexdigest()
 

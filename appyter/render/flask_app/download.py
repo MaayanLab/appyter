@@ -39,7 +39,9 @@ async def download_with_progress_and_hash(sid, data_fs, name, url, path, filenam
             )
           with tmp_fs.open(path, 'wb') as fw:
             await reporthook(chunk)
-            while buf := await resp.content.read(chunk_size):
+            while True:
+              buf = await resp.content.read(chunk_size)
+              if not buf: break
               fw.write(buf)
               chunk += 1
               await reporthook(chunk)
