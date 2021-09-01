@@ -14,6 +14,11 @@ def nb_to_ipynb_string(nb):
   return nbf.writes(nb)
 
 def nb_to_ipynb_io(nb, io):
+  # remove `id` when writing, this is added by nbclient
+  #  but causes nbformat validation errors when reading.
+  for cell in nb.cells:
+    if 'id' in cell:
+      del cell['id']
   return nbf.write(nb, io)
 
 def nb_to_json(nb):
