@@ -45,7 +45,9 @@
 <div class="viewcode-block" id="sha1sum_io"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.util.sha1sum_io">[docs]</a><span class="k">def</span> <span class="nf">sha1sum_io</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">65536</span><span class="p">):</span>
   <span class="kn">import</span> <span class="nn">hashlib</span>
   <span class="n">sha1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">()</span>
-  <span class="k">while</span> <span class="n">buf</span> <span class="o">:=</span> <span class="n">io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">):</span>
+  <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">buf</span><span class="p">:</span> <span class="k">break</span>
     <span class="n">sha1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">sha1</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
 

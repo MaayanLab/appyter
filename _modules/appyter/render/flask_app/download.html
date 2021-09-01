@@ -78,7 +78,9 @@
             <span class="p">)</span>
           <span class="k">with</span> <span class="n">tmp_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
             <span class="k">await</span> <span class="n">reporthook</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
-            <span class="k">while</span> <span class="n">buf</span> <span class="o">:=</span> <span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">):</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+              <span class="n">buf</span> <span class="o">=</span> <span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">)</span>
+              <span class="k">if</span> <span class="ow">not</span> <span class="n">buf</span><span class="p">:</span> <span class="k">break</span>
               <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
               <span class="n">chunk</span> <span class="o">+=</span> <span class="mi">1</span>
               <span class="k">await</span> <span class="n">reporthook</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>

@@ -20,6 +20,14 @@ appyter.helpers.fetch\_and\_serve module
    :undoc-members:
    :show-inheritance:
 
+appyter.helpers.init module
+---------------------------
+
+.. automodule:: appyter.helpers.init
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.helpers.nbclean module
 ------------------------------
 
