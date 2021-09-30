@@ -6,6 +6,12 @@ from werkzeug.security import safe_join
 
 logger = logging.getLogger(__name__)
 
+def collapse(L):
+  if len(L) == 1:
+    return L[0]
+  else:
+    return L
+
 def dict_filter_none(d):
   return { k: v for k, v in d.items() if v }
 
