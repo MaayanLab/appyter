@@ -5,7 +5,7 @@ import urllib.parse
 from werkzeug.security import safe_join
 
 class Filesystem:
-  def __init__(self, uri, with_path=False, asynchronous=False):
+  def __init__(self, uri, pathmap={}, with_path=False, asynchronous=False):
     if '://' not in uri:
       uri = 'file://' + uri
     uri_parsed = urllib.parse.urlparse(uri)
