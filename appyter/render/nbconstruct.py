@@ -11,6 +11,7 @@ from appyter.context import get_env, get_jinja2_env
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.parse.nbtemplate import cell_match
 from appyter.ext.click import click_option_setenv, click_argument_setenv
+from appyter.util import parse_file_uri
 
 def render_cell(env, cell):
   ''' Render a single cell, calling jinja2 templates when necessary
@@ -53,11 +54,16 @@ def render_cell(env, cell):
 
   return cell
 
-
-def render_nb_from_nbtemplate(env, nb, files={}):
+def render_nb_from_nbtemplate(env, nbtemplate, fields=[], data={}):
   ''' Render the notebook by rendering the jinja2 templates using the context in env.
   '''
-  nb = deepcopy(nb)
+  files = {}
+  for field in fields:
+    if field.field == 'FileField':
+      uri, filename = parse_file_uri(data[field.args['name']])
+      files[filename] = uri
+  #
+  nb = deepcopy(nbtemplate)
   nb.cells = list(filter(None, [
     render_cell(
       env,

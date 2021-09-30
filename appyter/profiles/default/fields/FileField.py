@@ -1,6 +1,7 @@
 import re
 from appyter.fields import Field
-from appyter.util import secure_filepath, join_routes, re_full
+from appyter.util import parse_file_uri, secure_filepath, join_routes, re_full
+from appyter.render.flask_app.download import upload_from_request
 
 class FileField(Field):
   ''' Represing a uploadable File and facilitating that file upload.
@@ -32,9 +33,17 @@ class FileField(Field):
   @property
   def raw_value(self):
     if type(self.args['value']) == str and self.args['value']:
-      return secure_filepath(self.args['value'])
+      _uri, filename = parse_file_uri(self.args['value'])
+      return secure_filepath(filename)
     else:
       return None
+
+  def prepare(self, req):
+    if getattr(req, 'files', None):
+      data_path = upload_from_request(req, self.args['name'])
+      if data_path:
+        return {self.args['name']: data_path}
+    return super().prepare(req)
 
   def constraint(self):
     if self.raw_value is None:

@@ -1,4 +1,4 @@
-from appyter.fields import Field, PartialField
+from appyter.fields import Field
 
 class TabField(Field):
   ''' Representing a tab field which contains inner fields to choose from.
@@ -34,6 +34,11 @@ class TabField(Field):
     for section, fields in self.choices.items():
       for field in fields:
         field['args']['parent'] = self.args['name']
+
+  def prepare(self, req):
+    data = super().prepare(req)
+    data.update(self.value.prepare(req))
+    return data
 
   def constraint(self):
     if not self.raw_value:

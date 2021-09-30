@@ -75,7 +75,11 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   await emit({ 'type': 'status', 'data': 'Starting' })
   #
   try:
-    with Filesystem(cwd, with_path=True, asynchronous=True) as fs:
+    with Filesystem(cwd,
+      pathmap=nb.metadata['appyter']['nbconstruct'].get('files', {}),
+      with_path=True,
+      asynchronous=True,
+    ) as fs:
       # setup execution_info with start time
       nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
       with fs.open(ipynb, 'w') as fw:

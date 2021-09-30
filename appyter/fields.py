@@ -3,12 +3,8 @@ This module contains :class:`appyter.fields.Field`, the base class for all field
 defined in :mod:`appyter.profiles.default.fields`.
 ``` '''
 
-import os
-import re
-import json
-from copy import copy
 from flask import Markup
-from appyter.context import get_jinja2_env
+from appyter.util import collapse
 
 class PartialField:
   ''' Partial instantiation of a field
@@ -99,6 +95,21 @@ class Field(dict):
     ''' Get the raw args, the values used to initialize this field
     '''
     return self['args']
+
+  def prepare(self, req):
+    ''' Given a flask request, capture relevant variables for this field
+    '''
+    data = {}
+    if type(req) == dict:
+      data[self.args['name']] = self.args['value'] = req.get(self.args['name'])
+    elif req.json:
+      data[self.args['name']] = self.args['value'] = req.json.get(self.args['name'])
+    elif req.form:
+      data[self.args['name']] = self.args['value'] = collapse(req.form.getlist(self.args['name']))
+    else:
+      raise NotImplementedError
+    #
+    return data
 
   def constraint(self):
     ''' Return true if the received args.value satisfies constraints.

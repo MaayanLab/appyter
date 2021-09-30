@@ -8,14 +8,14 @@ from appyter.render.flask_app.socketio import socketio
 from appyter.render.flask_app.util import secure_filepath, secure_url, sha1sum_io, generate_uuid
 
 # organize file by content hash
-def organize_file_content(data_fs, tmp_fs, tmp_path):
+def organize_file_content(data_fs, tmp_fs, tmp_path, filename):
   with tmp_fs.open(tmp_path, 'rb') as fr:
     content_hash = sha1sum_io(fr)
   data_path = Filesystem.join('input', content_hash)
   if not data_fs.exists(data_path):
     Filesystem.mv(src_fs=tmp_fs, src_path=tmp_path, dst_fs=data_fs, dst_path=data_path)
     data_fs.chmod_ro(data_path)
-  return content_hash
+  return f"storage://{data_path}#{filename}"
 
 # download from remote
 async def download_with_progress_and_hash(sid, data_fs, name, url, path, filename):
@@ -57,7 +57,7 @@ async def download_with_progress_and_hash(sid, data_fs, name, url, path, filenam
         'download_complete',
         dict(
           name=name, filename=filename,
-          full_filename='/'.join((organize_file_content(data_fs, tmp_fs, path), filename)),
+          full_filename=organize_file_content(data_fs, tmp_fs, path, filename),
         ),
         room=sid,
       )
@@ -130,29 +130,25 @@ async def siofu_done(sid, evt):
     tmp_fs = sess['file_%d' % (evt['id'])]['tmp_fs']
     path = sess['file_%d' % (evt['id'])]['path']
     filename = sess['file_%d' % (evt['id'])]['name']
-    content_hash = organize_file_content(data_fs, tmp_fs, path)
+    full_filename = organize_file_content(data_fs, tmp_fs, path, filename)
     tmp_fs.close()
     del sess['file_%d' % (evt['id'])]
   #
   await socketio.emit('siofu_complete', dict(
     id=evt['id'],
-    detail=dict(
-      full_filename='/'.join((content_hash, filename)),
-    )
+    detail=dict(full_filename=full_filename)
   ), room=sid)
 
 # upload from client with POST
-def upload_from_request(req, fnames):
+def upload_from_request(req, fname):
   from flask import current_app
   data_fs = Filesystem(current_app.config['DATA_DIR'])
-  data = dict()
-  for fname in fnames:
-    fh = req.files.get(fname)
-    if fh:
-      filename = secure_filepath(fh.filename)
-      path = generate_uuid()
-      with Filesystem('tmpfs://') as tmp_fs:
-        with tmp_fs.open(path, 'wb') as fw:
-          fh.save(fw)
-        data[fname] = '/'.join((organize_file_content(data_fs, tmp_fs, path), filename))
-  return data
+  fh = req.files.get(fname)
+  if not fh:
+    return None
+  filename = secure_filepath(fh.filename)
+  path = generate_uuid()
+  with Filesystem('tmpfs://') as tmp_fs:
+    with tmp_fs.open(path, 'wb') as fw:
+      fh.save(fw)
+    return organize_file_content(data_fs, tmp_fs, path, filename)
