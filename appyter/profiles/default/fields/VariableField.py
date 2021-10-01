@@ -1,5 +1,6 @@
+import re
 from appyter.fields import Field
-from appyter.util import collapse, ensure_list, try_json_loads, resolve_json_ref
+from appyter.util import ensure_list, try_json_loads
 
 class VariableField(Field):
   ''' Represing a variable number of instances of a given Field
@@ -34,6 +35,7 @@ class VariableField(Field):
       field=field,
       **kwargs,
     )
+    field['args']['parent'] = self.args['name']
   #
   def prepare(self, req):
     ''' Typically, you'll just provide a list of values satisfying the Field type,
@@ -55,15 +57,35 @@ class VariableField(Field):
     Letting us construct the form as before but permitting us to reference form fields
      generated on the fly that end up in the form request.
     '''
-    data = {}
-    if getattr(req, 'form', None):
-      data[self.args['name']] = self.args['value'] = collapse([
-        resolve_json_ref(v, lambda k: try_json_loads(collapse(req.form.getlist(k))))
-        for v in ensure_list(try_json_loads(collapse(req.form.getlist(self.args['name']))))
-      ])
-    else:
-      data.update(super().prepare(req))
-    return data
+    data = super().prepare(req)
+    expr = re.compile(r'^#/([^/]+)$')
+    value = []
+    for i, v in enumerate(ensure_list(try_json_loads(data[self.args['name']]))):
+      # resolve json pointers
+      if type(v) == dict and len(v) == 1 and '$ref' in v:
+        ptr = v['$ref']
+        m = expr.match(ptr)
+        if m:
+          name = m.group(1)
+          # prepare from pointer to value in request
+          data.update(
+            self._env.globals[self.args['field']['field']](
+              name=name,
+            ).prepare(req)
+          )
+          value.append(data[name])
+          continue
+      # prepare with value provided using field
+      name = f"{self.args['field']['args']['name']}{i}"
+      data.update(
+        self._env.globals[self.args['field']['field']](
+          name=name,
+        ).prepare({name: v})
+      )
+      value.append(data[name])
+    # return prepared aggregated value
+    self.args['value'] = value
+    return { self.args['name']: value }
   #
   @property
   def raw_value(self):
@@ -86,3 +108,13 @@ class VariableField(Field):
       ).constraint()
       for v in self.raw_value
     )
+  #
+  @property
+  def value(self):
+    return [
+      self._env.globals[self.args['field']['field']](
+        name=self.args['field']['args']['name'],
+        value=v
+      ).value
+      for v in self.raw_value
+    ]

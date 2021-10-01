@@ -112,17 +112,3 @@ def exception_as_dict(exc):
     return dict(cls=exc.__class__.__name__, message=str(exc))
   else:
     return dict(cls=exc.__class__.__name__, **exc.as_dict())
-
-def resolve_json_ref(obj, getter):
-  ''' If we have a json reference, resolve it using the getter
-  '''
-  if type(obj) == dict and len(obj) == 1 and '$ref' in obj:
-    import re
-    ptr = obj.pop('$ref')
-    m = re.match(r'^#/([^/]+)$', ptr)
-    if m:
-      name = m.group(1)
-      obj = getter(name)
-    else:
-      logger.warn('JSONPointer format not supported')
-  return obj
