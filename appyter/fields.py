@@ -17,7 +17,7 @@ class PartialField:
 
   def __call__(self, name=None, value=None, **kwargs):
     kwargs = dict(self._kwargs, **kwargs)
-    value = kwargs.pop('context').get(name)
+    value = kwargs.pop('context').get(name) if value is None else value
     return self._field(name=name, value=value, **kwargs)
 
 def build_fields(fields, context={}, env=None):
