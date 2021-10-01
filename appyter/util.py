@@ -6,11 +6,23 @@ from werkzeug.security import safe_join
 
 logger = logging.getLogger(__name__)
 
+def try_json_loads(s):
+  try:
+    return json.loads(s)
+  except:
+    return s
+
 def collapse(L):
   if len(L) == 1:
     return L[0]
   else:
     return L
+
+def ensure_list(L):
+  if type(L) == list:
+    return L
+  else:
+    return [L]
 
 def dict_filter_none(d):
   return { k: v for k, v in d.items() if v }
@@ -100,3 +112,17 @@ def exception_as_dict(exc):
     return dict(cls=exc.__class__.__name__, message=str(exc))
   else:
     return dict(cls=exc.__class__.__name__, **exc.as_dict())
+
+def resolve_json_ref(obj, getter):
+  ''' If we have a json reference, resolve it using the getter
+  '''
+  if type(obj) == dict and len(obj) == 1 and '$ref' in obj:
+    import re
+    ptr = obj.pop('$ref')
+    m = re.match(r'^#/([^/]+)$', ptr)
+    if m:
+      name = m.group(1)
+      obj = getter(name)
+    else:
+      logger.warn('JSONPointer format not supported')
+  return obj
