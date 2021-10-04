@@ -1,3 +1,5 @@
+import sys
+import yaml
 import tempfile
 import urllib.parse
 import json
@@ -52,21 +54,20 @@ class RcloneParse:
     if uri.password:
       config['secret_access_key'] = uri.password
     #
-    return [el for key, value in config.items() for el in [key, value]]
+    return f":s3,{','.join([f'{key}={repr(value)}' for key, value in config.items()])}"
 
 class Filesystem(FSFilesystem):
-  def __init__(self, uri, asynchronous=False):
+  def __init__(self, uri, pathmap={}, asynchronous=False, **kwargs):
     self._uri = uri
     self._scheme = '+'.join(scheme for scheme in self._uri.scheme.split('+') if scheme != 'rclone')
-    self._remote = slugify(f"{self._scheme}:{self._uri.hostname}{self._uri.path}?{self._uri.query}")
-    if self._remote not in json.load(sh(['rclone', 'config', 'dump']).stdout).keys():
-      if sh(['rclone', 'config', 'create', self._remote, self._scheme] + RcloneParse.get(self._scheme)(self._uri)).wait() != 0:
-        raise Exception('Error configuring rclone')
+    self._remote = RcloneParse.get(self._scheme)(slugify(f"{self._scheme}:{self._uri.hostname}{self._uri.path}?{self._uri.query}"))
     self._tmpdir = tempfile.mkdtemp()
     logger.debug(f"Mounting {self._remote}:{self._uri.path[1:]} on {self._tmpdir}")
     self._mount = sh([
-      'rclone', 'mount', '--vfs-cache-mode', 'writes', f"{self._remote}:{self._uri.path[1:]}", self._tmpdir,
-    ])
+      sys.executable, '-u', '-m', 'rclone_pathmap', 'mount',
+      '-c', '-', f"{self._remote}:{self._uri.path[1:]}", self._tmpdir,
+      '--vfs-cache-mode', 'writes',
+    ], _in=yaml.dump(pathmap))
     sync_async_sleep(0.1, asynchronous=asynchronous)
     while not os.path.ismount(self._tmpdir):
       if self._mount.poll() is not None:

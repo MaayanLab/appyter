@@ -75,9 +75,11 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   await emit({ 'type': 'status', 'data': 'Starting' })
   #
   try:
+    if cwd.startswith('s3:'):
+      cwd = f"rclone+{cwd}"
+    logger.debug(nb.metadata['appyter']['nbconstruct'].get('files', {}))
     with Filesystem(cwd,
       pathmap=nb.metadata['appyter']['nbconstruct'].get('files', {}),
-      with_path=True,
       asynchronous=True,
     ) as fs:
       # setup execution_info with start time

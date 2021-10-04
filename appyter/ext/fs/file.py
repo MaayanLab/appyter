@@ -10,11 +10,18 @@ from appyter.ext.fs import Filesystem as FS
 
 
 class Filesystem:
-  def __init__(self, uri):
+  def __init__(self, uri, pathmap={}, **kwargs):
     self._uri = uri
+    self._pathmap = pathmap
     self._prefix = self._uri.path
   #
   def __enter__(self):
+    if self._pathmap:
+      for filename, source in self._pathmap.items():
+        FS.link(
+          src_fs=FS(os.path.dirname(source)), src_path=os.path.basename(source),
+          dst_fs=self, dst_path=filename,
+        )
     return self
   #
   def path(self, path=''):

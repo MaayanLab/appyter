@@ -18,7 +18,7 @@ def create_app(**kwargs):
   from aiohttp.web_exceptions import HTTPException
   from aiohttp.web_middlewares import middleware
   #
-  from flask import Flask, Blueprint, current_app, redirect
+  from flask import Flask, Blueprint
   from flask_cors import CORS
   #
   from appyter.render.flask_app.socketio import socketio
@@ -27,6 +27,7 @@ def create_app(**kwargs):
   import appyter.render.flask_app.export
   import appyter.render.flask_app.download
   import appyter.render.flask_app.execution
+  from appyter.render.flask_app.storage import storage_ctx
   if kwargs['debug']:
     import appyter.render.flask_app.livereload
   #
@@ -97,6 +98,9 @@ def create_app(**kwargs):
   if flask_app.config['PROXY']:
     logger.info('Applying proxy fix middleware...')
     asyncio.get_event_loop().run_until_complete(setup(app, XForwardedRelaxed()))
+  #
+  logger.info('Registering application storage handler')
+  app.cleanup_ctx.append(storage_ctx)
   return app
 
 # register flask_app with CLI
