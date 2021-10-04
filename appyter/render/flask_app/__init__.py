@@ -31,7 +31,7 @@ def create_app(**kwargs):
     import appyter.render.flask_app.livereload
   #
   from appyter.context import get_env, find_blueprints
-  from appyter.util import join_routes
+  from appyter.ext.flask import join_routes
   config = get_env(**kwargs)
   #
   if config['DEBUG']:

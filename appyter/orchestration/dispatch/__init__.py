@@ -2,7 +2,7 @@
 '''
 
 import os
-from appyter.util import importdir
+from appyter.ext.importlib import importdir
 from appyter.orchestration.cli import orchestration
 
 # capture all dispatchers in the directory and add to dispatchers/globals

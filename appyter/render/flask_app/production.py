@@ -7,16 +7,11 @@ def s3_to_url(s3_uri):
 def serve(app_path, **kwargs):
   import os
   import sys
-  import time
-  import appyter
-  import functools
   import logging
   logger = logging.getLogger(__name__)
   from subprocess import Popen
   from appyter.ext.fs import Filesystem
   from appyter.context import get_env, get_jinja2_env, find_blueprints, get_appyter_directory
-  from appyter.util import join_routes
-  from appyter.profiles.default.filters.url_for import url_for
   config = get_env(**kwargs)
   logger.info(kwargs)
   env = get_jinja2_env(config=config)

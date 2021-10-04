@@ -49,7 +49,7 @@ async def try_n_times(n, coro, *args, **kwargs):
 
 async def app_messager(emitter, config):
   import asyncio
-  from appyter.util import join_routes
+  from appyter.ext.flask import join_routes
   from appyter.ext.socketio import AsyncClient
   sio = AsyncClient()
   #

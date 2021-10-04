@@ -1,2 +1,2 @@
 import os
-from appyter.util import join_routes
+from appyter.ext.flask import join_routes

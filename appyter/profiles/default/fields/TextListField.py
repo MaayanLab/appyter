@@ -1,6 +1,6 @@
 import re
 from appyter.fields import Field, FieldConstraintException
-from appyter.util import re_full
+from appyter.ext.re import re_full
 
 class TextListField(Field):
   ''' Representing a field that accepts a set of strings separated by newlines

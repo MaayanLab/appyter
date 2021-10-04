@@ -1,6 +1,6 @@
 import re
 from appyter.fields import Field
-from appyter.util import re_full
+from appyter.ext.re import re_full
 
 class AutocompleteField(Field):
   ''' Representing a field that accepts a string with autocomplete.

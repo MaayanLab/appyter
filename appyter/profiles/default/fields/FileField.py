@@ -1,6 +1,8 @@
 import re
 from appyter.fields import Field
-from appyter.util import parse_file_uri, secure_filepath, join_routes, re_full
+from appyter.ext.flask import secure_filepath, join_routes
+from appyter.ext.re import re_full
+from appyter.ext.fs.parse import parse_file_uri
 from appyter.render.flask_app.download import upload_from_request
 
 class FileField(Field):

@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 
 from appyter.render.flask_app.core import prepare_data, prepare_results
 from appyter.render.flask_app.socketio import socketio
-from appyter.render.flask_app.util import sanitize_sha1sum, generate_uuid, join_routes
+from appyter.ext.flask import join_routes
+from appyter.ext.uuid import sanitize_sha1sum, generate_uuid
 from appyter.ext.fs import Filesystem
 
 # construct/join a notebook

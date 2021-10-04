@@ -4,7 +4,7 @@ defined in :mod:`appyter.profiles.default.fields`.
 ``` '''
 
 from flask import Markup
-from appyter.util import collapse
+from appyter.ext.itertools import collapse
 
 class PartialField:
   ''' Partial instantiation of a field
