@@ -5,7 +5,9 @@ logger = logging.getLogger(__name__)
 
 from appyter.ext.fs import Filesystem
 from appyter.render.flask_app.socketio import socketio
-from appyter.render.flask_app.util import secure_filepath, secure_url, sha1sum_io, generate_uuid
+from appyter.ext.flask import secure_filepath, secure_url
+from appyter.ext.hashlib import sha1sum_io
+from appyter.ext.uuid import generate_uuid
 
 # organize file by content hash
 def organize_file_content(data_fs, tmp_fs, tmp_path, filename):

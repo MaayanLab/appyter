@@ -1,5 +1,5 @@
 ''' Tools for orchestrating appyter clusters
 '''
 import os
-from appyter.util import importdir
+from appyter.ext.importlib import importdir
 importdir(os.path.join(os.path.dirname(__file__)), __package__, globals())

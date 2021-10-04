@@ -8,7 +8,7 @@ from nbconvert import HTMLExporter
 
 from appyter.ext.fs import Filesystem
 from appyter.render.flask_app.core import core
-from appyter.render.flask_app.util import route_join_with_or_without_slash
+from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.parse.nb import nb_from_ipynb_io
 
 _html_exporter = None

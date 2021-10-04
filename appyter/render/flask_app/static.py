@@ -6,7 +6,7 @@ from werkzeug.exceptions import NotFound
 
 from appyter.ext.fs import Filesystem
 from appyter.render.flask_app.core import core
-from appyter.render.flask_app.util import route_join_with_or_without_slash
+from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.context import get_appyter_directory
 from appyter.parse.nb import nb_from_ipynb_io
 from appyter.render.form import render_form_from_nbtemplate

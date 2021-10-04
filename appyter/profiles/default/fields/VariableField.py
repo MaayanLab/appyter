@@ -1,6 +1,7 @@
 import re
 from appyter.fields import Field
-from appyter.util import ensure_list, try_json_loads
+from appyter.ext.json import try_json_loads
+from appyter.ext.itertools import ensure_list
 
 class VariableField(Field):
   ''' Represing a variable number of instances of a given Field

@@ -11,7 +11,7 @@ def create_app(**kwargs):
   #
   from appyter.orchestration.dispatcher.core import core
   from appyter.orchestration.dispatcher.socketio import socketio
-  from appyter.util import join_routes
+  from appyter.ext.flask import join_routes
   #
   logging.basicConfig(
     level=logging.DEBUG if kwargs.get('debug') else logging.WARNING,
@@ -62,7 +62,7 @@ def create_app(**kwargs):
 def dispatcher(*args, **kwargs):
   from aiohttp import web
   from appyter.orchestration.dispatcher.socketio import socketio
-  from appyter.util import dict_filter_none
+  from appyter.ext.dict import dict_filter_none
   #
   app = create_app(**kwargs)
   web.run_app(app, host=app['config']['HOST'], port=int(app['config']['PORT']))

@@ -5,7 +5,7 @@ import json
 import logging
 logger = logging.getLogger(__name__)
 
-from appyter.util import run_in_executor
+from appyter.ext.asyncio.run_in_executor import run_in_executor
 
 
 def endless_watch(*args, **kwargs):

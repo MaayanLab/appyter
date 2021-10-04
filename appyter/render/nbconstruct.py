@@ -11,7 +11,7 @@ from appyter.context import get_env, get_jinja2_env
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.parse.nbtemplate import cell_match
 from appyter.ext.click import click_option_setenv, click_argument_setenv
-from appyter.util import parse_file_uri
+from appyter.ext.fs.parse import parse_file_uri
 
 def render_cell(env, cell):
   ''' Render a single cell, calling jinja2 templates when necessary

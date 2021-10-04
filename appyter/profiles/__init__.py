@@ -4,7 +4,7 @@ Each submodule represents a profile extending from :mod:`appyter.profiles.defaul
 
 import os
 from appyter.cli import cli
-from appyter.util import importdir
+from appyter.ext.importlib import importdir
 
 # capture all profiles in the directory and add to profiles/globals
 profiles = {}

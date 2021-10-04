@@ -5,7 +5,7 @@ import traceback
 from appyter import __version__
 from appyter.cli import cli
 from appyter.ext.click import click_option_setenv, click_argument_setenv
-from appyter.util import join_routes
+from appyter.ext.flask import join_routes
 
 @cli.command(
   help='An alias for jupyter notebook which pre-fetches notebook data from a remote appyter and then launches serve',

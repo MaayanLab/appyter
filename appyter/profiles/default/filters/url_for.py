@@ -1,6 +1,6 @@
 def url_for(directory, public=False, **kwargs):
   from appyter.context import get_env
-  from appyter.util import safe_join, join_routes
+  from appyter.ext.flask import safe_join, join_routes
   config = get_env()
   url = None
   if config['DEBUG']:

@@ -6,7 +6,8 @@ logger = logging.getLogger(__name__)
 from appyter.cli import cli
 from appyter.ext.click import click_option_setenv, click_argument_setenv
 from appyter.ext.json import try_json_loads
-from appyter.util import importdir_deep, join_routes
+from appyter.ext.importlib import importdir_deep
+from appyter.ext.flask import join_routes
 
 def find_fields_dir_mappings(config=None):
   assert config is not None
@@ -235,7 +236,6 @@ def get_env_from_kwargs(mode='default', **kwargs):
 def get_env_from_click():
   ''' Traverse click context and use params for get_env_from_kwargs
   '''
-  import click
   click_ctx = click.get_current_context()
   # aggregate all params from all parents
   params = {}
