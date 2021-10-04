@@ -1,37 +1,30 @@
-import os
 import shutil
 import importlib
 import urllib.parse
 from werkzeug.security import safe_join
 
 class Filesystem:
-  def __init__(self, uri, pathmap={}, with_path=False, asynchronous=False):
+  protocols = {
+    'file': lambda *args, **kwargs: importlib.import_module('appyter.ext.fs.file').Filesystem(*args, **kwargs),
+    'tmpfs': lambda *args, **kwargs: importlib.import_module('appyter.ext.fs.tmpfs').Filesystem(*args, **kwargs),
+    's3': lambda *args, **kwargs: importlib.import_module('appyter.ext.fs.s3').Filesystem(*args, **kwargs),
+    'rclone+s3': lambda *args, **kwargs: importlib.import_module('appyter.ext.fs.rclone').Filesystem(*args, **kwargs),
+  }
+  def __init__(self, uri, root=None, **kwargs):
     if '://' not in uri:
       uri = 'file://' + uri
+    self._uri = uri
+    self._root = self if root is None else root
+    self._kwargs = kwargs
     uri_parsed = urllib.parse.urlparse(uri)
-    self._fs = None
-    if uri_parsed.scheme == 'file':
-      from appyter.ext.fs.file import Filesystem as FSFilesystem
-      self._fs = FSFilesystem(uri_parsed)
-    if uri_parsed.scheme == 'tmpfs':
-      from appyter.ext.fs.tmpfs import Filesystem as TmpFilesystem
-      self._fs = TmpFilesystem(uri_parsed)
-    if uri_parsed.scheme == 's3':
-      if not with_path:
-        from appyter.ext.fs.s3 import Filesystem as S3Filesystem
-        self._fs = S3Filesystem(uri_parsed, asynchronous=asynchronous)
-      else:
-        # we will need rclone to do s3 mounting with_path
-        uri_parsed = uri_parsed._replace(scheme='s3+rclone')
-    if 'rclone' in uri_parsed.scheme.split('+'):
-      from appyter.ext.fs.rclone import Filesystem as RcloneFilesystem
-      self._fs = RcloneFilesystem(uri_parsed, asynchronous=asynchronous)
-    #
-    if self._fs is None:
-      raise Exception(f"Unrecognized scheme {uri}")
+    self._fs = Filesystem.protocols[uri_parsed.scheme](uri_parsed, **kwargs)
+    self._fs._root = self._root
   #
   def __enter__(self):
     return self._fs.__enter__()
+  #
+  def chroot(self, subpath, **kwargs):
+    return Filesystem(Filesystem.join(self._uri, f".{subpath}"), root=self._root, **kwargs)
   #
   def path(self, path=''):
     return self._fs.path(path)
@@ -67,13 +60,38 @@ class Filesystem:
     return self._fs.__exit__(*args)
   #
   @staticmethod
+  def gcd(src_fs=None, src_path=None, dst_fs=None, dst_path=None):
+    ''' Greatest common denominator file path, useful for
+    optimizing staticmethods when filesystems overlap with one another
+    '''
+    if len(src_fs._root._uri) < len(dst_fs._root._uri):
+      if src_fs._root._uri == dst_fs._root._uri[:len(src_fs._root._uri)]:
+        return src_fs._root, src_path, Filesystem.join(dst_fs._root[len(src_fs._root._uri):], dst_path)
+    else:
+      if dst_fs._root._uri == src_fs._root._uri[:len(dst_fs._root._uri)]:
+        return dst_fs._root, Filesystem.join(src_fs[len(dst_fs._root._uri):], src_path), dst_path
+  #
+  @staticmethod
   def join(*args):
     return safe_join(*args)
   #
   @staticmethod
+  def link(src_fs=None, src_path=None, dst_fs=None, dst_path=None):
+    fs_src_dst = Filesystem.gcd(src_fs=src_fs, src_path=src_path, dst_fs=dst_fs, dst_path=dst_path)
+    if fs_src_dst:
+      fs, src, dst = fs_src_dst
+      fs.link(src, dst)
+    else:
+      with src_fs.open(src_path, 'rb') as fr:
+        with dst_fs.open(dst_path, 'wb') as fw:
+          shutil.copyfileobj(fr, fw)
+  #
+  @staticmethod
   def cp(src_fs=None, src_path=None, dst_fs=None, dst_path=None):
-    if src_fs == dst_fs:
-      src_fs.cp(src_path, dst_path)
+    fs_src_dst = Filesystem.gcd(src_fs, src_path, dst_fs, dst_path)
+    if fs_src_dst:
+      fs, src, dst = fs_src_dst
+      fs.cp(src, dst)
     else:
       with src_fs.open(src_path, 'rb') as fr:
         with dst_fs.open(dst_path, 'wb') as fw:
@@ -81,8 +99,10 @@ class Filesystem:
   #
   @staticmethod
   def mv(src_fs=None, src_path=None, dst_fs=None, dst_path=None):
-    if src_fs == dst_fs:
-      src_fs.mv(src_path, dst_path)
+    fs_src_dst = Filesystem.gcd(src_fs, src_path, dst_fs, dst_path)
+    if fs_src_dst:
+      fs, src, dst = fs_src_dst
+      fs.mv(src, dst)
     else:
       Filesystem.cp(src_fs=src_fs, src_path=src_path, dst_fs=dst_fs, dst_path=dst_path)
       src_fs.rm(src_path)

@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 from appyter.ext.fs import Filesystem as FS
 
 class Filesystem:
-  def __init__(self, uri, asynchronous=False):
+  def __init__(self, uri, asynchronous=False, **kwargs):
     try:
       self._uri = uri
       self._config = {'asynchronous': asynchronous}

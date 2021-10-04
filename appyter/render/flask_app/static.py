@@ -70,12 +70,12 @@ def data_files(path):
         _nb=os.path.basename(current_app.config['IPYNB']),
       )
     else:
-      data_fs = Filesystem(Filesystem.join(current_app.config['DATA_DIR'], 'output'))
+      data_fs = Filesystem('storage:///output/')
       path += current_app.config['IPYNB']
       if data_fs.exists(path):
         return send_file(data_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
   else:
-    data_fs = Filesystem(Filesystem.join(current_app.config['DATA_DIR'], 'output'))
+    data_fs = Filesystem('storage:///output/')
     if data_fs.exists(path):
       return send_file(data_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
   abort(404)

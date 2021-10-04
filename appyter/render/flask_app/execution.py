@@ -31,7 +31,7 @@ async def submit(sid, data):
   socketio.enter_room(sid, result_hash)
   await socketio.emit('status', 'Queuing execution', to=sid)
   job = dict(
-    cwd=Filesystem.join(config['DATA_DIR'], 'output', result_hash),
+    cwd=Filesystem.join('storage:///output/', result_hash),
     ipynb=os.path.basename(config['IPYNB']),
     session=result_hash,
     id=generate_uuid(),

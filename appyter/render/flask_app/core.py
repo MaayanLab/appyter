@@ -45,9 +45,9 @@ def prepare_data(req):
 
 def prepare_results(data):
   results_hash = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data=data))
-  data_fs = Filesystem(current_app.config['DATA_DIR'])
-  results_path = Filesystem.join('output', results_hash)
-  if not data_fs.exists(Filesystem.join(results_path, current_app.config['IPYNB'])):
+  data_fs = Filesystem('storage:///output/')
+  results_path = Filesystem.join(results_hash, current_app.config['IPYNB'])
+  if not data_fs.exists(results_path):
     # construct notebook
     env = get_jinja2_env(config=current_app.config, context=data, session=results_hash)
     fs = Filesystem(current_app.config['CWD'])
@@ -56,8 +56,7 @@ def prepare_results(data):
     # in case of constraint failures, we'll fail here
     nb = render_nb_from_nbtemplate(env, nbtemplate, fields=get_fields(), data=data)
     # write notebook
-    nbfile = Filesystem.join(results_path, os.path.basename(current_app.config['IPYNB']))
-    with data_fs.open(nbfile, 'w') as fw:
+    with data_fs.open(results_path, 'w') as fw:
       nb_to_ipynb_io(nb, fw)
   #
   return results_hash
