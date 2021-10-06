@@ -45,6 +45,7 @@ async def submit(sid, data):
     job['image'] = config['DISPATCHER_IMAGE']
   #
   if config['DISPATCHER']:
+    job['storage'] = config['DATA_DIR']
     queued = False
     backoff = 1
     while not queued:

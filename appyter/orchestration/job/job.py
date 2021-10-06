@@ -1,6 +1,8 @@
 import asyncio
 import urllib.parse
 import logging
+
+from appyter.ext.fs import Filesystem
 logger = logging.getLogger(__name__)
 
 async def setup_evaluate_notebook(emitter, job):
@@ -60,6 +62,11 @@ async def execute_async(job, debug=False):
   from appyter.ext.asyncio.event_emitter import EventEmitter
   emitter = EventEmitter()
   logger.debug(job)
+  if 'storage' in job:
+    if job['storage'].startswith('s3:'):
+      job['storage'] = f"rclone+{job['storage']}"
+    storage = Filesystem(job['storage'])
+    Filesystem.protocols['storage'] = lambda url, **kwargs: storage.chroot(url.path, **kwargs)
   await asyncio.gather(
     setup_evaluate_notebook(emitter, job),
     setup_socketio(emitter, job),
