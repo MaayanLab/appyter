@@ -1,7 +1,6 @@
 import os
 import glob
 import shutil
-import urllib.parse
 import logging
 import traceback
 logger = logging.getLogger(__name__)

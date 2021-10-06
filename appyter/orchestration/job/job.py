@@ -1,6 +1,5 @@
 import asyncio
 import urllib.parse
-import itertools as it
 import logging
 logger = logging.getLogger(__name__)
 
@@ -60,6 +59,7 @@ async def setup_socketio(emitter, job):
 async def execute_async(job, debug=False):
   from appyter.ext.asyncio.event_emitter import EventEmitter
   emitter = EventEmitter()
+  logger.debug(job)
   await asyncio.gather(
     setup_evaluate_notebook(emitter, job),
     setup_socketio(emitter, job),
@@ -70,8 +70,7 @@ def execute(job):
   debug = job.get('debug', False)
   logging.basicConfig(
     level=logging.DEBUG if debug else logging.WARNING,
-    format='%(name)s %(message).80s',
+    format='%(name)s %(message)s',
   )
-  logger.info(job)
   loop = asyncio.get_event_loop()
   loop.run_until_complete(execute_async(job, debug=debug))

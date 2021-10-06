@@ -3,21 +3,12 @@ import datetime
 import functools
 import importlib
 from aiohttp import web
-from collections import deque
 from collections import OrderedDict, Counter
 import logging
 logger = logging.getLogger(__name__)
 
-from appyter.orchestration.dispatcher.socketio import socketio
-
 class LockedOrderedDict(OrderedDict):
   lock = asyncio.Lock()
-
-# NOTE: This is questionable, this queue may run
-#       on a different thread or process; in the case of a thread it's fine
-#       because Queue is thread-safe, but not in the case of a process
-#       we'd need a monkey-patched redis-Queue.
-#
 
 core = web.Application()
 routes = web.RouteTableDef()
@@ -106,5 +97,3 @@ async def dispatcher(queued=None, tasks=None, dispatch=None, jobs_per_image=1):
     #
     async with tasks.lock:
       del tasks[job_id]
-  #
-  job.task_done()

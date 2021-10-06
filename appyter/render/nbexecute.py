@@ -2,8 +2,6 @@ import os
 import sys
 import click
 import asyncio
-import nbformat as nbf
-import functools
 import datetime
 import traceback
 import logging
@@ -77,11 +75,9 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   try:
     if cwd.startswith('s3:'):
       cwd = f"rclone+{cwd}"
-    logger.debug(nb.metadata['appyter']['nbconstruct'].get('files', {}))
-    with Filesystem(cwd,
-      pathmap=nb.metadata['appyter']['nbconstruct'].get('files', {}),
-      asynchronous=True,
-    ) as fs:
+    files = nb.metadata['appyter']['nbconstruct'].get('files', {})
+    logger.debug(files)
+    with Filesystem(cwd, pathmap=files, asynchronous=True) as fs:
       # setup execution_info with start time
       nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
       with fs.open(ipynb, 'w') as fw:
