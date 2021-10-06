@@ -15,7 +15,7 @@ def create_app(**kwargs):
   #
   logging.basicConfig(
     level=logging.DEBUG if kwargs.get('debug') else logging.WARNING,
-    format='%(name)s %(message).80s',
+    format='%(name)s %(message)s',
   )
   #
   logger.info('Initializing aiohttp...')

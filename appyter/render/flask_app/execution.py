@@ -2,7 +2,6 @@ import os
 import aiohttp
 import asyncio
 import traceback
-from subprocess import PIPE
 import logging
 logger = logging.getLogger(__name__)
 

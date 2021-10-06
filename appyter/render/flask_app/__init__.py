@@ -38,12 +38,12 @@ def create_app(**kwargs):
   if config['DEBUG']:
     logging.basicConfig(
       level=logging.DEBUG,
-      format='%(name)s %(message).80s',
+      format='%(name)s %(message)s',
     )
   else:
     logging.basicConfig(
       level=logging.WARNING,
-      format='%(name)s %(message).80s',
+      format='%(name)s %(message)s',
     )
     logging.getLogger(__package__).setLevel(logging.INFO)
   #
@@ -126,12 +126,12 @@ def flask_app(**kwargs):
   if kwargs.get('debug'):
     logging.basicConfig(
       level=logging.DEBUG,
-      format='%(name)s %(message).80s',
+      format='%(name)s %(message)s',
     )
   else:
     logging.basicConfig(
       level=logging.WARNING,
-      format='%(name)s %(message).80s',
+      format='%(name)s %(message)s',
     )
     logging.getLogger(__package__).setLevel(logging.INFO)
   #
