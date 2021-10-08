@@ -10,66 +10,42 @@ class Filesystem:
     's3': lambda *args, **kwargs: importlib.import_module('appyter.ext.fs.s3').Filesystem(*args, **kwargs),
     'rclone+s3': lambda *args, **kwargs: importlib.import_module('appyter.ext.fs.rclone').Filesystem(*args, **kwargs),
   }
-  def __init__(self, uri, root=None, **kwargs):
+  def __new__(self, uri, **kwargs):
     if '://' not in uri:
       uri = 'file://' + uri
-    self._uri = uri
-    self._root = self if root is None else root
-    self._kwargs = kwargs
-    uri_parsed = urllib.parse.urlparse(uri)
-    self._fs = Filesystem.protocols[uri_parsed.scheme](uri_parsed, **kwargs)
-    self._fs._root = self._root
+    uri = urllib.parse.urlparse(uri)
+    return Filesystem.protocols[uri.scheme](uri, **kwargs)
   #
-  def __enter__(self):
-    return self._fs.__enter__()
-  #
-  def chroot(self, subpath, **kwargs):
-    return Filesystem(Filesystem.join(self._uri, f".{subpath}"), root=self._root, **kwargs)
-  #
-  def path(self, path=''):
-    return self._fs.path(path)
-  #
-  def close(self):
-    return self._fs.close()
-  #
-  def open(self, path, mode='r'):
-    return self._fs.open(path, mode=mode)
-  #
-  def exists(self, path):
-    return self._fs.exists(path)
-  #
-  def glob(self, path=''):
-    return self._fs.glob(path=path)
-  #
-  def ls(self, path=''):
-    return self._fs.ls(path=path)
-  #
-  def cp(self, src, dst):
-    return self._fs.cp(src, dst)
-  #
-  def link(self, src, dst):
-    return self._fs.link(src, dst)
-  #
-  def rm(self, path, recursive=False):
-    return self._fs.rm(path, recursive=recursive)
-  #
-  def chmod_ro(self, path):
-    return self._fs.chmod_ro(path)
-  #
-  def __exit__(self, *args):
-    return self._fs.__exit__(*args)
+  @staticmethod
+  def chroot(fs, subpath, **kwargs):
+    return Filesystem(
+      Filesystem.join(fs.uri.geturl(), subpath.lstrip('/')),
+      **kwargs
+    )
   #
   @staticmethod
   def gcd(src_fs=None, src_path=None, dst_fs=None, dst_path=None):
     ''' Greatest common denominator file path, useful for
     optimizing staticmethods when filesystems overlap with one another
     '''
-    if len(src_fs._root._uri) < len(dst_fs._root._uri):
-      if src_fs._root._uri == dst_fs._root._uri[:len(src_fs._root._uri)]:
-        return src_fs._root, src_path, Filesystem.join(dst_fs._root[len(src_fs._root._uri):], dst_path)
-    else:
-      if dst_fs._root._uri == src_fs._root._uri[:len(dst_fs._root._uri)]:
-        return dst_fs._root, Filesystem.join(src_fs[len(dst_fs._root._uri):], src_path), dst_path
+    # TODO: optimize other schemes
+    if src_fs.uri.scheme == 'file' and dst_fs.uri.scheme == 'file':
+      from pathlib import PurePosixPath
+      if PurePosixPath(src_fs.uri.path).is_relative_to(dst_fs.uri.path):
+        return Filesystem(f"file://{dst_fs.uri.path}"), (PurePosixPath(src_fs.uri.path) / src_path).relative_to(dst_fs.uri.path), dst_path
+      elif PurePosixPath(dst_fs.uri.path).is_relative_to(src_fs.uri.path):
+        return Filesystem(f"file://{src_fs.uri.path}"), src_path, (PurePosixPath(dst_fs.uri.path) / dst_path).relative_to(src_fs.uri.path)
+      else:
+        src_parts = PurePosixPath(src_fs.uri.path).parts
+        dst_parts = PurePosixPath(dst_fs.uri.path).parts
+        common_parts = []
+        for src_part, dst_part in zip(src_parts, dst_parts):
+          if src_part == dst_part:
+            common_parts.append(src_part)
+          else:
+            break
+        common_path = PurePosixPath('/' + '/'.join(common_parts[1:]))
+        return Filesystem(f"file://{str(common_path)}"), (PurePosixPath(src_fs.uri.path) / src_path).relative_to(common_path), (PurePosixPath(dst_fs.uri.path) / dst_path).relative_to(common_path)
   #
   @staticmethod
   def join(*args):
