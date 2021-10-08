@@ -58,14 +58,14 @@ class RcloneParse:
 
 class Filesystem(FSFilesystem):
   def __init__(self, uri, pathmap={}, asynchronous=False, **kwargs):
-    self._uri = uri
-    self._scheme = '+'.join(scheme for scheme in self._uri.scheme.split('+') if scheme != 'rclone')
-    self._remote = RcloneParse.get(self._scheme)(slugify(f"{self._scheme}:{self._uri.hostname}{self._uri.path}?{self._uri.query}"))
+    self.uri = uri
+    self._scheme = '+'.join(scheme for scheme in uri.scheme.split('+') if scheme != 'rclone')
+    self._remote = RcloneParse.get(self._scheme)(slugify(f"{self._scheme}:{uri.hostname}{uri.path}?{uri.query}"))
     self._tmpdir = tempfile.mkdtemp()
-    logger.debug(f"Mounting {self._remote}:{self._uri.path[1:]} on {self._tmpdir}")
+    logger.debug(f"Mounting {self._remote}:{uri.path[1:]} on {self._tmpdir}")
     self._mount = sh([
       sys.executable, '-u', '-m', 'rclone_pathmap', 'mount',
-      '-c', '-', f"{self._remote}:{self._uri.path[1:]}", self._tmpdir,
+      '-c', '-', f"{self._remote}:{uri.path[1:]}", self._tmpdir,
       '--vfs-cache-mode', 'writes',
     ], _in=yaml.dump(pathmap))
     sync_async_sleep(0.1, asynchronous=asynchronous)

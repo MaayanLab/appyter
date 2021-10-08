@@ -66,7 +66,7 @@ async def execute_async(job, debug=False):
     if job['storage'].startswith('s3:'):
       job['storage'] = f"rclone+{job['storage']}"
     storage = Filesystem(job['storage'])
-    Filesystem.protocols['storage'] = lambda url, **kwargs: storage.chroot(url.path, **kwargs)
+    Filesystem.protocols['storage'] = lambda url, **kwargs: Filesystem.chroot(storage, url.path, **kwargs)
   await asyncio.gather(
     setup_evaluate_notebook(emitter, job),
     setup_socketio(emitter, job),

@@ -8,21 +8,21 @@ from appyter.ext.fs import Filesystem as FS
 
 class Filesystem:
   def __init__(self, uri, asynchronous=False, **kwargs):
+    self.uri = uri
     try:
-      self._uri = uri
       self._config = {'asynchronous': asynchronous}
       #
-      if self._uri.username and self._uri.password:
-        self._config['key'] = self._uri.username
-        self._config['secret'] = self._uri.password
-      elif self._uri.username:
-        self._config['token'] = self._uri.username
+      if uri.username and uri.password:
+        self._config['key'] = uri.username
+        self._config['secret'] = uri.password
+      elif uri.username:
+        self._config['token'] = uri.username
       else:
-        self._config.update(dict(urllib.parse.parse_qsl(self._uri.query)))
-      self._config['client_kwargs'] = dict(endpoint_url=f"{'https' if self._config.get('use_ssl') else 'http'}://{self._uri.hostname}:{self._uri.port or (443 if self._config.get('use_ssl') else 80)}")
+        self._config.update(dict(urllib.parse.parse_qsl(uri.query)))
+      self._config['client_kwargs'] = dict(endpoint_url=f"{'https' if self._config.get('use_ssl') else 'http'}://{uri.hostname}:{uri.port or (443 if self._config.get('use_ssl') else 80)}")
       self._config['config_kwargs'] = dict(signature_version='s3v4')
       #
-      self._prefix = self._uri.path.lstrip('/').rstrip('/') + '/'
+      self._prefix = uri.path.lstrip('/').rstrip('/') + '/'
       self._fs = s3fs.S3FileSystem(**self._config)
       if asynchronous:
         import asyncio

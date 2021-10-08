@@ -10,9 +10,9 @@ from appyter.ext.fs import Filesystem as FS
 
 class Filesystem:
   def __init__(self, uri, pathmap={}, **kwargs):
-    self._uri = uri
+    self.uri = uri
     self._pathmap = pathmap
-    self._prefix = self._uri.path
+    self._prefix = uri.path
   #
   def __enter__(self):
     if self._pathmap:
@@ -78,7 +78,7 @@ class Filesystem:
     try:
       assert src and dst
       os.makedirs(os.path.dirname(FS.join(self._prefix, dst)), exist_ok=True)
-      return os.link(FS.join(self._prefix, src), FS.join(self._prefix, dst))
+      return os.symlink(FS.join(self._prefix, src), FS.join(self._prefix, dst))
     except Exception:
       logger.error(traceback.format_exc())
       raise Exception(f"An error occurred while trying to link {src} to {dst}")
