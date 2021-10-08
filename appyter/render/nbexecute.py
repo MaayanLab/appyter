@@ -37,7 +37,7 @@ def json_emitter_factory(output):
 async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='', subscribe=None):
   logger.info('nbexecute starting')
   assert callable(emit), 'Emit must be callable'
-  with Filesystem(cwd, asynchronous=True) as fs:
+  with Filesystem(cwd) as fs:
     with fs.open(ipynb, 'r') as fr:
       nb = nb_from_ipynb_io(fr)
   #
@@ -75,7 +75,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   try:
     files = nb.metadata['appyter']['nbconstruct'].get('files', {})
     logger.debug(files)
-    with Filesystem(cwd, pathmap=files, asynchronous=True) as fs:
+    with Filesystem(cwd, pathmap=files) as fs:
       # setup execution_info with start time
       nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
       with fs.open(ipynb, 'w') as fw:

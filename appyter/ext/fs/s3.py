@@ -7,7 +7,13 @@ logger = logging.getLogger(__name__)
 from appyter.ext.fs import Filesystem as FS
 
 class Filesystem:
-  def __init__(self, uri, asynchronous=False, **kwargs):
+  def __new__(cls, uri, pathmap={}, **kwargs):
+    if pathmap:
+      return FS('rclone+' + uri.geturl(), pathmap=pathmap, **kwargs)
+    else:
+      return object.__new__(cls)
+  
+  def __init__(self, uri, pathmap={}, asynchronous=False, **kwargs):
     self.uri = uri
     try:
       self._config = {'asynchronous': asynchronous}
