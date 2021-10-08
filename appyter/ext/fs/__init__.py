@@ -10,7 +10,7 @@ class Filesystem:
     's3': lambda *args, **kwargs: importlib.import_module('appyter.ext.fs.s3').Filesystem(*args, **kwargs),
     'rclone+s3': lambda *args, **kwargs: importlib.import_module('appyter.ext.fs.rclone').Filesystem(*args, **kwargs),
   }
-  def __new__(self, uri, **kwargs):
+  def __new__(cls, uri, **kwargs):
     if '://' not in uri:
       uri = 'file://' + uri
     uri = urllib.parse.urlparse(uri)
