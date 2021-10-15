@@ -8,12 +8,12 @@ flask==2.0.1
 flask_cors
 ipython
 jinja2
-jupyter
 jupyter_client
 lxml
 nbclient==0.5.0
 nbconvert
-nbformat
+nbformat==5.0.8
+notebook
 python-dotenv
 python-engineio==4.0.0
 python-socketio==5.0.4
