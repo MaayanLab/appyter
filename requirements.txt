@@ -6,6 +6,8 @@ click
 click-default-group
 flask==2.0.1
 flask_cors
+fsspec
+fusepy
 ipython
 jinja2
 jupyter_client
