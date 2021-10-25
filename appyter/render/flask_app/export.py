@@ -6,7 +6,7 @@ import zipfile
 from flask import request, current_app, send_file, abort
 from nbconvert import HTMLExporter
 
-from appyter.ext.fs import Filesystem
+from appyter.ext.fsspec import url_to_chroot_fs
 from appyter.render.flask_app.core import core
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.parse.nb import nb_from_ipynb_io
@@ -28,7 +28,7 @@ def get_base_files():
   global _base_files
   if _base_files is None:
     _base_files = {}
-    fs = Filesystem(current_app.config['CWD'])
+    fs = url_to_chroot_fs(current_app.config['CWD'])
     for f in fs.glob('*'):
       if f.startswith('.'): continue
       if f == current_app.config['IPYNB']: continue
@@ -39,7 +39,7 @@ def get_base_files():
 def export(path):
   if path.endswith('/'):
     format = request.args.get('format', 'html')
-    data_fs = Filesystem('storage:///output/')
+    data_fs = url_to_chroot_fs('storage:///output/')
     nbpath = path + current_app.config['IPYNB']
     if data_fs.exists(nbpath):
       nb = nb_from_ipynb_io(data_fs.open(nbpath, 'rb'))
@@ -50,12 +50,14 @@ def export(path):
       elif format == 'zip':
         metadata = nb.get('metadata', {}).get('appyter', {})
         files = metadata.get('nbexecute', {}).get('files', metadata.get('nbconstruct', {}).get('files', {}))
-        with Filesystem('tmpfs://') as tmp_fs:
-          with zipfile.ZipFile(tmp_fs.path('output.zip'), 'a', zipfile.ZIP_DEFLATED, False) as zf:
-            for f, b in get_base_files().items():
-              zf.writestr(f, b)
-            for f, p in ([(os.path.basename(nbpath), nbpath)] + [(f, path+f) for f in files]):
-              if data_fs.exists(p):
-                zf.writestr(f, data_fs.open(p, 'rb').read())
-          return send_file(tmp_fs.path('output.zip'), mimetype='application/zip', as_attachment=True, attachment_filename='output.zip')
+        with url_to_chroot_fs('tmpfs://') as tmp_fs:
+          with tmp_fs.open('output.zip', 'wb') as fw:
+            with zipfile.ZipFile(fw, 'a', zipfile.ZIP_DEFLATED, False) as zf:
+              for f, b in get_base_files().items():
+                zf.writestr(f, b)
+              for f, p in ([(os.path.basename(nbpath), nbpath)] + [(f, path+f) for f in files]):
+                if data_fs.exists(p):
+                  with data_fs.open(p, 'rb') as fr:
+                    zf.writestr(f, fr.read())
+          return send_file(tmp_fs.open('output.zip', 'rb'), mimetype='application/zip', as_attachment=True, attachment_filename='output.zip')
   abort(404)

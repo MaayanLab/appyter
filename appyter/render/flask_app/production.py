@@ -1,3 +1,7 @@
+from appyter.ext import fsspec
+from appyter.ext.urllib import join_url
+
+
 def s3_to_url(s3_uri):
   import urllib.parse
   uri = urllib.parse.urlparse(s3_uri)
@@ -10,16 +14,15 @@ def serve(app_path, **kwargs):
   import logging
   logger = logging.getLogger(__name__)
   from subprocess import Popen
-  from appyter.ext.fs import Filesystem
   from appyter.context import get_env, get_jinja2_env, find_blueprints, get_appyter_directory
   config = get_env(**kwargs)
   logger.info(kwargs)
   env = get_jinja2_env(config=config)
-  with Filesystem('tmpfs://') as tmp_fs:
+  with fsspec.url_to_chroot_fs('tmpfs://') as tmp_fs:
     logger.info(f"Working directory {tmp_fs.path()}")
     #
     logger.info(f"Pre-rendering pages...")
-    with Filesystem(config['CWD']).open(config['IPYNB']) as fr:
+    with fsspec.open(join_url(config['CWD'], config['IPYNB']), 'r') as fr:
       from appyter.parse.nb import nb_from_ipynb_io
       nbtemplate = nb_from_ipynb_io(fr)
     with tmp_fs.open('index.html', 'w') as fw:

@@ -1,13 +1,14 @@
 import os
 import json
 import click
+import fsspec
 import nbformat as nbf
 from copy import deepcopy
 
 from appyter import __version__
 from appyter.cli import cli
-from appyter.ext.fs import Filesystem
 from appyter.context import get_env, get_jinja2_env
+from appyter.ext.urllib import join_url
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.parse.nbtemplate import cell_match
 from appyter.ext.click import click_option_setenv, click_argument_setenv
@@ -91,6 +92,7 @@ def nbconstruct(cwd, ipynb, context, output, **kwargs):
     config=get_env(cwd=cwd, ipynb=ipynb, mode='construct', **kwargs),
     context=context,
   )
-  nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
+  with fsspec.open(join_url(cwd, ipynb), 'r') as fr:
+    nbtemplate = nb_from_ipynb_io(fr)
   nb = render_nb_from_nbtemplate(env, nbtemplate)
   nb_to_ipynb_io(nb, output)

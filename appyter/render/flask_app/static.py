@@ -4,7 +4,8 @@ import os
 from flask import request, current_app, send_file, send_from_directory, abort, jsonify
 from werkzeug.exceptions import NotFound
 
-from appyter.ext.fs import Filesystem
+from appyter.ext.fsspec import url_to_chroot_fs
+from appyter.ext.urllib import join_url
 from appyter.render.flask_app.core import core
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.context import get_appyter_directory
@@ -21,32 +22,33 @@ def get_index():
     'application/json',
     'application/vnd.jupyter',
   ], 'text/html')
-  fs = Filesystem(current_app.config['CWD'])
+  fs = url_to_chroot_fs(current_app.config['CWD'])
   if mimetype in {'text/html'}:
+    env = get_jinja2_env(config=current_app.config)
     with fs.open(current_app.config['IPYNB'], 'r') as fr:
-      env = get_jinja2_env(config=current_app.config)
       nbtemplate = nb_from_ipynb_io(fr)
     return render_form_from_nbtemplate(env, nbtemplate)
   elif mimetype in {'application/json'}:
+    env = get_jinja2_env(config=current_app.config)
     with fs.open(current_app.config['IPYNB'], 'r') as fr:
-      env = get_jinja2_env(config=current_app.config)
       nbtemplate = nb_from_ipynb_io(fr)
     return jsonify(render_nbtemplate_json_from_nbtemplate(env, nbtemplate))
   elif mimetype in {'application/vnd.jupyter'}:
-    return send_file(fs.open(current_app.config['IPYNB'], 'rb'), attachment_filename=current_app.config['IPYNB'], mimetype=mimetype)
+    with fs.open(current_app.config['IPYNB'], 'rb') as fr:
+      return send_file(fr, attachment_filename=current_app.config['IPYNB'], mimetype=mimetype)
   else:
     abort(404)
 
 @core.route('/favicon.ico', methods=['GET'])
 def favicon():
-  static = Filesystem(current_app.config['STATIC_DIR'])
+  static = url_to_chroot_fs(current_app.config['STATIC_DIR'])
   if static.exists('favicon.ico'):
     return send_file(static.open('favicon.ico', 'rb'), attachment_filename='favicon.ico')
   abort(404)
 
 @core.route('/static/<path:filename>', methods=['GET'])
 def static(filename):
-  static = Filesystem(current_app.config['STATIC_DIR'])
+  static = url_to_chroot_fs(current_app.config['STATIC_DIR'])
   if static.exists(filename):
     return send_file(static.open(filename, 'rb'), attachment_filename=filename)
   #
@@ -64,18 +66,17 @@ def data_files(path):
       'application/vnd.jupyter',
     ], 'text/html')
     if mimetype == 'text/html':
-      fs = Filesystem(current_app.config['CWD'])
       env = get_jinja2_env(config=current_app.config)
       return env.get_template('landing.j2').render(
         _nb=os.path.basename(current_app.config['IPYNB']),
       )
     else:
-      data_fs = Filesystem('storage:///output/')
-      path += current_app.config['IPYNB']
+      data_fs = url_to_chroot_fs(join_url('storage:///output/', path))
+      path = '/' + current_app.config['IPYNB']
       if data_fs.exists(path):
         return send_file(data_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
   else:
-    data_fs = Filesystem('storage:///output/')
+    data_fs = url_to_chroot_fs('storage:///output/')
     if data_fs.exists(path):
       return send_file(data_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
   abort(404)

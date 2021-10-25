@@ -1,18 +1,21 @@
 import os
 import sys
 import click
+import fsspec
 import asyncio
 import datetime
 import traceback
 import logging
+
+from appyter.ext.fsspec import fs_mount, url_to_chroot_fs
 logger = logging.getLogger(__name__)
 
 from appyter import __version__
 from appyter.cli import cli
-from appyter.ext.fs import Filesystem
 from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io, nb_to_json
 from appyter.ext.click import click_option_setenv, click_argument_setenv
+from appyter.ext.urllib import join_url
 
 def cell_is_code(cell):
     return cell.get('cell_type') == 'code'
@@ -35,11 +38,10 @@ def json_emitter_factory(output):
   return json_emitter
 
 async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='', subscribe=None):
-  logger.info('nbexecute starting')
+  logger.info('starting')
   assert callable(emit), 'Emit must be callable'
-  with Filesystem(cwd) as fs:
-    with fs.open(ipynb, 'r') as fr:
-      nb = nb_from_ipynb_io(fr)
+  with fsspec.open(join_url(cwd, ipynb), 'r') as fr:
+    nb = nb_from_ipynb_io(fr)
   #
   if 'appyter' not in nb.metadata:
     logger.warn('detected legacy format, upgrading..')
@@ -73,84 +75,89 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   await emit({ 'type': 'status', 'data': 'Starting' })
   #
   try:
-    files = nb.metadata['appyter']['nbconstruct'].get('files', {})
-    logger.debug(files)
-    with Filesystem(cwd, pathmap=files) as fs:
+    files = nb.metadata['appyter']['nbconstruct'].get('files')
+    logger.debug(f"{cwd=} {files=}")
+    with url_to_chroot_fs(cwd, pathmap=files) as fs:
+      logger.debug(fs.ls('/'))
       # setup execution_info with start time
       nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
-      with fs.open(ipynb, 'w') as fw:
+      with fs.open('/' + ipynb, 'w') as fw:
         nb_to_ipynb_io(nb, fw)
       #
-      logger.info('nbexecute initializing')
+      logger.info('initializing')
       state = dict(progress=0, status='Starting')
       if callable(subscribe):
         await subscribe(lambda: dict(nb=nb_to_json(nb), **state))
       #
       try:
-        iopub_hook = iopub_hook_factory(nb, emit)
-        client = NotebookClientIOPubHook(
-          nb,
-          allow_errors=True,
-          timeout=None,
-          kernel_name='python3',
-          resources={ 'metadata': {'path': fs.path()} },
-          iopub_hook=iopub_hook,
-        )
-        await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
-        async with client.async_setup_kernel(
-          env=dict(
-            PYTHONPATH=':'.join(sys.path),
-            PATH=os.environ['PATH'],
-          ),
-        ):
-          logger.info('nbexecute executing')
-          state.update(status='Executing...', progress=0)
-          await emit({ 'type': 'status', 'data': state['status'] })
-          await emit({ 'type': 'progress', 'data': state['progress'] })
-          n_cells = len(nb.cells)
-          exec_count = 1
-          for index, cell in enumerate(nb.cells):
-            logger.info(f"nbexecute executing cell {index}")
-            cell = await client.async_execute_cell(
-              cell, index,
-              execution_count=exec_count,
-            )
-            if cell_is_code(cell):
-              if cell_has_error(cell):
-                raise Exception('Cell execution error on cell %d' % (exec_count))
-              exec_count += 1
-            if index < n_cells-1:
-              state['progress'] = index + 1
-              await emit({ 'type': 'progress', 'data': state['progress'] })
-            else:
-              state['status'] = 'Success'
-              await emit({ 'type': 'status', 'data': state['status'] })
+        async with fs_mount(fs, '/') as mnt:
+          iopub_hook = iopub_hook_factory(nb, emit)
+          client = NotebookClientIOPubHook(
+            nb,
+            allow_errors=True,
+            timeout=None,
+            kernel_name='python3',
+            resources={ 'metadata': {'path': str(mnt) } },
+            iopub_hook=iopub_hook,
+          )
+          await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
+          async with client.async_setup_kernel(
+            env=dict(
+              PYTHONPATH=':'.join(sys.path),
+              PATH=os.environ['PATH'],
+            ),
+          ):
+            logger.info('executing')
+            state.update(status='Executing...', progress=0)
+            await emit({ 'type': 'status', 'data': state['status'] })
+            await emit({ 'type': 'progress', 'data': state['progress'] })
+            n_cells = len(nb.cells)
+            exec_count = 1
+            for index, cell in enumerate(nb.cells):
+              logger.info(f"executing cell {index}")
+              cell = await client.async_execute_cell(
+                cell, index,
+                execution_count=exec_count,
+              )
+              if cell_is_code(cell):
+                if cell_has_error(cell):
+                  raise Exception('Cell execution error on cell %d' % (exec_count))
+                exec_count += 1
+              if index < n_cells-1:
+                state['progress'] = index + 1
+                await emit({ 'type': 'progress', 'data': state['progress'] })
+              else:
+                state['status'] = 'Success'
+                await emit({ 'type': 'status', 'data': state['status'] })
       except asyncio.CancelledError:
+        logger.info(f"cancelled")
         raise
       except Exception as e:
-        logger.info(f"nbexecute execution error")
+        logger.info(f"execution error")
         await emit({ 'type': 'error', 'data': str(e) })
       # Save execution completion time
-      logger.info('nbexecute saving')
+      logger.info('saving')
       nb.metadata['appyter']['nbexecute']['completed'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
       # save additional files
       # TODO: in the future we should individual files and include the original urls here
       nb.metadata['appyter']['nbexecute']['files'] = {
-        path: path
-        for path in fs.ls()
+        path.lstrip('/'): path
+        for path in fs.ls('/', detail=False)
         if path != ipynb
       }
       #
-      with fs.open(ipynb, 'w') as fw:
+      with fs.open('/' + ipynb, 'w') as fw:
         nb_to_ipynb_io(nb, fw)
       #
+      logger.info('finalized')
   except asyncio.CancelledError:
+    logger.info(f"outer cancelled")
     raise
   except Exception as e:
     await emit({ 'type': 'status', 'data': 'Error initializing, try again later' })
     logger.error(traceback.format_exc())
   finally:
-    logger.info('nbexecute complete')
+    logger.info('complete')
   #
 
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')

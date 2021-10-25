@@ -1,6 +1,5 @@
 import os
 import click
-from appyter.ext.fs import Filesystem
 from appyter.cli import cli
 from appyter.context import get_env, get_jinja2_env
 from appyter.ext.click import click_option_setenv, click_argument_setenv

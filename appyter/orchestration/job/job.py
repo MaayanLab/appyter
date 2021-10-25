@@ -1,8 +1,8 @@
 import asyncio
 import urllib.parse
 import logging
+from appyter.ext import fsspec
 
-from appyter.ext.fs import Filesystem
 logger = logging.getLogger(__name__)
 
 async def setup_evaluate_notebook(emitter, job):
@@ -63,8 +63,8 @@ async def execute_async(job, debug=False):
   emitter = EventEmitter()
   logger.debug(job)
   if 'storage' in job:
-    storage = Filesystem(job['storage'])
-    Filesystem.protocols['storage'] = lambda url, **kwargs: Filesystem.chroot(storage, url.path, **kwargs)
+    from appyter.ext.fsspec.alias import AliasFileSystemFactory
+    fsspec.register_implementation('storage', AliasFileSystemFactory('storage', job['storage']))
   await asyncio.gather(
     setup_evaluate_notebook(emitter, job),
     setup_socketio(emitter, job),

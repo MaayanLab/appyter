@@ -1,9 +1,10 @@
-import os
 import traceback
+import fsspec
 from flask import Blueprint, request, redirect, abort, url_for, current_app, jsonify, make_response
 
 from appyter.context import get_jinja2_env
-from appyter.ext.fs import Filesystem
+from appyter.ext.fsspec import url_to_chroot_fs
+from appyter.ext.urllib import join_url
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
 from appyter.ext.exceptions import exception_as_dict
@@ -20,7 +21,7 @@ def get_fields():
   '''
   global _fields
   if not _fields or current_app.config['DEBUG']:
-    fs = Filesystem(current_app.config['CWD'])
+    fs = url_to_chroot_fs(current_app.config['CWD'])
     with fs.open(current_app.config['IPYNB'], 'r') as fr:
       env = get_jinja2_env(config=current_app.config)
       nbtemplate = nb_from_ipynb_io(fr)
@@ -31,8 +32,8 @@ _ipynb_hash = None
 def get_ipynb_hash():
   global _ipynb_hash
   if not _ipynb_hash or current_app.config['DEBUG']:
-    fs = Filesystem(current_app.config['CWD'])
-    _ipynb_hash = sha1sum_io(fs.open(current_app.config['IPYNB'], 'rb'))
+    with fsspec.open(join_url(current_app.config['CWD'], current_app.config['IPYNB']), 'rb') as fr:
+      _ipynb_hash = sha1sum_io(fr)
   return _ipynb_hash
 
 def prepare_data(req):
@@ -45,13 +46,12 @@ def prepare_data(req):
 
 def prepare_results(data):
   results_hash = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data=data))
-  data_fs = Filesystem('storage:///output/')
-  results_path = Filesystem.join(results_hash, current_app.config['IPYNB'])
+  data_fs = url_to_chroot_fs(join_url('storage:///output/', results_hash))
+  results_path = '/' + current_app.config['IPYNB']
   if not data_fs.exists(results_path):
     # construct notebook
     env = get_jinja2_env(config=current_app.config, context=data, session=results_hash)
-    fs = Filesystem(current_app.config['CWD'])
-    with fs.open(current_app.config['IPYNB'], 'r') as fr:
+    with fsspec.open(join_url(current_app.config['CWD'], current_app.config['IPYNB']), 'r') as fr:
       nbtemplate = nb_from_ipynb_io(fr)
     # in case of constraint failures, we'll fail here
     nb = render_nb_from_nbtemplate(env, nbtemplate, fields=get_fields(), data=data)
