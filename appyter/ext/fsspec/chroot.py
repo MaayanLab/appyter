@@ -1,35 +1,5 @@
 from fsspec import filesystem, AbstractFileSystem
-
-from pathlib import PurePosixPath
-
-class ChrootPurePosixPath:
-  ''' Similar to pathlib but guaranteed to stay within the `root` directory.
-  '''
-  def __init__(self, root, _path=PurePosixPath('.')):
-    self.root = PurePosixPath(root)
-    self.path = PurePosixPath(_path)
-    assert not self.path.is_absolute()
-
-  def relative_to(self, *other):
-    return ChrootPurePosixPath(self.root, self.path.relative_to(*other))
-
-  def realpath(self):
-    return self.root / self.path
-
-  def __repr__(self):
-    return repr(self.path)
-
-  def __str__(self):
-    return str(self.path)
-
-  def __truediv__(self, other):
-    path = self.path
-    other = PurePosixPath(other)
-    parts = other.parts[1:] if other.is_absolute() else other.parts
-    for p in parts:
-      if p == '..': path = path.parent
-      else: path = path / p
-    return ChrootPurePosixPath(self.root, path)
+from appyter.ext.pathlib.chroot import ChrootPurePosixPath
 
 class ChrootFileSystem(AbstractFileSystem):
   ''' chroot: update root and disallow access beyond chroot, only works on directories.
