@@ -69,6 +69,15 @@ class PathMapFileSystem(AbstractFileSystem):
       mode = 0o755
     return fs, path, mode
 
+  def __enter__(self):
+    if getattr(self.fs, '__enter__', None) is not None:
+      self.fs.__enter__()
+    return self
+  
+  def __exit__(self, type, value, traceback):
+    if getattr(self.fs, '__exit__', None) is not None:
+      self.fs.__exit__(type, value, traceback)
+
   def mkdir(self, path, **kwargs):
     fs, path, mode = self._pathmap(path)
     if mode == 0o444: raise PermissionError

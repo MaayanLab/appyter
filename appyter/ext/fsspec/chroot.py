@@ -40,6 +40,15 @@ class ChrootFileSystem(AbstractFileSystem):
   def __unresolve_path(self, path):
     return '/' + str(PurePosixPath(path).relative_to(self.storage_options['fo']))
 
+  def __enter__(self):
+    if getattr(self.fs, '__enter__', None) is not None:
+      self.fs.__enter__()
+    return self
+  
+  def __exit__(self, type, value, traceback):
+    if getattr(self.fs, '__exit__', None) is not None:
+      self.fs.__exit__(type, value, traceback)
+
   def mkdir(self, path, **kwargs):
     return self.fs.mkdir(self.__resolve_path(path), **kwargs)
 
