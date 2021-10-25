@@ -1,6 +1,6 @@
 def url_for(directory, public=False, **kwargs):
   from appyter.context import get_env
-  from appyter.ext.flask import safe_join, join_routes
+  from appyter.ext.urllib import join_url
   config = get_env()
   url = None
   if config['DEBUG']:
@@ -16,13 +16,13 @@ def url_for(directory, public=False, **kwargs):
     # url_for outside of flask
     filename = kwargs.get('filename', kwargs.get('path'))
     assert filename is not None
-    url = safe_join(config['PREFIX'], directory, filename)
+    url = join_url(config['PREFIX'], directory, filename)
   #
   if public:
     # url_for public modifier -- return the public facing url
     try:
       from flask import request
-      url = join_routes(request.url_root, url)[1:]
+      url = join_url(request.url_root, url)
     except:
       pass
   #

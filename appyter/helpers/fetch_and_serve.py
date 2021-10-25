@@ -1,11 +1,10 @@
 import os
-import sys
 import click
 import traceback
 from appyter import __version__
 from appyter.cli import cli
 from appyter.ext.click import click_option_setenv, click_argument_setenv
-from appyter.ext.flask import join_routes
+from appyter.ext.urllib import join_url
 
 @cli.command(
   help='An alias for jupyter notebook which pre-fetches notebook data from a remote appyter and then launches serve',
@@ -72,7 +71,7 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
     # relative file paths (those without schemes) are relative to the base uri
     # TODO: in the future we might be able to mount these paths as we do in the job
     if '://' not in fileurl:
-      fileurl = join_routes(uri, fileurl)[1:]
+      fileurl = join_url(uri, fileurl)
     click.echo(f"Fetching {file} from {fileurl}...")
     try:
       urllib.request.urlretrieve(fileurl, os.path.join(data_dir, file))

@@ -32,7 +32,7 @@ def create_app(**kwargs):
     import appyter.render.flask_app.livereload
   #
   from appyter.context import get_env, find_blueprints
-  from appyter.ext.flask import join_routes
+  from appyter.ext.urllib import join_slash
   config = get_env(**kwargs)
   #
   if config['DEBUG']:
@@ -66,7 +66,7 @@ def create_app(**kwargs):
     app.middlewares.append(error_handler)
   #
   logger.info('Initializing socketio...')
-  socketio.attach(app, join_routes(config['PREFIX'], 'socket.io'))
+  socketio.attach(app, join_slash(config['PREFIX'], 'socket.io'))
   #
   logger.info('Initializing flask...')
   flask_app = Flask(__name__, static_url_path=None, static_folder=None)
@@ -89,12 +89,12 @@ def create_app(**kwargs):
     async def redirect_to_prefix(request):
       path = request.match_info['path']
       if path == app['config']['PREFIX'].strip('/'): path = ''
-      raise web.HTTPFound(join_routes(app['config']['PREFIX'], path) + '/')
+      raise web.HTTPFound(join_slash(app['config']['PREFIX'], path) + '/')
     app.router.add_get('/{path:[^/]*}', redirect_to_prefix)
   #
   logger.info('Registering flask with aiohttp...')
   wsgi_handler = WSGIHandler(flask_app)
-  app.router.add_route('*', join_routes(app['config']['PREFIX'], '{path_info:.*}'), wsgi_handler)
+  app.router.add_route('*', join_slash(app['config']['PREFIX'], '{path_info:.*}'), wsgi_handler)
   if flask_app.config['PROXY']:
     logger.info('Applying proxy fix middleware...')
     asyncio.get_event_loop().run_until_complete(setup(app, XForwardedRelaxed()))

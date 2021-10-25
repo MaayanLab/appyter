@@ -1,40 +1,9 @@
+import shutil
 import time
-import urllib.parse
 from fsspec import filesystem, AbstractFileSystem
 from fsspec.core import url_to_fs
-from fsspec.utils import DEFAULT_BLOCK_SIZE
 
-def _copy(fs1, path1, fs2, path2):
-  ''' Copy from one fp to another
-  '''
-  with fs1.open(path1, 'rb') as fr:
-    with fs2.open(path2, 'wb') as fw:
-      while block := fr.read(DEFAULT_BLOCK_SIZE):
-        fw.write(block)
-
-def _try_json_loads(s):
-  ''' Return json parsed item else return string
-  '''
-  import json
-  try:
-    return json.loads(s)
-  except:
-    return s
-
-def _parse_qs(qs):
-  ''' Convert dot-notation querystring into option params
-  '''
-  params = {}
-  for Kv in qs.split('&'):
-    K, v = Kv.split('=')
-    _params_n_2 = None
-    _params_n_1 = params
-    for k in K.split('.'):
-      if k not in _params_n_1: _params_n_1[k] = {}
-      _params_n_2 = _params_n_1
-      _params_n_1 = _params_n_2[k]
-    _params_n_2[k] = _try_json_loads(urllib.parse.unquote(v))
-  return params
+from appyter.ext.urllib import parse_qs
 
 class PathMapFileSystem(AbstractFileSystem):
   ''' Pathmap layer over any other FS. Typically one would use a chroot as a base
@@ -89,7 +58,7 @@ class PathMapFileSystem(AbstractFileSystem):
     if path in self.pathmap:
       if '?' in self.pathmap[path]:
         url, qs = self.pathmap[path].split('?', maxsplit=1)
-        qs = _parse_qs(qs)
+        qs = parse_qs(qs)
       else:
         url = self.pathmap[path]
         qs = {}
@@ -121,9 +90,13 @@ class PathMapFileSystem(AbstractFileSystem):
         for f1 in fs1.walk(path1, maxdepth=maxdepth):
           f_rel = f1.replace(path1, '')
           f2_rel = path2.rstrip('/') + '/' + f_rel
-          _copy(fs1, f1, fs2, f2_rel)
+          with fs1.open(f1, 'rb') as fr:
+            with fs2.open(f2_rel, 'wb') as fw:
+              shutil.copyfileobj(fr, fw)
       else:
-        _copy(fs1, path1, fs2, path2)
+        with fs1.open(path1, 'rb') as fr:
+          with fs2.open(path2, 'wb') as fw:
+            shutil.copyfileobj(fr, fw)
 
   def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
     fs1, path1, mode1 = self._pathmap(path1)
@@ -137,10 +110,14 @@ class PathMapFileSystem(AbstractFileSystem):
         for f1 in fs1.walk(path1, maxdepth=maxdepth):
           f_rel = f1.replace(path1, '')
           f2_rel = path2.rstrip('/') + '/' + f_rel
-          _copy(fs1, f1, fs2, f2_rel)
+          with fs1.open(f1, 'rb') as fr:
+            with fs2.open(f2_rel, 'wb') as fw:
+              shutil.copyfileobj(fr, fw)
           fs1.rm(f1)
       else:
-        _copy(fs1, path1, fs2, path2)
+        with fs1.open(path1, 'rb') as fr:
+          with fs2.open(path2, 'wb') as fw:
+            shutil.copyfileobj(fr, fw)
         fs1.rm(path1)
 
   def info(self, path, **kwargs):

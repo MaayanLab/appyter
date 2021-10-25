@@ -11,7 +11,7 @@ def create_app(**kwargs):
   #
   from appyter.orchestration.dispatcher.core import core
   from appyter.orchestration.dispatcher.socketio import socketio
-  from appyter.ext.flask import join_routes
+  from appyter.ext.urllib import join_slash
   #
   logging.basicConfig(
     level=logging.DEBUG if kwargs.get('debug') else logging.WARNING,
@@ -37,7 +37,7 @@ def create_app(**kwargs):
     logger.info('Registering prefix redirect')
     async def redirect_to_prefix(request):
       path = request.match_info['path']
-      raise web.HTTPFound(join_routes(app['config']['PREFIX'], path) + '/')
+      raise web.HTTPFound(join_slash(app['config']['PREFIX'], path) + '/')
     app.router.add_get('/{path:[^/]*}', redirect_to_prefix)
     app.add_subapp(config['PREFIX'].rstrip('/'), core)
   else:
@@ -45,7 +45,7 @@ def create_app(**kwargs):
     app['config'] = config
   #
   logger.info('Initializing socketio...')
-  socketio.attach(app, join_routes(app['config']['PREFIX'], 'socket.io'))
+  socketio.attach(app, join_slash(app['config']['PREFIX'], 'socket.io'))
   #
   return app
 
@@ -61,8 +61,5 @@ def create_app(**kwargs):
 @click_option_setenv('--dispatch', envvar='APPYTER_DISPATCH', type=str, default='native', help='The dispatcher mechanism to use (see list-dispatchers)')
 def dispatcher(*args, **kwargs):
   from aiohttp import web
-  from appyter.orchestration.dispatcher.socketio import socketio
-  from appyter.ext.dict import dict_filter_none
-  #
   app = create_app(**kwargs)
   web.run_app(app, host=app['config']['HOST'], port=int(app['config']['PORT']))

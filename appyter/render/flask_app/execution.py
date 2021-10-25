@@ -7,9 +7,8 @@ logger = logging.getLogger(__name__)
 
 from appyter.render.flask_app.core import prepare_data, prepare_results
 from appyter.render.flask_app.socketio import socketio
-from appyter.ext.flask import join_routes
 from appyter.ext.uuid import sanitize_sha1sum, generate_uuid
-from appyter.ext.fs import Filesystem
+from appyter.ext.urllib import join_slash, join_url
 
 # construct/join a notebook
 @socketio.on('submit')
@@ -30,14 +29,14 @@ async def submit(sid, data):
   socketio.enter_room(sid, result_hash)
   await socketio.emit('status', 'Queuing execution', to=sid)
   job = dict(
-    cwd=Filesystem.join('storage:///output/', result_hash),
+    cwd=join_url('storage:///output/', result_hash),
     ipynb=os.path.basename(config['IPYNB']),
     session=result_hash,
     id=generate_uuid(),
   )
   #
   if config['DISPATCHER_URL']:
-    job['url'] = join_routes(config['DISPATCHER_URL'], 'socket.io').lstrip('/') + '/'
+    job['url'] = join_slash(config['DISPATCHER_URL'], 'socket.io/')
   else:
     job['url'] = request_url
   #

@@ -7,7 +7,7 @@ from appyter.cli import cli
 from appyter.ext.click import click_option_setenv, click_argument_setenv
 from appyter.ext.json import try_json_loads
 from appyter.ext.importlib import importdir_deep
-from appyter.ext.flask import join_routes
+from appyter.ext.urllib import join_slash
 
 def find_fields_dir_mappings(config=None):
   assert config is not None
@@ -196,7 +196,7 @@ def get_env_from_kwargs(mode='default', **kwargs):
   SECRET_KEY = try_json_loads(kwargs.get('secret_key', os.environ.get('APPYTER_SECRET_KEY', str(uuid.uuid4()))))
   DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('APPYTER_DEBUG', 'true')))
   STATIC_DIR = try_json_loads(kwargs.get('static_dir', os.environ.get('APPYTER_STATIC_DIR', os.path.join(CWD, 'static'))))
-  STATIC_PREFIX = join_routes(PREFIX, 'static')
+  STATIC_PREFIX = join_slash(PREFIX, 'static')
   IPYNB = try_json_loads(kwargs.get('ipynb', os.environ.get('APPYTER_IPYNB')))
   #
   if mode == 'default' and (IPYNB is None or not os.path.isfile(os.path.join(CWD, IPYNB))):

@@ -1,6 +1,8 @@
 import logging
 logger = logging.getLogger(__name__)
 
+from appyter.ext.asyncio.try_n_times import try_n_times
+
 async def run_app(config):
   import os
   import sys
@@ -32,24 +34,9 @@ async def app_runner(emitter, config):
     if 'proc' in state:
       state.pop('proc').kill()
 
-async def try_n_times(n, coro, *args, **kwargs):
-  import asyncio
-  import traceback
-  backoff = 1
-  while n > 0:
-    try:
-      return await coro(*args, **kwargs)
-    except Exception as err:
-      n -= 1
-      if n == 0:
-        raise err
-      logger.warn(f"Failed to run start, trying again in {backoff}s...")
-      await asyncio.sleep(backoff)
-      backoff *= 2
-
 async def app_messager(emitter, config):
   import asyncio
-  from appyter.ext.flask import join_routes
+  from appyter.ext.urllib import join_slash
   from appyter.ext.socketio import AsyncClient
   sio = AsyncClient()
   #
@@ -64,7 +51,7 @@ async def app_messager(emitter, config):
     await sio.disconnect()
   #
   origin = f"http://{config['HOST']}:{config['PORT']}"
-  path = join_routes(config['PREFIX'], "socket.io")
+  path = join_slash(config['PREFIX'], "socket.io")
   logger.info(f"Connecting to appyter server at {origin}{path}...")
   await asyncio.sleep(1)
   await try_n_times(3, sio.connect, origin, socketio_path=path)
