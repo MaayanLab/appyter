@@ -1,5 +1,22 @@
+from pathlib import PurePosixPath
 from fsspec import filesystem, AbstractFileSystem
+from fsspec.core import url_to_fs, split_protocol
 from appyter.ext.pathlib.chroot import ChrootPurePosixPath
+
+def url_to_chroot_fs(url, pathmap=None, **kwargs):
+  ''' Like url_to_fs but supporting our extensions, namely:
+  chroot   filesystem path is treated as the root
+  pathmap  overlay other fsspec-compatible paths
+  '''
+  if 'file' not in kwargs: kwargs['file'] = {}
+  if 'auto_mkdir' not in kwargs['file']: kwargs['file']['auto_mkdir'] = True
+  protocol, path = split_protocol(url)
+  full_url = 'chroot::' + (protocol or 'file') + '://' + path
+  if pathmap is not None:
+    full_url = 'pathmap::' + full_url
+    kwargs['pathmap'] = dict(pathmap=pathmap)
+  fs, _ = url_to_fs(full_url, **kwargs)
+  return fs
 
 class ChrootFileSystem(AbstractFileSystem):
   ''' chroot: update root and disallow access beyond chroot, only works on directories.
@@ -17,8 +34,6 @@ class ChrootFileSystem(AbstractFileSystem):
       Passed to the instantiation of the FS, if fs is None.
     fs: filesystem instance
       The target filesystem to run against. Provide this or ``protocol``.
-    pathmap: dict
-      A mapping from [path to map onto the target filesystem]: filesystem url to present
     '''
     super().__init__(**kwargs)
     if not (fs is None) ^ (target_protocol is None):
@@ -35,7 +50,7 @@ class ChrootFileSystem(AbstractFileSystem):
     self.fs = fs if fs is not None else filesystem(target_protocol, **self.kwargs)
 
   def __resolve_path(self, path):
-    return (ChrootPurePosixPath(self.storage_options['fo']) / path).realpath()
+    return str((ChrootPurePosixPath(self.storage_options['fo']) / path).realpath())
 
   def __unresolve_path(self, path):
     return '/' + str(PurePosixPath(path).relative_to(self.storage_options['fo']))
@@ -60,6 +75,9 @@ class ChrootFileSystem(AbstractFileSystem):
 
   def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
     return self.fs.mv(self.__resolve_path(path1), self.__resolve_path(path2), recursive=recursive, maxdepth=maxdepth, **kwargs)
+
+  def info(self, path, **kwargs):
+    return self.fs.info(self.__resolve_path(path), **kwargs)
 
   def ls(self, path, detail=True, **kwargs):
     results = []

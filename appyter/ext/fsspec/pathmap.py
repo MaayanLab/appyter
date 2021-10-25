@@ -39,7 +39,10 @@ class PathMapFileSystem(AbstractFileSystem):
       else (fs.protocol if isinstance(fs.protocol, str) else fs.protocol[0])
     )
     self.fs = fs if fs is not None else filesystem(target_protocol, **self.kwargs)
-    self.pathmap = pathmap
+    self.pathmap = {
+      '/' + k.lstrip('/'): v
+      for k, v in pathmap.items()
+    }
     self.listing = {}
     for mapping in self.pathmap:
       src_split = mapping.split('/')
