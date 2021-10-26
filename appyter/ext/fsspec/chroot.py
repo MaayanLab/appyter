@@ -1,3 +1,9 @@
+import contextlib
+import traceback
+import logging
+
+logger = logging.getLogger(__name__)
+
 from pathlib import PurePosixPath
 from fsspec import filesystem, AbstractFileSystem
 from appyter.ext.pathlib.chroot import ChrootPurePosixPath
@@ -39,39 +45,61 @@ class ChrootFileSystem(AbstractFileSystem):
   def __unresolve_path(self, path):
     return '/' + str(PurePosixPath(path).relative_to(self.storage_options['fo']))
 
+  @contextlib.contextmanager
+  def __masquerade_os_error(self):
+    try:
+      yield
+    except OSError as e:
+      filename = self.__unresolve_path(e.filename) if e.filename else None
+      winerror = getattr(e, 'winerror', None)
+      filename2 = self.__unresolve_path(e.filename2) if e.filename2 else None
+      raise OSError(e.errno, e.strerror, filename, winerror, filename2) from None
+    except Exception as e:
+      logger.error(traceback.print_exc())
+      raise Exception(f"{e.__class__.__name__} occurred, details have been hidden for security reasons")
+
   def __enter__(self):
     if getattr(self.fs, '__enter__', None) is not None:
-      self.fs.__enter__()
+      with self.__masquerade_os_error():
+        self.fs.__enter__()
     return self
   
   def __exit__(self, type, value, traceback):
     if getattr(self.fs, '__exit__', None) is not None:
-      self.fs.__exit__(type, value, traceback)
+      with self.__masquerade_os_error():
+        self.fs.__exit__(type, value, traceback)
 
   def mkdir(self, path, **kwargs):
-    return self.fs.mkdir(self.__resolve_path(path), **kwargs)
+    with self.__masquerade_os_error():
+      return self.fs.mkdir(self.__resolve_path(path), **kwargs)
 
   def rm(self, path, recursive=False, maxdepth=None):
-    return self.fs.rm(self.__resolve_path(path), recursive=recursive, maxdepth=maxdepth)
+    with self.__masquerade_os_error():
+      return self.fs.rm(self.__resolve_path(path), recursive=recursive, maxdepth=maxdepth)
 
   def copy(self, path1, path2, recursive=False, on_error=None, **kwargs):
-    return self.fs.copy(self.__resolve_path(path1), self.__resolve_path(path2), recursive=recursive, on_error=on_error, **kwargs)
+    with self.__masquerade_os_error():
+      return self.fs.copy(self.__resolve_path(path1), self.__resolve_path(path2), recursive=recursive, on_error=on_error, **kwargs)
 
   def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
-    return self.fs.mv(self.__resolve_path(path1), self.__resolve_path(path2), recursive=recursive, maxdepth=maxdepth, **kwargs)
+    with self.__masquerade_os_error():
+      return self.fs.mv(self.__resolve_path(path1), self.__resolve_path(path2), recursive=recursive, maxdepth=maxdepth, **kwargs)
 
   def info(self, path, **kwargs):
-    return self.fs.info(self.__resolve_path(path), **kwargs)
+    with self.__masquerade_os_error():
+      return self.fs.info(self.__resolve_path(path), **kwargs)
 
   def ls(self, path, detail=True, **kwargs):
     results = []
-    for f in self.fs.ls(self.__resolve_path(path), detail=detail, **kwargs):
-      if detail:
-        f['name'] = self.__unresolve_path(f['name'])
-        results.append(f)
-      else:
-        results.append(self.__unresolve_path(f))
+    with self.__masquerade_os_error():
+      for f in self.fs.ls(self.__resolve_path(path), detail=detail, **kwargs):
+        if detail:
+          f['name'] = self.__unresolve_path(f['name'])
+          results.append(f)
+        else:
+          results.append(self.__unresolve_path(f))
     return results
 
   def _open(self, path, mode="rb", block_size=None, cache_options=None, **kwargs):
-    return self.fs._open(self.__resolve_path(path), mode=mode, block_size=block_size, cache_options=cache_options, **kwargs)
+    with self.__masquerade_os_error():
+      return self.fs._open(self.__resolve_path(path), mode=mode, block_size=block_size, cache_options=cache_options, **kwargs)
