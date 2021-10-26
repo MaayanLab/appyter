@@ -3,7 +3,7 @@ import traceback
 import logging
 import shutil
 
-from appyter.ext.fsspec import url_to_chroot_fs
+from appyter.ext.fsspec.core import url_to_chroot_fs
 logger = logging.getLogger(__name__)
 
 from appyter.render.flask_app.socketio import socketio

@@ -6,8 +6,6 @@ import asyncio
 import datetime
 import traceback
 import logging
-
-from appyter.ext.fsspec import fs_mount, url_to_chroot_fs
 logger = logging.getLogger(__name__)
 
 from appyter import __version__
@@ -16,6 +14,8 @@ from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io, nb_to_json
 from appyter.ext.click import click_option_setenv, click_argument_setenv
 from appyter.ext.urllib import join_url
+from appyter.ext.fsspec.core import url_to_chroot_fs
+from appyter.ext.fsspec.fuse import fs_mount
 
 def cell_is_code(cell):
     return cell.get('cell_type') == 'code'

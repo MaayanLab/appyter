@@ -3,7 +3,7 @@ import fsspec
 from flask import Blueprint, request, redirect, abort, url_for, current_app, jsonify, make_response
 
 from appyter.context import get_jinja2_env
-from appyter.ext.fsspec import url_to_chroot_fs
+from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.urllib import join_url
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.parse.nbtemplate import parse_fields_from_nbtemplate

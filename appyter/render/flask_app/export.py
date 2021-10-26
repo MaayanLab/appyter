@@ -6,7 +6,7 @@ import zipfile
 from flask import request, current_app, send_file, abort
 from nbconvert import HTMLExporter
 
-from appyter.ext.fsspec import url_to_chroot_fs
+from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.render.flask_app.core import core
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.parse.nb import nb_from_ipynb_io

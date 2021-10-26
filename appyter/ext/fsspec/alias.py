@@ -2,7 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from fsspec import AbstractFileSystem
-from appyter.ext.fsspec.chroot import url_to_chroot_fs
+from appyter.ext.fsspec.core import url_to_chroot_fs
 
 def AliasFileSystemFactory(proto, fs_url, **kwargs):
   logger.debug(f"creating AliasFileSystem {proto}:/// => {fs_url}")

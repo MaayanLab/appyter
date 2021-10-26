@@ -4,7 +4,7 @@ import os
 from flask import request, current_app, send_file, send_from_directory, abort, jsonify
 from werkzeug.exceptions import NotFound
 
-from appyter.ext.fsspec import url_to_chroot_fs
+from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.urllib import join_url
 from appyter.render.flask_app.core import core
 from appyter.ext.flask import route_join_with_or_without_slash
