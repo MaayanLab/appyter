@@ -12,7 +12,7 @@ def url_to_chroot_fs(url, pathmap=None, **kwargs):
   if 'auto_mkdir' not in kwargs['file']: kwargs['file']['auto_mkdir'] = True
   protocol, path = split_protocol(url)
   full_url = 'chroot::' + (protocol or 'file') + '://' + path
-  if pathmap is not None:
+  if pathmap:
     full_url = 'pathmap::' + full_url
     kwargs['pathmap'] = dict(pathmap=pathmap)
   fs, _ = url_to_fs(full_url, **kwargs)

@@ -62,7 +62,8 @@ def render_nb_from_nbtemplate(env, nbtemplate, fields=[], data={}):
   for field in fields:
     if field.field == 'FileField':
       uri, filename = parse_file_uri(data[field.args['name']])
-      files[filename] = uri
+      if filename and uri:
+        files[filename] = uri
   #
   nb = deepcopy(nbtemplate)
   nb.cells = list(filter(None, [
