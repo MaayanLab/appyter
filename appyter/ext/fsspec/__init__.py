@@ -16,6 +16,8 @@ fsspec.register_implementation('tmpfs', AliasFileSystemFactory('tmpfs', 'memory:
 
 @contextlib.asynccontextmanager
 async def fs_mount(fs, path):
+  import os
+  import signal
   import asyncio
   import pathlib
   import tempfile
@@ -38,14 +40,17 @@ async def fs_mount(fs, path):
   proc = Process(target=fsspec.fuse.run, args=(fs, path, str(tmp)))
   proc.start()
   try:
-    n = 0
     await try_n_times(3, assert_mounted, tmp)
+    logger.debug(f"fs mount ready on {tmp}")
     yield tmp
   except:
     logger.error(traceback.format_exc())
     raise
   finally:
-    proc.terminate()
+    logger.debug(f"unmounting fs from {tmp}")
+    os.kill(proc.pid, signal.SIGINT) # SIGINT cleanly stops fsspec.fuse.run
+    logger.debug(f"waiting for process to end")
     await loop.run_in_executor(None, proc.join)
     await try_n_times(3, assert_not_mounted, tmp)
     await try_n_times(3, rmdir, tmp)
+  logger.debug(f"done")

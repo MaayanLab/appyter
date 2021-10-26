@@ -154,8 +154,8 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
     logger.info(f"outer cancelled")
     raise
   except Exception as e:
-    await emit({ 'type': 'status', 'data': 'Error initializing, try again later' })
     logger.error(traceback.format_exc())
+    await emit({ 'type': 'status', 'data': 'Error initializing, try again later' })
   finally:
     logger.info('complete')
   #
