@@ -3,6 +3,7 @@ import json
 import click
 import fsspec
 import nbformat as nbf
+import datetime
 from copy import deepcopy
 
 from appyter import __version__
@@ -77,6 +78,7 @@ def render_nb_from_nbtemplate(env, nbtemplate, fields=[], data={}):
     nb.metadata['appyter'] = {}
   nb.metadata['appyter']['nbconstruct'] = dict(
     version=__version__,
+    created=datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat(),
     filename=env.globals['_config']['IPYNB'],
     files=files,
   )
