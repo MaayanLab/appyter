@@ -1,5 +1,5 @@
 {%- macro cache(name) -%}
-  proxy_cache_path "{{ _os.path.join(_tmp_fs.path(), name + '.cache.d') }}"
+  proxy_cache_path "{{ str(_tmp_dir / (name + '.cache.d')) }}"
     levels=1:2 keys_zone={{ name }}:10m max_size=1g
     inactive=60m use_temp_path=off;
 {%- endmacro -%}
@@ -26,7 +26,7 @@
       {%- endif %}
 {%- endmacro -%}
 
-pid {{ _tmp_fs.path('nginx.pid') }};
+pid {{ str(_tmp_dir/'nginx.pid') }};
 worker_processes 1;
 daemon off;
 
@@ -68,19 +68,10 @@ http {
   upstream appyter {
     {#- {% for n in range(1, _config.N_PROCS+1) %} #}
     {%- with n=1 %}
-    server "unix:{{ _tmp_fs.path() }}appyter_{{ n }}.sock" fail_timeout=0;
+    server "unix:{{ str(_tmp_dir) }}appyter_{{ n }}.sock" fail_timeout=0;
     {%- endwith %}
     {#- {% endfor %} #}
   }
-
-  {%- if _config.DATA_DIR.startswith('s3://') %}
-  {%- with s3_url = s3_to_url(_config.DATA_DIR) %}
-  upstream s3 {
-    server {{ s3_url.netloc }} fail_timeout=0;
-  }
-  {%- endwith %}
-  {%- endif %}
-
 
   {%- if _config.PROXY %}
   map $http_x_forwarded_for_proto $proxied_proto {
@@ -118,12 +109,12 @@ http {
     }
 
     location = {{ join_routes(_config.PREFIX, 'index.html') }} {
-      root "{{ _tmp_fs.path() }}";
+      root "{{ str(_tmp_dir) }}";
       try_files /index.html =404;
     }
 
     location = {{ join_routes(_config.PREFIX, 'index.json') }} {
-      root "{{ _tmp_fs.path() }}";
+      root "{{ str(_tmp_dir) }}";
       try_files /index.json =404;
     }
 
@@ -189,7 +180,7 @@ http {
       if ($parsed_method = 'GET:application/json') {
         rewrite ^(.*)/$ "$1/{{ _config.IPYNB }}";
       }
-      root "{{ _tmp_fs.path() }}";
+      root "{{ str(_tmp_dir) }}";
       try_files /landing.html =404;
     }
 
@@ -197,12 +188,6 @@ http {
       {%- if _config.DATA_DIR.startswith('/') %}
       root "{{ join_routes(_config.DATA_DIR, 'output') }}";
       try_files "/$1/$2" =404;
-      {%- elif _config.DATA_DIR.startswith('s3://') %}
-      {%- with s3_url = s3_to_url(_config.DATA_DIR) %}
-      rewrite ^{{ join_routes(_config.PREFIX, '([^/]+)', '(.+)') }}$ {{ join_routes(s3_url.path, 'output', '$1', '$2') }} break;
-      {{ proxy('http://s3', False, 'appyter-data') }}
-      {%- endwith %}
-      {%- else %}
       {{ proxy('http://appyter', False, 'appyter-data') }}
       {%- endif %}
     }

@@ -1,9 +1,9 @@
 import os
 import json
 import click
+import fsspec
 
 from appyter.cli import cli
-from appyter.ext import fsspec
 from appyter.ext.urllib import join_url
 from appyter.parse.nb import nb_from_ipynb_io
 from appyter.parse.nbtemplate import parse_fields_from_nbtemplate

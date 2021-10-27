@@ -1,6 +1,6 @@
 [supervisord]
-logfile = {{ _tmp_fs.path('supervisord.log') }}
-pidfile = {{ _tmp_fs.path('supervisord.pid') }}
+logfile = {{ str(_tmp_dir/'supervisord.log') }}
+pidfile = {{ str(_tmp_dir/'supervisord.pid') }}
 
 [program:nginx]
 process_name=%(program_name)s_%(process_num)d
@@ -8,7 +8,7 @@ numprocs=1
 startsecs=1
 startretries=3
 autostart=true
-command=/usr/sbin/nginx -c {{ _tmp_fs.path('nginx.conf') }}
+command=/usr/sbin/nginx -c {{ str(_tmp_dir/'nginx.conf') }}
 autorestart=true
 stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
@@ -26,7 +26,7 @@ autostart=true
 autorestart=true
 {#- NOTE: a `'` anywhere in `v` would cause an issue, we should come up with a way around this #}
 environment={% for k, v in _config.items() %}{% if v is not none %}{{ k }}='{{ v|jsonify }}'{% if not loop.last %},{% endif %}{% endif %}{% endfor %}
-command={{ sys.executable }} -u -m appyter --socket={{ _tmp_fs.path() }}%(program_name)s_%(process_num)d.sock
+command={{ sys.executable }} -u -m appyter --socket={{ str(_tmp_dir) }}%(program_name)s_%(process_num)d.sock
 stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
 stdout_logfile=/dev/stdout
