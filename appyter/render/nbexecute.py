@@ -141,9 +141,9 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
       # save additional files
       # TODO: in the future we should individual files and include the original urls here
       nb.metadata['appyter']['nbexecute']['files'] = {
-        path.lstrip('/'): path
-        for path in fs.ls('/', detail=False)
-        if path != ipynb
+        path: path
+        for path in map(lambda s: s.lstrip('/'), fs.ls('/', detail=False))
+        if path not in (files.keys()|{ipynb})
       }
       #
       with fs.open('/' + ipynb, 'w') as fw:
