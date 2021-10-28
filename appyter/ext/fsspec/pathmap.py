@@ -2,8 +2,7 @@ import shutil
 import time
 from fsspec import filesystem, AbstractFileSystem
 from fsspec.core import url_to_fs
-
-from appyter.ext.urllib import parse_qs
+from appyter.ext.fsspec.parse import parse_file_uri_qs
 
 class PathMapFileSystem(AbstractFileSystem):
   ''' Pathmap layer over any other FS. Typically one would use a chroot as a base
@@ -59,12 +58,7 @@ class PathMapFileSystem(AbstractFileSystem):
     ''' Return (fs, path, mode) depending on whether we hit a mapped paths or not
     '''
     if path in self.pathmap:
-      if '?' in self.pathmap[path]:
-        url, qs = self.pathmap[path].split('?', maxsplit=1)
-        qs = parse_qs(qs)
-      else:
-        url = self.pathmap[path]
-        qs = {}
+      url, qs = parse_file_uri_qs(self.pathmap[path])
       fs, path = url_to_fs(url, **qs)
       mode = 0o444
     else:

@@ -1,4 +1,6 @@
 import logging
+
+from appyter.ext.fsspec.parse import parse_file_uri_qs
 logger = logging.getLogger(__name__)
 
 from fsspec.core import url_to_fs, split_protocol
@@ -8,10 +10,18 @@ def url_to_chroot_fs(url, pathmap=None, **kwargs):
   chroot   filesystem path is treated as the root
   pathmap  overlay other fsspec-compatible paths
   '''
-  if 'file' not in kwargs: kwargs['file'] = {}
-  if 'auto_mkdir' not in kwargs['file']: kwargs['file']['auto_mkdir'] = True
+  url, qs = parse_file_uri_qs(url)
   protocol, path = split_protocol(url)
-  full_url = 'chroot::' + (protocol or 'file') + '://' + path
+  protocol = protocol or 'file'
+  full_url = protocol + '://' + path
+  full_url = 'chroot::' + full_url
+  # add protocol options to inner protocol
+  if protocol not in kwargs: kwargs[protocol] = {}
+  kwargs[protocol].update(qs)
+  # ensure auto_mkdir is enabled
+  if protocol == 'file':
+    if 'auto_mkdir' not in kwargs[protocol]: kwargs[protocol]['auto_mkdir'] = True
+  # add pathmap as necessary
   if pathmap:
     full_url = 'pathmap::' + full_url
     kwargs['pathmap'] = dict(pathmap=pathmap)
