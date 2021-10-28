@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 from fsspec import AbstractFileSystem
 from appyter.ext.fsspec.core import url_to_chroot_fs
 
-def AliasFileSystemFactory(proto, fs_url, **kwargs):
+def AliasFileSystemFactory(proto, fs_url, **_kwargs):
   logger.debug(f"creating AliasFileSystem {proto}:/// => {fs_url}")
   class AliasFileSystem(AbstractFileSystem):
     ''' alias: seemless passthrough to a more elaborate protocol
@@ -14,7 +14,7 @@ def AliasFileSystemFactory(proto, fs_url, **kwargs):
 
     def __init__(self, **kwargs):
       super().__init__(**kwargs)
-      self.fs = url_to_chroot_fs(fs_url, **kwargs)
+      self.fs = url_to_chroot_fs(fs_url, **_kwargs)
 
     def __enter__(self):
       if getattr(self.fs, '__enter__', None) is not None:
