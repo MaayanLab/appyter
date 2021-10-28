@@ -4,6 +4,11 @@ from fsspec import filesystem, AbstractFileSystem
 from fsspec.core import url_to_fs
 from appyter.ext.fsspec.parse import parse_file_uri_qs
 
+def _encase_path(p, trailing_slash=True):
+  p = p.strip('/')
+  if p: return '/'+p+('/' if trailing_slash else '')
+  else: return '/'
+
 class PathMapFileSystem(AbstractFileSystem):
   ''' Pathmap layer over any other FS. Typically one would use a chroot as a base
   filesystem, so instantiation would look like:
@@ -39,7 +44,7 @@ class PathMapFileSystem(AbstractFileSystem):
     )
     self.fs = fs if fs is not None else filesystem(target_protocol, **self.kwargs)
     self.pathmap = {
-      '/' + k.lstrip('/'): v
+      _encase_path(k, trailing_slash=False): v
       for k, v in pathmap.items()
     }
     self.listing = {}
@@ -49,7 +54,7 @@ class PathMapFileSystem(AbstractFileSystem):
         path_parent = '/'.join(src_split[:i-1]) + '/'
         path_current = '/'.join(src_split[:i]) + '/'
         if path_parent not in self.listing: self.listing[path_parent] = {}
-        self.listing[path_parent][path_current] = True
+        self.listing[path_parent][path_current.strip('/')] = True
       path_parent = '/'.join(src_split[:-1]) + '/'
       if path_parent not in self.listing: self.listing[path_parent] = {}
       self.listing[path_parent][src_split[-1]] = True
@@ -57,13 +62,13 @@ class PathMapFileSystem(AbstractFileSystem):
   def __pathmap(self, path):
     ''' Return (fs, path, mode) depending on whether we hit a mapped paths or not
     '''
-    path = '/'+path.lstrip('/')
+    path = _encase_path(path, trailing_slash=False)
     if path in self.pathmap:
       url, qs = parse_file_uri_qs(self.pathmap[path])
       fs, path = url_to_fs(url, **qs)
       mode = 0o444
     else:
-      fs, path = self.fs, self.storage_options['fo'].rstrip('/') + '/' + path.lstrip('/')
+      fs, path = self.fs, self.storage_options['fo'].rstrip('/') + _encase_path(path, trailing_slash=True)
       mode = 0o755
     return fs, path, mode
 
@@ -128,17 +133,12 @@ class PathMapFileSystem(AbstractFileSystem):
         fs1.rm(path1)
 
   def info(self, path, **kwargs):
-    if path in self.listing:
+    path = _encase_path(path, trailing_slash=False)
+    if _encase_path(path, trailing_slash=True) in self.listing:
       return {
         'name': path,
-        'size': 0,
         'type': 'directory',
-        'created': time.time(),
-        'mtime': time.time(),
         'mode': 0o444,
-        'islink': False,
-        'uid': 1000,
-        'gid': 1000,
       }
     else:
       fs, fs_path, mode = self.__pathmap(path)
@@ -149,20 +149,22 @@ class PathMapFileSystem(AbstractFileSystem):
   def ls(self, path, detail=False, **kwargs):
     ''' Aggregate results based on pathmap listing & underlying fs
     '''
+    path = _encase_path(path, trailing_slash=True)
     results = {}
     if path in self.listing:
       for p in self.listing[path]:
         if detail:
-          results[p] = self.info(path + p.lstrip('/'))
+          results[path + p] = self.info(path + p)
         else:
-          results[p] = p
+          results[path + p] = path + p
     #
     fs, fs_path, mode = self.__pathmap(path)
-    for f in fs.ls(fs_path, detail=detail, **kwargs):
-      if detail:
-        results[f['name']] = f
-      else:
-        results[f] = f
+    if fs is self.fs:
+      for f in fs.ls(fs_path, detail=detail, **kwargs):
+        if detail:
+          results[f['name']] = f
+        else:
+          results[f] = f
     #
     return list(results.values())
 
