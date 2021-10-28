@@ -14,7 +14,6 @@ from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io, nb_to_json
 from appyter.ext.click import click_option_setenv, click_argument_setenv
 from appyter.ext.urllib import join_url
-from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.fsspec.fuse import fs_mount
 
 def cell_is_code(cell):
@@ -77,7 +76,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   try:
     files = nb.metadata['appyter']['nbconstruct'].get('files')
     logger.debug(f"{cwd=} {files=}")
-    async with fs_mount(cwd, '/', pathmap=files) as mnt:
+    async with fs_mount(cwd, pathmap=files, cached=True) as mnt:
       # setup execution_info with start time
       nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
       with (mnt/ipynb).open('w') as fw:
