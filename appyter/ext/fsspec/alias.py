@@ -1,20 +1,25 @@
 import logging
+
 logger = logging.getLogger(__name__)
 
-from fsspec import AbstractFileSystem
+import fsspec
 from appyter.ext.fsspec.core import url_to_chroot_fs
 
-def AliasFileSystemFactory(proto, fs_url, **_kwargs):
-  logger.debug(f"creating AliasFileSystem {proto}:/// => {fs_url}")
-  class AliasFileSystem(AbstractFileSystem):
+class AliasFileSystemBase(fsspec.AbstractFileSystem): pass
+
+def AliasFileSystemFactory(_proto, _fs_url, **_kwargs):
+  logger.debug(f"creating AliasFileSystem {_proto}:/// => {_fs_url}")
+  class AliasFileSystem(AliasFileSystemBase):
     ''' alias: seemless passthrough to a more elaborate protocol
     '''
     root_marker = '/'
-    protocol = proto
+    protocol = _proto
+    fs_url = _fs_url
+    kwargs = _kwargs
 
     def __init__(self, **kwargs):
       super().__init__(**kwargs)
-      self.fs = url_to_chroot_fs(fs_url, **_kwargs)
+      self.fs = url_to_chroot_fs(_fs_url, chroot=True, **_kwargs)
 
     def __enter__(self):
       if getattr(self.fs, '__enter__', None) is not None:
@@ -47,3 +52,14 @@ def AliasFileSystemFactory(proto, fs_url, **_kwargs):
       return self.fs._open(path, mode=mode, block_size=block_size, cache_options=cache_options, **kwargs)
 
   return AliasFileSystem
+
+def dump_aliases():
+  return {
+    k: [[cls.protocol, cls.fs_url], cls.kwargs]
+    for k, cls in fsspec.registry.target.items()
+    if issubclass(cls, AliasFileSystemBase)
+  }
+
+def register_aliases(alias_dump):
+  for k, (args, kwargs) in alias_dump.items():
+    fsspec.register_implementation(k, AliasFileSystemFactory(*args, **kwargs))

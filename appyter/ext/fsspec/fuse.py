@@ -4,9 +4,11 @@ from multiprocessing import Process
 
 logger = logging.getLogger(__name__)
 
-def _fuse_run(url, mount_point, kwargs):
+def _fuse_run(url, mount_point, kwargs, alias_dump):
   import fsspec.fuse
   from appyter.ext.fsspec.core import url_to_chroot_fs
+  from appyter.ext.fsspec.alias import register_aliases
+  register_aliases(alias_dump)
   logger.debug(f'preparing fs from {url} ({kwargs})..')
   with url_to_chroot_fs(url, **kwargs) as fs:
     logger.debug('launching fuse..')
@@ -21,6 +23,7 @@ async def fs_mount(url, **kwargs):
   import pathlib
   import tempfile
   import traceback
+  from appyter.ext.fsspec.alias import dump_aliases
   from appyter.ext.asyncio.try_n_times import try_n_times
   from appyter.ext.asyncio.run_in_executor import run_in_executor
   @run_in_executor
@@ -35,7 +38,7 @@ async def fs_mount(url, **kwargs):
   tmp = pathlib.Path(tempfile.mkdtemp())
   logger.debug(f'mounting {url} onto {tmp}')
   proc = Process(
-    target=_fuse_run, args=(url, str(tmp), kwargs)
+    target=_fuse_run, args=(url, str(tmp), kwargs, dump_aliases())
   )
   proc.start()
   try:
