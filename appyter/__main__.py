@@ -1,4 +1,6 @@
 def main():
+  import multiprocessing as mp
+  mp.set_start_method('spawn')
   # load dotenv if present
   from dotenv import load_dotenv
   load_dotenv()
