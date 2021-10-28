@@ -54,9 +54,10 @@ class PathMapFileSystem(AbstractFileSystem):
       if path_parent not in self.listing: self.listing[path_parent] = {}
       self.listing[path_parent][src_split[-1]] = True
 
-  def _pathmap(self, path):
+  def __pathmap(self, path):
     ''' Return (fs, path, mode) depending on whether we hit a mapped paths or not
     '''
+    path = '/'+path.lstrip('/')
     if path in self.pathmap:
       url, qs = parse_file_uri_qs(self.pathmap[path])
       fs, path = url_to_fs(url, **qs)
@@ -76,18 +77,18 @@ class PathMapFileSystem(AbstractFileSystem):
       self.fs.__exit__(type, value, traceback)
 
   def mkdir(self, path, **kwargs):
-    fs, path, mode = self._pathmap(path)
+    fs, path, mode = self.__pathmap(path)
     if mode == 0o444: raise PermissionError
     return fs.mkdir(path, **kwargs)
 
   def rm(self, path, recursive=False, maxdepth=None):
-    fs, path, mode = self._pathmap(path)
+    fs, path, mode = self.__pathmap(path)
     if mode == 0o444: raise PermissionError
     return fs.rm(path, recursive=recursive, maxdepth=maxdepth)
 
   def copy(self, path1, path2, recursive=False, on_error=None, maxdepth=None, **kwargs):
-    fs1, path1, mode1 = self._pathmap(path1)
-    fs2, path2, mode2 = self._pathmap(path2)
+    fs1, path1, mode1 = self.__pathmap(path1)
+    fs2, path2, mode2 = self.__pathmap(path2)
     if mode2 == 0o444: raise PermissionError
     if fs1 == fs2:
       return fs1.copy(path1, path2, recursive=recursive, on_error=on_error, **kwargs)
@@ -105,8 +106,8 @@ class PathMapFileSystem(AbstractFileSystem):
             shutil.copyfileobj(fr, fw)
 
   def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
-    fs1, path1, mode1 = self._pathmap(path1)
-    fs2, path2, mode2 = self._pathmap(path2)
+    fs1, path1, mode1 = self.__pathmap(path1)
+    fs2, path2, mode2 = self.__pathmap(path2)
     if mode1 == 0o444: raise PermissionError
     if mode2 == 0o444: raise PermissionError
     if fs1 == fs2:
@@ -140,10 +141,9 @@ class PathMapFileSystem(AbstractFileSystem):
         'gid': 1000,
       }
     else:
-      fs, fs_path, mode = self._pathmap(path)
+      fs, fs_path, mode = self.__pathmap(path)
       info = fs.info(fs_path)
-      info['name'] = path
-      info['mode'] = mode
+      info = dict(info, name=path, mode=mode)
       return info
 
   def ls(self, path, detail=False, **kwargs):
@@ -157,7 +157,7 @@ class PathMapFileSystem(AbstractFileSystem):
         else:
           results[p] = p
     #
-    fs, fs_path, mode = self._pathmap(path)
+    fs, fs_path, mode = self.__pathmap(path)
     for f in fs.ls(fs_path, detail=detail, **kwargs):
       if detail:
         results[f['name']] = f
@@ -167,7 +167,7 @@ class PathMapFileSystem(AbstractFileSystem):
     return list(results.values())
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
-    fs, path, fs_mode = self._pathmap(path)
+    fs, path, fs_mode = self.__pathmap(path)
     if fs_mode == 0o444 and 'w' in mode or '+' in mode: raise PermissionError
     return fs._open(
       path,

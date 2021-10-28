@@ -40,22 +40,25 @@ class ChrootFileSystem(AbstractFileSystem):
     self.fs = fs if fs is not None else filesystem(target_protocol, **self.kwargs)
 
   def __resolve_path(self, path):
-    return str((ChrootPurePosixPath(self.storage_options['fo']) / path).realpath())
+    resolved_path = self.fs.root_marker + str((ChrootPurePosixPath('/'+self.storage_options['fo'].lstrip('/')) / ('/'+path.lstrip('/'))).realpath()).lstrip('/')
+    return resolved_path
 
   def __unresolve_path(self, path):
-    return '/' + str(PurePosixPath(path).relative_to(self.storage_options['fo']))
+    unresolve_path = self.root_marker + str(PurePosixPath('/'+path.lstrip('/')).relative_to('/'+self.storage_options['fo'].lstrip('/')))
+    return unresolve_path
 
   @contextlib.contextmanager
   def __masquerade_os_error(self):
     try:
       yield
     except OSError as e:
+      logger.error(traceback.format_exc())
       filename = self.__unresolve_path(e.filename) if e.filename else None
       winerror = getattr(e, 'winerror', None)
       filename2 = self.__unresolve_path(e.filename2) if e.filename2 else None
       raise OSError(e.errno, e.strerror, filename, winerror, filename2) from None
     except Exception as e:
-      logger.error(traceback.print_exc())
+      logger.error(traceback.format_exc())
       raise Exception(f"{e.__class__.__name__} occurred, details have been hidden for security reasons")
 
   def __enter__(self):
@@ -87,14 +90,15 @@ class ChrootFileSystem(AbstractFileSystem):
 
   def info(self, path, **kwargs):
     with self.__masquerade_os_error():
-      return self.fs.info(self.__resolve_path(path), **kwargs)
+      info = self.fs.info(self.__resolve_path(path), **kwargs)
+      return dict(info, name=self.__unresolve_path(info['name']))
 
   def ls(self, path, detail=True, **kwargs):
     results = []
     with self.__masquerade_os_error():
       for f in self.fs.ls(self.__resolve_path(path), detail=detail, **kwargs):
         if detail:
-          f['name'] = self.__unresolve_path(f['name'])
+          f = dict(f, name=self.__unresolve_path(f['name']))
           results.append(f)
         else:
           results.append(self.__unresolve_path(f))
