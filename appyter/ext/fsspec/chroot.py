@@ -51,12 +51,37 @@ class ChrootFileSystem(AbstractFileSystem):
   def __masquerade_os_error(self):
     try:
       yield
+    except FileNotFoundError as e:
+      filename, = e.args
+      raise FileNotFoundError(self.__unresolve_path(filename))
+    except FileExistsError as e:
+      filename, = e.args
+      raise FileExistsError(self.__unresolve_path(filename))
+    except IsADirectoryError as e:
+      filename, = e.args
+      raise IsADirectoryError(self.__unresolve_path(filename))
+    except NotADirectoryError as e:
+      filename, = e.args
+      raise IsADirectoryError(self.__unresolve_path(filename))
+    except PermissionError as e:
+      filename, = e.args
+      raise PermissionError(self.__unresolve_path(filename))
     except OSError as e:
-      logger.error(traceback.format_exc())
-      filename = self.__unresolve_path(e.filename) if e.filename else None
-      winerror = getattr(e, 'winerror', None)
-      filename2 = self.__unresolve_path(e.filename2) if e.filename2 else None
-      raise OSError(e.errno, e.strerror, filename, winerror, filename2) from None
+      new_error = []
+      if getattr(e, 'errno', None):
+        new_error.append(e.errno)
+      if getattr(e, 'strerror', None):
+        if getattr(e, 'filename', None):
+          new_error.append(e.strerror.replace(e.filename, self.__unresolve_path(e.filename)))
+        else:
+          new_error.append(e.strerror)
+      if getattr(e, 'filename', None):
+        new_error.append(self.__unresolve_path(e.filename))
+      if getattr(e, 'winerror', None):
+        new_error.append(e.winerror)
+      if getattr(e, 'filename2', None):
+        new_error.append(self.__unresolve_path(e.filename2))
+      raise type(e)(*new_error) from None
     except Exception as e:
       logger.error(traceback.format_exc())
       raise Exception(f"{e.__class__.__name__} occurred, details have been hidden for security reasons")
@@ -87,6 +112,10 @@ class ChrootFileSystem(AbstractFileSystem):
   def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
     with self.__masquerade_os_error():
       return self.fs.mv(self.__resolve_path(path1), self.__resolve_path(path2), recursive=recursive, maxdepth=maxdepth, **kwargs)
+
+  def exists(self, path, **kwargs):
+    with self.__masquerade_os_error():
+      return self.fs.exists(self.__resolve_path(path), **kwargs)
 
   def info(self, path, **kwargs):
     with self.__masquerade_os_error():
