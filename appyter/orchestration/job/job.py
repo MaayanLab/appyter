@@ -1,7 +1,6 @@
 import asyncio
 import urllib.parse
 import logging
-from appyter.ext import fsspec
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +62,7 @@ async def execute_async(job, debug=False):
   emitter = EventEmitter()
   logger.debug(job)
   if 'storage' in job:
+    import fsspec
     from appyter.ext.fsspec.alias import AliasFileSystemFactory
     fsspec.register_implementation('storage', AliasFileSystemFactory('storage', job['storage']))
   await asyncio.gather(
