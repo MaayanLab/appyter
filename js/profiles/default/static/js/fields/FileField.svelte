@@ -141,7 +141,7 @@
   onMount(async () => {
     window.require.config({
       paths: {
-        'socketio-file-upload': `${window._config.STATIC_URL}js/lib/socketio-file-upload/client.min`,
+        'socketio-file-upload': `${window._config.STATIC_URL}/js/lib/socketio-file-upload/client.min`,
       },
       shim: {
         'socketio-file-upload': {
