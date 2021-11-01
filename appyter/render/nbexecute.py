@@ -139,7 +139,11 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
       # TODO: in the future we should individual files and include the original urls here
       nb.metadata['appyter']['nbexecute']['files'] = {
         path: path
-        for path in map(str, mnt.glob('*'))
+        for path in (
+          str(p.relative_to(mnt))
+          for p in mnt.rglob('*')
+          if p.is_file()
+        )
         if path not in (files.keys()|{ipynb})
       }
       #
