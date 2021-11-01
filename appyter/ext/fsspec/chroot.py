@@ -48,40 +48,20 @@ class ChrootFileSystem(AbstractFileSystem):
     return unresolve_path
 
   @contextlib.contextmanager
-  def __masquerade_os_error(self):
+  def __masquerade_os_error(self, path=None):
     try:
       yield
-    except FileNotFoundError as e:
-      filename, = e.args
-      raise FileNotFoundError(self.__unresolve_path(filename))
-    except FileExistsError as e:
-      filename, = e.args
-      raise FileExistsError(self.__unresolve_path(filename))
-    except IsADirectoryError as e:
-      filename, = e.args
-      raise IsADirectoryError(self.__unresolve_path(filename))
-    except NotADirectoryError as e:
-      filename, = e.args
-      raise IsADirectoryError(self.__unresolve_path(filename))
-    except PermissionError as e:
-      filename, = e.args
-      raise PermissionError(self.__unresolve_path(filename))
+    except FileNotFoundError:
+      if path:
+        raise FileNotFoundError(path)
+      else:
+        raise FileNotFoundError
     except OSError as e:
-      new_error = []
-      if getattr(e, 'errno', None):
-        new_error.append(e.errno)
-      if getattr(e, 'strerror', None):
-        if getattr(e, 'filename', None):
-          new_error.append(e.strerror.replace(e.filename, self.__unresolve_path(e.filename)))
-        else:
-          new_error.append(e.strerror)
-      if getattr(e, 'filename', None):
-        new_error.append(self.__unresolve_path(e.filename))
-      if getattr(e, 'winerror', None):
-        new_error.append(e.winerror)
-      if getattr(e, 'filename2', None):
-        new_error.append(self.__unresolve_path(e.filename2))
-      raise type(e)(*new_error) from None
+      logger.error(traceback.format_exc())
+      if e.errno:
+        raise type(e)(e.errno, '{e.__class__.__name__} occurred, details have been hidden for security reasons')
+      else:
+        raise Exception(f"{e.__class__.__name__} occurred, details have been hidden for security reasons")
     except Exception as e:
       logger.error(traceback.format_exc())
       raise Exception(f"{e.__class__.__name__} occurred, details have been hidden for security reasons")
@@ -98,11 +78,11 @@ class ChrootFileSystem(AbstractFileSystem):
         self.fs.__exit__(type, value, traceback)
 
   def mkdir(self, path, **kwargs):
-    with self.__masquerade_os_error():
+    with self.__masquerade_os_error(path=path):
       return self.fs.mkdir(self.__resolve_path(path), **kwargs)
 
   def rm(self, path, recursive=False, maxdepth=None):
-    with self.__masquerade_os_error():
+    with self.__masquerade_os_error(path=path):
       return self.fs.rm(self.__resolve_path(path), recursive=recursive, maxdepth=maxdepth)
 
   def copy(self, path1, path2, recursive=False, on_error=None, **kwargs):
@@ -114,17 +94,17 @@ class ChrootFileSystem(AbstractFileSystem):
       return self.fs.mv(self.__resolve_path(path1), self.__resolve_path(path2), recursive=recursive, maxdepth=maxdepth, **kwargs)
 
   def exists(self, path, **kwargs):
-    with self.__masquerade_os_error():
+    with self.__masquerade_os_error(path=path):
       return self.fs.exists(self.__resolve_path(path), **kwargs)
 
   def info(self, path, **kwargs):
-    with self.__masquerade_os_error():
+    with self.__masquerade_os_error(path=path):
       info = self.fs.info(self.__resolve_path(path), **kwargs)
       return dict(info, name=self.__unresolve_path(info['name']))
 
   def ls(self, path, detail=True, **kwargs):
     results = []
-    with self.__masquerade_os_error():
+    with self.__masquerade_os_error(path=path):
       for f in self.fs.ls(self.__resolve_path(path), detail=detail, **kwargs):
         if detail:
           f = dict(f, name=self.__unresolve_path(f['name']))
@@ -134,5 +114,5 @@ class ChrootFileSystem(AbstractFileSystem):
     return results
 
   def _open(self, path, mode="rb", block_size=None, cache_options=None, **kwargs):
-    with self.__masquerade_os_error():
+    with self.__masquerade_os_error(path=path):
       return self.fs._open(self.__resolve_path(path), mode=mode, block_size=block_size, cache_options=cache_options, **kwargs)
