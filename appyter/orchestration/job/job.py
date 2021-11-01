@@ -15,7 +15,7 @@ async def setup_evaluate_notebook(emitter, job):
   # someone joins, send them the notebook, state
   @emitter.on('joined')
   async def on_joined(id=None, **kwargs):
-    if 'get_state' in state:
+    if state.get('get_state'):
       nb_state = state['get_state']()
       await emitter.emit('msg', type='nb', data=nb_state['nb'], to=id)
       await emitter.emit('msg', type='status', data=nb_state['status'], to=id)
