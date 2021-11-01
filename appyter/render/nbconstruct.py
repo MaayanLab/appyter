@@ -81,6 +81,7 @@ def render_nb_from_nbtemplate(env, nbtemplate, fields=[], data={}):
     created=datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat(),
     filename=env.globals['_config']['IPYNB'],
     files=files,
+    data=data,
   )
   return nb
 
