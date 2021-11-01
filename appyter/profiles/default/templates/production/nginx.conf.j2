@@ -188,8 +188,8 @@ http {
       {%- if _config.DATA_DIR.startswith('/') %}
       root "{{ join_routes(_config.DATA_DIR, 'output') }}";
       try_files "/$1/$2" =404;
-      {{ proxy('http://appyter', False, 'appyter-data') }}
       {%- endif %}
+      {{ proxy('http://appyter', False, 'appyter-data') }}
     }
 
     location {{ _config.PREFIX }} {
