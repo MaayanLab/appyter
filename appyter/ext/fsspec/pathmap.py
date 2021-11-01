@@ -68,7 +68,7 @@ class PathMapFileSystem(AbstractFileSystem):
       fs, path = url_to_fs(url, **qs)
       mode = 0o444
     else:
-      fs, path = self.fs, self.storage_options['fo'].rstrip('/') + _encase_path(path, trailing_slash=True)
+      fs, path = self.fs, self.storage_options['fo'].rstrip('/') + _encase_path(path, trailing_slash=False)
       mode = 0o755
     return fs, path, mode
 
@@ -132,6 +132,14 @@ class PathMapFileSystem(AbstractFileSystem):
             shutil.copyfileobj(fr, fw)
         fs1.rm(path1)
 
+  def exists(self, path, **kwargs):
+    path = _encase_path(path, trailing_slash=False)
+    if _encase_path(path, trailing_slash=True) in self.listing:
+      return True
+    else:
+      fs, fs_path, mode = self.__pathmap(path)
+      return fs.exists(fs_path, **kwargs)
+
   def info(self, path, **kwargs):
     path = _encase_path(path, trailing_slash=False)
     if _encase_path(path, trailing_slash=True) in self.listing:
@@ -142,7 +150,7 @@ class PathMapFileSystem(AbstractFileSystem):
       }
     else:
       fs, fs_path, mode = self.__pathmap(path)
-      info = fs.info(fs_path)
+      info = fs.info(fs_path, **kwargs)
       info = dict(info, name=path, mode=mode)
       return info
 
@@ -170,7 +178,7 @@ class PathMapFileSystem(AbstractFileSystem):
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
     fs, path, fs_mode = self.__pathmap(path)
-    if fs_mode == 0o444 and 'w' in mode or '+' in mode: raise PermissionError
+    if fs_mode == 0o444 and ('w' in mode or '+' in mode): raise PermissionError
     return fs._open(
       path,
       mode=mode,
