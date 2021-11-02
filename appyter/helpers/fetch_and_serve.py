@@ -4,7 +4,8 @@ import traceback
 from appyter import __version__
 from appyter.cli import cli
 from appyter.ext.click import click_option_setenv, click_argument_setenv
-from appyter.ext.urllib import join_url
+from appyter.ext.fsspec.fuse import fs_mount
+from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager
 
 @cli.command(
   help='An alias for jupyter notebook which pre-fetches notebook data from a remote appyter and then launches serve',
@@ -65,21 +66,10 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
   with open(os.path.join(data_dir, filename), 'w') as fw:
     nbf.write(nb, fw)
   #
-  # download all files to data_dir (get files from nbexecute if available otherwise fall back to nbconstruct input-files)
-  files = metadata.get('nbexecute', {}).get('files', metadata.get('nbconstruct', {}).get('files', {}))
-  for file, fileurl in files.items():
-    # relative file paths (those without schemes) are relative to the base uri
-    # TODO: in the future we might be able to mount these paths as we do in the job
-    if '://' not in fileurl:
-      fileurl = join_url(uri, fileurl)
-    click.echo(f"Fetching {file} from {fileurl}...")
-    try:
-      urllib.request.urlretrieve(fileurl, os.path.join(data_dir, file))
-    except:
-      traceback.print_exc()
-      click.echo(f"WARNING: Error fetching '{file}' exported by the appyter")
-  #
-  click.echo(f"Done. Starting `appyter serve`...")
-  # serve the bundle in jupyter notebook
-  from appyter.helpers.serve import serve
-  ctx.invoke(serve, cwd=cwd, data_dir=data_dir, host=host, port=port, args=[*args, filename])
+  # mount input files into data_dir
+  files = metadata.get('nbconstruct', {}).get('files', {})
+  with sync_contextmanager(fs_mount(data_dir, pathmap=files)) as mnt:
+    click.echo(f"Starting `appyter serve`...")
+    # serve the bundle in jupyter notebook
+    from appyter.helpers.serve import serve
+    ctx.invoke(serve, cwd=cwd, data_dir=str(mnt), host=host, port=port, args=[*args, filename])
