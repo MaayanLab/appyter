@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 async def dispatch(job=None, **kwargs):
   args = ['docker', 'run']
   args += ['--device', '/dev/fuse']
-  args += ['--privileged']
+  args += ['--cap-add', 'SYS_ADMIN']
   try:
     proc = await asyncio.create_subprocess_exec(*[
       'docker', 'inspect', os.environ['HOSTNAME'],
