@@ -4,7 +4,7 @@ import contextlib
 
 @contextlib.contextmanager
 def sync_contextmanager(async_contextmanager):
-  loop = asyncio.get_running_loop()
+  loop = asyncio.get_event_loop()
   ctx = loop.run_until_complete(async_contextmanager.__aenter__())
   try:
     yield ctx
