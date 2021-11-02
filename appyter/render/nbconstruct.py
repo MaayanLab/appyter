@@ -11,7 +11,7 @@ from appyter.cli import cli
 from appyter.context import get_env, get_jinja2_env
 from appyter.ext.urllib import join_url
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
-from appyter.parse.nbtemplate import cell_match
+from appyter.parse.nbtemplate import cell_match, parse_fields_from_nbtemplate
 from appyter.ext.click import click_option_setenv, click_argument_setenv
 from appyter.ext.fsspec.parse import parse_file_uri
 
@@ -56,12 +56,15 @@ def render_cell(env, cell):
 
   return cell
 
-def render_nb_from_nbtemplate(env, nbtemplate, fields=[], data={}):
+def render_nb_from_nbtemplate(env, nbtemplate, data={}, fields=None):
   ''' Render the notebook by rendering the jinja2 templates using the context in env.
   '''
+  if fields is None:
+    fields = parse_fields_from_nbtemplate(env, nbtemplate)
+  #
   files = {}
   for field in fields:
-    if field.field == 'FileField':
+    if field.field == 'FileField' and data.get(field.args['name']):
       uri, filename = parse_file_uri(data[field.args['name']])
       if filename and uri:
         files[filename] = uri
@@ -98,5 +101,5 @@ def nbconstruct(cwd, ipynb, context, output, **kwargs):
   )
   with fsspec.open(join_url(cwd, ipynb), 'r') as fr:
     nbtemplate = nb_from_ipynb_io(fr)
-  nb = render_nb_from_nbtemplate(env, nbtemplate)
+  nb = render_nb_from_nbtemplate(env, nbtemplate, data=context)
   nb_to_ipynb_io(nb, output)
