@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import functools
 import importlib
+import random
 from aiohttp import web
 from collections import OrderedDict, Counter
 import logging
@@ -68,7 +69,7 @@ core.add_routes(routes)
 async def slow_put(queue, item):
   ''' Queue put debouncing
   '''
-  await asyncio.sleep(1)
+  await asyncio.sleep(0.5 + random.random())
   await queue.put(item)
 
 async def dispatcher(queued=None, tasks=None, dispatch=None, jobs_per_image=1):
