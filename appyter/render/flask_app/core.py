@@ -21,8 +21,7 @@ def get_fields():
   '''
   global _fields
   if not _fields or current_app.config['DEBUG']:
-    fs = url_to_chroot_fs(current_app.config['CWD'])
-    with fs.open(current_app.config['IPYNB'], 'r') as fr:
+    with fsspec.open(join_url(current_app.config['CWD'], current_app.config['IPYNB']), 'r') as fr:
       env = get_jinja2_env(config=current_app.config)
       nbtemplate = nb_from_ipynb_io(fr)
       _fields = parse_fields_from_nbtemplate(env, nbtemplate)
