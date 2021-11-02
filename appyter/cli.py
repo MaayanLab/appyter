@@ -1,4 +1,5 @@
 import click
+import logging
 from appyter import __version__
 from click_default_group import DefaultGroup
 
@@ -8,4 +9,4 @@ from click_default_group import DefaultGroup
   version=__version__,
 )
 def cli():
-  pass
+  logging.basicConfig(level=logging.INFO)

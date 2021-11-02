@@ -3,10 +3,13 @@ import re
 import sys
 import click
 import pathlib
+import logging
 from nbformat.v4 import new_code_cell
 from appyter.cli import cli
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.ext.click import click_argument_setenv
+
+logger = logging.getLogger(__name__)
 
 def slugify(s):
   return re.sub(r'[^a-zA-Z0-9]+', '_', s)
@@ -49,5 +52,5 @@ def init(ipynb, **kwargs):
         ))
       nb_to_ipynb_io(nb, (outdir / ipynb.name).open('w'))
   except ImportError:
-    click.echo("Cookiecutter must be installed to use `appyter init`")
+    logger.error("Cookiecutter must be installed to use `appyter init`")
     sys.exit(1)
