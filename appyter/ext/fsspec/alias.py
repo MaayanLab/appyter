@@ -8,11 +8,11 @@ from appyter.ext.fsspec.core import url_to_chroot_fs
 class AliasFileSystemBase(fsspec.AbstractFileSystem): pass
 
 def AliasFileSystemFactory(_proto, _fs_url, **_kwargs):
-  logger.debug(f"creating AliasFileSystem {_proto}:/// => {_fs_url}")
+  logger.debug(f"creating AliasFileSystem {_proto}://* => {_fs_url}*")
   class AliasFileSystem(AliasFileSystemBase):
     ''' alias: seemless passthrough to a more elaborate protocol
     '''
-    root_marker = '/'
+    root_marker = ''
     protocol = _proto
     fs_url = _fs_url
     kwargs = _kwargs
@@ -20,6 +20,7 @@ def AliasFileSystemFactory(_proto, _fs_url, **_kwargs):
     def __init__(self, **kwargs):
       super().__init__(**kwargs)
       self.fs = url_to_chroot_fs(_fs_url, chroot=True, **_kwargs)
+      self.root_marker = self.fs.root_marker
 
     def __enter__(self):
       if getattr(self.fs, '__enter__', None) is not None:

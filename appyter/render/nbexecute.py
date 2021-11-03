@@ -163,7 +163,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
 
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')
 @click.option('-o', '--output', default='-', type=click.File('w'), help='The output location to write dynamic updates')
-@click_option_setenv('--data-dir', envvar='APPYTER_DATA_DIR', default=None, help='The directory that storage:/// uris correspond to')
+@click_option_setenv('--data-dir', envvar='APPYTER_DATA_DIR', default=None, help='The directory that storage:// uris correspond to')
 @click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def nbexecute(ipynb, output, cwd, data_dir=None):

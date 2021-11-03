@@ -2,6 +2,8 @@ import contextlib
 import traceback
 import logging
 
+from appyter.ext.urllib import join_slash, join_url
+
 logger = logging.getLogger(__name__)
 
 from pathlib import PurePosixPath
@@ -11,7 +13,7 @@ from appyter.ext.pathlib.chroot import ChrootPurePosixPath
 class ChrootFileSystem(AbstractFileSystem):
   ''' chroot: update root and disallow access beyond chroot, only works on directories.
   '''
-  root_marker = '/'
+  root_marker = ''
   protocol = 'chroot'
 
   def __init__(self, target_protocol=None, target_options=None, fs=None, **kwargs):
@@ -39,12 +41,25 @@ class ChrootFileSystem(AbstractFileSystem):
     )
     self.fs = fs if fs is not None else filesystem(target_protocol, **self.kwargs)
 
-  def __resolve_path(self, path):
-    resolved_path = self.fs.root_marker + str((ChrootPurePosixPath('/'+self.storage_options['fo'].lstrip('/')) / ('/'+path.lstrip('/'))).realpath()).lstrip('/')
+  def _target_fo(self):
+    if '://' in self.storage_options['fo']:
+      target_fo_split = self.storage_options['fo'].split('/')
+      # [scheme://base-path][/path-part?...]
+      return '/'.join(target_fo_split[:3]), '/' + '/'.join(target_fo_split[3:])
+    else:
+      return '', self.storage_options['fo']
+
+  def _resolve_path(self, path):
+    target_fo_base, target_fo_path = self._target_fo()
+    resolved_path = join_slash(target_fo_base, str((ChrootPurePosixPath(target_fo_path) / path).realpath()))
     return resolved_path
 
-  def __unresolve_path(self, path):
-    unresolve_path = self.root_marker + str(PurePosixPath('/'+path.lstrip('/')).relative_to('/'+self.storage_options['fo'].lstrip('/')))
+  def _unresolve_path(self, path):
+    target_fo_base, target_fo_path = self._target_fo()
+    if not path.startswith(target_fo_base):
+      logger.warn(f"{path=} {target_fo_base=} {target_fo_path=}")
+      raise FileNotFoundError(path)
+    unresolve_path = str(PurePosixPath(path[len(target_fo_base):]).relative_to(target_fo_path))
     return unresolve_path
 
   @contextlib.contextmanager
@@ -79,40 +94,40 @@ class ChrootFileSystem(AbstractFileSystem):
 
   def mkdir(self, path, **kwargs):
     with self.__masquerade_os_error(path=path):
-      return self.fs.mkdir(self.__resolve_path(path), **kwargs)
+      return self.fs.mkdir(self._resolve_path(path), **kwargs)
 
   def rm(self, path, recursive=False, maxdepth=None):
     with self.__masquerade_os_error(path=path):
-      return self.fs.rm(self.__resolve_path(path), recursive=recursive, maxdepth=maxdepth)
+      return self.fs.rm(self._resolve_path(path), recursive=recursive, maxdepth=maxdepth)
 
   def copy(self, path1, path2, recursive=False, on_error=None, **kwargs):
     with self.__masquerade_os_error():
-      return self.fs.copy(self.__resolve_path(path1), self.__resolve_path(path2), recursive=recursive, on_error=on_error, **kwargs)
+      return self.fs.copy(self._resolve_path(path1), self._resolve_path(path2), recursive=recursive, on_error=on_error, **kwargs)
 
   def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
     with self.__masquerade_os_error():
-      return self.fs.mv(self.__resolve_path(path1), self.__resolve_path(path2), recursive=recursive, maxdepth=maxdepth, **kwargs)
+      return self.fs.mv(self._resolve_path(path1), self._resolve_path(path2), recursive=recursive, maxdepth=maxdepth, **kwargs)
 
   def exists(self, path, **kwargs):
     with self.__masquerade_os_error(path=path):
-      return self.fs.exists(self.__resolve_path(path), **kwargs)
+      return self.fs.exists(self._resolve_path(path), **kwargs)
 
   def info(self, path, **kwargs):
     with self.__masquerade_os_error(path=path):
-      info = self.fs.info(self.__resolve_path(path), **kwargs)
-      return dict(info, name=self.__unresolve_path(info['name']))
+      info = self.fs.info(self._resolve_path(path), **kwargs)
+      return dict(info, name=self._unresolve_path(info['name']))
 
   def ls(self, path, detail=True, **kwargs):
     results = []
     with self.__masquerade_os_error(path=path):
-      for f in self.fs.ls(self.__resolve_path(path), detail=detail, **kwargs):
+      for f in self.fs.ls(self._resolve_path(path), detail=detail, **kwargs):
         if detail:
-          f = dict(f, name=self.__unresolve_path(f['name']))
+          f = dict(f, name=self._unresolve_path(f['name']))
           results.append(f)
         else:
-          results.append(self.__unresolve_path(f))
+          results.append(self._unresolve_path(f))
     return results
 
   def _open(self, path, mode="rb", block_size=None, cache_options=None, **kwargs):
     with self.__masquerade_os_error(path=path):
-      return self.fs._open(self.__resolve_path(path), mode=mode, block_size=block_size, cache_options=cache_options, **kwargs)
+      return self.fs._open(self._resolve_path(path), mode=mode, block_size=block_size, cache_options=cache_options, **kwargs)

@@ -19,7 +19,7 @@ def organize_file_content(data_fs, tmp_fs, tmp_path, filename):
     with tmp_fs.open(tmp_path, 'rb') as fr:
       with data_fs.open(content_hash, 'wb') as fw:
         shutil.copyfileobj(fr, fw)
-  return f"storage:///input/{content_hash}#{filename}"
+  return f"storage://input/{content_hash}#{filename}"
 
 # download from remote
 async def download_with_progress_and_hash(sid, data_fs, name, url, path, filename):
@@ -72,7 +72,7 @@ async def download(sid, data):
   async with socketio.session(sid) as sess:
     config = sess['config']
   #
-  data_fs = url_to_chroot_fs('storage:///input/')
+  data_fs = url_to_chroot_fs('storage://input/')
   name = data.get('name')
   # TODO: hash based on url?
   # TODO: s3 bypass
@@ -132,7 +132,7 @@ async def siofu_done(sid, evt):
   async with socketio.session(sid) as sess:
     sess['file_%d' % (evt['id'])]['fh'].close()
     config = sess['config']
-    data_fs = url_to_chroot_fs('storage:///input/')
+    data_fs = url_to_chroot_fs('storage://input/')
     tmp_fs = sess['file_%d' % (evt['id'])]['tmp_fs']
     path = sess['file_%d' % (evt['id'])]['path']
     filename = sess['file_%d' % (evt['id'])]['name']
@@ -147,7 +147,7 @@ async def siofu_done(sid, evt):
 
 # upload from client with POST
 def upload_from_request(req, fname):
-  data_fs = url_to_chroot_fs('storage:///input/')
+  data_fs = url_to_chroot_fs('storage://input/')
   fh = req.files.get(fname)
   if not fh:
     return None

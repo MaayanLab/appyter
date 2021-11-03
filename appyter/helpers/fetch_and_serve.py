@@ -26,8 +26,19 @@ logger = logging.getLogger(__name__)
 def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
   import json
   import tempfile
-  import urllib.request
+  import urllib.parse, urllib.request
   import nbformat as nbf
+  import fsspec
+  # TODO: can this be less reliant on the `appyter-catalog` storage setup
+  uri_parsed = urllib.parse.urlparse(uri)
+  from appyter.ext.fsspec.alias import AliasFileSystemFactory
+  storage_uri = f"{uri_parsed.scheme}://{uri_parsed.netloc}/storage/appyters/"
+  fsspec.register_implementation('storage',
+    AliasFileSystemFactory(
+      'storage',
+      storage_uri,
+    )
+  )
   # fetch the actual notebook
   try:
     with urllib.request.urlopen(

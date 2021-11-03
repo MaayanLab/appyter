@@ -45,7 +45,7 @@ def prepare_data(req):
 
 def prepare_results(data):
   results_hash = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data=data))
-  data_fs = url_to_chroot_fs(join_url('storage:///output/', results_hash))
+  data_fs = url_to_chroot_fs(join_url('storage://output/', results_hash))
   results_path = '/' + current_app.config['IPYNB']
   if not data_fs.exists(results_path):
     # construct notebook

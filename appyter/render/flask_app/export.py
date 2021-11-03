@@ -39,7 +39,7 @@ def get_base_files():
 def export(path):
   if path.endswith('/'):
     format = request.args.get('format', 'html')
-    data_fs = url_to_chroot_fs('storage:///output/')
+    data_fs = url_to_chroot_fs('storage://output/')
     nbpath = path + current_app.config['IPYNB']
     if data_fs.exists(nbpath):
       nb = nb_from_ipynb_io(data_fs.open(nbpath, 'rb'))

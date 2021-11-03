@@ -71,12 +71,12 @@ def data_files(path):
         _nb=os.path.basename(current_app.config['IPYNB']),
       )
     else:
-      data_fs = url_to_chroot_fs(join_url('storage:///output/', path))
+      data_fs = url_to_chroot_fs(join_url('storage://output/', path))
       path = '/' + current_app.config['IPYNB']
       if data_fs.exists(path):
         return send_file(data_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
   else:
-    data_fs = url_to_chroot_fs('storage:///output/')
+    data_fs = url_to_chroot_fs('storage://output/')
     if data_fs.exists(path):
       return send_file(data_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
   abort(404)

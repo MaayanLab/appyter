@@ -29,7 +29,7 @@ async def submit(sid, data):
   socketio.enter_room(sid, result_hash)
   await socketio.emit('status', 'Queuing execution', to=sid)
   job = dict(
-    cwd=join_url('storage:///output/', result_hash),
+    cwd=join_url('storage://output/', result_hash),
     ipynb=os.path.basename(config['IPYNB']),
     session=result_hash,
     id=generate_uuid(),

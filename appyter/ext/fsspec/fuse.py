@@ -45,7 +45,7 @@ async def fs_mount(url, **kwargs):
     await try_n_times(3, _assert_mounted, tmp)
     logger.debug(f"fs mount ready on {tmp}")
     yield tmp
-  except:
+  except Exception as e:
     logger.error(traceback.format_exc())
     raise
   finally:

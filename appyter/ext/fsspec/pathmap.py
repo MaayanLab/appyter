@@ -1,20 +1,15 @@
 import shutil
-import time
 from fsspec import filesystem, AbstractFileSystem
 from fsspec.core import url_to_fs
 from appyter.ext.fsspec.parse import parse_file_uri_qs
-
-def _encase_path(p, trailing_slash=True):
-  p = p.strip('/')
-  if p: return '/'+p+('/' if trailing_slash else '')
-  else: return '/'
+from appyter.ext.urllib import join_slash
 
 class PathMapFileSystem(AbstractFileSystem):
   ''' Pathmap layer over any other FS. Typically one would use a chroot as a base
   filesystem, so instantiation would look like:
-  `pathmap::chroot::file://underyling-fs`
+  `pathmap::chroot::proto://underyling-fs`
   '''
-  root_marker = '/'
+  root_marker = ''
   protocol = 'pathmap'
 
   def __init__(self, target_protocol=None, target_options=None, fs=None, pathmap={}, **kwargs):
@@ -43,32 +38,32 @@ class PathMapFileSystem(AbstractFileSystem):
       else (fs.protocol if isinstance(fs.protocol, str) else fs.protocol[0])
     )
     self.fs = fs if fs is not None else filesystem(target_protocol, **self.kwargs)
-    self.pathmap = {
-      _encase_path(k, trailing_slash=False): v
-      for k, v in pathmap.items()
-    }
+    self.pathmap = pathmap
     self.listing = {}
     for mapping in self.pathmap:
       src_split = mapping.split('/')
-      for i in range(2, len(src_split)):
-        path_parent = '/'.join(src_split[:i-1]) + '/'
-        path_current = '/'.join(src_split[:i]) + '/'
-        if path_parent not in self.listing: self.listing[path_parent] = {}
-        self.listing[path_parent][path_current.strip('/')] = True
-      path_parent = '/'.join(src_split[:-1]) + '/'
-      if path_parent not in self.listing: self.listing[path_parent] = {}
-      self.listing[path_parent][src_split[-1]] = True
+      for i in range(len(src_split)):
+        p = '/'.join(src_split[:i+1])
+        if i == 0:
+          if '' not in self.listing:
+            self.listing[''] = {}
+          if p:
+            self.listing[''][p] = True
+        else:
+          self.listing['/'.join(src_split[:i])][p] = True
+        if i < len(src_split)-1:
+          if p not in self.listing:
+            self.listing[p] = {}
 
   def __pathmap(self, path):
     ''' Return (fs, path, mode) depending on whether we hit a mapped paths or not
     '''
-    path = _encase_path(path, trailing_slash=False)
     if path in self.pathmap:
       url, qs = parse_file_uri_qs(self.pathmap[path])
       fs, path = url_to_fs(url, **qs)
       mode = 0o444
     else:
-      fs, path = self.fs, self.storage_options['fo'].rstrip('/') + _encase_path(path, trailing_slash=False)
+      fs, path = self.fs, join_slash(self.storage_options['fo'], path)
       mode = 0o755
     return fs, path, mode
 
@@ -101,7 +96,7 @@ class PathMapFileSystem(AbstractFileSystem):
       if fs1.isdir(path1) and recursive:
         for f1 in fs1.walk(path1, maxdepth=maxdepth):
           f_rel = f1.replace(path1, '')
-          f2_rel = path2.rstrip('/') + '/' + f_rel
+          f2_rel = join_slash(path2, f_rel)
           with fs1.open(f1, 'rb') as fr:
             with fs2.open(f2_rel, 'wb') as fw:
               shutil.copyfileobj(fr, fw)
@@ -121,7 +116,7 @@ class PathMapFileSystem(AbstractFileSystem):
       if fs1.isdir(path1) and recursive:
         for f1 in fs1.walk(path1, maxdepth=maxdepth):
           f_rel = f1.replace(path1, '')
-          f2_rel = path2.rstrip('/') + '/' + f_rel
+          f2_rel = join_slash(path2, f_rel)
           with fs1.open(f1, 'rb') as fr:
             with fs2.open(f2_rel, 'wb') as fw:
               shutil.copyfileobj(fr, fw)
@@ -133,16 +128,14 @@ class PathMapFileSystem(AbstractFileSystem):
         fs1.rm(path1)
 
   def exists(self, path, **kwargs):
-    path = _encase_path(path, trailing_slash=False)
-    if _encase_path(path, trailing_slash=True) in self.listing:
+    if path in self.listing:
       return True
     else:
       fs, fs_path, mode = self.__pathmap(path)
       return fs.exists(fs_path, **kwargs)
 
   def info(self, path, **kwargs):
-    path = _encase_path(path, trailing_slash=False)
-    if _encase_path(path, trailing_slash=True) in self.listing:
+    if path in self.listing:
       return {
         'name': path,
         'type': 'directory',
@@ -157,7 +150,6 @@ class PathMapFileSystem(AbstractFileSystem):
   def ls(self, path, detail=False, **kwargs):
     ''' Aggregate results based on pathmap listing & underlying fs
     '''
-    path = _encase_path(path, trailing_slash=True)
     results = {}
     if path in self.listing:
       for p in self.listing[path]:
