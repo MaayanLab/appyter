@@ -74,7 +74,7 @@ class ChrootFileSystem(AbstractFileSystem):
     except OSError as e:
       logger.error(traceback.format_exc())
       if e.errno:
-        raise type(e)(e.errno, '{e.__class__.__name__} occurred, details have been hidden for security reasons')
+        raise type(e)(e.errno, f'{e.__class__.__name__} occurred, details have been hidden for security reasons')
       else:
         raise Exception(f"{e.__class__.__name__} occurred, details have been hidden for security reasons")
     except Exception as e:
