@@ -51,15 +51,24 @@ class ChrootFileSystem(AbstractFileSystem):
 
   def _resolve_path(self, path):
     target_fo_base, target_fo_path = self._target_fo()
-    resolved_path = join_slash(target_fo_base, str((ChrootPurePosixPath(target_fo_path) / path).realpath()))
+    resolved_path = join_slash(*filter(None, (target_fo_base, str((ChrootPurePosixPath(target_fo_path) / path).realpath()))))
+    if resolved_path == '.':
+      resolved_path = ''
+    if resolved_path.startswith('./'):
+      resolved_path = resolved_path[2:]
     return resolved_path
 
   def _unresolve_path(self, path):
     target_fo_base, target_fo_path = self._target_fo()
     if not path.startswith(target_fo_base):
-      logger.warn(f"{path=} {target_fo_base=} {target_fo_path=}")
       raise FileNotFoundError(path)
-    unresolve_path = str(PurePosixPath(path[len(target_fo_base):]).relative_to(target_fo_path))
+    path = path[len(target_fo_base):]
+    # ensure leading/trailing slash is the same
+    if path.startswith('/') and not target_fo_path.startswith('/'):
+      path = path.lstrip('/')
+    elif not path.startswith('/') and target_fo_path.startswith('/'):
+      path = '/' + path
+    unresolve_path = str(PurePosixPath(path).relative_to(target_fo_path))
     return unresolve_path
 
   @contextlib.contextmanager

@@ -66,7 +66,7 @@ class PathMapFileSystem(AbstractFileSystem):
       fs, path = url_to_fs(url, **qs)
       mode = 0o444
     else:
-      fs, path = self.fs, join_slash(self.storage_options['fo'], path)
+      fs, path = self.fs, join_slash(*filter(None, (self.storage_options['fo'], path)))
       mode = 0o755
     return fs, path, mode
 
