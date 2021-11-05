@@ -4,7 +4,9 @@ import urllib.parse
 from appyter.ext.pathlib.chroot import ChrootPurePosixPath
 from appyter.ext.json import try_json_loads
 
-def join_slash(part0, *parts):
+def join_slash(*parts):
+  if not parts: return ''
+  part0, *parts = parts
   return '/'.join(itertools.chain((part0.rstrip('/'),), (part.lstrip('/') for part in parts)))
 
 def join_url(root, *parts):
