@@ -1,9 +1,9 @@
 import asyncio
 import typing as t
-from nbclient import NotebookClient
 from nbformat import NotebookNode
 from nbclient.util import ensure_async
 from nbclient.exceptions import CellExecutionComplete, DeadKernelError, CellControlSignal
+from nbclient.client import NotebookClient, timestamp
 
 class NotebookClientIOPubHook(NotebookClient):
   ''' A notebook client with the ability to hook into iopub updates
@@ -18,6 +18,8 @@ class NotebookClientIOPubHook(NotebookClient):
     cell,
     cell_index
   ):
+    ''' Override output_msg polling to send to iopub_hook
+    '''
     assert self.kc is not None
     complete = False
     while not complete:
@@ -25,14 +27,53 @@ class NotebookClientIOPubHook(NotebookClient):
       if msg['parent_header'].get('msg_id') == parent_msg_id:
         try:
           # Will raise CellExecutionComplete when completed
-          self.process_message(msg, cell, cell_index)
+          await self.process_message(msg, cell, cell_index)
         except CellExecutionComplete:
           complete = True
         finally:
           if self.iopub_hook is not None:
             await self.iopub_hook(cell, cell_index)
 
+  async def handle_comm_msg(
+    self,
+    outs: t.List,
+    msg: t.Dict,
+    cell_index: int
+  ) -> None:
+    ''' Store ipywidget state in each cell during execution and trigger iopub_hook
+    '''
+    super().handle_comm_msg(outs, msg, cell_index)
+    content = msg['content']
+    data = content['data']
+    if self.store_widget_state and 'state' in data:  # ignore custom msg'es
+      # Here we store the updated state in the cell during execution, and trigger an iopub_hook
+      # we'll arbitrarily choose to store it in the cell's metadata.widget-state
+      cell = self.nb['cells'][cell_index]
+      cell.setdefault('metadata', {}).setdefault('widgets', {
+        'version_major': 2,
+        'version_minor': 0,
+      }).setdefault('state', {}).update({
+        content['comm_id']: self._serialize_widget_state(self.widget_state[content['comm_id']]),
+      })
+      for key, widget in cell['metadata']['widgets']['state'].items():
+        buffers = self.widget_buffers.get(key)
+        if buffers:
+            widget['buffers'] = buffers
+      if self.iopub_hook is not None:
+        await self.iopub_hook(cell, cell_index)
+
+  def set_widgets_metadata(self) -> None:
+    ''' Cleanup ipywidget state from each cell when we write the state of all cells
+    '''
+    super().set_widgets_metadata()
+    for cell in self.nb['cells']:
+      if 'metadata' in cell:
+        if 'widgets' in cell['metadata']:
+          del cell['metadata']['widgets']
+
   def _kc_execute(self, *args, **kwargs):
+    ''' Execute in a different event loop so we don't block the main one
+    '''
     try:
       loop = asyncio.get_event_loop()
     except (RuntimeError, AssertionError):
@@ -133,3 +174,69 @@ class NotebookClientIOPubHook(NotebookClient):
     self._check_raise_for_error(cell, exec_reply)
     self.nb['cells'][cell_index] = cell
     return cell
+
+  async def process_message(
+      self,
+      msg: t.Dict,
+      cell: NotebookNode,
+      cell_index: int) -> t.Optional[t.List]:
+    """
+    Processes a kernel message, updates cell state, and returns the
+    resulting output object that was appended to cell.outputs.
+
+    The input argument *cell* is modified in-place.
+
+    Parameters
+    ----------
+    msg : dict
+      The kernel message being processed.
+    cell : nbformat.NotebookNode
+      The cell which is currently being processed.
+    cell_index : int
+      The position of the cell within the notebook object.
+
+    Returns
+    -------
+    output : dict
+      The execution output payload (or None for no output).
+
+    Raises
+    ------
+    CellExecutionComplete
+      Once a message arrives which indicates computation completeness.
+
+    """
+    msg_type = msg['msg_type']
+    self.log.debug("msg_type: %s", msg_type)
+    content = msg['content']
+    self.log.debug("content: %s", content)
+
+    display_id = content.get('transient', {}).get('display_id', None)
+    if display_id and msg_type in {'execute_result', 'display_data', 'update_display_data'}:
+      self._update_display_id(display_id, msg)
+
+    # set the prompt number for the input and the output
+    if 'execution_count' in content:
+      cell['execution_count'] = content['execution_count']
+
+    if self.record_timing:
+      if msg_type == 'status':
+        if content['execution_state'] == 'idle':
+          cell['metadata']['execution']['iopub.status.idle'] = timestamp()
+        elif content['execution_state'] == 'busy':
+          cell['metadata']['execution']['iopub.status.busy'] = timestamp()
+      elif msg_type == 'execute_input':
+        cell['metadata']['execution']['iopub.execute_input'] = timestamp()
+
+    if msg_type == 'status':
+      if content['execution_state'] == 'idle':
+        raise CellExecutionComplete()
+    elif msg_type == 'clear_output':
+      self.clear_output(cell.outputs, msg, cell_index)
+    elif msg_type.startswith('comm'):
+      await self.handle_comm_msg(cell.outputs, msg, cell_index)
+    # Check for remaining messages we don't process
+    elif msg_type not in ['execute_input', 'update_display_data']:
+      # Assign output as our processed "result"
+      return self.output(cell.outputs, msg, display_id, cell_index)
+    return None

@@ -1,4 +1,5 @@
 import ApplicationJavascript from './ApplicationJavascript.svelte'
+import ApplicationJupyterWidget from './ApplicationJupyterWidget.svelte'
 import ImagePng from './ImagePng.svelte'
 import ImageSvgXml from './ImageSvgXml.svelte'
 import TextHtml from './TextHtml.svelte'
@@ -10,6 +11,7 @@ const output_mimetypes = {
   'image/svg+xml': ImageSvgXml,
   'image/png': ImagePng,
   'text/html': TextHtml,
+  'application/vnd.jupyter.widget-view+json': ApplicationJupyterWidget,
   'application/javascript': ApplicationJavascript,
   'text/markdown': TextMarkdown,
   'text/plain': TextPlain,

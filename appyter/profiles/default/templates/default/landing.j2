@@ -1,5 +1,22 @@
 {% extends "base.j2" %}
 
+{% block script_head %}
+{{ super() }}
+{% if 'ipywidgets' in _config.EXTRAS %}
+<script>
+require.config({
+  paths: {
+    '@jupyter-widgets/html-manager': 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd',
+  }
+})
+define('@appyter/ipywidgets-manager', ['@jupyter-widgets/html-manager'], function (htmlmanager) {
+  const manager = new htmlmanager.HTMLManager({ loader: htmlmanager.requireLoader })
+  return manager
+})
+</script>
+{% endif %}
+{% endblock %}
+
 {% block body %}
 {{ super() }}
 <div class="row">
