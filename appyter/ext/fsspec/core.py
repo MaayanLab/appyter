@@ -29,7 +29,7 @@ def url_to_chroot_fs(url, chroot=True, pathmap=None, cached=False, **kwargs):
     full_url = 'writecache::' + full_url
   # add pathmap as necessary
   if pathmap:
-    full_url = 'pathmap::' + full_url
+    full_url = 'chroot::pathmap::' + full_url
     kwargs['pathmap'] = dict(pathmap=pathmap)
   fs, _ = url_to_fs(full_url, **kwargs)
   return fs

@@ -12,7 +12,7 @@ def _fuse_run(url, mount_point, kwargs, alias_dump):
   logger.debug(f'preparing fs from {url} ({kwargs})..')
   with url_to_chroot_fs(url, **kwargs) as fs:
     logger.debug('launching fuse..')
-    fsspec.fuse.run(fs, '/', mount_point)
+    fsspec.fuse.run(fs, '', mount_point)
     logger.debug('teardown..')
 
 @contextlib.asynccontextmanager
