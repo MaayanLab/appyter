@@ -118,6 +118,7 @@ class ChrootFileSystem(AbstractFileSystem):
       return dict(info, name=self._unresolve_path(info['name']))
 
   def ls(self, path, detail=True, **kwargs):
+    logger.debug(f"ls({path}) => fs.ls({self._resolve_path(path)})")
     results = []
     with self.__masquerade_os_error(path=path):
       for f in self.fs.ls(self._resolve_path(path), detail=detail, **kwargs):

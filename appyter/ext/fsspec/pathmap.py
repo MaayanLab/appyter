@@ -1,4 +1,7 @@
 import shutil
+import logging
+logger = logging.getLogger(__name__)
+
 from fsspec import filesystem, AbstractFileSystem
 from fsspec.core import url_to_fs
 from appyter.ext.fsspec.parse import parse_file_uri_qs
@@ -150,6 +153,7 @@ class PathMapFileSystem(AbstractFileSystem):
   def ls(self, path, detail=False, **kwargs):
     ''' Aggregate results based on pathmap listing & underlying fs
     '''
+    logger.debug(f"ls({path})")
     results = {}
     if path in self.listing:
       for p in self.listing[path]:

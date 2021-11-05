@@ -76,7 +76,7 @@ class WriteCacheFileSystem(AbstractFileSystem):
   def ls(self, path, detail=False, **kwargs):
     # add local paths
     path = self.fs.root_marker + path.lstrip('/')
-    logger.info(f'ls({path=}')
+    logger.info(f'ls({path})')
     path_split = ('',) if path == self.fs.root_marker else tuple(path.split('/'))
     results = {}
     for local_file_path, f in self._local_files.items():
