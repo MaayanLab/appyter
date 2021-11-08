@@ -80,6 +80,11 @@ class ChrootFileSystem(AbstractFileSystem):
         raise FileNotFoundError(path)
       else:
         raise FileNotFoundError
+    except PermissionError:
+      if path:
+        raise PermissionError(path)
+      else:
+        raise PermissionError
     except OSError as e:
       logger.error(traceback.format_exc())
       if e.errno:
