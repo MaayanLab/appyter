@@ -42,13 +42,13 @@ class MapperFileSystem(AbstractFileSystem):
           if p not in self.listing:
             self.listing[p] = {}
 
-  def __pathmap(self, path):
-    ''' Return (fs, path, mode) depending on whether we hit a mapped paths or not
+  def _pathmap(self, path):
+    ''' Return (fs, path) depending on whether we hit a mapped paths or not
     '''
     if path in self.pathmap:
       url, qs = parse_file_uri_qs(self.pathmap[path])
-      fs, path = url_to_fs(url, **qs)
-      return fs, path
+      fs, fs_path = url_to_fs(url, **qs)
+      return fs, fs_path
     else:
       raise FileNotFoundError(path)
 
@@ -86,7 +86,7 @@ class MapperFileSystem(AbstractFileSystem):
         'type': 'directory',
       }
     else:
-      fs, fs_path = self.__pathmap(path)
+      fs, fs_path = self._pathmap(path)
       info = fs.info(fs_path, **kwargs)
       info = dict(info, name=path)
       return info
@@ -105,10 +105,10 @@ class MapperFileSystem(AbstractFileSystem):
     return results
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
-    fs, path = self.__pathmap(path)
-    if 'r' not in mode: raise PermissionError
+    fs, fs_path = self._pathmap(path)
+    if 'r' not in mode: raise PermissionError(path)
     return fs._open(
-      path,
+      fs_path,
       mode=mode,
       block_size=block_size,
       autocommit=autocommit,
