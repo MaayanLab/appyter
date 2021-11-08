@@ -59,16 +59,16 @@ class MapperFileSystem(AbstractFileSystem):
     pass
 
   def mkdir(self, path, **kwargs):
-    raise PermissionError
+    raise PermissionError(path)
 
   def rm(self, path, recursive=False, maxdepth=None):
-    raise PermissionError
+    raise PermissionError(path)
 
   def copy(self, path1, path2, recursive=False, on_error=None, maxdepth=None, **kwargs):
-    raise PermissionError
+    raise PermissionError(path2)
 
   def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
-    raise PermissionError
+    raise PermissionError(path1)
 
   def exists(self, path, **kwargs):
     return path in self.listing or path in self.pathmap
