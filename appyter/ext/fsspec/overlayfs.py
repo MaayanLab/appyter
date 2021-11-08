@@ -1,10 +1,11 @@
 import shutil
 import logging
+
+from appyter.ext.fsspec.core import url_to_chroot_fs
+from appyter.ext.fsspec.chroot import ChrootFileSystem
 logger = logging.getLogger(__name__)
 
 from fsspec import filesystem, AbstractFileSystem
-from fsspec.core import url_to_fs
-from appyter.ext.fsspec.parse import parse_file_uri_qs
 from appyter.ext.urllib import join_slash
 
 class OverlayFileSystem(AbstractFileSystem):
@@ -27,20 +28,24 @@ class OverlayFileSystem(AbstractFileSystem):
       )
 
     if type(lower) == str:
-      self.lower = url_to_fs(lower)
+      self.lower = url_to_chroot_fs(lower)
     elif isinstance(lower, AbstractFileSystem):
       self.lower = lower
     else:
       protocol, opts = lower
       self.lower = filesystem(protocol, **opts)
+    if not isinstance(self.lower, ChrootFileSystem):
+      self.lower = ChrootFileSystem(fs=self.lower)
 
     if type(upper) == str:
-      self.upper = url_to_fs(upper)
+      self.upper = url_to_chroot_fs(upper)
     elif isinstance(upper, AbstractFileSystem):
       self.upper = upper
     else:
       protocol, opts = upper
       self.upper = filesystem(protocol, **opts)
+    if not isinstance(self.upper, ChrootFileSystem):
+      self.upper = ChrootFileSystem(fs=self.upper)
 
   def __enter__(self):
     if getattr(self.lower, '__enter__', None) is not None:
@@ -83,29 +88,33 @@ class OverlayFileSystem(AbstractFileSystem):
     else:
       raise PermissionError(path1)
 
-  def exists(self, path, **kwargs):
-    return self.upper.exists(path, **kwargs) or self.lower.exists(path, **kwargs)
+  # def exists(self, path, **kwargs):
+  #   return self.upper.exists(path, **kwargs) or self.lower.exists(path, **kwargs)
 
   def info(self, path, **kwargs):
+    logger.debug(f"info({path})")
     if self.upper.exists(path) or not self.lower.exists(path):
       return self.upper.info(path, **kwargs)
     else:
       return self.lower.info(path, **kwargs)
 
   def ls(self, path, detail=False, **kwargs):
+    logger.debug(f"ls({path})")
     results = {}
-    for info in self.lower.ls(path, detail=detail, **kwargs):
-      if detail:
-        results[info['name']] = info
-      else:
-        results[info] = info
-
-    for info in self.upper.ls(path, detail=detail, **kwargs):
-      if detail:
-        results[info['name']] = info
-      else:
-        results[info] = info
-    
+    lower_exists = self.lower.exists(path)
+    upper_exists = self.upper.exists(path)
+    if lower_exists:
+      for info in self.lower.ls(path, detail=detail, **kwargs):
+        if detail:
+          results[info['name']] = info
+        else:
+          results[info] = info
+    if upper_exists or not lower_exists:
+      for info in self.upper.ls(path, detail=detail, **kwargs):
+        if detail:
+          results[info['name']] = info
+        else:
+          results[info] = info
     return list(results.values())
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
