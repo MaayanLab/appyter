@@ -22,9 +22,6 @@ def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):
     if 'auto_mkdir' not in kwargs[protocol]: kwargs[protocol]['auto_mkdir'] = True
   # add chroot
   full_url = 'chroot::' + full_url
-  # add cache
-  if cached:
-    full_url = 'writecache::' + full_url
   fs, _ = url_to_fs(full_url, **kwargs)
   # apply pathmap as needed
   if pathmap:
@@ -84,5 +81,7 @@ def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):
         upper_fs=fs,
       ),
     )
-
+  if cached:
+    from appyter.ext.fsspec.writecache import WriteCacheFileSystem
+    fs = WriteCacheFileSystem(fs=fs)
   return fs

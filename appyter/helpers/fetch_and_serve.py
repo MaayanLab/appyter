@@ -38,7 +38,7 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
   # if data_dir doesn't exist, create it
   if data_dir is None: data_dir = 'tmpfs://'
   # mount the appyter into the data_dir
-  with sync_contextmanager(fs_mount(data_dir, appyter=uri)) as mnt:
+  with sync_contextmanager(fs_mount(data_dir, appyter=uri, cached=True)) as mnt:
     logging.info(f"Starting `appyter serve`...")
     # serve the bundle in jupyter notebook
     from appyter.helpers.serve import serve
