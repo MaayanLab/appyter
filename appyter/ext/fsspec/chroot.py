@@ -2,7 +2,7 @@ import contextlib
 import traceback
 import logging
 
-from appyter.ext.urllib import join_slash, join_url
+from appyter.ext.urllib import join_slash
 
 logger = logging.getLogger(__name__)
 

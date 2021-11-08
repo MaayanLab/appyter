@@ -24,7 +24,6 @@ logger = logging.getLogger(__name__)
 @click_argument_setenv('uri', envvar='APPYTER_URI', nargs=1, type=str)
 @click.pass_context
 def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
-  import json
   import tempfile
   import urllib.parse, urllib.request
   import nbformat as nbf

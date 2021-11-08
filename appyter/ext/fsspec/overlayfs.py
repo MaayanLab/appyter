@@ -1,7 +1,6 @@
 import shutil
 import logging
 
-from appyter.ext.fsspec.chroot import ChrootFileSystem
 logger = logging.getLogger(__name__)
 
 from fsspec import filesystem, AbstractFileSystem
