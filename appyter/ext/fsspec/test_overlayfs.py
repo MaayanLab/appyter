@@ -1,16 +1,13 @@
 import multiprocessing as mp
-
-from appyter.ext.fsspec.overlayfs import OverlayFileSystem
 mp.set_start_method('spawn', True)
 
 import tempfile
 import contextlib
 from pathlib import Path
-from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager
+from fsspec.core import url_to_fs
 
 import appyter.ext.fsspec
-from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.fsspec.fuse import fs_mount
+from appyter.ext.fsspec.overlayfs import OverlayFileSystem
 
 def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
 
@@ -32,7 +29,9 @@ def test_file_overlayfs():
     with tempfile.TemporaryDirectory() as upper_tmpdir:
       upper_tmpdir = Path(upper_tmpdir)
       assert_eq(frozenset(str(p.relative_to(lower_tmpdir)) for p in lower_tmpdir.rglob('*')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e']))
-      with OverlayFileSystem(lower=str(lower_tmpdir), upper=str(upper_tmpdir)) as fs:
+      lower_fs, _ = url_to_fs(f"chroot::{lower_tmpdir}")
+      upper_fs, _ = url_to_fs(f"chroot::{upper_tmpdir}")
+      with OverlayFileSystem(lower_fs=lower_fs, upper_fs=upper_fs) as fs:
         assert_eq(frozenset(fs.glob('**')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e']))
         fs.copy('e', 'E')
         fs.pipe('e', b'A')

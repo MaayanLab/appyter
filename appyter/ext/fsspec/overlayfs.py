@@ -1,7 +1,6 @@
 import shutil
 import logging
 
-from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.fsspec.chroot import ChrootFileSystem
 logger = logging.getLogger(__name__)
 
@@ -14,7 +13,7 @@ class OverlayFileSystem(AbstractFileSystem):
   root_marker = ''
   protocol = 'overlayfs'
 
-  def __init__(self, lower=None, upper=None, **kwargs):
+  def __init__(self, lower_fs=None, lower_protocol=None, lower_options=dict(), upper_fs=None, upper_protocol=None, upper_options=dict(), **kwargs):
     '''
     Parameters
     ----------
@@ -22,95 +21,83 @@ class OverlayFileSystem(AbstractFileSystem):
     upper: str | fs | (protocol, options) writes go here
     '''
     super().__init__(**kwargs)
-    if (lower is None) or (upper is None):
+    if not (lower_fs is None) ^ (lower_protocol is None):
       raise ValueError(
-          "Please provide lower & upper"
+          "Please provide one of lower filesystem instance (lower_fs) or"
+          " lower_protocol, not both"
       )
-
-    if type(lower) == str:
-      self.lower = url_to_chroot_fs(lower)
-    elif isinstance(lower, AbstractFileSystem):
-      self.lower = lower
-    else:
-      protocol, opts = lower
-      self.lower = filesystem(protocol, **opts)
-    if not isinstance(self.lower, ChrootFileSystem):
-      self.lower = ChrootFileSystem(fs=self.lower)
-
-    if type(upper) == str:
-      self.upper = url_to_chroot_fs(upper)
-    elif isinstance(upper, AbstractFileSystem):
-      self.upper = upper
-    else:
-      protocol, opts = upper
-      self.upper = filesystem(protocol, **opts)
-    if not isinstance(self.upper, ChrootFileSystem):
-      self.upper = ChrootFileSystem(fs=self.upper)
+    if not (upper_fs is None) ^ (upper_protocol is None):
+      raise ValueError(
+          "Please provide one of upper filesystem instance (upper_fs) or"
+          " upper_protocol, not both"
+      )
+    self.lower_fs = lower_fs if lower_fs is not None else filesystem(lower_protocol, **lower_options)
+    self.upper_fs = upper_fs if upper_fs is not None else filesystem(upper_protocol, **upper_options)
 
   def __enter__(self):
-    if getattr(self.lower, '__enter__', None) is not None:
-      self.lower.__enter__()
-    if getattr(self.upper, '__enter__', None) is not None:
-      self.upper.__enter__()
+    if getattr(self.lower_fs, '__enter__', None) is not None:
+      self.lower_fs.__enter__()
+    if getattr(self.upper_fs, '__enter__', None) is not None:
+      self.upper_fs.__enter__()
     return self
   
   def __exit__(self, type, value, traceback):
-    if getattr(self.upper, '__exit__', None) is not None:
-      self.upper.__exit__(type, value, traceback)
-    if getattr(self.lower, '__exit__', None) is not None:
-      self.lower.__exit__(type, value, traceback)
+    if getattr(self.upper_fs, '__exit__', None) is not None:
+      self.upper_fs.__exit__(type, value, traceback)
+    if getattr(self.lower_fs, '__exit__', None) is not None:
+      self.lower_fs.__exit__(type, value, traceback)
 
   def mkdir(self, path, **kwargs):
-    return self.upper.mkdir(path, **kwargs)
+    return self.upper_fs.mkdir(path, **kwargs)
 
   def rm(self, path, recursive=False, maxdepth=None):
-    return self.upper.rm(path, recursive=recursive, maxdepth=maxdepth)
+    return self.upper_fs.rm(path, recursive=recursive, maxdepth=maxdepth)
 
   def copy(self, path1, path2, recursive=False, on_error=None, maxdepth=None, **kwargs):
-    if self.upper.exists(path1) or not self.lower.exists(path1):
-      return self.upper.copy(path1, path2, recursive=recursive, on_error=on_error, maxdepth=maxdepth, **kwargs)
+    if self.upper_fs.exists(path1) or not self.lower_fs.exists(path1):
+      return self.upper_fs.copy(path1, path2, recursive=recursive, on_error=on_error, maxdepth=maxdepth, **kwargs)
     else:
-      if self.lower.isdir(path1) and recursive:
-        for f1 in self.lower.walk(path1, maxdepth=maxdepth):
+      if self.lower_fs.isdir(path1) and recursive:
+        for f1 in self.lower_fs.walk(path1, maxdepth=maxdepth):
           f_rel = f1.replace(path1, '')
           f2_rel = join_slash(path2, f_rel)
-          with self.lower.open(f1, 'rb') as fr:
-            with self.upper.open(f2_rel, 'wb') as fw:
+          with self.lower_fs.open(f1, 'rb') as fr:
+            with self.upper_fs.open(f2_rel, 'wb') as fw:
               shutil.copyfileobj(fr, fw)
       else:
-        with self.lower.open(path1, 'rb') as fr:
-          with self.upper.open(path2, 'wb') as fw:
+        with self.lower_fs.open(path1, 'rb') as fr:
+          with self.upper_fs.open(path2, 'wb') as fw:
             shutil.copyfileobj(fr, fw)
 
   def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
-    if self.upper.exists(path1):
-      return self.upper.mv(path1, path2, recursive=recursive, maxdepth=maxdepth, **kwargs)
+    if self.upper_fs.exists(path1):
+      return self.upper_fs.mv(path1, path2, recursive=recursive, maxdepth=maxdepth, **kwargs)
     else:
       raise PermissionError(path1)
 
-  # def exists(self, path, **kwargs):
-  #   return self.upper.exists(path, **kwargs) or self.lower.exists(path, **kwargs)
+  def exists(self, path, **kwargs):
+    return self.upper_fs.exists(path, **kwargs) or self.lower_fs.exists(path, **kwargs)
 
   def info(self, path, **kwargs):
     logger.debug(f"info({path})")
-    if self.upper.exists(path) or not self.lower.exists(path):
-      return self.upper.info(path, **kwargs)
+    if self.upper_fs.exists(path) or not self.lower_fs.exists(path):
+      return self.upper_fs.info(path, **kwargs)
     else:
-      return self.lower.info(path, **kwargs)
+      return self.lower_fs.info(path, **kwargs)
 
   def ls(self, path, detail=False, **kwargs):
     logger.debug(f"ls({path})")
     results = {}
-    lower_exists = self.lower.exists(path)
-    upper_exists = self.upper.exists(path)
+    lower_exists = self.lower_fs.exists(path)
+    upper_exists = self.upper_fs.exists(path)
     if lower_exists:
-      for info in self.lower.ls(path, detail=detail, **kwargs):
+      for info in self.lower_fs.ls(path, detail=detail, **kwargs):
         if detail:
           results[info['name']] = info
         else:
           results[info] = info
     if upper_exists or not lower_exists:
-      for info in self.upper.ls(path, detail=detail, **kwargs):
+      for info in self.upper_fs.ls(path, detail=detail, **kwargs):
         if detail:
           results[info['name']] = info
         else:
@@ -121,15 +108,15 @@ class OverlayFileSystem(AbstractFileSystem):
     if 'w' in mode:
       pass
     elif 'a' in mode or '+' in mode:
-      if not self.upper.exists(path):
-        with self.lower.open(path, 'rb') as fr:
-          with self.upper.open(path, 'wb') as fw:
+      if not self.upper_fs.exists(path):
+        with self.lower_fs.open(path, 'rb') as fr:
+          with self.upper_fs.open(path, 'wb') as fw:
             shutil.copyfileobj(fr, fw)
-    elif self.upper.exists(path):
+    elif self.upper_fs.exists(path):
       pass
-    elif self.lower.exists(path):
+    elif self.lower_fs.exists(path):
       # completely readonly and only exists in lower
-      return self.lower._open(
+      return self.lower_fs._open(
         path,
         mode=mode,
         block_size=block_size,
@@ -138,7 +125,7 @@ class OverlayFileSystem(AbstractFileSystem):
         **kwargs
       )
     #
-    return self.upper._open(
+    return self.upper_fs._open(
       path,
       mode=mode,
       block_size=block_size,
