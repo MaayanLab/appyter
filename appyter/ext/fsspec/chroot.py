@@ -42,12 +42,12 @@ class ChrootFileSystem(AbstractFileSystem):
     self.fs = fs if fs is not None else filesystem(target_protocol, **self.kwargs)
 
   def _target_fo(self):
-    if '://' in self.storage_options['fo']:
-      target_fo_split = self.storage_options['fo'].split('/')
+    if '://' in self.storage_options.get('fo', ''):
+      target_fo_split = self.storage_options.get('fo','').split('/')
       # [scheme://base-path][/path-part?...]
       return '/'.join(target_fo_split[:3]), '/' + '/'.join(target_fo_split[3:])
     else:
-      return '', self.storage_options['fo']
+      return '', self.storage_options.get('fo', '')
 
   def _resolve_path(self, path):
     target_fo_base, target_fo_path = self._target_fo()
