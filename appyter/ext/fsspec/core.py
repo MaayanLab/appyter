@@ -1,4 +1,7 @@
 import logging
+from appyter.ext.fsspec.chroot import ChrootFileSystem
+from appyter.ext.fsspec.mapperfs import MapperFileSystem
+from appyter.ext.fsspec.overlayfs import OverlayFileSystem
 
 from appyter.ext.fsspec.parse import parse_file_uri_qs
 logger = logging.getLogger(__name__)
@@ -26,9 +29,13 @@ def url_to_chroot_fs(url, pathmap=None, cached=False, **kwargs):
   # add cache
   if cached:
     full_url = 'writecache::' + full_url
-  # add pathmap as necessary
-  if pathmap:
-    full_url = 'chroot::pathmap::' + full_url
-    kwargs['pathmap'] = dict(pathmap=pathmap)
   fs, _ = url_to_fs(full_url, **kwargs)
+  # apply pathmap as needed
+  if pathmap:
+    fs = ChrootFileSystem(
+      fs=OverlayFileSystem(
+        lower_fs=MapperFileSystem(pathmap=pathmap),
+        upper_fs=fs,
+      )
+    )
   return fs

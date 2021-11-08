@@ -6,7 +6,7 @@ click
 click-default-group
 flask==2.0.1
 flask_cors
-fsspec
+fsspec==2021.7.0
 fusepy
 ipython
 jinja2
