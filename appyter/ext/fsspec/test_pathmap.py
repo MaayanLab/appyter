@@ -28,7 +28,7 @@ def _test_ctx():
 def test_file_pathmap_chroot():
   with _test_ctx() as tmpdir:
     # instantiate filesystem & check that it works
-    with url_to_chroot_fs(str(tmpdir), chroot=True, pathmap={'E': str(tmpdir/'e')}) as fs:
+    with url_to_chroot_fs(str(tmpdir), pathmap={'E': str(tmpdir/'e')}) as fs:
       assert_eq(frozenset(fs.glob('**')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e', 'E']))
       assert_eq(fs.cat('a/b/c'), b'C')
       assert_eq(fs.cat('a/d'), b'D')
@@ -37,7 +37,7 @@ def test_file_pathmap_chroot():
 
 def test_file_pathmap_chroot_fuse():
   with _test_ctx() as tmpdir:
-    with sync_contextmanager(fs_mount(str(tmpdir), chroot=True, pathmap={'/E': str(tmpdir/'e')})) as fs:
+    with sync_contextmanager(fs_mount(str(tmpdir), pathmap={'/E': str(tmpdir/'e')})) as fs:
       assert_eq(frozenset(str(p.relative_to(fs)) for p in fs.rglob('*')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e']))
       assert_eq((fs/'a'/'b'/'c').open('rb').read(), b'C')
       assert_eq((fs/'a'/'d').open('rb').read(), b'D')
@@ -87,7 +87,7 @@ def test_http_pathmap_chroot():
   with _test_ctx() as tmpdir:
     with _http_serve_ctx(str(tmpdir), port):
       # instantiate filesystem & check that it works
-      with url_to_chroot_fs(f"http://localhost:{port}/subdir/", chroot=True, pathmap={'E': f'http://localhost:{port}/subdir/e'}) as fs:
+      with url_to_chroot_fs(f"http://localhost:{port}/subdir/", pathmap={'E': f'http://localhost:{port}/subdir/e'}) as fs:
         assert_eq(fs.cat('a/b/c'), b'C')
         assert_eq(fs.cat('a/d'), b'D')
         assert_eq(fs.cat('e'), b'E')

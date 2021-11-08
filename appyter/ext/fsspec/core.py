@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 
 from fsspec.core import url_to_fs, split_protocol
 
-def url_to_chroot_fs(url, chroot=True, pathmap=None, cached=False, **kwargs):
+def url_to_chroot_fs(url, pathmap=None, cached=False, **kwargs):
   ''' Like url_to_fs but supporting our extensions, namely:
   chroot   filesystem path is treated as the root
   pathmap  overlay other fsspec-compatible paths
@@ -21,9 +21,8 @@ def url_to_chroot_fs(url, chroot=True, pathmap=None, cached=False, **kwargs):
   # ensure auto_mkdir is enabled
   if protocol == 'file':
     if 'auto_mkdir' not in kwargs[protocol]: kwargs[protocol]['auto_mkdir'] = True
-  # add chroot as necessary
-  if chroot:
-    full_url = 'chroot::' + full_url
+  # add chroot
+  full_url = 'chroot::' + full_url
   # add cache
   if cached:
     full_url = 'writecache::' + full_url

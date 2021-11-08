@@ -26,7 +26,7 @@ def _test_ctx():
 def test_file_chroot_in_chroot():
   with _test_ctx() as tmpdir:
     # instantiate filesystem & check that it works
-    with url_to_chroot_fs(f"chroot::file://{str(tmpdir)}", chroot=True) as fs:
+    with url_to_chroot_fs(f"chroot::file://{str(tmpdir)}") as fs:
       assert_eq(frozenset(fs.glob('**')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e']))
       assert_eq(fs.cat('a/b/c'), b'C')
       assert_eq(fs.cat('a/d'), b'D')
@@ -35,7 +35,7 @@ def test_file_chroot_in_chroot():
 def test_file_chroot():
   with _test_ctx() as tmpdir:
     # instantiate filesystem & check that it works
-    with url_to_chroot_fs(str(tmpdir), chroot=True) as fs:
+    with url_to_chroot_fs(str(tmpdir)) as fs:
       assert_eq(frozenset(fs.glob('**')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e']))
       assert_eq(fs.cat('a/b/c'), b'C')
       assert_eq(fs.cat('a/d'), b'D')
@@ -84,7 +84,7 @@ def test_http_chroot():
   with _test_ctx() as tmpdir:
     with _http_serve_ctx(tmpdir, port):
       # instantiate filesystem & check that it works
-      with url_to_chroot_fs(f"http://localhost:{port}/subdir/", chroot=True) as fs:
+      with url_to_chroot_fs(f"http://localhost:{port}/subdir/") as fs:
         assert_eq(fs.cat('a/b/c'), b'C')
         assert_eq(fs.cat('a/d'), b'D')
         assert_eq(fs.cat('e'), b'E')

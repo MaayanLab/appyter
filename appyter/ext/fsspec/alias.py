@@ -19,7 +19,7 @@ def AliasFileSystemFactory(_proto, _fs_url, **_kwargs):
 
     def __init__(self, **kwargs):
       super().__init__(**kwargs)
-      self.fs = url_to_chroot_fs(_fs_url, chroot=True, **_kwargs)
+      self.fs = url_to_chroot_fs(_fs_url, **_kwargs)
       self.root_marker = self.fs.root_marker
 
     def __enter__(self):
