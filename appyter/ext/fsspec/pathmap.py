@@ -178,7 +178,7 @@ class PathMapFileSystem(AbstractFileSystem):
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
     fs, path, fs_mode = self.__pathmap(path)
-    if fs_mode == 0o444 and ('w' in mode or '+' in mode): raise PermissionError
+    if fs_mode == 0o444 and ('r' not in mode): raise PermissionError
     return fs._open(
       path,
       mode=mode,
