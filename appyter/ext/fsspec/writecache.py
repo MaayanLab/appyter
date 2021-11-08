@@ -47,6 +47,14 @@ class WriteCacheFileSystem(AbstractFileSystem):
     path = self.fs.root_marker + path.lstrip('/')
     return self.fs.mkdir(path, **kwargs)
 
+  def makedirs(self, path, exist_ok=False):
+    path = self.fs.root_marker + path.lstrip('/')
+    return self.fs.makedirs(path, exist_ok=exist_ok)
+
+  def rmdir(self, path):
+    path = self.fs.root_marker + path.lstrip('/')
+    return self.upper_fs.rmdir(path)
+
   def rm(self, path, recursive=False, maxdepth=None):
     path = self.fs.root_marker + path.lstrip('/')
     return self.fs.rm(path, recursive=recursive, maxdepth=maxdepth)

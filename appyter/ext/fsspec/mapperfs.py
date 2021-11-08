@@ -60,6 +60,12 @@ class MapperFileSystem(AbstractFileSystem):
 
   def mkdir(self, path, **kwargs):
     raise PermissionError(path)
+  
+  def makedirs(self, path, exist_ok=False):
+    raise PermissionError(path)
+
+  def rmdir(self, path):
+    raise PermissionError(path)
 
   def rm(self, path, recursive=False, maxdepth=None):
     raise PermissionError(path)

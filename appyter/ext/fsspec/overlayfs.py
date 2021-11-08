@@ -48,6 +48,12 @@ class OverlayFileSystem(AbstractFileSystem):
 
   def mkdir(self, path, **kwargs):
     return self.upper_fs.mkdir(path, **kwargs)
+  
+  def makedirs(self, path, exist_ok=False):
+    return self.upper_fs.makedirs(path, exist_ok=exist_ok)
+
+  def rmdir(self, path):
+    return self.upper_fs.rmdir(path)
 
   def rm(self, path, recursive=False, maxdepth=None):
     return self.upper_fs.rm(path, recursive=recursive, maxdepth=maxdepth)

@@ -34,6 +34,12 @@ def AliasFileSystemFactory(_proto, _fs_url, **_kwargs):
     def mkdir(self, path, **kwargs):
       return self.fs.mkdir(path, **kwargs)
 
+    def makedirs(self, path, exist_ok=False):
+      return self.fs.makedirs(path, exist_ok=exist_ok)
+
+    def rmdir(self, path):
+      return self.fs.rmdir(path)
+
     def rm(self, path, recursive=False, maxdepth=None):
       return self.fs.rm(path, recursive=recursive, maxdepth=maxdepth)
 
