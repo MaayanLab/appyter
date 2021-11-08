@@ -1,7 +1,6 @@
 import os
 import click
 import logging
-import traceback
 from appyter import __version__
 from appyter.cli import cli
 from appyter.ext.click import click_option_setenv, click_argument_setenv
@@ -24,9 +23,7 @@ logger = logging.getLogger(__name__)
 @click_argument_setenv('uri', envvar='APPYTER_URI', nargs=1, type=str)
 @click.pass_context
 def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
-  import tempfile
   import urllib.parse, urllib.request
-  import nbformat as nbf
   import fsspec
   # TODO: can this be less reliant on the `appyter-catalog` storage setup
   uri_parsed = urllib.parse.urlparse(uri)
@@ -38,51 +35,11 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
       storage_uri,
     )
   )
-  # fetch the actual notebook
-  try:
-    with urllib.request.urlopen(
-      urllib.request.Request(uri, headers={ 'Accept': 'application/vnd.jupyter' })
-    ) as fr:
-      nb = nbf.read(fr, as_version=4)
-  except:
-    traceback.print_exc()
-    logging.error('Error fetching appyter instance, is the url right?')
-  #
-  metadata = nb.get('metadata', {}).get('appyter', {})
-  #
-  nbconstruct_version = metadata.get('nbconstruct', {}).get('version', 'unknown')
-  if nbconstruct_version and nbconstruct_version == __version__:
-    pass
-  else:
-    logging.warning(f"This appyter was not created with this version, instance version was {nbconstruct_version} and our version is {__version__}. Proceed with caution")
-  #
-  nbexecute_version = metadata.get('nbexecute', {}).get('version', 'unknown')
-  if nbexecute_version and nbexecute_version == __version__:
-    pass
-  else:
-    logging.warning(f"This appyter was not executed with this version, instance version was {nbexecute_version} and our version is {__version__}. Proceed with caution")
-  #
-  if 'nbexecute' not in metadata:
-    logging.warning('This appyter instance has not been executed, no results will be available')
-  elif 'started' in metadata['nbexecute'] and 'completed' not in metadata['nbexecute']:
-    logging.warning('This appyter is not finished running, no results will be available')
-  elif 'started' in metadata['nbexecute'] and 'completed' in metadata['nbexecute']:
-    logging.info(f"Appyter ran from {metadata['nbexecute']['started']} to {metadata['nbexecute']['completed']}")
-  else:
-    logging.warning('This appyter seems old, this may not work properly, please contact us and we can update it')
-  # if tmpdir doesn't exist, create it
-  if data_dir is None:
-    data_dir = tempfile.mkdtemp()
-  # write notebook to data_dir
-  os.makedirs(data_dir, exist_ok=True)
-  filename = metadata.get('nbconstruct', {}).get('filename', 'appyter.ipynb')
-  with open(os.path.join(data_dir, filename), 'w') as fw:
-    nbf.write(nb, fw)
-  #
-  # mount input files into data_dir
-  files = metadata.get('nbconstruct', {}).get('files', {})
-  with sync_contextmanager(fs_mount(data_dir, pathmap=files)) as mnt:
+  # if data_dir doesn't exist, create it
+  if data_dir is None: data_dir = 'tmpfs://'
+  # mount the appyter into the data_dir
+  with sync_contextmanager(fs_mount(data_dir, appyter=uri)) as mnt:
     logging.info(f"Starting `appyter serve`...")
     # serve the bundle in jupyter notebook
     from appyter.helpers.serve import serve
-    ctx.invoke(serve, cwd=cwd, data_dir=str(mnt), host=host, port=port, args=[*args, filename])
+    ctx.invoke(serve, cwd=cwd, data_dir=str(mnt), host=host, port=port, args=[*args, uri.path.rsplit('/', maxsplit=1)[-1]])
