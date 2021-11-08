@@ -42,4 +42,4 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
     logging.info(f"Starting `appyter serve`...")
     # serve the bundle in jupyter notebook
     from appyter.helpers.serve import serve
-    ctx.invoke(serve, cwd=cwd, data_dir=str(mnt), host=host, port=port, args=[*args, uri.path.rsplit('/', maxsplit=1)[-1]])
+    ctx.invoke(serve, cwd=cwd, data_dir=str(mnt), host=host, port=port, args=args)
