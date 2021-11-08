@@ -37,11 +37,17 @@ def test_file_pathmap_chroot():
 
 def test_file_pathmap_chroot_fuse():
   with _test_ctx() as tmpdir:
-    with sync_contextmanager(fs_mount(str(tmpdir), pathmap={'/E': str(tmpdir/'e')})) as fs:
-      assert_eq(frozenset(str(p.relative_to(fs)) for p in fs.rglob('*')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e']))
+    with sync_contextmanager(fs_mount(str(tmpdir), pathmap={'E': str(tmpdir/'e')})) as fs:
+      assert_eq(frozenset(str(p.relative_to(fs)) for p in fs.rglob('*')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e', 'E']))
       assert_eq((fs/'a'/'b'/'c').open('rb').read(), b'C')
       assert_eq((fs/'a'/'d').open('rb').read(), b'D')
       assert_eq((fs/'e').open('rb').read(), b'E')
+      assert_eq((fs/'E').open('rb').read(), b'E')
+      with (fs/'E').open('a') as fw:
+        fw.write('!')
+      assert_eq((fs/'E').open('rb').read(), b'E!')
+      with (fs/'E').open('w') as fw:
+        fw.write('E')
       assert_eq((fs/'E').open('rb').read(), b'E')
 
 def _http_serve(directory, port=8888):

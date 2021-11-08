@@ -112,12 +112,11 @@ class OverlayFileSystem(AbstractFileSystem):
     return list(results.values())
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
-    if 'w' in mode:
-      pass
-    elif 'a' in mode or '+' in mode:
-      if not self.upper_fs.exists(path):
+    logger.error(f"_open({path}, {mode})")
+    if 'r' not in mode:
+      if not self.upper_fs.exists(path) and self.lower_fs.exists(path):
         with self.lower_fs.open(path, 'rb') as fr:
-          self.upper_fs.mkdir(parent_url(path), exist_ok=True)
+          self.upper_fs.makedirs(parent_url(path), exist_ok=True)
           with self.upper_fs.open(path, 'wb') as fw:
             shutil.copyfileobj(fr, fw)
     elif self.upper_fs.exists(path):
