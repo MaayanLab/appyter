@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from fsspec import filesystem, AbstractFileSystem
-from appyter.ext.urllib import join_slash
+from appyter.ext.urllib import join_slash, parent_url
 
 class OverlayFileSystem(AbstractFileSystem):
   ''' OverlayFS implemented with fsspec
@@ -67,10 +67,12 @@ class OverlayFileSystem(AbstractFileSystem):
           f_rel = f1.replace(path1, '')
           f2_rel = join_slash(path2, f_rel)
           with self.lower_fs.open(f1, 'rb') as fr:
+            self.upper_fs.makedirs(parent_url(f2_rel), exist_ok=True)
             with self.upper_fs.open(f2_rel, 'wb') as fw:
               shutil.copyfileobj(fr, fw)
       else:
         with self.lower_fs.open(path1, 'rb') as fr:
+          self.upper_fs.makedirs(parent_url(path2), exist_ok=True)
           with self.upper_fs.open(path2, 'wb') as fw:
             shutil.copyfileobj(fr, fw)
 
@@ -115,6 +117,7 @@ class OverlayFileSystem(AbstractFileSystem):
     elif 'a' in mode or '+' in mode:
       if not self.upper_fs.exists(path):
         with self.lower_fs.open(path, 'rb') as fr:
+          self.upper_fs.mkdir(parent_url(path), exist_ok=True)
           with self.upper_fs.open(path, 'wb') as fw:
             shutil.copyfileobj(fr, fw)
     elif self.upper_fs.exists(path):

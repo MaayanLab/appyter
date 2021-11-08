@@ -4,6 +4,10 @@ import urllib.parse
 from appyter.ext.pathlib.chroot import ChrootPurePosixPath
 from appyter.ext.json import try_json_loads
 
+def parent_url(url):
+  parent, *filename = url.rsplit('/', maxsplit=1)
+  return parent if filename else ''
+
 def join_slash(*parts):
   if not parts: return ''
   part0, *parts = parts
