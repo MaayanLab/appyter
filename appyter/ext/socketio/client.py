@@ -24,6 +24,7 @@ class AsyncClient(PriorityQueuedEmitMixin, socketio.AsyncClient):
       await self._emit_queue.join()
     logger.debug('Disconnect')
     await self.klass.disconnect(self)
+    await PriorityQueuedEmitMixin.close(self)
 
   def connection_tracker(self):
     @self.event

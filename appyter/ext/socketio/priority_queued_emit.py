@@ -15,7 +15,7 @@ class PriorityQueuedEmitMixin:
     self._emit_counter = iter(itertools.count())
     self._emit_queue = asyncio.PriorityQueue()
     self._emit_enabled = asyncio.Event()
-    loop.create_task(self.emit_dispatcher())
+    self._emit_dispatcher_task = loop.create_task(self.emit_dispatcher())
 
   async def emit_dispatcher(self):
     while True:
@@ -23,10 +23,13 @@ class PriorityQueuedEmitMixin:
       await self._emit_enabled.wait()
       try:
         await self.klass.emit(self, *args, **{k:v for k,v in kwargs.items() if v})
+      except asyncio.CancelledError:
+        raise
       except:
         import traceback
         logger.error(traceback.format_exc())
-      self._emit_queue.task_done()
+      finally:
+        self._emit_queue.task_done()
 
   async def _emit(self, evt, data, priority=0, **kwargs):
     await self._emit_queue.put((
@@ -42,3 +45,10 @@ class PriorityQueuedEmitMixin:
       priority=priority,
       **kwargs,
     )
+
+  async def close(self):
+    self._emit_dispatcher_task.cancel()
+    try:
+      await self._emit_dispatcher_task
+    except asyncio.CancelledError:
+      pass
