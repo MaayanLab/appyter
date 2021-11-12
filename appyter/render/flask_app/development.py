@@ -127,3 +127,4 @@ def serve(app_path, **kwargs):
   loop.run_forever()
   loop.run_until_complete(emitter.emit('quit'))
   loop.run_until_complete(emitter.flush())
+  loop.run_until_complete(emitter.clear())

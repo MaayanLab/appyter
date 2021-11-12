@@ -81,12 +81,11 @@ class EventEmitter:
       await self._queues[event].join()
       self._consumers[event].cancel()
       await self._consumers[event]
+    except asyncio.CancelledError:
+      pass
     finally:
       del self._consumers[event]
 
   async def clear(self):
     logger.debug(f"Clearing...")
-    await asyncio.gather(*[
-      event
-      for event in self._consumers.keys()
-    ])
+    await asyncio.gather(*map(self.remove, self._consumers.keys()))

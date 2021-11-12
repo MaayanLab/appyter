@@ -55,6 +55,7 @@ async def setup_socketio(emitter, job):
   await sio.emit('join', job['session'])
   await emitter.wait('stopped')
   await emitter.flush()
+  await emitter.clear()
   await sio.disconnect()
 
 async def execute_async(job, debug=False):
