@@ -4,9 +4,8 @@ import os
 from flask import request, current_app, send_file, send_from_directory, abort, jsonify
 from werkzeug.exceptions import NotFound
 
-from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.urllib import join_url
-from appyter.render.flask_app.constants import get_form, get_ipynb_io, get_nbtemplate_json, get_static_fs, get_j2_env
+from appyter.render.flask_app.constants import get_form, get_ipynb_io, get_nbtemplate_json, get_output_fs, get_static_fs, get_j2_env
 from appyter.render.flask_app.core import core
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.context import get_appyter_directory
@@ -55,15 +54,15 @@ def data_files(path):
     ], 'text/html')
     if mimetype == 'text/html':
       return get_j2_env().get_template('landing.j2').render(
-        _nb=os.path.basename(current_app.config['IPYNB']),
+        _nb=current_app.config['IPYNB'],
       )
     else:
-      data_fs = url_to_chroot_fs(join_url('storage://output/', path))
-      path = '/' + current_app.config['IPYNB']
-      if data_fs.exists(path):
-        return send_file(data_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
+      output_fs = get_output_fs()
+      path = join_url(path, current_app.config['IPYNB'])
+      if output_fs.exists(path):
+        return send_file(output_fs.open(path, 'rb'), attachment_filename=current_app.config['IPYNB'])
   else:
-    data_fs = url_to_chroot_fs('storage://output/')
-    if data_fs.exists(path):
-      return send_file(data_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
+    output_fs = get_output_fs()
+    if output_fs.exists(path):
+      return send_file(output_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
   abort(404)

@@ -21,6 +21,20 @@ def get_static_fs():
   return url_to_chroot_fs(current_app.config['STATIC_DIR'])
 
 @memcached
+def get_input_fs():
+  ''' Return fsspec compatible chroot to the static directory
+  '''
+  from appyter.ext.fsspec.core import url_to_chroot_fs
+  return url_to_chroot_fs('storage://input/')
+
+@memcached
+def get_output_fs():
+  ''' Return fsspec compatible chroot to the static directory
+  '''
+  from appyter.ext.fsspec.core import url_to_chroot_fs
+  return url_to_chroot_fs('storage://output/')
+
+@memcached
 def _get_ipynb_io():
   ''' Return byte stream for original ipynb
   '''

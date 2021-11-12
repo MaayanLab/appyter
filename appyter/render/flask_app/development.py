@@ -1,8 +1,6 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from appyter.ext.asyncio.try_n_times import try_n_times
-
 async def run_app(config):
   import os
   import sys
@@ -39,6 +37,7 @@ async def app_messager(emitter, config):
   import asyncio
   from appyter.ext.urllib import join_slash
   from appyter.ext.socketio import AsyncClient
+  from appyter.ext.asyncio.try_n_times import try_n_times
   sio = AsyncClient()
   #
   @emitter.on('livereload')

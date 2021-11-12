@@ -4,6 +4,7 @@ import logging
 import shutil
 
 from appyter.ext.fsspec.core import url_to_chroot_fs
+from appyter.render.flask_app.constants import get_input_fs
 logger = logging.getLogger(__name__)
 
 from appyter.render.flask_app.socketio import socketio
@@ -69,10 +70,7 @@ async def download_with_progress_and_hash(sid, data_fs, name, url, path, filenam
 
 @socketio.on('download_start')
 async def download(sid, data):
-  async with socketio.session(sid) as sess:
-    config = sess['config']
-  #
-  data_fs = url_to_chroot_fs('storage://input/')
+  input_fs = get_input_fs()
   name = data.get('name')
   # TODO: hash based on url?
   # TODO: s3 bypass
@@ -81,7 +79,7 @@ async def download(sid, data):
   await socketio.emit('download_queued', dict(name=name, filename=filename), room=sid)
   await download_with_progress_and_hash(
     sid=sid,
-    data_fs=data_fs,
+    data_fs=input_fs,
     name=name,
     url=url,
     path=generate_uuid(),
@@ -131,12 +129,11 @@ async def siofu_done(sid, evt):
   import asyncio
   async with socketio.session(sid) as sess:
     sess['file_%d' % (evt['id'])]['fh'].close()
-    config = sess['config']
-    data_fs = url_to_chroot_fs('storage://input/')
+    input_fs = get_input_fs()
     tmp_fs = sess['file_%d' % (evt['id'])]['tmp_fs']
     path = sess['file_%d' % (evt['id'])]['path']
     filename = sess['file_%d' % (evt['id'])]['name']
-    full_filename = await asyncio.get_event_loop().run_in_executor(None, organize_file_content, data_fs, tmp_fs, path, filename)
+    full_filename = await asyncio.get_event_loop().run_in_executor(None, organize_file_content, input_fs, tmp_fs, path, filename)
     tmp_fs.__exit__(None, None, None)
     del sess['file_%d' % (evt['id'])]
   #
@@ -147,7 +144,7 @@ async def siofu_done(sid, evt):
 
 # upload from client with POST
 def upload_from_request(req, fname):
-  data_fs = url_to_chroot_fs('storage://input/')
+  input_fs = get_input_fs()
   fh = req.files.get(fname)
   if not fh:
     return None
@@ -156,4 +153,4 @@ def upload_from_request(req, fname):
   with url_to_chroot_fs('tmpfs:///') as tmp_fs:
     with tmp_fs.open(path, 'wb') as fw:
       fh.save(fw)
-    return organize_file_content(data_fs, tmp_fs, path, filename)
+    return organize_file_content(input_fs, tmp_fs, path, filename)
