@@ -35,17 +35,16 @@ def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):
       )
     )
   elif appyter:
+    import urllib.request
     from appyter import __version__
     from appyter.ext.urllib import join_slash
     from appyter.parse.nb import nb_from_ipynb_io
     from appyter.ext.fsspec.chroot import ChrootFileSystem
     from appyter.ext.fsspec.mapperfs import MapperFileSystem
     from appyter.ext.fsspec.overlayfs import OverlayFileSystem
-    url, qs = parse_file_uri_qs(appyter)
-    _fs, path = url_to_fs(url, **qs)
-    parent, _filename = path.rsplit('/', maxsplit=1)
     # load notebook
-    with _fs.open(path, 'rb') as fr:
+    req = urllib.request.Request(appyter, headers={'Accept': 'application/vnd.jupyter'})
+    with urllib.request.urlopen(req) as fr:
       nb = nb_from_ipynb_io(fr)
     # grab relevant files from metadata
     metadata = nb.get('metadata', {}).get('appyter', {})
