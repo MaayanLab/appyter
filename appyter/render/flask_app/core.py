@@ -5,9 +5,9 @@ from flask import Blueprint, request, redirect, abort, url_for, current_app, jso
 from appyter.context import get_jinja2_env
 from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.urllib import join_url
-from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
+from appyter.parse.nb import nb_to_ipynb_io
 from appyter.ext.exceptions import exception_as_dict
-from appyter.render.flask_app.constants import get_fields, get_ipynb_hash
+from appyter.render.flask_app.constants import get_fields, get_ipynb_hash, get_nbtemplate
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.ext.hashlib import sha1sum_dict
@@ -24,18 +24,16 @@ def prepare_data(req):
 
 def prepare_results(data):
   results_hash = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data=data))
-  data_fs = url_to_chroot_fs(join_url('storage://output/', results_hash))
-  results_path = '/' + current_app.config['IPYNB']
-  if not data_fs.exists(results_path):
-    # construct notebook
-    env = get_jinja2_env(config=current_app.config, context=data, session=results_hash)
-    with fsspec.open(join_url(current_app.config['CWD'], current_app.config['IPYNB']), 'r') as fr:
-      nbtemplate = nb_from_ipynb_io(fr)
-    # in case of constraint failures, we'll fail here
-    nb = render_nb_from_nbtemplate(env, nbtemplate, fields=get_fields(), data=data)
-    # write notebook
-    with data_fs.open(results_path, 'w') as fw:
-      nb_to_ipynb_io(nb, fw)
+  with url_to_chroot_fs(join_url('storage://output/', results_hash)) as data_fs:
+    if not data_fs.exists(current_app.config['IPYNB']):
+      # construct notebook
+      env = get_jinja2_env(config=current_app.config, context=data, session=results_hash)
+      nbtemplate = get_nbtemplate()
+      # in case of constraint failures, we'll fail here
+      nb = render_nb_from_nbtemplate(env, nbtemplate, fields=get_fields(), data=data)
+      # write notebook
+      with data_fs.open(current_app.config['IPYNB'], 'w') as fw:
+        nb_to_ipynb_io(nb, fw)
   #
   return results_hash
 
