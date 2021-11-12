@@ -1,6 +1,6 @@
 from appyter.ext.urllib import parse_qs
 
-def parse_file_uri(uri):
+def parse_file_uri_fragment(uri):
   if '#' in uri:
     uri, filename = uri.rsplit('#', 1)
   else:
