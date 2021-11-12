@@ -65,18 +65,17 @@ def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):
       logger.warning('This appyter seems old, this may not work properly, please contact us and we can update it')
     #
     filename = nbconstruct.get('filename', 'appyter.ipynb')
-    files = { filename: appyter }
-    # input files are fully resolvable
+    files = { filename: filename }
     files.update(nbconstruct.get('files', {}))
-    # output files are relative to notebook
-    files.update({
-      k: join_slash(parent, v)
-      for k, v in metadata.get('nbexecute', {}).get('files', {}).items()
-    })
+    files.update(metadata.get('nbexecute', {}).get('files', {}))
+    pathmap = {
+      filename: path if '://' in path else join_slash(appyter, path)
+      for filename, path in files.items()
+    }
     # prepare pathmaped filesystem overlayed on target_fs
     fs = ChrootFileSystem(
       fs=OverlayFileSystem(
-        lower_fs=MapperFileSystem(pathmap=files),
+        lower_fs=MapperFileSystem(pathmap=pathmap),
         upper_fs=fs,
       ),
     )
