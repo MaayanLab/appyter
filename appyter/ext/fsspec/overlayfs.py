@@ -112,7 +112,6 @@ class OverlayFileSystem(AbstractFileSystem):
     return list(results.values())
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
-    logger.error(f"_open({path}, {mode})")
     if 'r' not in mode:
       if 'w' in mode:
         pass
