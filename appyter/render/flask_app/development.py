@@ -24,14 +24,15 @@ async def app_runner(emitter, config):
   async def reload(changes):
     logger.info(f"Reload {changes}")
     async with state_lock:
-      proc = state.pop('proc')
-      proc.kill()
-      state['proc'] = await run_app(config)
+      if 'proc' in state:
+        proc = state.pop('proc')
+        proc.kill()
+        state['proc'] = await run_app(config)
   #
   @emitter.on('quit')
   async def quit():
     logger.info('Stopping app..')
-    if 'proc' in state:
+    async with state_lock:
       state.pop('proc').kill()
 
 async def app_messager(emitter, config):
