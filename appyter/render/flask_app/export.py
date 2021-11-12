@@ -4,36 +4,12 @@ import os
 import io
 import zipfile
 from flask import request, current_app, send_file, abort
-from nbconvert import HTMLExporter
 
 from appyter.ext.fsspec.core import url_to_chroot_fs
+from appyter.render.flask_app.constants import get_base_files, get_html_exporer
 from appyter.render.flask_app.core import core
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.parse.nb import nb_from_ipynb_io
-
-_html_exporter = None
-def get_html_exporer():
-  ''' nbconvert html export
-  '''
-  global _html_exporter
-  if _html_exporter is None:
-    _html_exporter = HTMLExporter()
-    _html_exporter.template_name = 'classic'
-  return _html_exporter
-
-_base_files = None
-def get_base_files():
-  ''' Include all (non-hidden) files in cwd (include requirements.txt, utils, etc..)
-  '''
-  global _base_files
-  if _base_files is None:
-    _base_files = {}
-    fs = url_to_chroot_fs(current_app.config['CWD'])
-    for f in fs.glob('*'):
-      if f.startswith('.'): continue
-      if f == current_app.config['IPYNB']: continue
-      _base_files[f] = fs.open(f, 'rb').read()
-  return _base_files
 
 @route_join_with_or_without_slash(core, 'export', '<path:path>', methods=['GET'])
 def export(path):

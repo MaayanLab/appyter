@@ -6,34 +6,13 @@ from appyter.context import get_jinja2_env
 from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.urllib import join_url
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
-from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
 from appyter.ext.exceptions import exception_as_dict
+from appyter.render.flask_app.constants import get_fields, get_ipynb_hash
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.ext.flask import route_join_with_or_without_slash
-from appyter.ext.hashlib import sha1sum_io, sha1sum_dict
-
+from appyter.ext.hashlib import sha1sum_dict
 
 core = Blueprint('__main__', __name__)
-
-_fields = None
-def get_fields():
-  ''' Helper to get/cache fields even if we're on a different thread
-  '''
-  global _fields
-  if not _fields or current_app.config['DEBUG']:
-    with fsspec.open(join_url(current_app.config['CWD'], current_app.config['IPYNB']), 'r') as fr:
-      env = get_jinja2_env(config=current_app.config)
-      nbtemplate = nb_from_ipynb_io(fr)
-      _fields = parse_fields_from_nbtemplate(env, nbtemplate)
-  return _fields
-
-_ipynb_hash = None
-def get_ipynb_hash():
-  global _ipynb_hash
-  if not _ipynb_hash or current_app.config['DEBUG']:
-    with fsspec.open(join_url(current_app.config['CWD'], current_app.config['IPYNB']), 'rb') as fr:
-      _ipynb_hash = sha1sum_io(fr)
-  return _ipynb_hash
 
 def prepare_data(req):
   data = {}

@@ -6,14 +6,10 @@ from werkzeug.exceptions import NotFound
 
 from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.urllib import join_url
+from appyter.render.flask_app.constants import get_form, get_ipynb_io, get_nbtemplate_json, get_static_fs, get_j2_env
 from appyter.render.flask_app.core import core
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.context import get_appyter_directory
-from appyter.parse.nb import nb_from_ipynb_io
-from appyter.render.form import render_form_from_nbtemplate
-from appyter.render.nbinspect import render_nbtemplate_json_from_nbtemplate
-from appyter.context import get_jinja2_env
-
 
 @route_join_with_or_without_slash(core, methods=['GET'])
 def get_index():
@@ -22,33 +18,25 @@ def get_index():
     'application/json',
     'application/vnd.jupyter',
   ], 'text/html')
-  fs = url_to_chroot_fs(current_app.config['CWD'])
   if mimetype in {'text/html'}:
-    env = get_jinja2_env(config=current_app.config)
-    with fs.open(current_app.config['IPYNB'], 'r') as fr:
-      nbtemplate = nb_from_ipynb_io(fr)
-    return render_form_from_nbtemplate(env, nbtemplate)
+    return get_form()
   elif mimetype in {'application/json'}:
-    env = get_jinja2_env(config=current_app.config)
-    with fs.open(current_app.config['IPYNB'], 'r') as fr:
-      nbtemplate = nb_from_ipynb_io(fr)
-    return jsonify(render_nbtemplate_json_from_nbtemplate(env, nbtemplate))
+    return jsonify(get_nbtemplate_json())
   elif mimetype in {'application/vnd.jupyter'}:
-    with fs.open(current_app.config['IPYNB'], 'rb') as fr:
-      return send_file(fr, attachment_filename=current_app.config['IPYNB'], mimetype=mimetype)
+    return send_file(get_ipynb_io(), attachment_filename=current_app.config['IPYNB'], mimetype=mimetype)
   else:
     abort(404)
 
 @core.route('/favicon.ico', methods=['GET'])
 def favicon():
-  static = url_to_chroot_fs(current_app.config['STATIC_DIR'])
+  static = get_static_fs()
   if static.exists('favicon.ico'):
     return send_file(static.open('favicon.ico', 'rb'), attachment_filename='favicon.ico')
   abort(404)
 
 @core.route('/static/<path:filename>', methods=['GET'])
 def static(filename):
-  static = url_to_chroot_fs(current_app.config['STATIC_DIR'])
+  static = get_static_fs()
   if static.exists(filename):
     return send_file(static.open(filename, 'rb'), attachment_filename=filename)
   #
@@ -66,8 +54,7 @@ def data_files(path):
       'application/vnd.jupyter',
     ], 'text/html')
     if mimetype == 'text/html':
-      env = get_jinja2_env(config=current_app.config)
-      return env.get_template('landing.j2').render(
+      return get_j2_env().get_template('landing.j2').render(
         _nb=os.path.basename(current_app.config['IPYNB']),
       )
     else:
