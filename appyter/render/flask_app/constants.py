@@ -100,5 +100,6 @@ def get_base_files():
   for f in fs.glob('*'):
     if f.startswith('.'): continue
     if f == current_app.config['IPYNB']: continue
+    if not fs.isfile(f): continue
     base_files[f] = fs.open(f, 'rb').read()
   return base_files
