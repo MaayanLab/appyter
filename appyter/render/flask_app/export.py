@@ -1,7 +1,7 @@
 ''' Endpoints for exporting results
 '''
-import os
 import io
+import shutil
 import zipfile
 from flask import request, current_app, send_file, abort
 
@@ -19,7 +19,8 @@ def export(path):
     data_fs = url_to_chroot_fs(join_url('storage://output/', path))
     nbpath = current_app.config['IPYNB']
     if data_fs.exists(nbpath):
-      nb = nb_from_ipynb_io(data_fs.open(nbpath, 'rb'))
+      with data_fs.open(nbpath, 'rb') as fr:
+        nb = nb_from_ipynb_io(fr)
       if format == 'html':
         exporter = get_html_exporer()
         body, _rcs = exporter.from_notebook_node(nb)
@@ -35,6 +36,7 @@ def export(path):
               for f in (nbpath, *files):
                 if data_fs.exists(f):
                   with data_fs.open(f, 'rb') as fr:
-                    zf.writestr(f, fr.read())
+                    with zf.open(f, 'w') as zfw:
+                      shutil.copyfileobj(fr, zfw)
           return send_file(tmp_fs.open('output.zip', 'rb'), mimetype='application/zip', as_attachment=True, attachment_filename='output.zip')
   abort(404)
