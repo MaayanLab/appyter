@@ -1,5 +1,6 @@
 import os
 import tempfile
+from pathlib import PurePath
 from fsspec import filesystem, AbstractFileSystem
 
 import logging
@@ -32,7 +33,8 @@ class WriteCacheFileSystem(AbstractFileSystem):
       else (fs.protocol if isinstance(fs.protocol, str) else fs.protocol[0])
     )
     self.fs = fs if fs is not None else filesystem(target_protocol, **self.kwargs)
-    self._local_files = {}
+    self._local_cache = {}
+    self._dir_cache = set()
 
   def __enter__(self):
     if getattr(self.fs, '__enter__', None) is not None:
@@ -45,40 +47,91 @@ class WriteCacheFileSystem(AbstractFileSystem):
 
   def mkdir(self, path, **kwargs):
     path = self.fs.root_marker + path.lstrip('/')
-    return self.fs.mkdir(path, **kwargs)
+    try:
+      self.fs.mkdir(path, **kwargs)
+    except:
+      raise
+    else:
+      self._dir_cache.add(path)
 
   def makedirs(self, path, exist_ok=False):
     path = self.fs.root_marker + path.lstrip('/')
-    return self.fs.makedirs(path, exist_ok=exist_ok)
+    try:
+      self.fs.makedirs(path, exist_ok=exist_ok)
+    except:
+      raise
+    else:
+      path_split = path.split('/')
+      for i in range(1, len(path_split)+1):
+        self._dir_cache.add('/'.join(path_split[:i]))
 
   def rmdir(self, path):
     path = self.fs.root_marker + path.lstrip('/')
-    return self.upper_fs.rmdir(path)
+    try:
+      self.upper_fs.rmdir(path)
+    except:
+      raise
+    else:
+      self._dir_cache.discard(path)
 
   def rm(self, path, recursive=False, maxdepth=None):
     path = self.fs.root_marker + path.lstrip('/')
-    return self.fs.rm(path, recursive=recursive, maxdepth=maxdepth)
+    try:
+      self.fs.rm(path, recursive=recursive, maxdepth=maxdepth)
+    except:
+      raise
+    else:
+      if recursive:
+        for d in list(self._dir_cache):
+          if d.startswith(path):
+            self._dir_cache.remove(d)
 
   def copy(self, path1, path2, recursive=False, on_error=None, **kwargs):
     path1 = self.fs.root_marker + path1.lstrip('/')
     path2 = self.fs.root_marker + path2.lstrip('/')
-    return self.fs.copy(path1, path2, recursive=recursive, on_error=on_error, **kwargs)
+    try:
+      self.fs.copy(path1, path2, recursive=recursive, on_error=on_error, **kwargs)
+    except:
+      raise
+    else:
+      if recursive:
+        p1 = PurePath(path1)
+        p2 = PurePath(path2)
+        for d in list(self._dir_cache):
+          p = PurePath(d)
+          if p.is_relative_to(p1):
+            self._dir_cache.add(str(p2 / p.relative_to(path1)))
+
 
   def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
     path1 = self.fs.root_marker + path1.lstrip('/')
     path2 = self.fs.root_marker + path2.lstrip('/')
-    return self.fs.mv(path1, path2, recursive=recursive, maxdepth=maxdepth, **kwargs)
+    try:
+      self.fs.mv(path1, path2, recursive=recursive, maxdepth=maxdepth, **kwargs)
+    except:
+      raise
+    else:
+      if recursive:
+        p1 = PurePath(path1)
+        p2 = PurePath(path2)
+        for d in list(self._dir_cache):
+          p = PurePath(d)
+          if p.is_relative_to(p1):
+            self._dir_cache.remove(d)
+            self._dir_cache.add(str(p2 / p.relative_to(path1)))
 
   def exists(self, path, **kwargs):
     path = self.fs.root_marker + path.lstrip('/')
-    if path in self._local_files:
+    if path in self._local_cache or path in self._dir_cache:
       return True
     return self.fs.exists(path, **kwargs)
 
   def info(self, path, **kwargs):
     path = self.fs.root_marker + path.lstrip('/')
-    if path in self._local_files:
-      return self._local_files[path]
+    if path in self._local_cache:
+      return self._local_cache[path]
+    elif path in self._dir_cache:
+      return {'type': 'directory', 'name': path}
     return self.fs.info(path, **kwargs)
 
   def ls(self, path, detail=False, **kwargs):
@@ -87,7 +140,7 @@ class WriteCacheFileSystem(AbstractFileSystem):
     logger.info(f'ls({path})')
     path_split = ('',) if path == self.fs.root_marker else tuple(path.split('/'))
     results = {}
-    for local_file_path, f in self._local_files.items():
+    for local_file_path, f in self._local_cache.items():
       if tuple(local_file_path.split('/'))[:len(path_split)] == path_split:
         if detail:
           results[local_file_path] = f
@@ -103,8 +156,8 @@ class WriteCacheFileSystem(AbstractFileSystem):
   def _open(self, path, mode='rb', **kwargs):
     path = self.fs.root_marker + path.lstrip('/')
     if 'r' not in mode or '+' in mode:
-      if path in self._local_files:
-        details = self._local_files[path]
+      if path in self._local_cache:
+        details = self._local_cache[path]
       else:
         try:
           details = self.fs.info(path)
@@ -119,7 +172,7 @@ class LocalTempFile:
   """A temporary local file, which will be uploaded on commit"""
 
   def __init__(self, fs, path, fn=None, mode="wb", autocommit=True, seek=0, details=None):
-    fs._local_files[path] = details if details else {'type': 'file', 'size': 0}
+    fs._local_cache[path] = details if details else {'type': 'file', 'size': 0}
     fn = fn or tempfile.mktemp()
     self.mode = mode
     self.fn = fn
@@ -156,13 +209,13 @@ class LocalTempFile:
   def discard(self):
     self.fh.close()
     os.remove(self.fn)
-    if self.path in self.fs._local_files:
-      del self.fs._local_files[self.path]
+    if self.path in self.fs._local_cache:
+      del self.fs._local_cache[self.path]
 
   def commit(self):
     self.fs.fs.put(self.fn, self.path)
-    if self.path in self.fs._local_files:
-      del self.fs._local_files[self.path]
+    if self.path in self.fs._local_cache:
+      del self.fs._local_cache[self.path]
 
   def __getattr__(self, item):
     return getattr(self.fh, item)
