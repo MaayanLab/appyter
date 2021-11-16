@@ -53,6 +53,11 @@ class FileField(Field):
     else:
       return re.match(re_full(self.args['constraint']), self.raw_value)
 
+  def to_cwl(self):
+    schema = super().to_cwl()
+    schema['type'] = f"File{'' if self.args.get('required') == True else '?'}"
+    return schema
+
   @property
   def value(self):
     ret = super().value

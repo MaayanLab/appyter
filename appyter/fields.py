@@ -128,6 +128,40 @@ class Field(dict):
       ).render(dict(**kwargs, this=self))
     )
 
+  def to_jsonschema(self):
+    schema = {'type': 'string'}
+    if self.args.get('label'): schema['title'] = self.args['label']
+    if self.args.get('description'): schema['description'] = self.args['description']
+    if self.args.get('choices'): schema['enum'] = list(self.args['choices'])
+    if self.args.get('default'): schema['default'] = self.args['default']
+    return schema
+
+  def to_cwl(self):
+    schema = {
+      'id': self.args['name'],
+      'inputBinding': {
+        'prefix': f"--{self.args['name']}=",
+        'separate': False,
+        'shellQuote': True,
+      }
+    }
+    if self.args.get('choices'):
+      if self.args.get('required') == True:
+        schema['type'] = {
+          'type': 'enum', 'symbols': list(self.args['choices'])
+        }
+      else:
+        schema['type'] = ['null', {
+          'type': 'enum', 'symbols': list(self.args['choices'])
+        }]
+    else:
+      schema['type'] = f"string{'' if self.args.get('required') == True else '?'}"
+    #
+    if self.args.get('label'): schema['label'] = self.args['label']
+    if self.args.get('description'): schema['doc'] = self.args['description']
+    if self.args.get('default'): schema['default'] = self.args['default']
+    return schema
+
   @property
   def field(self):
     ''' Field name

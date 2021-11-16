@@ -22,3 +22,9 @@ class DescriptionField(Field):
   @property
   def raw_value(self):
     raise Exception('DescriptionField has no value')
+
+  def to_jsonschema(self):
+    return None
+
+  def to_cwl(self):
+    return None

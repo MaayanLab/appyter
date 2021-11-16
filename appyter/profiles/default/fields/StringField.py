@@ -34,3 +34,8 @@ class StringField(Field):
       return not self.args.get('required')
     else:
       return re.match(re_full(self.args['constraint']), self.raw_value)
+
+  def to_jsonschema(self):
+    schema = super().to_jsonschema()
+    if self.args.get('constraint'): schema['pattern'] = re_full(self.args['constraint'])
+    return schema

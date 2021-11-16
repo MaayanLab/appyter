@@ -28,3 +28,9 @@ class FloatField(Field):
     else:
       # Raw value would fail otherwise
       return True
+
+  def to_jsonschema(self):
+    return dict(super().to_jsonschema(), type='numeric')
+
+  def to_cwl(self):
+    return dict(super().to_cwl(), type='float')

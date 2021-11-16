@@ -3,12 +3,12 @@ import json
 import click
 import fsspec
 
-from appyter.cli import cli
 from appyter.ext.urllib import join_url
-from appyter.parse.nb import nb_from_ipynb_io
-from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
 from appyter.context import get_env, get_jinja2_env
 from appyter.ext.click import click_option_setenv, click_argument_setenv
+from appyter.parse.nb import nb_from_ipynb_io
+from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
+from appyter.render.nbinspect.cli import nbinspect
 
 def render_nbtemplate_json_from_nbtemplate(env, nb):
   ''' Render a json representing the relevant Fields throughout the notebook.
@@ -18,7 +18,7 @@ def render_nbtemplate_json_from_nbtemplate(env, nb):
     for field in parse_fields_from_nbtemplate(env, nb, deep=True)
   ]
 
-@cli.command(help='Inspect appyter for arguments (fields)')
+@nbinspect.command(help='Inspect appyter for arguments (fields)')
 @click.option('-o', '--output', default='-', type=click.File('w'), help='The output location of the inspection json')
 @click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
