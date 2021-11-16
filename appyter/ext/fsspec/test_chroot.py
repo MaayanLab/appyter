@@ -64,14 +64,14 @@ def _http_serve_ctx(directory, port=8888):
   import os
   import signal
   from multiprocessing import Process
-  from appyter.ext.asyncio.try_n_times import try_n_times
+  from appyter.ext.asyncio.try_n_times import async_try_n_times
   from appyter.ext.asyncio.sync_coro import sync_coro
   proc = Process(
     target=_http_serve, args=(directory, port)
   )
   proc.start()
   try:
-    sync_coro(try_n_times(3, _http_connect, f"http://localhost:{port}"))
+    sync_coro(async_try_n_times(3, _http_connect, f"http://localhost:{port}"))
     yield
   finally:
     if proc.pid:

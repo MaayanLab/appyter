@@ -37,7 +37,7 @@ async def app_messager(emitter, config):
   import asyncio
   from appyter.ext.urllib import join_slash
   from appyter.ext.socketio import AsyncClient
-  from appyter.ext.asyncio.try_n_times import try_n_times
+  from appyter.ext.asyncio.try_n_times import async_try_n_times
   sio = AsyncClient()
   #
   @emitter.on('livereload')
@@ -54,7 +54,7 @@ async def app_messager(emitter, config):
   path = join_slash(config['PREFIX'], "socket.io")
   logger.info(f"Connecting to appyter server at {origin}{path}...")
   await asyncio.sleep(1)
-  await try_n_times(3, sio.connect, origin, socketio_path=path)
+  await async_try_n_times(3, sio.connect, origin, socketio_path=path)
   await sio.wait()
 
 async def file_watcher(emitter, evt, path, **kwargs):
