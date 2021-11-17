@@ -3,11 +3,14 @@ import re
 import sys
 import click
 import shutil
+import fsspec
+import tempfile
+from pathlib import Path
 
 from appyter.cli import cli
-from appyter.ext.fs import Filesystem
 from appyter.ext.json import try_json_loads
 from appyter.context import get_env_from_kwargs, get_jinja2_env
+from appyter.ext.urllib import join_slash
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.ext.click import click_argument_setenv
 from appyter.render.nbinspect.nbtemplate_json import render_nbtemplate_json_from_nbtemplate
@@ -38,7 +41,8 @@ def cwl_runner(ipynb, args):
   env = get_jinja2_env(
     config=get_env_from_kwargs(cwd=cwd, ipynb=ipynb, mode='inspect'),
   )
-  nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
+  with fsspec.open(join_slash(cwd, ipynb), 'r') as fr:
+    nbtemplate = nb_from_ipynb_io(fr)
   fields = render_nbtemplate_json_from_nbtemplate(env, nbtemplate)
   # convert arguments into context
   kwargs = dict(map(parse_cli, args))
@@ -56,27 +60,22 @@ def cwl_runner(ipynb, args):
     context=context,
   )
   nb = render_nb_from_nbtemplate(env, nbtemplate)
-  # prepare tmpfs with notebook & symlinks to files
-  with Filesystem('tmpfs://') as tmp_fs:
-    with tmp_fs.open(ipynb, 'w') as fw:
-      nb_to_ipynb_io(nb, fw)
-    for field in fields:
-      if field['field'] == 'FileField' and field['args']['name'] in context:
-        # TODO: integrate with ext.fs
-        os.symlink(
-          os.path.realpath(kwargs[field['args']['name']]),
-          tmp_fs.path(context[field['args']['name']]),
-        )
-    # nbexecute in tmpfs
-    import asyncio
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(nbexecute_async(
-      cwd=tmp_fs.path(),
-      ipynb=ipynb,
-      # status updates go to stderr
-      emit=json_emitter_factory(sys.stderr),
-    ))
-    loop.close()
-    with tmp_fs.open(ipynb, 'r') as fr:
-      # write result to stdout
-      shutil.copyfileobj(fr, sys.stdout)
+  # prepare temporary directory with notebook
+  tmp_fs = Path(tempfile.mkdtemp())
+  with (tmp_fs/ipynb).open('w') as fw:
+    nb_to_ipynb_io(nb, fw)
+  # nbexecute in temporary directory
+  import asyncio
+  loop = asyncio.get_event_loop()
+  loop.run_until_complete(nbexecute_async(
+    cwd=str(tmp_fs),
+    ipynb=ipynb,
+    # status updates go to stderr
+    emit=json_emitter_factory(sys.stderr),
+  ))
+  loop.close()
+  with (tmp_fs/ipynb).open('r') as fr:
+    # write result to stdout
+    shutil.copyfileobj(fr, sys.stdout)
+  # cleanup temporary directory
+  shutil.rmtree(tmp_fs)

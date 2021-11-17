@@ -1,10 +1,11 @@
 import os
 import json
 import click
+import fsspec
 
 from appyter.context import get_env, get_jinja2_env
 from appyter.ext.click import click_option_setenv, click_argument_setenv
-from appyter.ext.fs import Filesystem
+from appyter.ext.urllib import join_slash
 from appyter.parse.nb import nb_from_ipynb_io
 from appyter.render.nbinspect.cli import nbinspect
 from appyter.render.nbinspect.jsonschema import render_jsonschema_from_nbtemplate
@@ -335,5 +336,6 @@ def render_openapi_from_nbtemplate(env, nb):
 def openapi(cwd, ipynb, output, **kwargs):
   cwd = os.path.realpath(cwd)
   env = get_jinja2_env(config=get_env(cwd=cwd, ipynb=ipynb, mode='inspect', **kwargs))
-  nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
+  with fsspec.open(join_slash(cwd, ipynb), 'r') as fr:
+    nbtemplate = nb_from_ipynb_io(fr)
   json.dump(render_openapi_from_nbtemplate(env, nbtemplate), output)
