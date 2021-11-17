@@ -8,5 +8,5 @@ async_assert_mounted = run_in_executor(assert_mounted)
 
 def assert_unmounted(path: Path):
   assert not path.is_mount()
-async_assert_unmounted = run_in_executor(assert_mounted)
+async_assert_unmounted = run_in_executor(assert_unmounted)
 
