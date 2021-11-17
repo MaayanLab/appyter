@@ -22,16 +22,15 @@ def parse_qs(qs):
   ''' Convert dot-notation querystring into option params
   '''
   params = {}
-  for Kv in qs.split('&'):
-    K, eq, v = Kv.partition('=')
-    if not eq: v = True
+  for Kv in filter(None, qs.split('&')):
+    K, _, v = Kv.partition('=')
     _params_n_2 = None
     _params_n_1 = params
     for k in K.split('.'):
       if k not in _params_n_1: _params_n_1[k] = {}
       _params_n_2 = _params_n_1
       _params_n_1 = _params_n_2[k]
-    _params_n_2[k] = try_json_loads(urllib.parse.unquote(v)) if type(v) == str else v
+    _params_n_2[k] = try_json_loads(urllib.parse.unquote(v)) if v else True
   return params
 
 @dataclass
