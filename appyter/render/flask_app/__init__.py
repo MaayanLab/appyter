@@ -106,6 +106,17 @@ def create_app(**kwargs):
     fsspec.register_implementation('storage', AliasFileSystemFactory('storage', data_dir))
     yield
   app.cleanup_ctx.append(storage_ctx)
+  #
+  logger.info('Registering application executor handler')
+  async def executor_ctx(app):
+    dispatcher = app['config'].get('DISPATCHER') or 'local'
+    if dispatcher != 'local' and '::' not in dispatcher:
+      dispatcher = 'appyter::' + dispatcher
+    from appyter.execspec.core import url_to_executor
+    async with url_to_executor(dispatcher) as executor:
+      app['executor'] = executor
+      yield
+  app.cleanup_ctx.append(executor_ctx)
   return app
 
 # register flask_app with CLI

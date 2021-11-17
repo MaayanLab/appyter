@@ -12,6 +12,7 @@ async def _(sid, environ):
   async with socketio.session(sid) as sess:
     sess['request_url'] = f"{request.scheme}://{request.host}{request.path}"
     sess['config'] = request.app['config']
+    sess['executor'] = request.app['executor']
 
 @socketio.on('disconnect')
 async def _(sid):
