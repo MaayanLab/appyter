@@ -27,7 +27,6 @@ def create_app(**kwargs):
   import appyter.render.flask_app.export
   import appyter.render.flask_app.download
   import appyter.render.flask_app.execution
-  from appyter.render.flask_app.storage import storage_ctx
   if kwargs['debug']:
     import appyter.render.flask_app.livereload
   #
@@ -100,6 +99,12 @@ def create_app(**kwargs):
     asyncio.get_event_loop().run_until_complete(setup(app, XForwardedRelaxed()))
   #
   logger.info('Registering application storage handler')
+  async def storage_ctx(app):
+    data_dir = app['config']['DATA_DIR']
+    import fsspec
+    from appyter.ext.fsspec.alias import AliasFileSystemFactory
+    fsspec.register_implementation('storage', AliasFileSystemFactory('storage', data_dir))
+    yield
   app.cleanup_ctx.append(storage_ctx)
   return app
 
