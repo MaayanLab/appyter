@@ -19,6 +19,7 @@ class DockerExecutor(AbstractExecutor):
       'docker', 'run',
       '--device', '/dev/fuse',
       '--cap-add', 'SYS_ADMIN',
+      '--security-opt', 'apparmor:unconfined',
     ]
 
   async def __aenter__(self):
