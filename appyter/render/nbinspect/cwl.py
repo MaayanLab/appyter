@@ -2,16 +2,17 @@ import os
 import sys
 import json
 import click
+import fsspec
 
 from appyter import __version__
 from appyter.context import get_env, get_jinja2_env
 from appyter.ext.click import click_option_setenv, click_argument_setenv
-from appyter.ext.fs import Filesystem
+from appyter.ext.urllib import join_slash
 from appyter.parse.nb import nb_from_ipynb_io
 from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
 from appyter.render.nbinspect.cli import nbinspect
 
-from appyter.util import dict_filter_none
+from appyter.ext.dict import dict_filter_none
 from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
 
 def render_cwl_from_nbtemplate(env, nb, ipynb=None, cwd=None, info=None):
@@ -101,6 +102,7 @@ def render_cwl_from_nbtemplate(env, nb, ipynb=None, cwd=None, info=None):
 def cwl(cwd, ipynb, info, output, **kwargs):
   cwd = os.path.realpath(cwd)
   env = get_jinja2_env(config=get_env(cwd=cwd, ipynb=ipynb, mode='inspect', **kwargs))
-  nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
+  with fsspec.open(join_slash(cwd, ipynb), 'r') as fr:
+    nbtemplate = nb_from_ipynb_io(fr)
   info = json.load(info) if info is not None else None
   json.dump(render_cwl_from_nbtemplate(env, nbtemplate, cwd=cwd, ipynb=ipynb, info=info), output)
