@@ -1,5 +1,4 @@
 import os
-import aiohttp
 import asyncio
 import traceback
 import logging
@@ -16,6 +15,7 @@ async def submit(sid, data):
   async with socketio.session(sid) as sess:
     config = sess['config']
     request_url = sess['request_url']
+    executor = sess['executor']
   #
   if type(data) == dict:
     data = prepare_data(data)
@@ -33,41 +33,18 @@ async def submit(sid, data):
     ipynb=os.path.basename(config['IPYNB']),
     session=result_hash,
     id=generate_uuid(),
+    url=request_url,
+    image=config.get('DISPATCHER_IMAGE'),
+    storage=config['DATA_DIR'],
   )
-  #
-  if config['DISPATCHER_URL']:
-    job['url'] = join_slash(config['DISPATCHER_URL'], 'socket.io/')
-  else:
-    job['url'] = request_url
-  #
-  if config['DISPATCHER_IMAGE']:
-    job['image'] = config['DISPATCHER_IMAGE']
-  #
-  if config['DISPATCHER']:
-    job['storage'] = config['DATA_DIR']
-    queued = False
-    backoff = 1
-    while not queued:
-      try:
-        async with aiohttp.ClientSession(headers={'Content-Type': 'application/json'}) as client:
-          async with client.post(config['DISPATCHER'], json=job) as resp:
-            queue_size = await resp.json()
-            await socketio.emit('status', f"Queued successfully, you are at position {queue_size} in the queue", to=sid)
-            queued = True
-      except asyncio.CancelledError:
-        raise
-      except Exception:
-        logger.error(traceback.format_exc())
-        if backoff < 60:
-          await socketio.emit('status', f"Failed to contact orchestrator, trying again in {backoff}s...", to=sid)
-          asyncio.sleep(backoff)
-          backoff *= 2
-        else:
-          await socketio.emit('error', 'Failed to contact orchestrator, please try again later.', to=sid)
-          break
-  else:
-    from appyter.orchestration.job.job import execute_async
-    asyncio.create_task(execute_async(job))
+  try:
+    await executor.submit(job)
+    await socketio.emit('status', f"Queued successfully, your execution will begin when resources are available.", to=sid)
+  except asyncio.CancelledError:
+    raise
+  except Exception:
+    logger.error(traceback.format_exc())
+    await socketio.emit('error', 'Failed to submit job, please try again later.', to=sid)
 
 @socketio.on('join')
 async def _(sid, data):
