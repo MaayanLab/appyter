@@ -1,8 +1,6 @@
+import random
 import asyncio
 import datetime
-import functools
-import importlib
-import random
 from aiohttp import web
 from collections import OrderedDict, Counter
 import logging
@@ -29,7 +27,6 @@ async def on_submit(request):
   request_data = await request.json()
   async with core['tasks'].lock:
     core['tasks'][request_data['id']] = dict(request_data,
-      debug=core['config']['DEBUG'],
       queued_ts=datetime.datetime.now().replace(
         tzinfo=datetime.timezone.utc
       ).isoformat(),
@@ -37,32 +34,42 @@ async def on_submit(request):
   asyncio.create_task(core['dispatch_queue'].put(request_data['id']))
   return web.json_response(core['dispatch_queue'].qsize() + 1)
 
-@core.on_startup.append
-async def start_dispatchers(app):
-  logger.info('Initializing dispatch...')
+@core.cleanup_ctx.append
+async def executor_ctx(app):
+  logger.info('Initializing executor...')
+  dispatch = app['config'].get('DISPATCH') or 'local'
+  from appyter.execspec.core import url_to_executor
+  async with url_to_executor(dispatch) as executor:
+    app['executor'] = executor
+    yield
+
+@core.cleanup_ctx.append
+async def dispatcher_ctx(app):
+  logger.info('Initializing dispatcher...')
   #
   app['dispatch_queue'] = asyncio.Queue()
   app['tasks'] = LockedOrderedDict()
   #
-  dispatch = functools.partial(
-    importlib.import_module(
-      '..dispatch.{}'.format(app['config']['DISPATCH']),
-      __package__
-    ).dispatch,
-    debug=app['config']['DEBUG'],
-    namespace=app['config']['KUBE_NAMESPACE'],
-  )
-  #
   logger.info('Starting background tasks...')
-  for _ in range(app['config']['JOBS']):
+  tasks = [
     asyncio.create_task(
       dispatcher(
         queued=app['dispatch_queue'],
         tasks=app['tasks'],
-        dispatch=dispatch,
+        executor=app['executor'],
         jobs_per_image=app['config']['JOBS_PER_IMAGE'],
       )
     )
+    for _ in range(app['config']['JOBS'])
+  ]
+  yield
+  await app['dispatch_queue'].join()
+  for task in tasks:
+    try:
+      task.cancel()
+      await task
+    except asyncio.CancelledError:
+      pass
 
 core.add_routes(routes)
 
@@ -72,7 +79,7 @@ async def slow_put(queue, item):
   await asyncio.sleep(0.5 + random.random())
   await queue.put(item)
 
-async def dispatcher(queued=None, tasks=None, dispatch=None, jobs_per_image=1):
+async def dispatcher(queued=None, tasks=None, executor=None, jobs_per_image=1):
   while True:
     job_id = await queued.get()
     async with tasks.lock:
@@ -91,7 +98,9 @@ async def dispatcher(queued=None, tasks=None, dispatch=None, jobs_per_image=1):
     #
     try:
       logger.info(f"Dispatching job {job_id}")
-      await dispatch(job=job)
+      await executor.run(job)
+    except asyncio.CancelledError:
+      raise
     except:
       import traceback
       logger.error(f"dispatch error: {traceback.format_exc()}")
