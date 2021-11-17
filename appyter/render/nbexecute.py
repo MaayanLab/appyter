@@ -72,6 +72,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
     return
   #
   await emit({ 'type': 'status', 'data': 'Starting' })
+  state = dict(progress=0, status='Starting')
   #
   try:
     files = nb.metadata['appyter']['nbconstruct'].get('files')
@@ -83,7 +84,6 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
         nb_to_ipynb_io(nb, fw)
       #
       logger.info('initializing')
-      state = dict(progress=0, status='Starting')
       if callable(subscribe):
         await subscribe(lambda: dict(nb=nb_to_json(nb), **state))
       #
@@ -156,7 +156,8 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
     raise
   except Exception as e:
     logger.error(traceback.format_exc())
-    await emit({ 'type': 'status', 'data': 'Error initializing, try again later' })
+    if state['status'] != 'Success':
+      await emit({ 'type': 'status', 'data': f"Error occured while {state['status']}" })
   finally:
     logger.info('complete')
   #
