@@ -1,5 +1,6 @@
 import random
 import asyncio
+import fsspec
 import logging
 logger = logging.getLogger(__name__)
 
@@ -12,6 +13,11 @@ class WESExecutor(AbstractExecutor):
   ''' Run executions via a workflow execution service endpoint
   '''
   protocol = 'wes'
+
+  def __init__(self, url=None, **kwargs) -> None:
+    super().__init__(url=url, **kwargs)
+    with fsspec.open(self.executor_options['cwl'], 'r') as fr:
+      self.cwl = fr.read()
 
   async def submit(self, job):
     async def _submit():
@@ -29,10 +35,9 @@ class WESExecutor(AbstractExecutor):
             workflow_params=dict(
               inputs=job,
             ),
-            workflow_url='#/workflow_attachment/0', #TODO: possibly store this ahead of time via sbfs
-            workflow_attachment=[
-              # TODO: create CWL & insert here
-            ],
+            # TODO: possibly create on the fly
+            workflow_url='#/workflow_attachment/0',
+            workflow_attachment=[self.cwl],
           ),
         ) as req:
           res = await req.json()
