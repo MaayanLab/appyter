@@ -22,7 +22,7 @@ RUN set -x \
   && useradd -ms /bin/bash -d /app app \
   && groupadd fuse \
   && adduser app fuse \
-  && groupadd docker \
+  && (groupadd docker || true) \
   && adduser app docker \
   && chown -R app:app /app \
   && chmod og+rwx -R /var/lib/nginx /var/log/nginx
