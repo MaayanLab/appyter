@@ -111,7 +111,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
           n_cells = len(nb.cells)
           exec_count = 1
           for index, cell in enumerate(nb.cells):
-            logger.info(f"executing cell {index}")
+            logger.debug(f"executing cell {index}")
             cell = await client.async_execute_cell(
               cell, index,
               execution_count=exec_count,
@@ -127,10 +127,10 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
               state['status'] = 'Success'
               await emit({ 'type': 'status', 'data': state['status'] })
       except asyncio.CancelledError:
-        logger.info(f"cancelled")
+        logger.info('cancelled')
         raise
       except Exception as e:
-        logger.info(f"execution error")
+        logger.info('execution error')
         await emit({ 'type': 'error', 'data': str(e) })
       # Save execution completion time
       logger.info('saving')
