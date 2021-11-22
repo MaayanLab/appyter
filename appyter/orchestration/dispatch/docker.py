@@ -12,6 +12,7 @@ async def dispatch(job=None, **kwargs):
   args = ['docker', 'run']
   args += ['--device', '/dev/fuse']
   args += ['--cap-add', 'SYS_ADMIN']
+  args += ['--security-opt', 'apparmor:unconfined']
   try:
     proc = await asyncio.create_subprocess_exec(*[
       'docker', 'inspect', os.environ['HOSTNAME'],
