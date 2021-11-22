@@ -37,7 +37,8 @@ class TabField(Field):
 
   def prepare(self, req):
     data = super().prepare(req)
-    data.update(self.value.prepare(req))
+    for value in self.value:
+      data.update(value.prepare(req))
     return data
 
   def constraint(self):
