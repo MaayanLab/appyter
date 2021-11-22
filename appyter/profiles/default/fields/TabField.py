@@ -1,4 +1,5 @@
 from appyter.fields import Field
+from appyter.ext.dict import dict_collision_free_update
 
 class TabField(Field):
   ''' Representing a tab field which contains inner fields to choose from.
@@ -38,7 +39,7 @@ class TabField(Field):
   def prepare(self, req):
     data = super().prepare(req)
     for value in self.value:
-      data.update(value.prepare(req))
+      dict_collision_free_update(data, **value.prepare(req))
     return data
 
   def constraint(self):

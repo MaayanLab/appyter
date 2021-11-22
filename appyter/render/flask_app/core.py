@@ -3,6 +3,7 @@ import fsspec
 from flask import Blueprint, request, redirect, abort, url_for, current_app, jsonify, make_response
 
 from appyter.context import get_jinja2_env
+from appyter.ext.dict import dict_collision_free_update
 from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.urllib import join_url
 from appyter.parse.nb import nb_to_ipynb_io
@@ -17,9 +18,7 @@ core = Blueprint('__main__', __name__)
 def prepare_data(req):
   data = {}
   for field in get_fields():
-    for name, value in field.prepare(req).items():
-      assert name not in data, 'Prepare collision'
-      data[name] = value
+    dict_collision_free_update(data, **field.prepare(req))
   return data
 
 def prepare_results(data):
