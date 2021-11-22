@@ -101,15 +101,16 @@ class Field(dict):
     '''
     data = {}
     if type(req) == dict:
-      data[self.args['name']] = self.args['value'] = req.get(self.args['name'])
+      value = req.get(self.args['name']) if self.args['name'] in req else self.args.get('default')
     elif req.json:
-      data[self.args['name']] = self.args['value'] = req.json.get(self.args['name'])
+      value = req.json.get(self.args['name']) if self.args['name'] in req.json else self.args.get('default')
     elif req.form:
-      data[self.args['name']] = self.args['value'] = collapse(req.form.getlist(self.args['name']))
+      value = collapse(req.form.getlist(self.args['name'])) if self.args['name'] in req.form else self.args.get('default')
     else:
       raise NotImplementedError
     #
-    return data
+    self.args['value'] = value
+    return { self.args['name']: value }
 
   def constraint(self):
     ''' Return true if the received args.value satisfies constraints.
@@ -164,6 +165,7 @@ class Field(dict):
     ''' (SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
     When instantiating code, you should use safe_value.
     '''
+    print(self.args['name'], self.args['value'])
     choices = self.choices
     if self.raw_value is None:
       if not self.args.get('required'):
