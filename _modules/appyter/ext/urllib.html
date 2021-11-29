@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.ext.urllib &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.urllib</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.ext.urllib</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
+
+<span class="kn">from</span> <span class="nn">appyter.ext.pathlib.chroot</span> <span class="kn">import</span> <span class="n">ChrootPurePosixPath</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.json</span> <span class="kn">import</span> <span class="n">try_json_loads</span>
+
+<div class="viewcode-block" id="parent_url"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.parent_url">[docs]</a><span class="k">def</span> <span class="nf">parent_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+  <span class="n">parent</span><span class="p">,</span> <span class="o">*</span><span class="n">filename</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">parent</span> <span class="k">if</span> <span class="n">filename</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span></div>
+
+<div class="viewcode-block" id="join_slash"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.join_slash">[docs]</a><span class="k">def</span> <span class="nf">join_slash</span><span class="p">(</span><span class="o">*</span><span class="n">parts</span><span class="p">):</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">parts</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+  <span class="n">part0</span><span class="p">,</span> <span class="o">*</span><span class="n">parts</span> <span class="o">=</span> <span class="n">parts</span>
+  <span class="k">return</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">((</span><span class="n">part0</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">),),</span> <span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="join_url"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.join_url">[docs]</a><span class="k">def</span> <span class="nf">join_url</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="o">*</span><span class="n">parts</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">join_slash</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ChrootPurePosixPath</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">parts</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="parse_qs"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.parse_qs">[docs]</a><span class="k">def</span> <span class="nf">parse_qs</span><span class="p">(</span><span class="n">qs</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Convert dot-notation querystring into option params</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">for</span> <span class="n">Kv</span> <span class="ow">in</span> <span class="n">qs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">):</span>
+    <span class="n">K</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">Kv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+    <span class="n">_params_n_2</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_params_n_1</span> <span class="o">=</span> <span class="n">params</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_params_n_1</span><span class="p">:</span> <span class="n">_params_n_1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="n">_params_n_2</span> <span class="o">=</span> <span class="n">_params_n_1</span>
+      <span class="n">_params_n_1</span> <span class="o">=</span> <span class="n">_params_n_2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">_params_n_2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">try_json_loads</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">params</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.urllib</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

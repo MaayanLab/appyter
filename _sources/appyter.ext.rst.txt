@@ -9,18 +9,99 @@ Subpackages
 
    appyter.ext.asyncio
    appyter.ext.click
-   appyter.ext.fs
+   appyter.ext.fsspec
    appyter.ext.nbclient
+   appyter.ext.pathlib
    appyter.ext.socketio
    appyter.ext.watchgod
 
 Submodules
 ----------
 
+appyter.ext.dict module
+-----------------------
+
+.. automodule:: appyter.ext.dict
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.exceptions module
+-----------------------------
+
+.. automodule:: appyter.ext.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.flask module
+------------------------
+
+.. automodule:: appyter.ext.flask
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.functools module
+----------------------------
+
+.. automodule:: appyter.ext.functools
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.hashlib module
+--------------------------
+
+.. automodule:: appyter.ext.hashlib
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.importlib module
+----------------------------
+
+.. automodule:: appyter.ext.importlib
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.itertools module
+----------------------------
+
+.. automodule:: appyter.ext.itertools
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.ext.json module
 -----------------------
 
 .. automodule:: appyter.ext.json
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.re module
+---------------------
+
+.. automodule:: appyter.ext.re
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.urllib module
+-------------------------
+
+.. automodule:: appyter.ext.urllib
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.uuid module
+-----------------------
+
+.. automodule:: appyter.ext.uuid
    :members:
    :undoc-members:
    :show-inheritance:

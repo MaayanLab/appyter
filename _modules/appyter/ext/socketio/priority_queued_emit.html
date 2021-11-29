@@ -53,7 +53,7 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">_emit_counter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">PriorityQueue</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_emit_enabled</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
-    <span class="n">loop</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">emit_dispatcher</span><span class="p">())</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_emit_dispatcher_task</span> <span class="o">=</span> <span class="n">loop</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">emit_dispatcher</span><span class="p">())</span>
 
 <div class="viewcode-block" id="PriorityQueuedEmitMixin.emit_dispatcher"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit_dispatcher">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">emit_dispatcher</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
@@ -61,10 +61,13 @@
       <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_enabled</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
       <span class="k">try</span><span class="p">:</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">klass</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="p">})</span>
+      <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+        <span class="k">raise</span>
       <span class="k">except</span><span class="p">:</span>
         <span class="kn">import</span> <span class="nn">traceback</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span></div>
+      <span class="k">finally</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span></div>
 
   <span class="k">async</span> <span class="k">def</span> <span class="nf">_emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span>
@@ -79,7 +82,14 @@
       <span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
       <span class="n">priority</span><span class="o">=</span><span class="n">priority</span><span class="p">,</span>
       <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span></div></div>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="PriorityQueuedEmitMixin.close"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.close">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_emit_dispatcher_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_dispatcher_task</span>
+    <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+      <span class="k">pass</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

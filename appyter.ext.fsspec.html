@@ -1,0 +1,799 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>appyter.ext.fsspec package &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.fsspec package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="appyter-ext-fsspec-package">
+<h1>appyter.ext.fsspec package<a class="headerlink" href="#appyter-ext-fsspec-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-appyter.ext.fsspec.alias">
+<span id="appyter-ext-fsspec-alias-module"></span><h2>appyter.ext.fsspec.alias module<a class="headerlink" href="#module-appyter.ext.fsspec.alias" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.ext.fsspec.alias.AliasFileSystemBase">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.fsspec.alias.</code><code class="sig-name descname">AliasFileSystemBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/alias.html#AliasFileSystemBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.alias.AliasFileSystemBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">fsspec.spec.AbstractFileSystem</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.alias.AliasFileSystemFactory">
+<code class="sig-prename descclassname">appyter.ext.fsspec.alias.</code><code class="sig-name descname">AliasFileSystemFactory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_proto</span></em>, <em class="sig-param"><span class="n">_fs_url</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">_kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/alias.html#AliasFileSystemFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.alias.AliasFileSystemFactory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.alias.dump_aliases">
+<code class="sig-prename descclassname">appyter.ext.fsspec.alias.</code><code class="sig-name descname">dump_aliases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/alias.html#dump_aliases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.alias.dump_aliases" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.alias.register_aliases">
+<code class="sig-prename descclassname">appyter.ext.fsspec.alias.</code><code class="sig-name descname">register_aliases</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alias_dump</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/alias.html#register_aliases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.alias.register_aliases" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.chroot">
+<span id="appyter-ext-fsspec-chroot-module"></span><h2>appyter.ext.fsspec.chroot module<a class="headerlink" href="#module-appyter.ext.fsspec.chroot" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.ext.fsspec.chroot.ChrootFileSystem">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.fsspec.chroot.</code><code class="sig-name descname">ChrootFileSystem</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/chroot.html#ChrootFileSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.chroot.ChrootFileSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">fsspec.spec.AbstractFileSystem</span></code></p>
+<p>chroot: update root and disallow access beyond chroot, only works on directories.</p>
+<dl class="py method">
+<dt id="appyter.ext.fsspec.chroot.ChrootFileSystem.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path1</span></em>, <em class="sig-param"><span class="n">path2</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">on_error</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/chroot.html#ChrootFileSystem.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.chroot.ChrootFileSystem.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy within two locations in the filesystem</p>
+<p>on_error : “raise”, “ignore”
+If raise, any not-found exceptions will be raised; if ignore any
+not-found exceptions will cause the path to be skipped; defaults to
+raise unless recursive is true, where the default is ignore</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.chroot.ChrootFileSystem.exists">
+<code class="sig-name descname">exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/chroot.html#ChrootFileSystem.exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.chroot.ChrootFileSystem.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is there a file at the given path</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.chroot.ChrootFileSystem.info">
+<code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/chroot.html#ChrootFileSystem.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.chroot.ChrootFileSystem.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Give details of entry at path</p>
+<p>Returns a single dictionary, with exactly the same information as <code class="docutils literal notranslate"><span class="pre">ls</span></code>
+would with <code class="docutils literal notranslate"><span class="pre">detail=True</span></code>.</p>
+<p>The default implementation should calls ls and could be overridden by a
+shortcut. kwargs are passed on to <code class="docutils literal notranslate"><span class="pre">`ls()</span></code>.</p>
+<p>Some file systems might not be able to measure the file’s size, in
+which case, the returned dict will include <code class="docutils literal notranslate"><span class="pre">'size':</span> <span class="pre">None</span></code>.</p>
+<p>dict with keys: name (full path in the FS), size (in bytes), type (file,
+directory, or something else) and other FS-specific keys.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.chroot.ChrootFileSystem.ls">
+<code class="sig-name descname">ls</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">detail</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/chroot.html#ChrootFileSystem.ls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.chroot.ChrootFileSystem.ls" title="Permalink to this definition">¶</a></dt>
+<dd><p>List objects at path.</p>
+<p>This should include subdirectories and files at that location. The
+difference between a file and a directory must be clear when details
+are requested.</p>
+<p>The specific keys, or perhaps a FileInfo class, or similar, is TBD,
+but must be consistent across implementations.
+Must include:</p>
+<ul class="simple">
+<li><p>full path to the entry (without protocol)</p></li>
+<li><p>size of the entry, in bytes. If the value cannot be determined, will</p></li>
+</ul>
+<p>be <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+* type of entry, “file”, “directory” or other</p>
+<p>Additional information
+may be present, aproriate to the file-system, e.g., generation,
+checksum, etc.</p>
+<p>May use refresh=True|False to allow use of self._ls_from_cache to
+check for a saved listing and avoid calling the backend. This would be
+common where listing may be expensive.</p>
+<p>path: str
+detail: bool
+if True, gives a list of dictionaries, where each is the same as
+the result of <code class="docutils literal notranslate"><span class="pre">info(path)</span></code>. If False, gives a list of paths
+(str).
+kwargs: may have additional backend-specific options, such as version
+information</p>
+<p>List of strings if detail is False, or list of directory information
+dicts if detail is True.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.chroot.ChrootFileSystem.makedirs">
+<code class="sig-name descname">makedirs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">exist_ok</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/chroot.html#ChrootFileSystem.makedirs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.chroot.ChrootFileSystem.makedirs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively make directories</p>
+<p>Creates directory at path and any intervening required directories.
+Raises exception if, for instance, the path already exists but is a
+file.</p>
+<p>path: str
+leaf directory name
+exist_ok: bool (False)
+If True, will error if the target already exists</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.chroot.ChrootFileSystem.mkdir">
+<code class="sig-name descname">mkdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/chroot.html#ChrootFileSystem.mkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.chroot.ChrootFileSystem.mkdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create directory entry at path</p>
+<p>For systems that don’t have true directories, may create an for
+this instance only and not touch the real filesystem</p>
+<p>path: str
+location
+create_parents: bool
+if True, this is equivalent to <code class="docutils literal notranslate"><span class="pre">makedirs</span></code>
+kwargs:
+may be permissions, etc.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.chroot.ChrootFileSystem.mv">
+<code class="sig-name descname">mv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path1</span></em>, <em class="sig-param"><span class="n">path2</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">maxdepth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/chroot.html#ChrootFileSystem.mv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.chroot.ChrootFileSystem.mv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move file(s) from one location to another</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.ext.fsspec.chroot.ChrootFileSystem.protocol">
+<code class="sig-name descname">protocol</code><em class="property"> = 'chroot'</em><a class="headerlink" href="#appyter.ext.fsspec.chroot.ChrootFileSystem.protocol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.chroot.ChrootFileSystem.rm">
+<code class="sig-name descname">rm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">maxdepth</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/chroot.html#ChrootFileSystem.rm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.chroot.ChrootFileSystem.rm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete files.</p>
+<p>path: str or list of str
+File(s) to delete.
+recursive: bool
+If file(s) are directories, recursively delete contents and then
+also remove the directory
+maxdepth: int or None
+Depth to pass to walk for finding files to delete, if recursive.
+If None, there will be no limit and infinite recursion may be
+possible.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.chroot.ChrootFileSystem.rmdir">
+<code class="sig-name descname">rmdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/chroot.html#ChrootFileSystem.rmdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.chroot.ChrootFileSystem.rmdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a directory, if empty</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.ext.fsspec.chroot.ChrootFileSystem.root_marker">
+<code class="sig-name descname">root_marker</code><em class="property"> = ''</em><a class="headerlink" href="#appyter.ext.fsspec.chroot.ChrootFileSystem.root_marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.core">
+<span id="appyter-ext-fsspec-core-module"></span><h2>appyter.ext.fsspec.core module<a class="headerlink" href="#module-appyter.ext.fsspec.core" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.fsspec.core.url_to_chroot_fs">
+<code class="sig-prename descclassname">appyter.ext.fsspec.core.</code><code class="sig-name descname">url_to_chroot_fs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">pathmap</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cached</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">appyter</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/core.html#url_to_chroot_fs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.core.url_to_chroot_fs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like url_to_fs but supporting our extensions, namely:
+chroot   filesystem path is treated as the root
+pathmap  overlay other fsspec-compatible paths
+appyter  create a pathmap from an appyter ipynb
+cached   cache read/writes</p>
+</dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.fuse">
+<span id="appyter-ext-fsspec-fuse-module"></span><h2>appyter.ext.fsspec.fuse module<a class="headerlink" href="#module-appyter.ext.fsspec.fuse" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.fsspec.fuse.fs_mount">
+<code class="sig-prename descclassname">appyter.ext.fsspec.fuse.</code><code class="sig-name descname">fs_mount</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/fuse.html#fs_mount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.fuse.fs_mount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.mapperfs">
+<span id="appyter-ext-fsspec-mapperfs-module"></span><h2>appyter.ext.fsspec.mapperfs module<a class="headerlink" href="#module-appyter.ext.fsspec.mapperfs" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.ext.fsspec.mapperfs.MapperFileSystem">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.fsspec.mapperfs.</code><code class="sig-name descname">MapperFileSystem</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/mapperfs.html#MapperFileSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.mapperfs.MapperFileSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">fsspec.spec.AbstractFileSystem</span></code></p>
+<p>MapperFS is the inverse of a fsspec.mapper – it lets you use a mapping to
+define a virtual filesystem.</p>
+<dl class="py method">
+<dt id="appyter.ext.fsspec.mapperfs.MapperFileSystem.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path1</span></em>, <em class="sig-param"><span class="n">path2</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">on_error</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maxdepth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/mapperfs.html#MapperFileSystem.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.mapperfs.MapperFileSystem.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy within two locations in the filesystem</p>
+<p>on_error : “raise”, “ignore”
+If raise, any not-found exceptions will be raised; if ignore any
+not-found exceptions will cause the path to be skipped; defaults to
+raise unless recursive is true, where the default is ignore</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.mapperfs.MapperFileSystem.exists">
+<code class="sig-name descname">exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/mapperfs.html#MapperFileSystem.exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.mapperfs.MapperFileSystem.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is there a file at the given path</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.mapperfs.MapperFileSystem.info">
+<code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/mapperfs.html#MapperFileSystem.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.mapperfs.MapperFileSystem.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Give details of entry at path</p>
+<p>Returns a single dictionary, with exactly the same information as <code class="docutils literal notranslate"><span class="pre">ls</span></code>
+would with <code class="docutils literal notranslate"><span class="pre">detail=True</span></code>.</p>
+<p>The default implementation should calls ls and could be overridden by a
+shortcut. kwargs are passed on to <code class="docutils literal notranslate"><span class="pre">`ls()</span></code>.</p>
+<p>Some file systems might not be able to measure the file’s size, in
+which case, the returned dict will include <code class="docutils literal notranslate"><span class="pre">'size':</span> <span class="pre">None</span></code>.</p>
+<p>dict with keys: name (full path in the FS), size (in bytes), type (file,
+directory, or something else) and other FS-specific keys.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.mapperfs.MapperFileSystem.ls">
+<code class="sig-name descname">ls</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">detail</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/mapperfs.html#MapperFileSystem.ls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.mapperfs.MapperFileSystem.ls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Aggregate results based on pathmap listing &amp; underlying fs</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.mapperfs.MapperFileSystem.makedirs">
+<code class="sig-name descname">makedirs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">exist_ok</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/mapperfs.html#MapperFileSystem.makedirs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.mapperfs.MapperFileSystem.makedirs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively make directories</p>
+<p>Creates directory at path and any intervening required directories.
+Raises exception if, for instance, the path already exists but is a
+file.</p>
+<p>path: str
+leaf directory name
+exist_ok: bool (False)
+If True, will error if the target already exists</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.mapperfs.MapperFileSystem.mkdir">
+<code class="sig-name descname">mkdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/mapperfs.html#MapperFileSystem.mkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.mapperfs.MapperFileSystem.mkdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create directory entry at path</p>
+<p>For systems that don’t have true directories, may create an for
+this instance only and not touch the real filesystem</p>
+<p>path: str
+location
+create_parents: bool
+if True, this is equivalent to <code class="docutils literal notranslate"><span class="pre">makedirs</span></code>
+kwargs:
+may be permissions, etc.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.mapperfs.MapperFileSystem.mv">
+<code class="sig-name descname">mv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path1</span></em>, <em class="sig-param"><span class="n">path2</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">maxdepth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/mapperfs.html#MapperFileSystem.mv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.mapperfs.MapperFileSystem.mv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move file(s) from one location to another</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.ext.fsspec.mapperfs.MapperFileSystem.protocol">
+<code class="sig-name descname">protocol</code><em class="property"> = 'mapperfs'</em><a class="headerlink" href="#appyter.ext.fsspec.mapperfs.MapperFileSystem.protocol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.mapperfs.MapperFileSystem.rm">
+<code class="sig-name descname">rm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">maxdepth</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/mapperfs.html#MapperFileSystem.rm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.mapperfs.MapperFileSystem.rm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete files.</p>
+<p>path: str or list of str
+File(s) to delete.
+recursive: bool
+If file(s) are directories, recursively delete contents and then
+also remove the directory
+maxdepth: int or None
+Depth to pass to walk for finding files to delete, if recursive.
+If None, there will be no limit and infinite recursion may be
+possible.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.mapperfs.MapperFileSystem.rmdir">
+<code class="sig-name descname">rmdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/mapperfs.html#MapperFileSystem.rmdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.mapperfs.MapperFileSystem.rmdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a directory, if empty</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.ext.fsspec.mapperfs.MapperFileSystem.root_marker">
+<code class="sig-name descname">root_marker</code><em class="property"> = ''</em><a class="headerlink" href="#appyter.ext.fsspec.mapperfs.MapperFileSystem.root_marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.overlayfs">
+<span id="appyter-ext-fsspec-overlayfs-module"></span><h2>appyter.ext.fsspec.overlayfs module<a class="headerlink" href="#module-appyter.ext.fsspec.overlayfs" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.ext.fsspec.overlayfs.OverlayFileSystem">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.fsspec.overlayfs.</code><code class="sig-name descname">OverlayFileSystem</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/overlayfs.html#OverlayFileSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.overlayfs.OverlayFileSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">fsspec.spec.AbstractFileSystem</span></code></p>
+<p>OverlayFS implemented with fsspec</p>
+<dl class="py method">
+<dt id="appyter.ext.fsspec.overlayfs.OverlayFileSystem.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path1</span></em>, <em class="sig-param"><span class="n">path2</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">on_error</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maxdepth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/overlayfs.html#OverlayFileSystem.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.overlayfs.OverlayFileSystem.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy within two locations in the filesystem</p>
+<p>on_error : “raise”, “ignore”
+If raise, any not-found exceptions will be raised; if ignore any
+not-found exceptions will cause the path to be skipped; defaults to
+raise unless recursive is true, where the default is ignore</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.overlayfs.OverlayFileSystem.exists">
+<code class="sig-name descname">exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/overlayfs.html#OverlayFileSystem.exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.overlayfs.OverlayFileSystem.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is there a file at the given path</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.overlayfs.OverlayFileSystem.info">
+<code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/overlayfs.html#OverlayFileSystem.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.overlayfs.OverlayFileSystem.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Give details of entry at path</p>
+<p>Returns a single dictionary, with exactly the same information as <code class="docutils literal notranslate"><span class="pre">ls</span></code>
+would with <code class="docutils literal notranslate"><span class="pre">detail=True</span></code>.</p>
+<p>The default implementation should calls ls and could be overridden by a
+shortcut. kwargs are passed on to <code class="docutils literal notranslate"><span class="pre">`ls()</span></code>.</p>
+<p>Some file systems might not be able to measure the file’s size, in
+which case, the returned dict will include <code class="docutils literal notranslate"><span class="pre">'size':</span> <span class="pre">None</span></code>.</p>
+<p>dict with keys: name (full path in the FS), size (in bytes), type (file,
+directory, or something else) and other FS-specific keys.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.overlayfs.OverlayFileSystem.ls">
+<code class="sig-name descname">ls</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">detail</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/overlayfs.html#OverlayFileSystem.ls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.overlayfs.OverlayFileSystem.ls" title="Permalink to this definition">¶</a></dt>
+<dd><p>List objects at path.</p>
+<p>This should include subdirectories and files at that location. The
+difference between a file and a directory must be clear when details
+are requested.</p>
+<p>The specific keys, or perhaps a FileInfo class, or similar, is TBD,
+but must be consistent across implementations.
+Must include:</p>
+<ul class="simple">
+<li><p>full path to the entry (without protocol)</p></li>
+<li><p>size of the entry, in bytes. If the value cannot be determined, will</p></li>
+</ul>
+<p>be <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+* type of entry, “file”, “directory” or other</p>
+<p>Additional information
+may be present, aproriate to the file-system, e.g., generation,
+checksum, etc.</p>
+<p>May use refresh=True|False to allow use of self._ls_from_cache to
+check for a saved listing and avoid calling the backend. This would be
+common where listing may be expensive.</p>
+<p>path: str
+detail: bool
+if True, gives a list of dictionaries, where each is the same as
+the result of <code class="docutils literal notranslate"><span class="pre">info(path)</span></code>. If False, gives a list of paths
+(str).
+kwargs: may have additional backend-specific options, such as version
+information</p>
+<p>List of strings if detail is False, or list of directory information
+dicts if detail is True.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.overlayfs.OverlayFileSystem.makedirs">
+<code class="sig-name descname">makedirs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">exist_ok</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/overlayfs.html#OverlayFileSystem.makedirs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.overlayfs.OverlayFileSystem.makedirs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively make directories</p>
+<p>Creates directory at path and any intervening required directories.
+Raises exception if, for instance, the path already exists but is a
+file.</p>
+<p>path: str
+leaf directory name
+exist_ok: bool (False)
+If True, will error if the target already exists</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.overlayfs.OverlayFileSystem.mkdir">
+<code class="sig-name descname">mkdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/overlayfs.html#OverlayFileSystem.mkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.overlayfs.OverlayFileSystem.mkdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create directory entry at path</p>
+<p>For systems that don’t have true directories, may create an for
+this instance only and not touch the real filesystem</p>
+<p>path: str
+location
+create_parents: bool
+if True, this is equivalent to <code class="docutils literal notranslate"><span class="pre">makedirs</span></code>
+kwargs:
+may be permissions, etc.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.overlayfs.OverlayFileSystem.mv">
+<code class="sig-name descname">mv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path1</span></em>, <em class="sig-param"><span class="n">path2</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">maxdepth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/overlayfs.html#OverlayFileSystem.mv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.overlayfs.OverlayFileSystem.mv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move file(s) from one location to another</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.ext.fsspec.overlayfs.OverlayFileSystem.protocol">
+<code class="sig-name descname">protocol</code><em class="property"> = 'overlayfs'</em><a class="headerlink" href="#appyter.ext.fsspec.overlayfs.OverlayFileSystem.protocol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.overlayfs.OverlayFileSystem.rm">
+<code class="sig-name descname">rm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">maxdepth</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/overlayfs.html#OverlayFileSystem.rm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.overlayfs.OverlayFileSystem.rm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete files.</p>
+<p>path: str or list of str
+File(s) to delete.
+recursive: bool
+If file(s) are directories, recursively delete contents and then
+also remove the directory
+maxdepth: int or None
+Depth to pass to walk for finding files to delete, if recursive.
+If None, there will be no limit and infinite recursion may be
+possible.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.overlayfs.OverlayFileSystem.rmdir">
+<code class="sig-name descname">rmdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/overlayfs.html#OverlayFileSystem.rmdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.overlayfs.OverlayFileSystem.rmdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a directory, if empty</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.ext.fsspec.overlayfs.OverlayFileSystem.root_marker">
+<code class="sig-name descname">root_marker</code><em class="property"> = ''</em><a class="headerlink" href="#appyter.ext.fsspec.overlayfs.OverlayFileSystem.root_marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.parse">
+<span id="appyter-ext-fsspec-parse-module"></span><h2>appyter.ext.fsspec.parse module<a class="headerlink" href="#module-appyter.ext.fsspec.parse" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.fsspec.parse.parse_file_uri_fragment">
+<code class="sig-prename descclassname">appyter.ext.fsspec.parse.</code><code class="sig-name descname">parse_file_uri_fragment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/parse.html#parse_file_uri_fragment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.parse.parse_file_uri_fragment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.parse.parse_file_uri_qs">
+<code class="sig-prename descclassname">appyter.ext.fsspec.parse.</code><code class="sig-name descname">parse_file_uri_qs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/parse.html#parse_file_uri_qs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.parse.parse_file_uri_qs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.test_chroot">
+<span id="appyter-ext-fsspec-test-chroot-module"></span><h2>appyter.ext.fsspec.test_chroot module<a class="headerlink" href="#module-appyter.ext.fsspec.test_chroot" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_chroot.assert_eq">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_chroot.</code><code class="sig-name descname">assert_eq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_chroot.html#assert_eq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_chroot.assert_eq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_chroot.test_file_chroot">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_chroot.</code><code class="sig-name descname">test_file_chroot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_chroot.html#test_file_chroot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_chroot.test_file_chroot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_chroot.test_file_chroot_in_chroot">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_chroot.</code><code class="sig-name descname">test_file_chroot_in_chroot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_chroot.html#test_file_chroot_in_chroot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_chroot.test_file_chroot_in_chroot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_chroot.test_http_chroot">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_chroot.</code><code class="sig-name descname">test_http_chroot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_chroot.html#test_http_chroot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_chroot.test_http_chroot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serve the test directory over http and ensure chroot_fs still works using the webserver</p>
+</dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.test_fuse">
+<span id="appyter-ext-fsspec-test-fuse-module"></span><h2>appyter.ext.fsspec.test_fuse module<a class="headerlink" href="#module-appyter.ext.fsspec.test_fuse" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_fuse.assert_eq">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_fuse.</code><code class="sig-name descname">assert_eq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_fuse.html#assert_eq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_fuse.assert_eq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_fuse.test_file_chroot_fuse">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_fuse.</code><code class="sig-name descname">test_file_chroot_fuse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_fuse.html#test_file_chroot_fuse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_fuse.test_file_chroot_fuse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.test_mapperfs">
+<span id="appyter-ext-fsspec-test-mapperfs-module"></span><h2>appyter.ext.fsspec.test_mapperfs module<a class="headerlink" href="#module-appyter.ext.fsspec.test_mapperfs" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_mapperfs.assert_eq">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_mapperfs.</code><code class="sig-name descname">assert_eq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_mapperfs.html#assert_eq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_mapperfs.assert_eq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_mapperfs.test_file_mapperfs">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_mapperfs.</code><code class="sig-name descname">test_file_mapperfs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_mapperfs.html#test_file_mapperfs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_mapperfs.test_file_mapperfs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.test_overlayfs">
+<span id="appyter-ext-fsspec-test-overlayfs-module"></span><h2>appyter.ext.fsspec.test_overlayfs module<a class="headerlink" href="#module-appyter.ext.fsspec.test_overlayfs" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_overlayfs.assert_eq">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_overlayfs.</code><code class="sig-name descname">assert_eq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_overlayfs.html#assert_eq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_overlayfs.assert_eq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_overlayfs.test_file_overlayfs">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_overlayfs.</code><code class="sig-name descname">test_file_overlayfs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_overlayfs.html#test_file_overlayfs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_overlayfs.test_file_overlayfs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.test_pathmap">
+<span id="appyter-ext-fsspec-test-pathmap-module"></span><h2>appyter.ext.fsspec.test_pathmap module<a class="headerlink" href="#module-appyter.ext.fsspec.test_pathmap" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_pathmap.assert_eq">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_pathmap.</code><code class="sig-name descname">assert_eq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_pathmap.html#assert_eq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_pathmap.assert_eq" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_pathmap.test_file_pathmap_chroot">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_pathmap.</code><code class="sig-name descname">test_file_pathmap_chroot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_pathmap.html#test_file_pathmap_chroot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_pathmap.test_file_pathmap_chroot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_pathmap.test_file_pathmap_chroot_fuse">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_pathmap.</code><code class="sig-name descname">test_file_pathmap_chroot_fuse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_pathmap.html#test_file_pathmap_chroot_fuse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_pathmap.test_file_pathmap_chroot_fuse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.fsspec.test_pathmap.test_http_pathmap_chroot">
+<code class="sig-prename descclassname">appyter.ext.fsspec.test_pathmap.</code><code class="sig-name descname">test_http_pathmap_chroot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_pathmap.html#test_http_pathmap_chroot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_pathmap.test_http_pathmap_chroot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serve the test directory over http and ensure chroot_fs still works using the webserver</p>
+</dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.writecache">
+<span id="appyter-ext-fsspec-writecache-module"></span><h2>appyter.ext.fsspec.writecache module<a class="headerlink" href="#module-appyter.ext.fsspec.writecache" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.ext.fsspec.writecache.LocalTempFile">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.fsspec.writecache.</code><code class="sig-name descname">LocalTempFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fs</span></em>, <em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">fn</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'wb'</span></em>, <em class="sig-param"><span class="n">autocommit</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">seek</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">details</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#LocalTempFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.LocalTempFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A temporary local file, which will be uploaded on commit</p>
+<dl class="py method">
+<dt id="appyter.ext.fsspec.writecache.LocalTempFile.close">
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#LocalTempFile.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.LocalTempFile.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.writecache.LocalTempFile.commit">
+<code class="sig-name descname">commit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#LocalTempFile.commit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.LocalTempFile.commit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.writecache.LocalTempFile.discard">
+<code class="sig-name descname">discard</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#LocalTempFile.discard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.LocalTempFile.discard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="appyter.ext.fsspec.writecache.WriteCacheFileSystem">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.fsspec.writecache.</code><code class="sig-name descname">WriteCacheFileSystem</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#WriteCacheFileSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.WriteCacheFileSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">fsspec.spec.AbstractFileSystem</span></code></p>
+<dl class="py method">
+<dt id="appyter.ext.fsspec.writecache.WriteCacheFileSystem.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path1</span></em>, <em class="sig-param"><span class="n">path2</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">on_error</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#WriteCacheFileSystem.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.WriteCacheFileSystem.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy within two locations in the filesystem</p>
+<p>on_error : “raise”, “ignore”
+If raise, any not-found exceptions will be raised; if ignore any
+not-found exceptions will cause the path to be skipped; defaults to
+raise unless recursive is true, where the default is ignore</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.writecache.WriteCacheFileSystem.exists">
+<code class="sig-name descname">exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#WriteCacheFileSystem.exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.WriteCacheFileSystem.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is there a file at the given path</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.writecache.WriteCacheFileSystem.info">
+<code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#WriteCacheFileSystem.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.WriteCacheFileSystem.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Give details of entry at path</p>
+<p>Returns a single dictionary, with exactly the same information as <code class="docutils literal notranslate"><span class="pre">ls</span></code>
+would with <code class="docutils literal notranslate"><span class="pre">detail=True</span></code>.</p>
+<p>The default implementation should calls ls and could be overridden by a
+shortcut. kwargs are passed on to <code class="docutils literal notranslate"><span class="pre">`ls()</span></code>.</p>
+<p>Some file systems might not be able to measure the file’s size, in
+which case, the returned dict will include <code class="docutils literal notranslate"><span class="pre">'size':</span> <span class="pre">None</span></code>.</p>
+<p>dict with keys: name (full path in the FS), size (in bytes), type (file,
+directory, or something else) and other FS-specific keys.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.writecache.WriteCacheFileSystem.ls">
+<code class="sig-name descname">ls</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">detail</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#WriteCacheFileSystem.ls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.WriteCacheFileSystem.ls" title="Permalink to this definition">¶</a></dt>
+<dd><p>List objects at path.</p>
+<p>This should include subdirectories and files at that location. The
+difference between a file and a directory must be clear when details
+are requested.</p>
+<p>The specific keys, or perhaps a FileInfo class, or similar, is TBD,
+but must be consistent across implementations.
+Must include:</p>
+<ul class="simple">
+<li><p>full path to the entry (without protocol)</p></li>
+<li><p>size of the entry, in bytes. If the value cannot be determined, will</p></li>
+</ul>
+<p>be <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+* type of entry, “file”, “directory” or other</p>
+<p>Additional information
+may be present, aproriate to the file-system, e.g., generation,
+checksum, etc.</p>
+<p>May use refresh=True|False to allow use of self._ls_from_cache to
+check for a saved listing and avoid calling the backend. This would be
+common where listing may be expensive.</p>
+<p>path: str
+detail: bool
+if True, gives a list of dictionaries, where each is the same as
+the result of <code class="docutils literal notranslate"><span class="pre">info(path)</span></code>. If False, gives a list of paths
+(str).
+kwargs: may have additional backend-specific options, such as version
+information</p>
+<p>List of strings if detail is False, or list of directory information
+dicts if detail is True.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.writecache.WriteCacheFileSystem.makedirs">
+<code class="sig-name descname">makedirs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">exist_ok</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#WriteCacheFileSystem.makedirs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.WriteCacheFileSystem.makedirs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively make directories</p>
+<p>Creates directory at path and any intervening required directories.
+Raises exception if, for instance, the path already exists but is a
+file.</p>
+<p>path: str
+leaf directory name
+exist_ok: bool (False)
+If True, will error if the target already exists</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.writecache.WriteCacheFileSystem.mkdir">
+<code class="sig-name descname">mkdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#WriteCacheFileSystem.mkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.WriteCacheFileSystem.mkdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create directory entry at path</p>
+<p>For systems that don’t have true directories, may create an for
+this instance only and not touch the real filesystem</p>
+<p>path: str
+location
+create_parents: bool
+if True, this is equivalent to <code class="docutils literal notranslate"><span class="pre">makedirs</span></code>
+kwargs:
+may be permissions, etc.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.writecache.WriteCacheFileSystem.mv">
+<code class="sig-name descname">mv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path1</span></em>, <em class="sig-param"><span class="n">path2</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">maxdepth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#WriteCacheFileSystem.mv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.WriteCacheFileSystem.mv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move file(s) from one location to another</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.ext.fsspec.writecache.WriteCacheFileSystem.protocol">
+<code class="sig-name descname">protocol</code><em class="property"> = 'writecache'</em><a class="headerlink" href="#appyter.ext.fsspec.writecache.WriteCacheFileSystem.protocol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.writecache.WriteCacheFileSystem.rm">
+<code class="sig-name descname">rm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">recursive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">maxdepth</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#WriteCacheFileSystem.rm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.WriteCacheFileSystem.rm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete files.</p>
+<p>path: str or list of str
+File(s) to delete.
+recursive: bool
+If file(s) are directories, recursively delete contents and then
+also remove the directory
+maxdepth: int or None
+Depth to pass to walk for finding files to delete, if recursive.
+If None, there will be no limit and infinite recursion may be
+possible.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.fsspec.writecache.WriteCacheFileSystem.rmdir">
+<code class="sig-name descname">rmdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/writecache.html#WriteCacheFileSystem.rmdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.writecache.WriteCacheFileSystem.rmdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a directory, if empty</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.ext.fsspec" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">appyter.ext.fsspec package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.alias">appyter.ext.fsspec.alias module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.chroot">appyter.ext.fsspec.chroot module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.core">appyter.ext.fsspec.core module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.fuse">appyter.ext.fsspec.fuse module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.mapperfs">appyter.ext.fsspec.mapperfs module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.overlayfs">appyter.ext.fsspec.overlayfs module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.parse">appyter.ext.fsspec.parse module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.test_chroot">appyter.ext.fsspec.test_chroot module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.test_fuse">appyter.ext.fsspec.test_fuse module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.test_mapperfs">appyter.ext.fsspec.test_mapperfs module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.test_overlayfs">appyter.ext.fsspec.test_overlayfs module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.test_pathmap">appyter.ext.fsspec.test_pathmap module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.writecache">appyter.ext.fsspec.writecache module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/appyter.ext.fsspec.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.fsspec package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

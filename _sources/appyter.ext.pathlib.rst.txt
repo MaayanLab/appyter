@@ -1,0 +1,21 @@
+appyter.ext.pathlib package
+===========================
+
+Submodules
+----------
+
+appyter.ext.pathlib.chroot module
+---------------------------------
+
+.. automodule:: appyter.ext.pathlib.chroot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: appyter.ext.pathlib
+   :members:
+   :undoc-members:
+   :show-inheritance:

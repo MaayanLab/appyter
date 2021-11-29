@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>appyter.ext.socketio package &#8212; Appyter 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -69,7 +69,7 @@
 <em class="property">async </em><code class="sig-name descname">emit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">evt</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">priority</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/client.html#AsyncClient.emit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient.emit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Emit a custom event to one or more connected clients.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>event</strong> – The event name. It can be any string. The event names</p>
 </dd>
 </dl>
@@ -109,6 +109,11 @@ object) to prevent this situation.</p>
 <dt id="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin">
 <em class="property">class </em><code class="sig-prename descclassname">appyter.ext.socketio.priority_queued_emit.</code><code class="sig-name descname">PriorityQueuedEmitMixin</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/priority_queued_emit.html#PriorityQueuedEmitMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.close">
+<em class="property">async </em><code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/priority_queued_emit.html#PriorityQueuedEmitMixin.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt id="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit">
 <em class="property">async </em><code class="sig-name descname">emit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">evt</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">priority</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/priority_queued_emit.html#PriorityQueuedEmitMixin.emit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit" title="Permalink to this definition">¶</a></dt>

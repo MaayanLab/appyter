@@ -116,6 +116,14 @@ appyter.profiles.default.fields.TextListField module
    :undoc-members:
    :show-inheritance:
 
+appyter.profiles.default.fields.VariableField module
+----------------------------------------------------
+
+.. automodule:: appyter.profiles.default.fields.VariableField
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>appyter package &#8212; Appyter 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -46,6 +46,10 @@
 <li class="toctree-l3"><a class="reference internal" href="appyter.ext.asyncio.html">appyter.ext.asyncio package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="appyter.ext.asyncio.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio.event_emitter">appyter.ext.asyncio.event_emitter module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio.run_in_executor">appyter.ext.asyncio.run_in_executor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio.sync_contextmanager">appyter.ext.asyncio.sync_contextmanager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio.sync_coro">appyter.ext.asyncio.sync_coro module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio.try_n_times">appyter.ext.asyncio.try_n_times module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio">Module contents</a></li>
 </ul>
 </li>
@@ -53,17 +57,32 @@
 <li class="toctree-l4"><a class="reference internal" href="appyter.ext.click.html#module-appyter.ext.click">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="appyter.ext.fs.html">appyter.ext.fs package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fs.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fs.html#module-appyter.ext.fs.file">appyter.ext.fs.file module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fs.html#module-appyter.ext.fs.rclone">appyter.ext.fs.rclone module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fs.html#appyter-ext-fs-s3-module">appyter.ext.fs.s3 module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fs.html#module-appyter.ext.fs.tmpfs">appyter.ext.fs.tmpfs module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fs.html#module-appyter.ext.fs">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.ext.fsspec.html">appyter.ext.fsspec package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.alias">appyter.ext.fsspec.alias module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.chroot">appyter.ext.fsspec.chroot module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.core">appyter.ext.fsspec.core module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.fuse">appyter.ext.fsspec.fuse module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.mapperfs">appyter.ext.fsspec.mapperfs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.overlayfs">appyter.ext.fsspec.overlayfs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.parse">appyter.ext.fsspec.parse module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_chroot">appyter.ext.fsspec.test_chroot module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_fuse">appyter.ext.fsspec.test_fuse module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_mapperfs">appyter.ext.fsspec.test_mapperfs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_overlayfs">appyter.ext.fsspec.test_overlayfs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_pathmap">appyter.ext.fsspec.test_pathmap module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.writecache">appyter.ext.fsspec.writecache module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="appyter.ext.nbclient.html">appyter.ext.nbclient package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="appyter.ext.nbclient.html#module-appyter.ext.nbclient">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.ext.pathlib.html">appyter.ext.pathlib package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.pathlib.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.pathlib.html#module-appyter.ext.pathlib.chroot">appyter.ext.pathlib.chroot module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.ext.pathlib.html#module-appyter.ext.pathlib">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="appyter.ext.socketio.html">appyter.ext.socketio package</a><ul>
@@ -83,7 +102,17 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext.dict">appyter.ext.dict module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext.exceptions">appyter.ext.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext.flask">appyter.ext.flask module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext.functools">appyter.ext.functools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext.hashlib">appyter.ext.hashlib module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext.importlib">appyter.ext.importlib module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext.itertools">appyter.ext.itertools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext.json">appyter.ext.json module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext.re">appyter.ext.re module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext.urllib">appyter.ext.urllib module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext.uuid">appyter.ext.uuid module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.html#module-appyter.ext">Module contents</a></li>
 </ul>
 </li>
@@ -162,6 +191,7 @@
 <li class="toctree-l2"><a class="reference internal" href="appyter.render.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="appyter.render.flask_app.html">appyter.render.flask_app package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.constants">appyter.render.flask_app.constants module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.core">appyter.render.flask_app.core module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.development">appyter.render.flask_app.development module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.download">appyter.render.flask_app.download module</a></li>
@@ -171,7 +201,7 @@
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.production">appyter.render.flask_app.production module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.socketio">appyter.render.flask_app.socketio module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.static">appyter.render.flask_app.static module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.util">appyter.render.flask_app.util module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app.storage">appyter.render.flask_app.storage module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="appyter.render.flask_app.html#module-appyter.render.flask_app">Module contents</a></li>
 </ul>
 </li>
@@ -319,6 +349,12 @@ Should be overridden by subclasses.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="appyter.fields.Field.prepare">
+<code class="sig-name descname">prepare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">req</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/fields.html#Field.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.fields.Field.prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a flask request, capture relevant variables for this field</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="appyter.fields.Field.raw_value">
 <em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.fields.Field.raw_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>(UNSAFE) Raw value of the field</p>
@@ -329,7 +365,7 @@ Should be overridden by subclasses.</p>
 <code class="sig-name descname">render</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/fields.html#Field.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.fields.Field.render" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a rendered version of the field (form)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>**kwargs</strong> – <p>The instance values of the form e.g. <code class="docutils literal notranslate"><span class="pre">Field.render(**field.args)</span></code></p>
 </p>
 </dd>
@@ -412,7 +448,7 @@ for import.</p>
 <dd><p>Initialize appyter magic.</p>
 <p>Sets up a jinj2 environment and injects %%appyter magic into your environment.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>_globals</strong> – (Dict[str, Any]) A callable with your globals for the purpose of injection, basically just: <code class="docutils literal notranslate"><span class="pre">lambda</span> <span class="pre">_=globals:</span> <span class="pre">_()</span></code></p></li>
 <li><p><strong>verbose</strong> – (Optional[bool]) Expand exception reporting to be more verbose</p></li>
@@ -420,61 +456,6 @@ for import.</p>
 </dd>
 </dl>
 </dd></dl>
-
-</section>
-<section id="module-appyter.util">
-<span id="appyter-util-module"></span><h2>appyter.util module<a class="headerlink" href="#module-appyter.util" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt id="appyter.util.dict_filter_none">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">dict_filter_none</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#dict_filter_none"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.dict_filter_none" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="appyter.util.exception_as_dict">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">exception_as_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">exc</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#exception_as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.exception_as_dict" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="appyter.util.importdir">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">importdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_dirname_</span></em>, <em class="sig-param"><span class="n">_package_</span></em>, <em class="sig-param"><span class="n">_globals_</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#importdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.importdir" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="appyter.util.importdir_deep">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">importdir_deep</code><span class="sig-paren">(</span><em class="sig-param">_dirname_</em>, <em class="sig-param">_package_</em>, <em class="sig-param">_globals_</em>, <em class="sig-param">filter_mod=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#importdir_deep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.importdir_deep" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="appyter.util.is_remote">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">is_remote</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#is_remote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.is_remote" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="appyter.util.join_routes">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">join_routes</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">routes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#join_routes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.join_routes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Utility function for joining routes while striping extraneous slashes</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="appyter.util.re_full">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">re_full</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">expr</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#re_full"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.re_full" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="appyter.util.run_in_executor">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">run_in_executor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#run_in_executor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.run_in_executor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="appyter.util.secure_filepath">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">secure_filepath</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#secure_filepath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.secure_filepath" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ensures this will be a sanitized relative path</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="appyter.util.secure_url">
-<code class="sig-prename descclassname">appyter.util.</code><code class="sig-name descname">secure_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/util.html#secure_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.util.secure_url" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </section>
 <section id="module-appyter">
@@ -499,7 +480,6 @@ for import.</p>
 <li><a class="reference internal" href="#module-appyter.context">appyter.context module</a></li>
 <li><a class="reference internal" href="#module-appyter.fields">appyter.fields module</a></li>
 <li><a class="reference internal" href="#module-appyter.magic">appyter.magic module</a></li>
-<li><a class="reference internal" href="#module-appyter.util">appyter.util module</a></li>
 <li><a class="reference internal" href="#module-appyter">Module contents</a></li>
 </ul>
 </li>

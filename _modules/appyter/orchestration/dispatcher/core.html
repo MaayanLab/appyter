@@ -41,22 +41,14 @@
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">from</span> <span class="nn">aiohttp</span> <span class="kn">import</span> <span class="n">web</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">Counter</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">appyter.orchestration.dispatcher.socketio</span> <span class="kn">import</span> <span class="n">socketio</span>
-
 <div class="viewcode-block" id="LockedOrderedDict"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.LockedOrderedDict">[docs]</a><span class="k">class</span> <span class="nc">LockedOrderedDict</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">):</span>
   <span class="n">lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span></div>
-
-<span class="c1"># NOTE: This is questionable, this queue may run</span>
-<span class="c1">#       on a different thread or process; in the case of a thread it&#39;s fine</span>
-<span class="c1">#       because Queue is thread-safe, but not in the case of a process</span>
-<span class="c1">#       we&#39;d need a monkey-patched redis-Queue.</span>
-<span class="c1">#</span>
 
 <span class="n">core</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">()</span>
 <span class="n">routes</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">RouteTableDef</span><span class="p">()</span>
@@ -116,7 +108,7 @@
 <div class="viewcode-block" id="slow_put"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.slow_put">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">slow_put</span><span class="p">(</span><span class="n">queue</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Queue put debouncing</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">())</span>
   <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="dispatcher"><a class="viewcode-back" href="../../../../appyter.orchestration.dispatcher.html#appyter.orchestration.dispatcher.core.dispatcher">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">dispatcher</span><span class="p">(</span><span class="n">queued</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tasks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dispatch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">jobs_per_image</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
@@ -144,9 +136,7 @@
       <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dispatch error: </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="c1">#</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">tasks</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-      <span class="k">del</span> <span class="n">tasks</span><span class="p">[</span><span class="n">job_id</span><span class="p">]</span>
-  <span class="c1">#</span>
-  <span class="n">job</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span></div>
+      <span class="k">del</span> <span class="n">tasks</span><span class="p">[</span><span class="n">job_id</span><span class="p">]</span></div>
 </pre></div>
 
             <div class="clearer"></div>

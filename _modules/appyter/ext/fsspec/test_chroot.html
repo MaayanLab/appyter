@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.ext.fsspec.test_chroot &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.fsspec.test_chroot</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.ext.fsspec.test_chroot</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="n">mp</span><span class="o">.</span><span class="n">set_start_method</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">appyter.ext.fsspec</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_chroot_fs</span>
+
+<div class="viewcode-block" id="assert_eq"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.test_chroot.assert_eq">[docs]</a><span class="k">def</span> <span class="nf">assert_eq</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span> <span class="k">assert</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="si">}</span><span class="s2"> != </span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+<span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">_test_ctx</span><span class="p">():</span>
+  <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+    <span class="n">tmpdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">tmpdir</span><span class="o">/</span><span class="s1">&#39;a&#39;</span><span class="o">/</span><span class="s1">&#39;b&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">tmpdir</span><span class="o">/</span><span class="s1">&#39;a&#39;</span><span class="o">/</span><span class="s1">&#39;b&#39;</span><span class="o">/</span><span class="s1">&#39;c&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+      <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">tmpdir</span><span class="o">/</span><span class="s1">&#39;a&#39;</span><span class="o">/</span><span class="s1">&#39;d&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+      <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">tmpdir</span><span class="o">/</span><span class="s1">&#39;e&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+      <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;E&#39;</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">tmpdir</span>
+
+<div class="viewcode-block" id="test_file_chroot_in_chroot"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.test_chroot.test_file_chroot_in_chroot">[docs]</a><span class="k">def</span> <span class="nf">test_file_chroot_in_chroot</span><span class="p">():</span>
+  <span class="k">with</span> <span class="n">_test_ctx</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+    <span class="c1"># instantiate filesystem &amp; check that it works</span>
+    <span class="k">with</span> <span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chroot::file://</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fs</span><span class="p">:</span>
+      <span class="n">assert_eq</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;**&#39;</span><span class="p">)),</span> <span class="nb">frozenset</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;a/b&#39;</span><span class="p">,</span> <span class="s1">&#39;a/b/c&#39;</span><span class="p">,</span> <span class="s1">&#39;a/d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">]))</span>
+      <span class="n">assert_eq</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="s1">&#39;a/b/c&#39;</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+      <span class="n">assert_eq</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="s1">&#39;a/d&#39;</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+      <span class="n">assert_eq</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;E&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="test_file_chroot"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.test_chroot.test_file_chroot">[docs]</a><span class="k">def</span> <span class="nf">test_file_chroot</span><span class="p">():</span>
+  <span class="k">with</span> <span class="n">_test_ctx</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+    <span class="c1"># instantiate filesystem &amp; check that it works</span>
+    <span class="k">with</span> <span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">))</span> <span class="k">as</span> <span class="n">fs</span><span class="p">:</span>
+      <span class="n">assert_eq</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;**&#39;</span><span class="p">)),</span> <span class="nb">frozenset</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;a/b&#39;</span><span class="p">,</span> <span class="s1">&#39;a/b/c&#39;</span><span class="p">,</span> <span class="s1">&#39;a/d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">]))</span>
+      <span class="n">assert_eq</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="s1">&#39;a/b/c&#39;</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+      <span class="n">assert_eq</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="s1">&#39;a/d&#39;</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+      <span class="n">assert_eq</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;E&#39;</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">_http_serve</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8888</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Serve a simple static listing of the given directory on the specified port</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="kn">from</span> <span class="nn">aiohttp</span> <span class="kn">import</span> <span class="n">web</span>
+  <span class="n">app</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">()</span>
+  <span class="n">app</span><span class="o">.</span><span class="n">add_routes</span><span class="p">([</span><span class="n">web</span><span class="o">.</span><span class="n">static</span><span class="p">(</span><span class="s1">&#39;/subdir&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">),</span> <span class="n">show_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)])</span>
+  <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">run_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_http_connect</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Successfully connect to and resolve a url</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="kn">import</span> <span class="nn">aiohttp</span>
+  <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+      <span class="k">return</span> <span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+
+<span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">_http_serve_ctx</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8888</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Context for _http_serve, ensuring server is ready before proceeding</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="kn">import</span> <span class="nn">os</span>
+  <span class="kn">import</span> <span class="nn">signal</span>
+  <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Process</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.try_n_times</span> <span class="kn">import</span> <span class="n">try_n_times</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.sync_coro</span> <span class="kn">import</span> <span class="n">sync_coro</span>
+  <span class="n">proc</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span>
+    <span class="n">target</span><span class="o">=</span><span class="n">_http_serve</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+  <span class="p">)</span>
+  <span class="n">proc</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">sync_coro</span><span class="p">(</span><span class="n">try_n_times</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">_http_connect</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;http://localhost:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+    <span class="k">yield</span>
+  <span class="k">finally</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">proc</span><span class="o">.</span><span class="n">pid</span><span class="p">:</span>
+      <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">)</span>
+
+<div class="viewcode-block" id="test_http_chroot"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.test_chroot.test_http_chroot">[docs]</a><span class="k">def</span> <span class="nf">test_http_chroot</span><span class="p">():</span>
+  <span class="sd">&#39;&#39;&#39; Serve the test directory over http and ensure chroot_fs still works using the webserver</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">port</span> <span class="o">=</span> <span class="mi">8888</span>
+  <span class="k">with</span> <span class="n">_test_ctx</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">_http_serve_ctx</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+      <span class="c1"># instantiate filesystem &amp; check that it works</span>
+      <span class="k">with</span> <span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;http://localhost:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">/subdir/&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fs</span><span class="p">:</span>
+        <span class="n">assert_eq</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="s1">&#39;a/b/c&#39;</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+        <span class="n">assert_eq</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="s1">&#39;a/d&#39;</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+        <span class="n">assert_eq</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;E&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.fsspec.test_chroot</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

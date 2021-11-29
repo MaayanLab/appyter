@@ -38,7 +38,10 @@
   <h1>Source code for appyter.profiles.default.fields.FileField</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">appyter.fields</span> <span class="kn">import</span> <span class="n">Field</span>
-<span class="kn">from</span> <span class="nn">appyter.util</span> <span class="kn">import</span> <span class="n">secure_filepath</span><span class="p">,</span> <span class="n">join_routes</span><span class="p">,</span> <span class="n">re_full</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.flask</span> <span class="kn">import</span> <span class="n">secure_filepath</span><span class="p">,</span> <span class="n">join_routes</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.re</span> <span class="kn">import</span> <span class="n">re_full</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.parse</span> <span class="kn">import</span> <span class="n">parse_file_uri_fragment</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.download</span> <span class="kn">import</span> <span class="n">upload_from_request</span>
 
 <div class="viewcode-block" id="FileField"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.FileField.FileField">[docs]</a><span class="k">class</span> <span class="nc">FileField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Represing a uploadable File and facilitating that file upload.</span>
@@ -70,9 +73,17 @@
   <span class="nd">@property</span>
   <span class="k">def</span> <span class="nf">raw_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]:</span>
-      <span class="k">return</span> <span class="n">secure_filepath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+      <span class="n">_uri</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">parse_file_uri_fragment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+      <span class="k">return</span> <span class="n">secure_filepath</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="FileField.prepare"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.FileField.FileField.prepare">[docs]</a>  <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="s1">&#39;files&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+      <span class="n">data_path</span> <span class="o">=</span> <span class="n">upload_from_request</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+      <span class="k">if</span> <span class="n">data_path</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span> <span class="n">data_path</span><span class="p">}</span>
+    <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">req</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FileField.constraint"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.FileField.FileField.constraint">[docs]</a>  <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

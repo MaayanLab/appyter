@@ -12,6 +12,38 @@ appyter.ext.asyncio.event\_emitter module
    :undoc-members:
    :show-inheritance:
 
+appyter.ext.asyncio.run\_in\_executor module
+--------------------------------------------
+
+.. automodule:: appyter.ext.asyncio.run_in_executor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.asyncio.sync\_contextmanager module
+-----------------------------------------------
+
+.. automodule:: appyter.ext.asyncio.sync_contextmanager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.asyncio.sync\_coro module
+-------------------------------------
+
+.. automodule:: appyter.ext.asyncio.sync_coro
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.asyncio.try\_n\_times module
+----------------------------------------
+
+.. automodule:: appyter.ext.asyncio.try_n_times
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

@@ -49,11 +49,11 @@
   <span class="c1">#</span>
   <span class="kn">from</span> <span class="nn">appyter.orchestration.dispatcher.core</span> <span class="kn">import</span> <span class="n">core</span>
   <span class="kn">from</span> <span class="nn">appyter.orchestration.dispatcher.socketio</span> <span class="kn">import</span> <span class="n">socketio</span>
-  <span class="kn">from</span> <span class="nn">appyter.util</span> <span class="kn">import</span> <span class="n">join_routes</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">join_slash</span>
   <span class="c1">#</span>
   <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
     <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span> <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
-    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(name)s</span><span class="s1"> </span><span class="si">%(message).80s</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(name)s</span><span class="s1"> </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
   <span class="p">)</span>
   <span class="c1">#</span>
   <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Initializing aiohttp...&#39;</span><span class="p">)</span>
@@ -75,7 +75,7 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Registering prefix redirect&#39;</span><span class="p">)</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">redirect_to_prefix</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
       <span class="n">path</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">match_info</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span>
-      <span class="k">raise</span> <span class="n">web</span><span class="o">.</span><span class="n">HTTPFound</span><span class="p">(</span><span class="n">join_routes</span><span class="p">(</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+      <span class="k">raise</span> <span class="n">web</span><span class="o">.</span><span class="n">HTTPFound</span><span class="p">(</span><span class="n">join_slash</span><span class="p">(</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
     <span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_get</span><span class="p">(</span><span class="s1">&#39;/{path:[^/]*}&#39;</span><span class="p">,</span> <span class="n">redirect_to_prefix</span><span class="p">)</span>
     <span class="n">app</span><span class="o">.</span><span class="n">add_subapp</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">),</span> <span class="n">core</span><span class="p">)</span>
   <span class="k">else</span><span class="p">:</span>
@@ -83,7 +83,7 @@
     <span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span>
   <span class="c1">#</span>
   <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Initializing socketio...&#39;</span><span class="p">)</span>
-  <span class="n">socketio</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">join_routes</span><span class="p">(</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span> <span class="s1">&#39;socket.io&#39;</span><span class="p">))</span>
+  <span class="n">socketio</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">join_slash</span><span class="p">(</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span> <span class="s1">&#39;socket.io&#39;</span><span class="p">))</span>
   <span class="c1">#</span>
   <span class="k">return</span> <span class="n">app</span></div>
 
@@ -99,9 +99,6 @@
 <span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--dispatch&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_DISPATCH&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;native&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The dispatcher mechanism to use (see list-dispatchers)&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">dispatcher</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
   <span class="kn">from</span> <span class="nn">aiohttp</span> <span class="kn">import</span> <span class="n">web</span>
-  <span class="kn">from</span> <span class="nn">appyter.orchestration.dispatcher.socketio</span> <span class="kn">import</span> <span class="n">socketio</span>
-  <span class="kn">from</span> <span class="nn">appyter.util</span> <span class="kn">import</span> <span class="n">dict_filter_none</span>
-  <span class="c1">#</span>
   <span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
   <span class="n">web</span><span class="o">.</span><span class="n">run_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;HOST&#39;</span><span class="p">],</span> <span class="n">port</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;PORT&#39;</span><span class="p">]))</span>
 </pre></div>

@@ -41,12 +41,8 @@
 <span class="sd">defined in :mod:`appyter.profiles.default.fields`.</span>
 <span class="sd">``` &#39;&#39;&#39;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
 <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Markup</span>
-<span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_jinja2_env</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.itertools</span> <span class="kn">import</span> <span class="n">collapse</span>
 
 <div class="viewcode-block" id="PartialField"><a class="viewcode-back" href="../../appyter.html#appyter.fields.PartialField">[docs]</a><span class="k">class</span> <span class="nc">PartialField</span><span class="p">:</span>
   <span class="sd">&#39;&#39;&#39; Partial instantiation of a field</span>
@@ -59,7 +55,7 @@
 
   <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;context&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;context&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">value</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_field</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="build_fields"><a class="viewcode-back" href="../../appyter.html#appyter.fields.build_fields">[docs]</a><span class="k">def</span> <span class="nf">build_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{},</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -137,6 +133,22 @@
     <span class="sd">&#39;&#39;&#39; Get the raw args, the values used to initialize this field</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Field.prepare"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.prepare">[docs]</a>  <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Given a flask request, capture relevant variables for this field</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">req</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+      <span class="n">value</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">req</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">req</span><span class="o">.</span><span class="n">json</span><span class="p">:</span>
+      <span class="n">value</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">json</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">req</span><span class="o">.</span><span class="n">form</span><span class="p">:</span>
+      <span class="n">value</span> <span class="o">=</span> <span class="n">collapse</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">form</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+    <span class="c1">#</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span> <span class="n">value</span> <span class="p">}</span></div>
 
 <div class="viewcode-block" id="Field.constraint"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.constraint">[docs]</a>  <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Return true if the received args.value satisfies constraints.</span>

@@ -38,8 +38,8 @@
   <h1>Source code for appyter.orchestration.job.job</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">import</span> <span class="nn">urllib.parse</span>
-<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="setup_evaluate_notebook"><a class="viewcode-back" href="../../../../appyter.orchestration.job.html#appyter.orchestration.job.job.setup_evaluate_notebook">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">setup_evaluate_notebook</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="n">job</span><span class="p">):</span>
@@ -52,7 +52,7 @@
   <span class="c1"># someone joins, send them the notebook, state</span>
   <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;joined&#39;</span><span class="p">)</span>
   <span class="k">async</span> <span class="k">def</span> <span class="nf">on_joined</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">if</span> <span class="s1">&#39;get_state&#39;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;get_state&#39;</span><span class="p">):</span>
       <span class="n">nb_state</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;get_state&#39;</span><span class="p">]()</span>
       <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;msg&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;nb&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">nb_state</span><span class="p">[</span><span class="s1">&#39;nb&#39;</span><span class="p">],</span> <span class="n">to</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
       <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;msg&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">nb_state</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">],</span> <span class="n">to</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
@@ -93,11 +93,17 @@
   <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">,</span> <span class="n">job</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">])</span>
   <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="s1">&#39;stopped&#39;</span><span class="p">)</span>
   <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+  <span class="k">await</span> <span class="n">emitter</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
   <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="execute_async"><a class="viewcode-back" href="../../../../appyter.orchestration.job.html#appyter.orchestration.job.job.execute_async">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
   <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.event_emitter</span> <span class="kn">import</span> <span class="n">EventEmitter</span>
   <span class="n">emitter</span> <span class="o">=</span> <span class="n">EventEmitter</span><span class="p">()</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+  <span class="k">if</span> <span class="s1">&#39;storage&#39;</span> <span class="ow">in</span> <span class="n">job</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">fsspec</span>
+    <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.alias</span> <span class="kn">import</span> <span class="n">AliasFileSystemFactory</span>
+    <span class="n">fsspec</span><span class="o">.</span><span class="n">register_implementation</span><span class="p">(</span><span class="s1">&#39;storage&#39;</span><span class="p">,</span> <span class="n">AliasFileSystemFactory</span><span class="p">(</span><span class="s1">&#39;storage&#39;</span><span class="p">,</span> <span class="n">job</span><span class="p">[</span><span class="s1">&#39;storage&#39;</span><span class="p">]))</span>
   <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
     <span class="n">setup_evaluate_notebook</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="n">job</span><span class="p">),</span>
     <span class="n">setup_socketio</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="n">job</span><span class="p">),</span>
@@ -108,9 +114,8 @@
   <span class="n">debug</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
   <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
     <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
-    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(name)s</span><span class="s1"> </span><span class="si">%(message).80s</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(name)s</span><span class="s1"> </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
   <span class="p">)</span>
-  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
   <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
   <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">execute_async</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">))</span></div>
 </pre></div>

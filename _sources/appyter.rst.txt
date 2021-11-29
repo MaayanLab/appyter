@@ -50,14 +50,6 @@ appyter.magic module
    :undoc-members:
    :show-inheritance:
 
-appyter.util module
--------------------
-
-.. automodule:: appyter.util
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

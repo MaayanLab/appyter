@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>appyter.profiles.default.fields package &#8212; Appyter 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -51,7 +51,7 @@ Auto complete will use <code class="docutils literal notranslate"><span class="p
 <p>Be careful with this field, consider defining a constraint regex. Note that it is equivalent to
 a string field, and still accepts choices not being autocompleted.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
@@ -88,7 +88,7 @@ Should be overridden by subclasses.</p>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Represing a true or false value with a checkbox.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
@@ -125,7 +125,7 @@ Should be overridden by subclasses.</p>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Represing a choice of string values with a combo box.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
@@ -171,7 +171,7 @@ Should be overridden by subclasses.</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>text</strong> – (str) A human readable, HTML parsable text</p></li>
@@ -203,7 +203,7 @@ The field ends up being a string of the file path, for example:</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
@@ -218,12 +218,18 @@ The field ends up being a string of the file path, for example:</p>
 <p>paths can be relative i.e. <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">&quot;my_file.txt&quot;:</span> <span class="pre">url_for('static',</span> <span class="pre">filename='my_file.txt')</span> <span class="pre">}</span></code>, or a remote url.
 :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
 :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-:param <a href="#id9"><span class="problematic" id="id10">**</span></a>kwargs: Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
+:param <a href="#system-message-5"><span class="problematic" id="problematic-5">**</span></a>kwargs: Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.FileField.FileField.constraint">
 <code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.constraint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.FileField.FileField.prepare">
+<code class="sig-name descname">prepare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">req</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a flask request, capture relevant variables for this field</p>
 </dd></dl>
 
 <dl class="py method">
@@ -255,7 +261,7 @@ When instantiating code, you should use safe_value.</p>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Representing a field that accepts a floating point value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
@@ -293,7 +299,7 @@ Should be overridden by subclasses.</p>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Representing a field that accepts an integer</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
@@ -338,7 +344,7 @@ Like <a class="reference internal" href="#module-appyter.profiles.default.fields
 <div><p>a different rendering (check boxes instead of select)</p>
 </div></blockquote>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
@@ -386,7 +392,7 @@ When instantiating code, you should use safe_value.</p>
 <p>Represing a multi-selectable combo box.
 The resulting selection is represented with a list of strings that were chosen.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
@@ -437,7 +443,7 @@ When instantiating code, you should use safe_value.</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>title</strong> – (str) A human readable title for the section</p></li>
@@ -466,7 +472,7 @@ When instantiating code, you should use safe_value.</p>
 <p>Representing a field that accepts a string</p>
 <p>Be careful with this field, consider defining a constraint regex.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
@@ -533,6 +539,12 @@ Should be overridden by subclasses.</p>
 Should be overridden by subclasses.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.TabField.TabField.prepare">
+<code class="sig-name descname">prepare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">req</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField.prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a flask request, capture relevant variables for this field</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -545,7 +557,7 @@ Should be overridden by subclasses.</p>
 <p>Representing a field that accepts a multi-line string</p>
 <p>Be careful with this field, consider defining a constraint regex.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
@@ -593,7 +605,7 @@ Unlike <a class="reference internal" href="#module-appyter.profiles.default.fiel
 <div><p>a list and potentially render differently.</p>
 </div></blockquote>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
@@ -629,6 +641,89 @@ Should be overridden by subclasses.</p>
 <dl class="py method">
 <dt id="appyter.profiles.default.fields.TextListField.TextListField.value">
 <em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
+When instantiating code, you should use safe_value.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-appyter.profiles.default.fields.VariableField">
+<span id="appyter-profiles-default-fields-variablefield-module"></span><h2>appyter.profiles.default.fields.VariableField module<a class="headerlink" href="#module-appyter.profiles.default.fields.VariableField" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.profiles.default.fields.VariableField.VariableField">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.VariableField.</code><code class="sig-name descname">VariableField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">field</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/VariableField.html#VariableField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<p>Represing a variable number of instances of a given Field
+Usage:</p>
+<div class="highlight-j2 notranslate"><div class="highlight"><pre><span></span>{{ VariableField(
+  nane=&#39;files&#39;
+  label=&#39;Files&#39;,
+  field=FileField(
+    name=&#39;file&#39;,
+    label=&#39;File&#39;,
+    default=&#39;file.txt&#39;,
+    examples={},
+  ),
+  default=[&#39;file.txt&#39;],
+  min=0,
+  max=10,
+) }}
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>default</strong> – (list) A default value as an example and for use during prototyping</p></li>
+<li><p><strong>min</strong> – (int) The minimum number of fields that can be specified</p></li>
+<li><p><strong>max</strong> – (int) The maximum number of fields that can be specified</p></li>
+<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
+<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
+<li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.VariableField.VariableField.constraint">
+<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/VariableField.html#VariableField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField.constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of values should satisfy bounded constraints and
+all values should satisfy the field constraints.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.VariableField.VariableField.prepare">
+<code class="sig-name descname">prepare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">req</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/VariableField.html#VariableField.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField.prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Typically, you’ll just provide a list of values satisfying the Field type,
+for forms we support json pointer refs for compatibility with older form fields – these
+pointers are resolved during prepare. Basically:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+  &quot;variablefield&quot;: [{&quot;$ref&quot;:&quot;#/singlefield0&quot;},{&quot;$ref&quot;:&quot;#/singlefield1&quot;}],
+  &quot;singlefield0&quot;: &quot;a&quot;,
+  &quot;singlefield1&quot;: &quot;b&quot;
+}
+```json
+Will resolve to
+```json
+{&quot;variablefield&quot;: [&quot;a&quot;, &quot;b&quot;]}
+</pre></div>
+</div>
+<p>Letting us construct the form as before but permitting us to reference form fields
+generated on the fly that end up in the form request.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.VariableField.VariableField.raw_value">
+<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>(UNSAFE) Raw value of the field</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.profiles.default.fields.VariableField.VariableField.value">
+<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField.value" title="Permalink to this definition">¶</a></dt>
 <dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
 When instantiating code, you should use safe_value.</p>
 </dd></dl>
@@ -672,6 +767,7 @@ can be used to extend or override those definitions.</p>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.TabField">appyter.profiles.default.fields.TabField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.TextField">appyter.profiles.default.fields.TextField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.TextListField">appyter.profiles.default.fields.TextListField module</a></li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.VariableField">appyter.profiles.default.fields.VariableField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields">Module contents</a></li>
 </ul>
 </li>

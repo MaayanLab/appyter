@@ -61,35 +61,22 @@
   <span class="k">async</span> <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="n">changes</span><span class="p">):</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reload </span><span class="si">{</span><span class="n">changes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">state_lock</span><span class="p">:</span>
-      <span class="n">proc</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;proc&#39;</span><span class="p">)</span>
-      <span class="n">proc</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
-      <span class="n">state</span><span class="p">[</span><span class="s1">&#39;proc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="n">run_app</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+      <span class="k">if</span> <span class="s1">&#39;proc&#39;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;proc&#39;</span><span class="p">)</span>
+        <span class="n">proc</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+        <span class="n">state</span><span class="p">[</span><span class="s1">&#39;proc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="n">run_app</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
   <span class="c1">#</span>
   <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;quit&#39;</span><span class="p">)</span>
   <span class="k">async</span> <span class="k">def</span> <span class="nf">quit</span><span class="p">():</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Stopping app..&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="s1">&#39;proc&#39;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">state_lock</span><span class="p">:</span>
       <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;proc&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="try_n_times"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.development.try_n_times">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">try_n_times</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">coro</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-  <span class="kn">import</span> <span class="nn">asyncio</span>
-  <span class="kn">import</span> <span class="nn">traceback</span>
-  <span class="n">backoff</span> <span class="o">=</span> <span class="mi">1</span>
-  <span class="k">while</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-    <span class="k">try</span><span class="p">:</span>
-      <span class="k">return</span> <span class="k">await</span> <span class="n">coro</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-      <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
-      <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">err</span>
-      <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to run start, trying again in </span><span class="si">{</span><span class="n">backoff</span><span class="si">}</span><span class="s2">s...&quot;</span><span class="p">)</span>
-      <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">backoff</span><span class="p">)</span>
-      <span class="n">backoff</span> <span class="o">*=</span> <span class="mi">2</span></div>
 
 <div class="viewcode-block" id="app_messager"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.development.app_messager">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">app_messager</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
   <span class="kn">import</span> <span class="nn">asyncio</span>
-  <span class="kn">from</span> <span class="nn">appyter.util</span> <span class="kn">import</span> <span class="n">join_routes</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">join_slash</span>
   <span class="kn">from</span> <span class="nn">appyter.ext.socketio</span> <span class="kn">import</span> <span class="n">AsyncClient</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.try_n_times</span> <span class="kn">import</span> <span class="n">try_n_times</span>
   <span class="n">sio</span> <span class="o">=</span> <span class="n">AsyncClient</span><span class="p">()</span>
   <span class="c1">#</span>
   <span class="nd">@emitter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;livereload&#39;</span><span class="p">)</span>
@@ -103,7 +90,7 @@
     <span class="k">await</span> <span class="n">sio</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
   <span class="c1">#</span>
   <span class="n">origin</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;HOST&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PORT&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-  <span class="n">path</span> <span class="o">=</span> <span class="n">join_routes</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span> <span class="s2">&quot;socket.io&quot;</span><span class="p">)</span>
+  <span class="n">path</span> <span class="o">=</span> <span class="n">join_slash</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span> <span class="s2">&quot;socket.io&quot;</span><span class="p">)</span>
   <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connecting to appyter server at </span><span class="si">{</span><span class="n">origin</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
   <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
   <span class="k">await</span> <span class="n">try_n_times</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">sio</span><span class="o">.</span><span class="n">connect</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">socketio_path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
@@ -178,7 +165,8 @@
   <span class="n">loop</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">app_messager</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="n">config</span><span class="p">))</span>
   <span class="n">loop</span><span class="o">.</span><span class="n">run_forever</span><span class="p">()</span>
   <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">emitter</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;quit&#39;</span><span class="p">))</span>
-  <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">emitter</span><span class="o">.</span><span class="n">flush</span><span class="p">())</span></div>
+  <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">emitter</span><span class="o">.</span><span class="n">flush</span><span class="p">())</span>
+  <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">emitter</span><span class="o">.</span><span class="n">clear</span><span class="p">())</span></div>
 </pre></div>
 
             <div class="clearer"></div>

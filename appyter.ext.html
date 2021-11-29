@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>appyter.ext package &#8212; Appyter 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -44,6 +44,10 @@
 <li class="toctree-l1"><a class="reference internal" href="appyter.ext.asyncio.html">appyter.ext.asyncio package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.asyncio.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio.event_emitter">appyter.ext.asyncio.event_emitter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio.run_in_executor">appyter.ext.asyncio.run_in_executor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio.sync_contextmanager">appyter.ext.asyncio.sync_contextmanager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio.sync_coro">appyter.ext.asyncio.sync_coro module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio.try_n_times">appyter.ext.asyncio.try_n_times module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.asyncio.html#module-appyter.ext.asyncio">Module contents</a></li>
 </ul>
 </li>
@@ -51,17 +55,32 @@
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.click.html#module-appyter.ext.click">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="appyter.ext.fs.html">appyter.ext.fs package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fs.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fs.html#module-appyter.ext.fs.file">appyter.ext.fs.file module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fs.html#module-appyter.ext.fs.rclone">appyter.ext.fs.rclone module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fs.html#appyter-ext-fs-s3-module">appyter.ext.fs.s3 module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fs.html#module-appyter.ext.fs.tmpfs">appyter.ext.fs.tmpfs module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fs.html#module-appyter.ext.fs">Module contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="appyter.ext.fsspec.html">appyter.ext.fsspec package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.alias">appyter.ext.fsspec.alias module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.chroot">appyter.ext.fsspec.chroot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.core">appyter.ext.fsspec.core module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.fuse">appyter.ext.fsspec.fuse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.mapperfs">appyter.ext.fsspec.mapperfs module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.overlayfs">appyter.ext.fsspec.overlayfs module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.parse">appyter.ext.fsspec.parse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_chroot">appyter.ext.fsspec.test_chroot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_fuse">appyter.ext.fsspec.test_fuse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_mapperfs">appyter.ext.fsspec.test_mapperfs module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_overlayfs">appyter.ext.fsspec.test_overlayfs module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_pathmap">appyter.ext.fsspec.test_pathmap module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.writecache">appyter.ext.fsspec.writecache module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appyter.ext.nbclient.html">appyter.ext.nbclient package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.nbclient.html#module-appyter.ext.nbclient">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="appyter.ext.pathlib.html">appyter.ext.pathlib package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.pathlib.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.pathlib.html#module-appyter.ext.pathlib.chroot">appyter.ext.pathlib.chroot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.pathlib.html#module-appyter.ext.pathlib">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appyter.ext.socketio.html">appyter.ext.socketio package</a><ul>
@@ -84,6 +103,111 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </section>
+<section id="module-appyter.ext.dict">
+<span id="appyter-ext-dict-module"></span><h2>appyter.ext.dict module<a class="headerlink" href="#module-appyter.ext.dict" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.dict.dict_collision_free_update">
+<code class="sig-prename descclassname">appyter.ext.dict.</code><code class="sig-name descname">dict_collision_free_update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/dict.html#dict_collision_free_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.dict.dict_collision_free_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.dict.dict_filter_none">
+<code class="sig-prename descclassname">appyter.ext.dict.</code><code class="sig-name descname">dict_filter_none</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/dict.html#dict_filter_none"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.dict.dict_filter_none" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.exceptions">
+<span id="appyter-ext-exceptions-module"></span><h2>appyter.ext.exceptions module<a class="headerlink" href="#module-appyter.ext.exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.exceptions.exception_as_dict">
+<code class="sig-prename descclassname">appyter.ext.exceptions.</code><code class="sig-name descname">exception_as_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">exc</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/exceptions.html#exception_as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.exceptions.exception_as_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.flask">
+<span id="appyter-ext-flask-module"></span><h2>appyter.ext.flask module<a class="headerlink" href="#module-appyter.ext.flask" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.flask.is_remote">
+<code class="sig-prename descclassname">appyter.ext.flask.</code><code class="sig-name descname">is_remote</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/flask.html#is_remote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.flask.is_remote" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.flask.join_routes">
+<code class="sig-prename descclassname">appyter.ext.flask.</code><code class="sig-name descname">join_routes</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">routes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/flask.html#join_routes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.flask.join_routes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function for joining routes while striping extraneous slashes</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.flask.route_join_with_or_without_slash">
+<code class="sig-prename descclassname">appyter.ext.flask.</code><code class="sig-name descname">route_join_with_or_without_slash</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">blueprint</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">routes</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/flask.html#route_join_with_or_without_slash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.flask.route_join_with_or_without_slash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like &#64;app.route but doesn’t care about trailing slash or not</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.flask.secure_filepath">
+<code class="sig-prename descclassname">appyter.ext.flask.</code><code class="sig-name descname">secure_filepath</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/flask.html#secure_filepath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.flask.secure_filepath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensures this will be a sanitized relative path</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.flask.secure_url">
+<code class="sig-prename descclassname">appyter.ext.flask.</code><code class="sig-name descname">secure_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/flask.html#secure_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.flask.secure_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.functools">
+<span id="appyter-ext-functools-module"></span><h2>appyter.ext.functools module<a class="headerlink" href="#module-appyter.ext.functools" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.functools.ensure_callable">
+<code class="sig-prename descclassname">appyter.ext.functools.</code><code class="sig-name descname">ensure_callable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">var</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/functools.html#ensure_callable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.functools.ensure_callable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.functools.memcached">
+<code class="sig-prename descclassname">appyter.ext.functools.</code><code class="sig-name descname">memcached</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/functools.html#memcached"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.functools.memcached" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cache all calls to this function in memory permanently</p>
+</dd></dl>
+
+</section>
+<section id="module-appyter.ext.hashlib">
+<span id="appyter-ext-hashlib-module"></span><h2>appyter.ext.hashlib module<a class="headerlink" href="#module-appyter.ext.hashlib" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.hashlib.sha1sum_dict">
+<code class="sig-prename descclassname">appyter.ext.hashlib.</code><code class="sig-name descname">sha1sum_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/hashlib.html#sha1sum_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.hashlib.sha1sum_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.hashlib.sha1sum_io">
+<code class="sig-prename descclassname">appyter.ext.hashlib.</code><code class="sig-name descname">sha1sum_io</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">io</span></em>, <em class="sig-param"><span class="n">chunk_size</span><span class="o">=</span><span class="default_value">65536</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/hashlib.html#sha1sum_io"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.hashlib.sha1sum_io" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.importlib">
+<span id="appyter-ext-importlib-module"></span><h2>appyter.ext.importlib module<a class="headerlink" href="#module-appyter.ext.importlib" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.importlib.importdir">
+<code class="sig-prename descclassname">appyter.ext.importlib.</code><code class="sig-name descname">importdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_dirname_</span></em>, <em class="sig-param"><span class="n">_package_</span></em>, <em class="sig-param"><span class="n">_globals_</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/importlib.html#importdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.importlib.importdir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.importlib.importdir_deep">
+<code class="sig-prename descclassname">appyter.ext.importlib.</code><code class="sig-name descname">importdir_deep</code><span class="sig-paren">(</span><em class="sig-param">_dirname_</em>, <em class="sig-param">_package_</em>, <em class="sig-param">_globals_</em>, <em class="sig-param">filter_mod=&lt;function &lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/importlib.html#importdir_deep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.importlib.importdir_deep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.itertools">
+<span id="appyter-ext-itertools-module"></span><h2>appyter.ext.itertools module<a class="headerlink" href="#module-appyter.ext.itertools" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.itertools.collapse">
+<code class="sig-prename descclassname">appyter.ext.itertools.</code><code class="sig-name descname">collapse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">L</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/itertools.html#collapse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.itertools.collapse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.itertools.ensure_list">
+<code class="sig-prename descclassname">appyter.ext.itertools.</code><code class="sig-name descname">ensure_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">L</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/itertools.html#ensure_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.itertools.ensure_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="module-appyter.ext.json">
 <span id="appyter-ext-json-module"></span><h2>appyter.ext.json module<a class="headerlink" href="#module-appyter.ext.json" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
@@ -94,6 +218,56 @@
 <dl class="py function">
 <dt id="appyter.ext.json.try_json_loads">
 <code class="sig-prename descclassname">appyter.ext.json.</code><code class="sig-name descname">try_json_loads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/json.html#try_json_loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.json.try_json_loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.re">
+<span id="appyter-ext-re-module"></span><h2>appyter.ext.re module<a class="headerlink" href="#module-appyter.ext.re" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.re.re_full">
+<code class="sig-prename descclassname">appyter.ext.re.</code><code class="sig-name descname">re_full</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">expr</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/re.html#re_full"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.re.re_full" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-appyter.ext.urllib">
+<span id="appyter-ext-urllib-module"></span><h2>appyter.ext.urllib module<a class="headerlink" href="#module-appyter.ext.urllib" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.urllib.join_slash">
+<code class="sig-prename descclassname">appyter.ext.urllib.</code><code class="sig-name descname">join_slash</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">parts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/urllib.html#join_slash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.urllib.join_slash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.urllib.join_url">
+<code class="sig-prename descclassname">appyter.ext.urllib.</code><code class="sig-name descname">join_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">root</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">parts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/urllib.html#join_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.urllib.join_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.urllib.parent_url">
+<code class="sig-prename descclassname">appyter.ext.urllib.</code><code class="sig-name descname">parent_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/urllib.html#parent_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.urllib.parent_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.urllib.parse_qs">
+<code class="sig-prename descclassname">appyter.ext.urllib.</code><code class="sig-name descname">parse_qs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">qs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/urllib.html#parse_qs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.urllib.parse_qs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert dot-notation querystring into option params</p>
+</dd></dl>
+
+</section>
+<section id="module-appyter.ext.uuid">
+<span id="appyter-ext-uuid-module"></span><h2>appyter.ext.uuid module<a class="headerlink" href="#module-appyter.ext.uuid" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.uuid.generate_uuid">
+<code class="sig-prename descclassname">appyter.ext.uuid.</code><code class="sig-name descname">generate_uuid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/uuid.html#generate_uuid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.uuid.generate_uuid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.uuid.sanitize_sha1sum">
+<code class="sig-prename descclassname">appyter.ext.uuid.</code><code class="sig-name descname">sanitize_sha1sum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/uuid.html#sanitize_sha1sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.uuid.sanitize_sha1sum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.uuid.sanitize_uuid">
+<code class="sig-prename descclassname">appyter.ext.uuid.</code><code class="sig-name descname">sanitize_uuid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/uuid.html#sanitize_uuid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.uuid.sanitize_uuid" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -114,7 +288,17 @@
 <li><a class="reference internal" href="#">appyter.ext package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.dict">appyter.ext.dict module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.exceptions">appyter.ext.exceptions module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.flask">appyter.ext.flask module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.functools">appyter.ext.functools module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.hashlib">appyter.ext.hashlib module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.importlib">appyter.ext.importlib module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.itertools">appyter.ext.itertools module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.json">appyter.ext.json module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.re">appyter.ext.re module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.urllib">appyter.ext.urllib module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.uuid">appyter.ext.uuid module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext">Module contents</a></li>
 </ul>
 </li>

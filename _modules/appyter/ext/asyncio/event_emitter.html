@@ -119,15 +119,14 @@
       <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queues</span><span class="p">[</span><span class="n">event</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_consumers</span><span class="p">[</span><span class="n">event</span><span class="p">]</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
       <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consumers</span><span class="p">[</span><span class="n">event</span><span class="p">]</span>
+    <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+      <span class="k">pass</span>
     <span class="k">finally</span><span class="p">:</span>
       <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consumers</span><span class="p">[</span><span class="n">event</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="EventEmitter.clear"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.event_emitter.EventEmitter.clear">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Clearing...&quot;</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
-      <span class="n">event</span>
-      <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consumers</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-    <span class="p">])</span></div></div>
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consumers</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

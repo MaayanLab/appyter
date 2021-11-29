@@ -4,6 +4,14 @@ appyter.render.flask\_app package
 Submodules
 ----------
 
+appyter.render.flask\_app.constants module
+------------------------------------------
+
+.. automodule:: appyter.render.flask_app.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.render.flask\_app.core module
 -------------------------------------
 
@@ -76,10 +84,10 @@ appyter.render.flask\_app.static module
    :undoc-members:
    :show-inheritance:
 
-appyter.render.flask\_app.util module
--------------------------------------
+appyter.render.flask\_app.storage module
+----------------------------------------
 
-.. automodule:: appyter.render.flask_app.util
+.. automodule:: appyter.render.flask_app.storage
    :members:
    :undoc-members:
    :show-inheritance:

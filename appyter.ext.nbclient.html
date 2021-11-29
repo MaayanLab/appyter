@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>appyter.ext.nbclient package &#8212; Appyter 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -46,7 +46,7 @@
 <p>A notebook client with the ability to hook into iopub updates</p>
 <dl class="py method">
 <dt id="appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell">
-<em class="property">async </em><code class="sig-name descname">async_execute_cell</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cell</span><span class="p">:</span> <span class="n">nbformat.notebooknode.NotebookNode</span></em>, <em class="sig-param"><span class="n">cell_index</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">execution_count</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">store_history</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; nbformat.notebooknode.NotebookNode<a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook.async_execute_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell" title="Permalink to this definition">¶</a></dt>
+<em class="property">async </em><code class="sig-name descname">async_execute_cell</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cell</span><span class="p">:</span> <span class="n">nbformat.notebooknode.NotebookNode</span></em>, <em class="sig-param"><span class="n">cell_index</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">execution_count</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">, </span>None<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">store_history</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; nbformat.notebooknode.NotebookNode<a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook.async_execute_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes a single code cell.</p>
 <p>To execute all cells see :meth:<code class="docutils literal notranslate"><span class="pre">execute</span></code>.</p>
 <p>cell : nbformat.NotebookNode
