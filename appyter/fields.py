@@ -165,7 +165,6 @@ class Field(dict):
     ''' (SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
     When instantiating code, you should use safe_value.
     '''
-    print(self.args['name'], self.args['value'])
     choices = self.choices
     if self.raw_value is None:
       if not self.args.get('required'):
