@@ -1,10 +1,10 @@
 import os
 import json
 import click
+import fsspec
 
 from appyter.context import get_env, get_jinja2_env
 from appyter.ext.click import click_option_setenv, click_argument_setenv
-from appyter.ext.fs import Filesystem
 from appyter.parse.nb import nb_from_ipynb_io
 from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
 from appyter.render.nbinspect.cli import nbinspect
@@ -24,5 +24,6 @@ def render_nbtemplate_json_from_nbtemplate(env, nb):
 def nbtemplate_json(cwd, ipynb, output, **kwargs):
   cwd = os.path.realpath(cwd)
   env = get_jinja2_env(config=get_env(cwd=cwd, ipynb=ipynb, mode='inspect', **kwargs))
-  nbtemplate = nb_from_ipynb_io(Filesystem(cwd).open(ipynb, 'r'))
+  with fsspec.open(join_slash(cwd, ipynb), 'r') as fr:
+    nbtemplate = nb_from_ipynb_io(fr)
   json.dump(render_nbtemplate_json_from_nbtemplate(env, nbtemplate), output)
