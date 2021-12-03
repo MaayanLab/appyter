@@ -8,23 +8,12 @@ from nbformat.v4 import new_code_cell
 from appyter.cli import cli
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.ext.click import click_argument_setenv
+from appyter.ext.itertools import one_and_only
 
 logger = logging.getLogger(__name__)
 
 def slugify(s):
   return re.sub(r'[^a-zA-Z0-9]+', '_', s)
-
-def one_and_only(it):
-  try:
-    it = iter(it)
-    ret = next(it)
-    try:
-      next(it)
-    except StopIteration:
-      pass
-  except:
-    raise
-  return ret
 
 @cli.command(help='Scaffold an appyter optionally with an existing Jupyter Notebook')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB', required=False, type=click.Path(file_okay=True, path_type=str))

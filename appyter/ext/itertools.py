@@ -9,3 +9,16 @@ def collapse(L):
     return L[0]
   else:
     return L
+
+def one_and_only(it):
+  it = iter(it)
+  try:
+    ret = next(it)
+    try:
+      next(it)
+      raise Exception('Expected one got multiple')
+    except StopIteration:
+      pass
+  except StopIteration:
+    raise Exception('Expected one got none')
+  return ret
