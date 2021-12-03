@@ -63,7 +63,7 @@ def render_nb_from_nbtemplate(env, nbtemplate, data={}, deep_fields=None):
     deep_fields = parse_fields_from_nbtemplate(env, nbtemplate, deep=True)
   files = {}
   for field in deep_fields:
-    if field.field == 'FileField' and data.get(field.args['name']):
+    if field.field in {'FileField', 'StorageFileField'} and data.get(field.args['name']):
       uri_parsed = parse_file_uri(data[field.args['name']])
       filename = uri_parsed.fragment
       uri_parsed.fragment = None

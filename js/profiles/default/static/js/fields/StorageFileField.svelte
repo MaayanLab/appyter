@@ -2,6 +2,9 @@
   export let window
   export let args
 
+  let value = args.value || args.default
+  $: args.value = `${args.storage}${value}#${value.split('/').slice(-1)[0]}`
+
   let cwd = ''
 
   let parent = ''
@@ -61,8 +64,8 @@
       {/each}
       {#each (ls[cwd]||[]) as p}
         {#if p.type === 'file'}
-          <li> [F] <a href="javascript:" on:click={()=>{ args.value = p.name }}>
-            {#if args.value === p.name}
+          <li> [F] <a href="javascript:" on:click={()=>{ value = p.name }}>
+            {#if value === p.name}
               <b>{p.name} ({human_size(p.size)})</b>
             {:else}
               {p.name} ({human_size(p.size)})
@@ -71,5 +74,11 @@
         {/if}
       {/each}
     </ul>
+    <input
+      type="text"
+      style="display: none"
+      name={args.name}
+      bind:value={args.value}
+    />
   </div>
 </div>
