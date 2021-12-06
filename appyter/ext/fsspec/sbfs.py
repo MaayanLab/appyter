@@ -119,4 +119,11 @@ class SBFSFileSystem(AbstractFileSystem):
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
     self._poll()
     self._block_info(path)
+    if 'w' in mode:
+      # NOTE: SBFS doesn't seem to support truncation
+      if self.fs.exists(path):
+        self.fs.rm(path)
+    elif 'a' in mode:
+      # TODO: use writecache if you need append support also
+      raise Exception('Append not supported by sbfs')
     return self.fs._open(path, mode=mode, block_size=block_size, autocommit=autocommit, cache_options=cache_options, **kwargs)
