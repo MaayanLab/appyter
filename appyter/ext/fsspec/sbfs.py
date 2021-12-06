@@ -29,6 +29,7 @@ class SBFSFileSystem(AbstractFileSystem):
     self.fs = ChrootFileSystem(
       target_protocol='file',
       fo=str(self._tmpdir),
+      target_options=dict(auto_mkdir=True),
     )
     return self
   
