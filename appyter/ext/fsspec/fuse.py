@@ -4,16 +4,18 @@ from multiprocessing import Process
 
 logger = logging.getLogger(__name__)
 
-def _fuse_run(url, mount_point, kwargs, alias_dump):
+def _fuse_run(url, mount_point, kwargs, alias_dump, singleton_dump):
   import fsspec.fuse
   from appyter.ext.fsspec.core import url_to_chroot_fs
   from appyter.ext.fsspec.alias import register_aliases
+  from appyter.ext.fsspec.singleton import register_singletons
   register_aliases(alias_dump)
   logger.debug(f'preparing fs from {url} ({kwargs})..')
-  with url_to_chroot_fs(url, **kwargs) as fs:
-    logger.debug('launching fuse..')
-    fsspec.fuse.run(fs, '', mount_point)
-    logger.debug('teardown..')
+  with register_singletons(singleton_dump):
+    with url_to_chroot_fs(url, **kwargs) as fs:
+      logger.debug('launching fuse..')
+      fsspec.fuse.run(fs, '', mount_point)
+      logger.debug('teardown..')
 
 @contextlib.asynccontextmanager
 async def fs_mount(url, **kwargs):
@@ -23,6 +25,7 @@ async def fs_mount(url, **kwargs):
   import pathlib
   import traceback
   from appyter.ext.fsspec.alias import dump_aliases
+  from appyter.ext.fsspec.singleton import dump_singletons
   from appyter.ext.asyncio.try_n_times import async_try_n_times
   from appyter.ext.asyncio.run_in_executor import run_in_executor
   from appyter.ext.pathlib.assertions import async_assert_mounted, async_assert_unmounted
@@ -32,7 +35,7 @@ async def fs_mount(url, **kwargs):
   tmp = pathlib.Path(tempfile.mkdtemp())
   logger.debug(f'mounting {url} onto {tmp}')
   proc = Process(
-    target=_fuse_run, args=(url, str(tmp), kwargs, dump_aliases())
+    target=_fuse_run, args=(url, str(tmp), kwargs, dump_aliases(), dump_singletons())
   )
   proc.start()
   try:

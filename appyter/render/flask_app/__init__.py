@@ -1,6 +1,7 @@
 import os
 import uuid
 import click
+import fsspec
 import logging
 import traceback
 logger = logging.getLogger(__name__)
@@ -102,9 +103,13 @@ def create_app(**kwargs):
   async def storage_ctx(app):
     data_dir = app['config']['DATA_DIR']
     import fsspec
-    from appyter.ext.fsspec.alias import AliasFileSystemFactory
-    fsspec.register_implementation('storage', AliasFileSystemFactory('storage', data_dir))
-    yield
+    if 'storage' not in fsspec.registry.target:
+      from appyter.ext.fsspec.singleton import SingletonFileSystemFactory
+      with SingletonFileSystemFactory('storage', data_dir) as storage:
+        fsspec.register_implementation('storage', storage)
+        yield
+    else:
+      yield
   app.cleanup_ctx.append(storage_ctx)
   #
   logger.info('Registering application executor handler')

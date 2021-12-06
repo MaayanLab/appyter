@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import urllib.parse
 import logging
 
@@ -58,19 +59,27 @@ async def setup_socketio(emitter, job):
   await emitter.clear()
   await sio.disconnect()
 
+@contextlib.contextmanager
+def setup_storage(storage):
+  import fsspec
+  if 'storage' not in fsspec.registry.target:
+    from appyter.ext.fsspec.singleton import SingletonFileSystemFactory
+    with SingletonFileSystemFactory('storage', storage) as storage:
+      fsspec.register_implementation('storage', storage)
+      yield
+  else:
+    yield
+
 async def execute_async(job, debug=False):
   from appyter.ext.asyncio.event_emitter import EventEmitter
   emitter = EventEmitter()
   logger.debug(job)
-  if 'storage' in job:
-    import fsspec
-    from appyter.ext.fsspec.alias import AliasFileSystemFactory
-    fsspec.register_implementation('storage', AliasFileSystemFactory('storage', job['storage']))
-  await asyncio.gather(
-    setup_evaluate_notebook(emitter, job),
-    setup_socketio(emitter, job),
-  )
-  logger.debug('EXITING')
+  with setup_storage(job['storage']):
+    await asyncio.gather(
+      setup_evaluate_notebook(emitter, job),
+      setup_socketio(emitter, job),
+    )
+    logger.debug('EXITING')
 
 def execute(job):
   debug = job.get('debug', False)

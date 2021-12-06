@@ -27,19 +27,15 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
   import fsspec
   # TODO: can this be less reliant on the `appyter-catalog` storage setup
   uri_parsed = urllib.parse.urlparse(uri)
-  from appyter.ext.fsspec.alias import AliasFileSystemFactory
+  from appyter.ext.fsspec.singleton import SingletonFileSystemFactory
   storage_uri = f"{uri_parsed.scheme}://{uri_parsed.netloc}/storage/appyters/"
-  fsspec.register_implementation('storage',
-    AliasFileSystemFactory(
-      'storage',
-      storage_uri,
-    )
-  )
-  # if data_dir doesn't exist, create it
-  if data_dir is None: data_dir = 'tmpfs://'
-  # mount the appyter into the data_dir
-  with sync_contextmanager(fs_mount(data_dir, appyter=uri, cached=True)) as mnt:
-    logging.info(f"Starting `appyter serve`...")
-    # serve the bundle in jupyter notebook
-    from appyter.helpers.serve import serve
-    ctx.invoke(serve, cwd=cwd, data_dir=str(mnt), host=host, port=port, args=args)
+  with SingletonFileSystemFactory('storage', storage_uri) as storage:
+    fsspec.register_implementation('storage', storage)
+    # if data_dir doesn't exist, create it
+    if data_dir is None: data_dir = 'tmpfs://'
+    # mount the appyter into the data_dir
+    with sync_contextmanager(fs_mount(data_dir, appyter=uri)) as mnt:
+      logging.info(f"Starting `appyter serve`...")
+      # serve the bundle in jupyter notebook
+      from appyter.helpers.serve import serve
+      ctx.invoke(serve, cwd=cwd, data_dir=str(mnt), host=host, port=port, args=args)
