@@ -3,7 +3,7 @@ from appyter.fields import Field
 from appyter.ext.flask import secure_filepath, join_routes
 from appyter.ext.re import re_full
 from appyter.ext.urllib import parse_file_uri
-from appyter.render.flask_app.download import upload_from_request
+from appyter.render.flask_app.upload import upload_from_request
 
 class FileField(Field):
   ''' Represing a uploadable File and facilitating that file upload.

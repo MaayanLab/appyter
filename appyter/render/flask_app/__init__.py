@@ -25,7 +25,7 @@ def create_app(**kwargs):
   from appyter.render.flask_app.core import core
   import appyter.render.flask_app.static
   import appyter.render.flask_app.export
-  import appyter.render.flask_app.download
+  import appyter.render.flask_app.upload
   import appyter.render.flask_app.execution
   from appyter.render.flask_app.storage import storage_ctx
   if kwargs['debug']:
