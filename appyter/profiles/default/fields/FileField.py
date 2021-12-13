@@ -2,7 +2,7 @@ import re
 from appyter.fields import Field
 from appyter.ext.flask import secure_filepath, join_routes
 from appyter.ext.re import re_full
-from appyter.ext.fsspec.parse import parse_file_uri_fragment
+from appyter.ext.urllib import parse_file_uri
 from appyter.render.flask_app.download import upload_from_request
 
 class FileField(Field):
@@ -35,8 +35,8 @@ class FileField(Field):
   @property
   def raw_value(self):
     if type(self.args['value']) == str and self.args['value']:
-      _uri, filename = parse_file_uri_fragment(self.args['value'])
-      return secure_filepath(filename)
+      uri_parsed = parse_file_uri(self.args['value'])
+      return secure_filepath(uri_parsed.fragment or self.args['value'])
     else:
       return None
 

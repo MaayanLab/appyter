@@ -13,7 +13,7 @@ from appyter.ext.urllib import join_url
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.parse.nbtemplate import cell_match, parse_fields_from_nbtemplate
 from appyter.ext.click import click_option_setenv, click_argument_setenv
-from appyter.ext.fsspec.parse import parse_file_uri_fragment
+from appyter.ext.urllib import parse_file_uri
 
 def render_cell(env, cell):
   ''' Render a single cell, calling jinja2 templates when necessary
@@ -65,9 +65,12 @@ def render_nb_from_nbtemplate(env, nbtemplate, data={}, fields=None):
   files = {}
   for field in fields:
     if field.field == 'FileField' and data.get(field.args['name']):
-      uri, filename = parse_file_uri_fragment(data[field.args['name']])
-      if filename and uri:
-        files[filename] = uri
+      uri_parsed = parse_file_uri(data[field.args['name']])
+      filename = uri_parsed.fragment
+      uri_parsed.fragment = None
+      url = str(uri_parsed)
+      if filename and url:
+        files[filename] = url
   #
   nb = deepcopy(nbtemplate)
   nb.cells = list(filter(None, [

@@ -9,14 +9,15 @@ def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):
   cached   cache read/writes
   '''
   from fsspec.core import url_to_fs, split_protocol
-  from appyter.ext.fsspec.parse import parse_file_uri_qs
-  url, qs = parse_file_uri_qs(url)
-  protocol, path = split_protocol(url)
+  from appyter.ext.urllib import parse_file_uri
+  uri_parsed = parse_file_uri(url)
+  uri_parsed.fragment = None
+  protocol, path = split_protocol(str(uri_parsed))
   protocol = protocol or 'file'
   full_url = protocol + '://' + path
   # add protocol options to inner protocol
   if protocol not in kwargs: kwargs[protocol] = {}
-  kwargs[protocol].update(qs)
+  kwargs[protocol].update(uri_parsed.fragment_qs or {})
   # ensure auto_mkdir is enabled
   if protocol == 'file':
     if 'auto_mkdir' not in kwargs[protocol]: kwargs[protocol]['auto_mkdir'] = True

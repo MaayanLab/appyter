@@ -14,7 +14,6 @@ from appyter.render.flask_app.socketio import socketio
 from appyter.ext.flask import secure_filepath, secure_url, route_join_with_or_without_slash
 from appyter.ext.hashlib import sha1sum_io
 from appyter.ext.uuid import generate_uuid
-from appyter.ext.fsspec.parse import parse_file_uri_qs
 
 # organize file by content hash
 def organize_file_content(data_fs, tmp_fs, tmp_path, filename):
