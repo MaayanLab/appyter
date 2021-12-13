@@ -13,79 +13,6 @@
   let filename
   let full_filename
 
-  // setup example downloading event handlers
-  async function setup_download(socket) {
-    socket.on('download_queued', function (evt) {
-      if (evt.name !== args.name) return
-      state = {
-        striped: true,
-        bg: 'primary',
-        progress: 0,
-      }
-    })
-    socket.on('download_start', function (evt) {
-      if (evt.name !== args.name) return
-      state = {
-        ...state,
-        animated: true,
-      }
-    })
-    socket.on('download_progress', function (evt) {
-      if (evt.name !== args.name) return
-      if (evt.total_size < 0) {
-        state = {
-          ...state,
-          progress: 25,
-          bg: 'warning',
-        }
-      } else if (evt.total_size === 0) {
-        state = {
-          ...state,
-          progress: 100,
-        }
-      } else {
-        state = {
-          ...state,
-          progress: (((evt.chunk * evt.chunk_size) / evt.total_size) * 100) | 0,
-        }
-      }
-    })
-    socket.on('download_complete', function (evt) {
-      if (evt.name !== args.name) return
-      state = {
-        ...state,
-        bg: 'success',
-        animated: false,
-        striped: false,
-        progress: 100,
-      }
-      filename = evt.filename
-      full_filename = evt.full_filename
-    })
-    socket.on('download_error', function (evt) {
-      if (evt.name !== args.name) return
-      if (evt.error === 'HTTP Error 404: Not Found') {
-        state = {
-          progress: 100,
-          url: evt.url,
-          bg: 'danger',
-          error: evt.error,
-          striped: false,
-          animated: false,
-        }
-      } else {
-        state = {
-          progress: 100,
-          url: evt.url,
-          bg: 'warning',
-          error: evt.error,
-          striped: false,
-          animated: false,
-        }
-      }
-    })
-  }
-
   // setup uploading event handlers
   async function setup_upload(siofu) {
     siofu.listenOnInput(fileField)
@@ -126,16 +53,37 @@
   }
 
   // trigger example download
-  async function load_file(name, url, file) {
+  async function load_file(url, file) {
+    state = {
+      striped: true,
+      animated: true,
+      bg: 'primary',
+      progress: 0,
+    }
     if (url.indexOf('://') === -1) {
       url = new URL(url, document.baseURI).href
     }
-    const socket = await get_require(window, 'socket')
-    socket.emit('download_start', {
-      name: name,
-      url: new URL(url).href,
-      file: file,
-    })
+    try {
+      const res = await fetch(`check/${url}`)
+      if (res.status !== 200) throw new Error()
+      state = {
+        ...state,
+        bg: 'success',
+        animated: false,
+        striped: false,
+        progress: 100,
+      }
+      filename = `${file}`
+      full_filename = `${url}#${file}`
+    } catch (e) {
+      state = {
+        progress: 100,
+        url,
+        bg: 'warning',
+        striped: false,
+        animated: false,
+      }
+    }
   }
 
   onMount(async () => {
@@ -151,7 +99,6 @@
     })
 
     const [socket, SocketIOFileUpload] = await get_require(window, ['socket', 'socketio-file-upload'])
-    await setup_download(socket)
     await setup_upload(new SocketIOFileUpload(socket))
   })
 </script>
@@ -209,15 +156,15 @@
           style="width: {state.progress}%"
         />
       </div>
-      {#if state.error}
+      {#if state.bg === 'error'}
         <div class="alert alert-danger">
-          Error downloading file: {state.error}
+          Error loading file{#if state.error}: {state.error}{/if}
           {#if state.url}from <a href={state.url} target=_blank>{state.url}</a>{/if}
         </div>
       {/if}
-      {#if state.warning}
+      {#if state.bg === 'warning'}
         <div class="alert alert-warning">
-          Error downloading file: {state.error}<br />
+          Error loading file{#if state.error}: {state.error}{/if}<br />
           <b>It may require user engagement</b>, please visit
             <a href={state.url} target=_blank>{state.url}</a>
           to download the example file for upload.
@@ -237,7 +184,7 @@
               <span class="text-sm m-1 p-1" style="white-space: nowrap;">
                 <a
                   href="javascript:"
-                  on:click={() => load_file(args.name, args.examples[example_name], example_name)}
+                  on:click={() => load_file(args.examples[example_name], example_name)}
                 >{example_name}</a>
               </span>
             {/each}
