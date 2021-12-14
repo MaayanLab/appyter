@@ -52,14 +52,6 @@ appyter.ext.fsspec.overlayfs module
    :undoc-members:
    :show-inheritance:
 
-appyter.ext.fsspec.parse module
--------------------------------
-
-.. automodule:: appyter.ext.fsspec.parse
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 appyter.ext.fsspec.test\_chroot module
 --------------------------------------
 
@@ -96,6 +88,14 @@ appyter.ext.fsspec.test\_pathmap module
 ---------------------------------------
 
 .. automodule:: appyter.ext.fsspec.test_pathmap
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.fsspec.util module
+------------------------------
+
+.. automodule:: appyter.ext.fsspec.util
    :members:
    :undoc-members:
    :show-inheritance:

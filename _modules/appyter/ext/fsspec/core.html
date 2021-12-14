@@ -46,24 +46,24 @@
 <span class="sd">  appyter  create a pathmap from an appyter ipynb</span>
 <span class="sd">  cached   cache read/writes</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="kn">from</span> <span class="nn">fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_fs</span><span class="p">,</span> <span class="n">split_protocol</span>
-  <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.parse</span> <span class="kn">import</span> <span class="n">parse_file_uri_qs</span>
-  <span class="n">url</span><span class="p">,</span> <span class="n">qs</span> <span class="o">=</span> <span class="n">parse_file_uri_qs</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-  <span class="n">protocol</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">split_protocol</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-  <span class="n">protocol</span> <span class="o">=</span> <span class="n">protocol</span> <span class="ow">or</span> <span class="s1">&#39;file&#39;</span>
-  <span class="n">full_url</span> <span class="o">=</span> <span class="n">protocol</span> <span class="o">+</span> <span class="s1">&#39;://&#39;</span> <span class="o">+</span> <span class="n">path</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.util</span> <span class="kn">import</span> <span class="n">split_protocol_opts</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.chroot</span> <span class="kn">import</span> <span class="n">ChrootFileSystem</span>
+  <span class="n">protocol</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">opts</span> <span class="o">=</span> <span class="n">split_protocol_opts</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
   <span class="c1"># add protocol options to inner protocol</span>
   <span class="k">if</span> <span class="n">protocol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">protocol</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-  <span class="n">kwargs</span><span class="p">[</span><span class="n">protocol</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">qs</span><span class="p">)</span>
+  <span class="n">kwargs</span><span class="p">[</span><span class="n">protocol</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">opts</span><span class="p">)</span>
   <span class="c1"># ensure auto_mkdir is enabled</span>
   <span class="k">if</span> <span class="n">protocol</span> <span class="o">==</span> <span class="s1">&#39;file&#39;</span><span class="p">:</span>
     <span class="k">if</span> <span class="s1">&#39;auto_mkdir&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">protocol</span><span class="p">]:</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">protocol</span><span class="p">][</span><span class="s1">&#39;auto_mkdir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="c1"># add chroot</span>
-  <span class="n">full_url</span> <span class="o">=</span> <span class="s1">&#39;chroot::&#39;</span> <span class="o">+</span> <span class="n">full_url</span>
-  <span class="n">fs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">url_to_fs</span><span class="p">(</span><span class="n">full_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="n">fs</span> <span class="o">=</span> <span class="n">ChrootFileSystem</span><span class="p">(</span>
+    <span class="n">target_protocol</span><span class="o">=</span><span class="n">protocol</span><span class="p">,</span>
+    <span class="n">target_options</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="n">protocol</span><span class="p">],</span>
+    <span class="n">fo</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+  <span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fs</span><span class="o">.</span><span class="n">storage_options</span><span class="si">=}</span><span class="s2">, </span><span class="si">{</span><span class="n">fs</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">storage_options</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
   <span class="c1"># apply pathmap as needed</span>
   <span class="k">if</span> <span class="n">pathmap</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.chroot</span> <span class="kn">import</span> <span class="n">ChrootFileSystem</span>
     <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.mapperfs</span> <span class="kn">import</span> <span class="n">MapperFileSystem</span>
     <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.overlayfs</span> <span class="kn">import</span> <span class="n">OverlayFileSystem</span>
     <span class="n">fs</span> <span class="o">=</span> <span class="n">ChrootFileSystem</span><span class="p">(</span>
@@ -77,7 +77,6 @@
     <span class="kn">from</span> <span class="nn">appyter</span> <span class="kn">import</span> <span class="n">__version__</span>
     <span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">join_slash</span>
     <span class="kn">from</span> <span class="nn">appyter.parse.nb</span> <span class="kn">import</span> <span class="n">nb_from_ipynb_io</span>
-    <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.chroot</span> <span class="kn">import</span> <span class="n">ChrootFileSystem</span>
     <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.mapperfs</span> <span class="kn">import</span> <span class="n">MapperFileSystem</span>
     <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.overlayfs</span> <span class="kn">import</span> <span class="n">OverlayFileSystem</span>
     <span class="c1"># load notebook</span>

@@ -51,7 +51,7 @@
 <span class="kn">from</span> <span class="nn">appyter.parse.nb</span> <span class="kn">import</span> <span class="n">nb_from_ipynb_io</span><span class="p">,</span> <span class="n">nb_to_ipynb_io</span>
 <span class="kn">from</span> <span class="nn">appyter.parse.nbtemplate</span> <span class="kn">import</span> <span class="n">cell_match</span><span class="p">,</span> <span class="n">parse_fields_from_nbtemplate</span>
 <span class="kn">from</span> <span class="nn">appyter.ext.click</span> <span class="kn">import</span> <span class="n">click_option_setenv</span><span class="p">,</span> <span class="n">click_argument_setenv</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.parse</span> <span class="kn">import</span> <span class="n">parse_file_uri_fragment</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">parse_file_uri</span>
 
 <div class="viewcode-block" id="render_cell"><a class="viewcode-back" href="../../../appyter.render.html#appyter.render.nbconstruct.render_cell">[docs]</a><span class="k">def</span> <span class="nf">render_cell</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">cell</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Render a single cell, calling jinja2 templates when necessary</span>
@@ -103,9 +103,12 @@
   <span class="n">files</span> <span class="o">=</span> <span class="p">{}</span>
   <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">field</span> <span class="o">==</span> <span class="s1">&#39;FileField&#39;</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]):</span>
-      <span class="n">uri</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">parse_file_uri_fragment</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]])</span>
-      <span class="k">if</span> <span class="n">filename</span> <span class="ow">and</span> <span class="n">uri</span><span class="p">:</span>
-        <span class="n">files</span><span class="p">[</span><span class="n">filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">uri</span>
+      <span class="n">uri_parsed</span> <span class="o">=</span> <span class="n">parse_file_uri</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]])</span>
+      <span class="n">filename</span> <span class="o">=</span> <span class="n">uri_parsed</span><span class="o">.</span><span class="n">fragment</span>
+      <span class="n">uri_parsed</span><span class="o">.</span><span class="n">fragment</span> <span class="o">=</span> <span class="kc">None</span>
+      <span class="n">url</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uri_parsed</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">filename</span> <span class="ow">and</span> <span class="n">url</span><span class="p">:</span>
+        <span class="n">files</span><span class="p">[</span><span class="n">filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span>
   <span class="c1">#</span>
   <span class="n">nb</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">nbtemplate</span><span class="p">)</span>
   <span class="n">nb</span><span class="o">.</span><span class="n">cells</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">[</span>

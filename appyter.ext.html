@@ -63,12 +63,12 @@
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.fuse">appyter.ext.fsspec.fuse module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.mapperfs">appyter.ext.fsspec.mapperfs module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.overlayfs">appyter.ext.fsspec.overlayfs module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.parse">appyter.ext.fsspec.parse module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_chroot">appyter.ext.fsspec.test_chroot module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_fuse">appyter.ext.fsspec.test_fuse module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_mapperfs">appyter.ext.fsspec.test_mapperfs module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_overlayfs">appyter.ext.fsspec.test_overlayfs module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.test_pathmap">appyter.ext.fsspec.test_pathmap module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.util">appyter.ext.fsspec.util module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec.writecache">appyter.ext.fsspec.writecache module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.ext.fsspec.html#module-appyter.ext.fsspec">Module contents</a></li>
 </ul>
@@ -231,6 +231,42 @@
 </section>
 <section id="module-appyter.ext.urllib">
 <span id="appyter-ext-urllib-module"></span><h2>appyter.ext.urllib module<a class="headerlink" href="#module-appyter.ext.urllib" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.ext.urllib.URIParsed">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.urllib.</code><code class="sig-name descname">URIParsed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">fragment</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">fragment_query</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/urllib.html#URIParsed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.urllib.URIParsed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="appyter.ext.urllib.URIParsed.fragment">
+<code class="sig-name descname">fragment</code><em class="property">: str</em><a class="headerlink" href="#appyter.ext.urllib.URIParsed.fragment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.urllib.URIParsed.fragment_qs">
+<em class="property">property </em><code class="sig-name descname">fragment_qs</code><a class="headerlink" href="#appyter.ext.urllib.URIParsed.fragment_qs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.ext.urllib.URIParsed.fragment_query">
+<code class="sig-name descname">fragment_query</code><em class="property">: str</em><a class="headerlink" href="#appyter.ext.urllib.URIParsed.fragment_query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.urllib.URIParsed.qs">
+<em class="property">property </em><code class="sig-name descname">qs</code><a class="headerlink" href="#appyter.ext.urllib.URIParsed.qs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.ext.urllib.URIParsed.query">
+<code class="sig-name descname">query</code><em class="property">: str</em><a class="headerlink" href="#appyter.ext.urllib.URIParsed.query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="appyter.ext.urllib.URIParsed.url">
+<code class="sig-name descname">url</code><em class="property">: str</em><a class="headerlink" href="#appyter.ext.urllib.URIParsed.url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt id="appyter.ext.urllib.join_slash">
 <code class="sig-prename descclassname">appyter.ext.urllib.</code><code class="sig-name descname">join_slash</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">parts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/urllib.html#join_slash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.urllib.join_slash" title="Permalink to this definition">¶</a></dt>
@@ -244,6 +280,11 @@
 <dl class="py function">
 <dt id="appyter.ext.urllib.parent_url">
 <code class="sig-prename descclassname">appyter.ext.urllib.</code><code class="sig-name descname">parent_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/urllib.html#parent_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.urllib.parent_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.urllib.parse_file_uri">
+<code class="sig-prename descclassname">appyter.ext.urllib.</code><code class="sig-name descname">parse_file_uri</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/urllib.html#parse_file_uri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.urllib.parse_file_uri" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">

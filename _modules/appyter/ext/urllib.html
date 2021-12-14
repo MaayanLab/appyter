@@ -36,8 +36,10 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.urllib</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">itertools</span>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">urllib.parse</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 
 <span class="kn">from</span> <span class="nn">appyter.ext.pathlib.chroot</span> <span class="kn">import</span> <span class="n">ChrootPurePosixPath</span>
 <span class="kn">from</span> <span class="nn">appyter.ext.json</span> <span class="kn">import</span> <span class="n">try_json_loads</span>
@@ -59,15 +61,50 @@
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
   <span class="k">for</span> <span class="n">Kv</span> <span class="ow">in</span> <span class="n">qs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">):</span>
-    <span class="n">K</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">Kv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+    <span class="n">K</span><span class="p">,</span> <span class="n">eq</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">Kv</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">eq</span><span class="p">:</span> <span class="n">v</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">_params_n_2</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_params_n_1</span> <span class="o">=</span> <span class="n">params</span>
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
       <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_params_n_1</span><span class="p">:</span> <span class="n">_params_n_1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
       <span class="n">_params_n_2</span> <span class="o">=</span> <span class="n">_params_n_1</span>
       <span class="n">_params_n_1</span> <span class="o">=</span> <span class="n">_params_n_2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-    <span class="n">_params_n_2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">try_json_loads</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+    <span class="n">_params_n_2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">try_json_loads</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">v</span>
   <span class="k">return</span> <span class="n">params</span></div>
+
+<div class="viewcode-block" id="URIParsed"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URIParsed">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">URIParsed</span><span class="p">:</span>
+  <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+  <span class="n">query</span><span class="p">:</span> <span class="nb">str</span>
+  <span class="n">fragment</span><span class="p">:</span> <span class="nb">str</span>
+  <span class="n">fragment_query</span><span class="p">:</span> <span class="nb">str</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">qs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">parse_qs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">fragment_qs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">parse_qs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">:</span>
+      <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;?&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment</span><span class="p">:</span>
+      <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;?&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span><span class="p">:</span>
+      <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;#?&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+<span class="n">uri_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(?P&lt;url&gt;[^\?#]+)(\?(?P&lt;query&gt;[^#]*))?(#(?P&lt;fragment&gt;[^\?]*?))?(\?(?P&lt;fragment_query&gt;.*?))?$&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="parse_file_uri"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.parse_file_uri">[docs]</a><span class="k">def</span> <span class="nf">parse_file_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">URIParsed</span><span class="p">(</span><span class="o">**</span><span class="n">uri_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span><span class="o">.</span><span class="n">groupdict</span><span class="p">())</span></div>
 </pre></div>
 
             <div class="clearer"></div>

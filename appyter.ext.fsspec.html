@@ -470,19 +470,6 @@ possible.</p>
 </dd></dl>
 
 </section>
-<section id="module-appyter.ext.fsspec.parse">
-<span id="appyter-ext-fsspec-parse-module"></span><h2>appyter.ext.fsspec.parse module<a class="headerlink" href="#module-appyter.ext.fsspec.parse" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt id="appyter.ext.fsspec.parse.parse_file_uri_fragment">
-<code class="sig-prename descclassname">appyter.ext.fsspec.parse.</code><code class="sig-name descname">parse_file_uri_fragment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/parse.html#parse_file_uri_fragment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.parse.parse_file_uri_fragment" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="appyter.ext.fsspec.parse.parse_file_uri_qs">
-<code class="sig-prename descclassname">appyter.ext.fsspec.parse.</code><code class="sig-name descname">parse_file_uri_qs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/parse.html#parse_file_uri_qs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.parse.parse_file_uri_qs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</section>
 <section id="module-appyter.ext.fsspec.test_chroot">
 <span id="appyter-ext-fsspec-test-chroot-module"></span><h2>appyter.ext.fsspec.test_chroot module<a class="headerlink" href="#module-appyter.ext.fsspec.test_chroot" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
@@ -567,6 +554,17 @@ possible.</p>
 <dt id="appyter.ext.fsspec.test_pathmap.test_http_pathmap_chroot">
 <code class="sig-prename descclassname">appyter.ext.fsspec.test_pathmap.</code><code class="sig-name descname">test_http_pathmap_chroot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/test_pathmap.html#test_http_pathmap_chroot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.test_pathmap.test_http_pathmap_chroot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serve the test directory over http and ensure chroot_fs still works using the webserver</p>
+</dd></dl>
+
+</section>
+<section id="module-appyter.ext.fsspec.util">
+<span id="appyter-ext-fsspec-util-module"></span><h2>appyter.ext.fsspec.util module<a class="headerlink" href="#module-appyter.ext.fsspec.util" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.fsspec.util.split_protocol_opts">
+<code class="sig-prename descclassname">appyter.ext.fsspec.util.</code><code class="sig-name descname">split_protocol_opts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">default_protocol</span><span class="o">=</span><span class="default_value">'file'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/util.html#split_protocol_opts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.util.split_protocol_opts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <code class="docutils literal notranslate"><span class="pre">fsspec.core.split_protocol</span></code>
+but remove fragments potentially parsing querystrings in the fragment as filesystem opts</p>
+<p>url of the form: proto://netloc/path?qs=anything#ignored?protocol.options=here</p>
 </dd></dl>
 
 </section>
@@ -745,12 +743,12 @@ possible.</p>
 <li><a class="reference internal" href="#module-appyter.ext.fsspec.fuse">appyter.ext.fsspec.fuse module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.fsspec.mapperfs">appyter.ext.fsspec.mapperfs module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.fsspec.overlayfs">appyter.ext.fsspec.overlayfs module</a></li>
-<li><a class="reference internal" href="#module-appyter.ext.fsspec.parse">appyter.ext.fsspec.parse module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.fsspec.test_chroot">appyter.ext.fsspec.test_chroot module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.fsspec.test_fuse">appyter.ext.fsspec.test_fuse module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.fsspec.test_mapperfs">appyter.ext.fsspec.test_mapperfs module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.fsspec.test_overlayfs">appyter.ext.fsspec.test_overlayfs module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.fsspec.test_pathmap">appyter.ext.fsspec.test_pathmap module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.util">appyter.ext.fsspec.util module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.fsspec.writecache">appyter.ext.fsspec.writecache module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.fsspec">Module contents</a></li>
 </ul>

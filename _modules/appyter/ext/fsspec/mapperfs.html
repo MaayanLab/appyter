@@ -41,7 +41,7 @@
 
 <span class="kn">from</span> <span class="nn">fsspec</span> <span class="kn">import</span> <span class="n">AbstractFileSystem</span>
 <span class="kn">from</span> <span class="nn">fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_fs</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.parse</span> <span class="kn">import</span> <span class="n">parse_file_uri_qs</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.util</span> <span class="kn">import</span> <span class="n">split_protocol_opts</span>
 
 <div class="viewcode-block" id="MapperFileSystem"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem">[docs]</a><span class="k">class</span> <span class="nc">MapperFileSystem</span><span class="p">(</span><span class="n">AbstractFileSystem</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; MapperFS is the inverse of a fsspec.mapper -- it lets you use a mapping to</span>
@@ -84,9 +84,9 @@
     <span class="sd">&#39;&#39;&#39; Return (fs, path) depending on whether we hit a mapped paths or not</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathmap</span><span class="p">:</span>
-      <span class="n">url</span><span class="p">,</span> <span class="n">qs</span> <span class="o">=</span> <span class="n">parse_file_uri_qs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pathmap</span><span class="p">[</span><span class="n">path</span><span class="p">])</span>
-      <span class="n">fs</span><span class="p">,</span> <span class="n">fs_path</span> <span class="o">=</span> <span class="n">url_to_fs</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">qs</span><span class="p">)</span>
-      <span class="k">return</span> <span class="n">fs</span><span class="p">,</span> <span class="n">fs_path</span>
+      <span class="kn">from</span> <span class="nn">fsspec</span> <span class="kn">import</span> <span class="n">filesystem</span>
+      <span class="n">protocol</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">opts</span> <span class="o">=</span> <span class="n">split_protocol_opts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pathmap</span><span class="p">[</span><span class="n">path</span><span class="p">])</span>
+      <span class="k">return</span> <span class="n">url_to_fs</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">protocol</span><span class="si">}</span><span class="s2">://</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">opts</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 

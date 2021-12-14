@@ -28,14 +28,6 @@ appyter.render.flask\_app.development module
    :undoc-members:
    :show-inheritance:
 
-appyter.render.flask\_app.download module
------------------------------------------
-
-.. automodule:: appyter.render.flask_app.download
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 appyter.render.flask\_app.execution module
 ------------------------------------------
 
@@ -88,6 +80,14 @@ appyter.render.flask\_app.storage module
 ----------------------------------------
 
 .. automodule:: appyter.render.flask_app.storage
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.render.flask\_app.upload module
+---------------------------------------
+
+.. automodule:: appyter.render.flask_app.upload
    :members:
    :undoc-members:
    :show-inheritance:
