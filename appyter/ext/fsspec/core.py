@@ -8,25 +8,24 @@ def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):
   appyter  create a pathmap from an appyter ipynb
   cached   cache read/writes
   '''
-  from fsspec.core import url_to_fs, split_protocol
-  from appyter.ext.urllib import parse_file_uri
-  uri_parsed = parse_file_uri(url)
-  uri_parsed.fragment = None
-  protocol, path = split_protocol(str(uri_parsed))
-  protocol = protocol or 'file'
-  full_url = protocol + '://' + path
+  from appyter.ext.fsspec.util import split_protocol_opts
+  from appyter.ext.fsspec.chroot import ChrootFileSystem
+  protocol, path, opts = split_protocol_opts(url)
   # add protocol options to inner protocol
   if protocol not in kwargs: kwargs[protocol] = {}
-  kwargs[protocol].update(uri_parsed.fragment_qs or {})
+  kwargs[protocol].update(opts)
   # ensure auto_mkdir is enabled
   if protocol == 'file':
     if 'auto_mkdir' not in kwargs[protocol]: kwargs[protocol]['auto_mkdir'] = True
   # add chroot
-  full_url = 'chroot::' + full_url
-  fs, _ = url_to_fs(full_url, **kwargs)
+  fs = ChrootFileSystem(
+    target_protocol=protocol,
+    target_options=kwargs[protocol],
+    fo=path,
+  )
+  print(f"{fs.storage_options=}, {fs.fs.storage_options=}")
   # apply pathmap as needed
   if pathmap:
-    from appyter.ext.fsspec.chroot import ChrootFileSystem
     from appyter.ext.fsspec.mapperfs import MapperFileSystem
     from appyter.ext.fsspec.overlayfs import OverlayFileSystem
     fs = ChrootFileSystem(
@@ -40,7 +39,6 @@ def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):
     from appyter import __version__
     from appyter.ext.urllib import join_slash
     from appyter.parse.nb import nb_from_ipynb_io
-    from appyter.ext.fsspec.chroot import ChrootFileSystem
     from appyter.ext.fsspec.mapperfs import MapperFileSystem
     from appyter.ext.fsspec.overlayfs import OverlayFileSystem
     # load notebook
