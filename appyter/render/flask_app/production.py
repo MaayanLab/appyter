@@ -1,7 +1,7 @@
 import fsspec
-import tempfile
 from pathlib import Path
 from appyter.ext.urllib import join_url
+from appyter.ext.tempfile import tempdir
 
 def serve(app_path, **kwargs):
   import os
@@ -13,9 +13,9 @@ def serve(app_path, **kwargs):
   config = get_env(**kwargs)
   logger.info(kwargs)
   env = get_jinja2_env(config=config)
-  with tempfile.TemporaryDirectory() as tmp_dir:
+  exit_code = 1
+  with tempdir() as tmp_dir:
     logger.info(f"Working directory {tmp_dir}")
-    tmp_dir = Path(tmp_dir)
     #
     logger.info(f"Pre-rendering pages...")
     with fsspec.open(join_url(config['CWD'], config['IPYNB']), 'r') as fr:
@@ -45,7 +45,9 @@ def serve(app_path, **kwargs):
     logger.info(f"Starting production instance at http://{config['HOST']}:{config['PORT']}{config['PREFIX']} ...")
     with Popen(['supervisord', '-n', '-c', str(tmp_dir/'supervisord.conf')]) as proc:
       try:
-        sys.exit(proc.wait())
+        exit_code = proc.wait()
       except KeyboardInterrupt:
         proc.terminate()
-        sys.exit(proc.wait())
+        exit_code = proc.wait()
+  #
+  sys.exit(exit_code)

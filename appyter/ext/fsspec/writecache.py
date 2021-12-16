@@ -1,7 +1,7 @@
 import os
-import tempfile
 from pathlib import PurePath
 from fsspec import filesystem, AbstractFileSystem
+from appyter.ext.tempfile import mktemp
 
 import logging
 logger = logging.getLogger(__name__)
@@ -173,7 +173,7 @@ class LocalTempFile:
 
   def __init__(self, fs, path, fn=None, mode="wb", autocommit=True, seek=0, details=None):
     fs._local_cache[path] = details if details else {'type': 'file', 'size': 0}
-    fn = fn or tempfile.mktemp()
+    fn = fn or mktemp()
     self.mode = mode
     self.fn = fn
     # if the file exists on the remote and we need the contents, get them first
@@ -208,12 +208,14 @@ class LocalTempFile:
 
   def discard(self):
     self.fh.close()
-    os.remove(self.fn)
-    if self.path in self.fs._local_cache:
-      del self.fs._local_cache[self.path]
+    self.cleanup()
 
   def commit(self):
     self.fs.fs.put(self.fn, self.path)
+    self.cleanup()
+
+  def cleanup(self):
+    os.remove(self.fn)
     if self.path in self.fs._local_cache:
       del self.fs._local_cache[self.path]
 
