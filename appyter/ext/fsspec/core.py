@@ -23,7 +23,6 @@ def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):
     target_options=kwargs[protocol],
     fo=path,
   )
-  print(f"{fs.storage_options=}, {fs.fs.storage_options=}")
   # apply pathmap as needed
   if pathmap:
     from appyter.ext.fsspec.mapperfs import MapperFileSystem
