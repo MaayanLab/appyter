@@ -59,42 +59,39 @@
   <span class="kn">import</span> <span class="nn">signal</span>
   <span class="kn">import</span> <span class="nn">asyncio</span>
   <span class="kn">import</span> <span class="nn">pathlib</span>
-  <span class="kn">import</span> <span class="nn">tempfile</span>
   <span class="kn">import</span> <span class="nn">traceback</span>
   <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.alias</span> <span class="kn">import</span> <span class="n">dump_aliases</span>
   <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.try_n_times</span> <span class="kn">import</span> <span class="n">try_n_times</span>
   <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.run_in_executor</span> <span class="kn">import</span> <span class="n">run_in_executor</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.tempfile</span> <span class="kn">import</span> <span class="n">tempdir</span>
   <span class="nd">@run_in_executor</span>
   <span class="k">def</span> <span class="nf">_assert_mounted</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">path</span><span class="o">.</span><span class="n">is_mount</span><span class="p">()</span>
   <span class="nd">@run_in_executor</span>
   <span class="k">def</span> <span class="nf">_assert_not_mounted</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_mount</span><span class="p">()</span>
-  <span class="nd">@run_in_executor</span>
-  <span class="k">def</span> <span class="nf">_rmdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="n">path</span><span class="o">.</span><span class="n">rmdir</span><span class="p">()</span>
-  <span class="n">tmp</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span>
-  <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;mounting </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1"> onto </span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-  <span class="n">proc</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span>
-    <span class="n">target</span><span class="o">=</span><span class="n">_fuse_run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">dump_aliases</span><span class="p">())</span>
-  <span class="p">)</span>
-  <span class="n">proc</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-  <span class="k">try</span><span class="p">:</span>
-    <span class="k">await</span> <span class="n">try_n_times</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">_assert_mounted</span><span class="p">,</span> <span class="n">tmp</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;fs mount ready on </span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">yield</span> <span class="n">tmp</span>
-  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
-    <span class="k">raise</span>
-  <span class="k">finally</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">proc</span><span class="o">.</span><span class="n">pid</span><span class="p">:</span>
-      <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unmounting fs from </span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-      <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">)</span> <span class="c1"># SIGINT cleanly stops fsspec.fuse.run</span>
-      <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;waiting for process to end&quot;</span><span class="p">)</span>
-      <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">proc</span><span class="o">.</span><span class="n">join</span><span class="p">)</span>
-      <span class="k">await</span> <span class="n">try_n_times</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">_assert_not_mounted</span><span class="p">,</span> <span class="n">tmp</span><span class="p">)</span>
-      <span class="k">await</span> <span class="n">try_n_times</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">_rmdir</span><span class="p">,</span> <span class="n">tmp</span><span class="p">)</span>
-  <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;done&quot;</span><span class="p">)</span></div>
+  <span class="k">with</span> <span class="n">tempdir</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;mounting </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1"> onto </span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">proc</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span>
+      <span class="n">target</span><span class="o">=</span><span class="n">_fuse_run</span><span class="p">,</span>
+      <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">dump_aliases</span><span class="p">()),</span>
+    <span class="p">)</span>
+    <span class="n">proc</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="k">await</span> <span class="n">try_n_times</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">_assert_mounted</span><span class="p">,</span> <span class="n">tmp</span><span class="p">)</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;fs mount ready on </span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="k">yield</span> <span class="n">tmp</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+      <span class="k">raise</span>
+    <span class="k">finally</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">proc</span><span class="o">.</span><span class="n">pid</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unmounting fs from </span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">)</span> <span class="c1"># SIGINT cleanly stops fsspec.fuse.run</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;waiting for process to end&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">proc</span><span class="o">.</span><span class="n">join</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">try_n_times</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">_assert_not_mounted</span><span class="p">,</span> <span class="n">tmp</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;done&quot;</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

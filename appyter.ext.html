@@ -229,6 +229,24 @@
 <dd></dd></dl>
 
 </section>
+<section id="module-appyter.ext.tempfile">
+<span id="appyter-ext-tempfile-module"></span><h2>appyter.ext.tempfile module<a class="headerlink" href="#module-appyter.ext.tempfile" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.tempfile.mktemp">
+<code class="sig-prename descclassname">appyter.ext.tempfile.</code><code class="sig-name descname">mktemp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">suffix</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">prefix</span><span class="o">=</span><span class="default_value">'appyter-tmp'</span></em>, <em class="sig-param"><span class="n">dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/tempfile.html#mktemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.tempfile.mktemp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as tempfile.mktemp but with appyter prefix</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.tempfile.tempdir">
+<code class="sig-prename descclassname">appyter.ext.tempfile.</code><code class="sig-name descname">tempdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/tempfile.html#tempdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.tempfile.tempdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>A context for a temporary directory that may exist,
+if it doesn’t we’ll use mkdtemp. Also has a safety mechanism
+when dealing with mounts – it will not rmtree if the directory
+is a mounted directory (since this might remove files unintentially).</p>
+</dd></dl>
+
+</section>
 <section id="module-appyter.ext.urllib">
 <span id="appyter-ext-urllib-module"></span><h2>appyter.ext.urllib module<a class="headerlink" href="#module-appyter.ext.urllib" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -338,6 +356,7 @@
 <li><a class="reference internal" href="#module-appyter.ext.itertools">appyter.ext.itertools module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.json">appyter.ext.json module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.re">appyter.ext.re module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.tempfile">appyter.ext.tempfile module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.urllib">appyter.ext.urllib module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.uuid">appyter.ext.uuid module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext">Module contents</a></li>

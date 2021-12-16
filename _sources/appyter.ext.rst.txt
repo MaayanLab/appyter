@@ -90,6 +90,14 @@ appyter.ext.re module
    :undoc-members:
    :show-inheritance:
 
+appyter.ext.tempfile module
+---------------------------
+
+.. automodule:: appyter.ext.tempfile
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.ext.urllib module
 -------------------------
 
