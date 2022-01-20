@@ -125,7 +125,14 @@
   <span class="sd">&#39;&#39;&#39; Parse the nbtemplate fields</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.parse.nbtemplate</span> <span class="kn">import</span> <span class="n">parse_fields_from_nbtemplate</span>
-  <span class="k">return</span> <span class="n">parse_fields_from_nbtemplate</span><span class="p">(</span><span class="n">get_j2_env</span><span class="p">(),</span> <span class="n">get_nbtemplate</span><span class="p">())</span></div>
+  <span class="k">return</span> <span class="n">parse_fields_from_nbtemplate</span><span class="p">(</span><span class="n">get_j2_env</span><span class="p">(),</span> <span class="n">get_nbtemplate</span><span class="p">(),</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_deep_fields"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_deep_fields">[docs]</a><span class="nd">@memcached</span>
+<span class="k">def</span> <span class="nf">get_deep_fields</span><span class="p">():</span>
+  <span class="sd">&#39;&#39;&#39; Parse the nbtemplate fields</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="kn">from</span> <span class="nn">appyter.parse.nbtemplate</span> <span class="kn">import</span> <span class="n">parse_fields_from_nbtemplate</span>
+  <span class="k">return</span> <span class="n">parse_fields_from_nbtemplate</span><span class="p">(</span><span class="n">get_j2_env</span><span class="p">(),</span> <span class="n">get_nbtemplate</span><span class="p">(),</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="get_ipynb_hash"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_ipynb_hash">[docs]</a><span class="nd">@memcached</span>
 <span class="k">def</span> <span class="nf">get_ipynb_hash</span><span class="p">():</span>

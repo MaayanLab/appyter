@@ -94,14 +94,13 @@
 
   <span class="k">return</span> <span class="n">cell</span></div>
 
-<div class="viewcode-block" id="render_nb_from_nbtemplate"><a class="viewcode-back" href="../../../appyter.render.html#appyter.render.nbconstruct.render_nb_from_nbtemplate">[docs]</a><span class="k">def</span> <span class="nf">render_nb_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nbtemplate</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{},</span> <span class="n">fields</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="render_nb_from_nbtemplate"><a class="viewcode-back" href="../../../appyter.render.html#appyter.render.nbconstruct.render_nb_from_nbtemplate">[docs]</a><span class="k">def</span> <span class="nf">render_nb_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nbtemplate</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{},</span> <span class="n">deep_fields</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Render the notebook by rendering the jinja2 templates using the context in env.</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">fields</span> <span class="o">=</span> <span class="n">parse_fields_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nbtemplate</span><span class="p">)</span>
-  <span class="c1">#</span>
+  <span class="k">if</span> <span class="n">deep_fields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">deep_fields</span> <span class="o">=</span> <span class="n">parse_fields_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nbtemplate</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
   <span class="n">files</span> <span class="o">=</span> <span class="p">{}</span>
-  <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+  <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">deep_fields</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">field</span> <span class="o">==</span> <span class="s1">&#39;FileField&#39;</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]):</span>
       <span class="n">uri_parsed</span> <span class="o">=</span> <span class="n">parse_file_uri</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]])</span>
       <span class="n">filename</span> <span class="o">=</span> <span class="n">uri_parsed</span><span class="o">.</span><span class="n">fragment</span>
