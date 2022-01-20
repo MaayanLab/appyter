@@ -86,7 +86,14 @@ def get_fields():
   ''' Parse the nbtemplate fields
   '''
   from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
-  return parse_fields_from_nbtemplate(get_j2_env(), get_nbtemplate())
+  return parse_fields_from_nbtemplate(get_j2_env(), get_nbtemplate(), deep=False)
+
+@memcached
+def get_deep_fields():
+  ''' Parse the nbtemplate fields
+  '''
+  from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
+  return parse_fields_from_nbtemplate(get_j2_env(), get_nbtemplate(), deep=True)
 
 @memcached
 def get_ipynb_hash():

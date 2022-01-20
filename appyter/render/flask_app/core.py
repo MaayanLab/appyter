@@ -8,7 +8,7 @@ from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.urllib import join_url
 from appyter.parse.nb import nb_to_ipynb_io
 from appyter.ext.exceptions import exception_as_dict
-from appyter.render.flask_app.constants import get_fields, get_ipynb_hash, get_j2_env, get_nbtemplate
+from appyter.render.flask_app.constants import get_fields, get_deep_fields, get_ipynb_hash, get_j2_env, get_nbtemplate
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.ext.hashlib import sha1sum_dict
@@ -29,7 +29,7 @@ def prepare_results(data):
       env = get_jinja2_env(config=current_app.config, context=data, session=results_hash)
       nbtemplate = get_nbtemplate()
       # in case of constraint failures, we'll fail here
-      nb = render_nb_from_nbtemplate(env, nbtemplate, fields=get_fields(), data=data)
+      nb = render_nb_from_nbtemplate(env, nbtemplate, deep_fields=get_deep_fields(), data=data)
       # write notebook
       with data_fs.open(current_app.config['IPYNB'], 'w') as fw:
         nb_to_ipynb_io(nb, fw)
