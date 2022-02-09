@@ -1,5 +1,6 @@
 import sys
 import tempfile
+import contextlib
 from subprocess import Popen
 from pathlib import Path
 from fsspec.spec import AbstractFileSystem
@@ -58,6 +59,15 @@ class SBFSFileSystem(AbstractFileSystem):
     if str(ChrootPurePosixPath('/') / path) == '.info':
       raise PermissionError
   
+  @contextlib.asynccontextmanager
+  async def mount(self, mount_dir, fuse=True, **kwargs):
+    if fuse:
+      # forward existing mount
+      yield self._tmpdir
+    else:
+      async with super().mount(mount_dir, fuse=fuse, **kwargs) as mount_dir:
+        yield mount_dir
+
   def mkdir(self, path, **kwargs):
     self._poll()
     self._block_info(path)

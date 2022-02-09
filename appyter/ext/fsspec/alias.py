@@ -3,9 +3,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 import fsspec
+import contextlib
+from appyter.ext.fsspec.spec import AbstractFileSystemEx
 from appyter.ext.fsspec.core import url_to_chroot_fs
 
-class AliasFileSystemBase(fsspec.AbstractFileSystem): pass
+class AliasFileSystemBase(AbstractFileSystemEx): pass
 
 def AliasFileSystemFactory(_proto, _fs_url, **_kwargs):
   logger.debug(f"creating AliasFileSystem {_proto}://* => {_fs_url}*")
@@ -30,6 +32,12 @@ def AliasFileSystemFactory(_proto, _fs_url, **_kwargs):
     def __exit__(self, type, value, traceback):
       if getattr(self.fs, '__exit__', None) is None:
         self.fs.__exit__(type, value, traceback)
+
+    @contextlib.asynccontextmanager
+    async def mount(self, mount_dir, **kwargs):
+      _mount = self.fs.mount if getattr(self.fs, 'mount', None) else super().mount
+      async with _mount(mount_dir, **kwargs) as mount_dir:
+        yield mount_dir
 
     def mkdir(self, path, **kwargs):
       return self.fs.mkdir(path, **kwargs)

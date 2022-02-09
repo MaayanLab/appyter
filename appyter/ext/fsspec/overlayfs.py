@@ -1,12 +1,14 @@
 import shutil
+import contextlib
 import logging
 
 logger = logging.getLogger(__name__)
 
-from fsspec import filesystem, AbstractFileSystem
+from fsspec import filesystem
+from appyter.ext.fsspec.spec import AbstractFileSystemEx
 from appyter.ext.urllib import join_slash, parent_url
 
-class OverlayFileSystem(AbstractFileSystem):
+class OverlayFileSystem(AbstractFileSystemEx):
   ''' OverlayFS implemented with fsspec
   '''
   root_marker = ''
@@ -45,6 +47,18 @@ class OverlayFileSystem(AbstractFileSystem):
       self.upper_fs.__exit__(type, value, traceback)
     if getattr(self.lower_fs, '__exit__', None) is not None:
       self.lower_fs.__exit__(type, value, traceback)
+
+  @contextlib.asynccontextmanager
+  async def mount(self, mount_dir, fuse=True, **kwargs):
+    if fuse:
+      async with super().mount(mount_dir, fuse=True, **kwargs) as mount_dir:
+        yield mount_dir
+    else:
+      _upper_mount = self.upper_fs.mount if getattr(self.upper_fs, 'mount', None) else super().mount
+      _lower_mount = self.lower_fs.mount if getattr(self.lower_fs, 'mount', None) else super().mount
+      async with _upper_mount(mount_dir, fuse=False, **kwargs) as mount_dir:
+        async with _lower_mount(mount_dir, fuse=False, **kwargs) as mount_dir:
+          yield mount_dir
 
   def mkdir(self, path, **kwargs):
     return self.upper_fs.mkdir(path, **kwargs)

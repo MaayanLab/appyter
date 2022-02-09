@@ -7,10 +7,11 @@ from appyter.ext.urllib import join_slash
 logger = logging.getLogger(__name__)
 
 from pathlib import PurePosixPath
-from fsspec import filesystem, AbstractFileSystem
+from fsspec import filesystem
+from appyter.ext.fsspec.spec import AbstractFileSystemEx
 from appyter.ext.pathlib.chroot import ChrootPurePosixPath
 
-class ChrootFileSystem(AbstractFileSystem):
+class ChrootFileSystem(AbstractFileSystemEx):
   ''' chroot: update root and disallow access beyond chroot, only works on directories.
   '''
   root_marker = ''
@@ -105,6 +106,12 @@ class ChrootFileSystem(AbstractFileSystem):
     if getattr(self.fs, '__exit__', None) is not None:
       with self.__masquerade_os_error():
         self.fs.__exit__(type, value, traceback)
+
+  @contextlib.asynccontextmanager
+  async def mount(self, mount_dir, **kwargs):
+    _mount = self.fs.mount if getattr(self.fs, 'mount', None) else super().mount
+    async with _mount(mount_dir, **kwargs) as mount_dir:
+      yield mount_dir
 
   def mkdir(self, path, **kwargs):
     with self.__masquerade_os_error(path=path):

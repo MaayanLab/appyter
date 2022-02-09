@@ -1,10 +1,10 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from fsspec import AbstractFileSystem
+from appyter.ext.fsspec.spec import AbstractFileSystemEx
 from appyter.ext.fsspec.core import url_to_fs_ex
 
-class MapperFileSystem(AbstractFileSystem):
+class MapperFileSystem(AbstractFileSystemEx):
   ''' MapperFS is the inverse of a fsspec.mapper -- it lets you use a mapping to
   define a virtual filesystem.
   '''
