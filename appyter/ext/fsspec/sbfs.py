@@ -6,7 +6,7 @@ from fsspec.spec import AbstractFileSystem
 from appyter.ext.asyncio.try_n_times import try_n_times
 
 from appyter.ext.fsspec.chroot import ChrootFileSystem
-from appyter.ext.pathlib.assertions import assert_mounted, assert_unmounted
+from appyter.ext.pathlib.assertions import assert_exists, assert_mounted, assert_unmounted
 from appyter.ext.pathlib.chroot import ChrootPurePosixPath
 
 class SBFSFileSystem(AbstractFileSystem):
@@ -26,6 +26,7 @@ class SBFSFileSystem(AbstractFileSystem):
       str(self._tmpdir),
     ], stderr=sys.stderr, stdout=sys.stdout)
     try_n_times(3, assert_mounted, self._tmpdir)
+    try_n_times(3, assert_exists, self._tmpdir / 'projects')
     self.fs = ChrootFileSystem(
       target_protocol='file',
       fo=str(self._tmpdir),
@@ -119,11 +120,10 @@ class SBFSFileSystem(AbstractFileSystem):
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
     self._poll()
     self._block_info(path)
+    # NOTE: SBFS writes are immutable
     if 'w' in mode:
-      # NOTE: SBFS doesn't seem to support truncation
       if self.fs.exists(path):
         self.fs.rm(path)
     elif 'a' in mode:
-      # TODO: use writecache if you need append support also
       raise Exception('Append not supported by sbfs')
     return self.fs._open(path, mode=mode, block_size=block_size, autocommit=autocommit, cache_options=cache_options, **kwargs)
