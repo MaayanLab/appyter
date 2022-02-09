@@ -38,11 +38,14 @@ def test_file_overlayfs():
         with fs.open('a/d', 'a') as fw:
           fw.write('!')
         assert_eq(fs.cat('a/d'), b'D!')
+        with fs.open('a/d', 'a') as fw:
+          fw.write('!')
+        assert_eq(fs.cat('a/d'), b'D!!')
         assert_eq(fs.cat('e'), b'A')
         assert_eq(fs.cat('E'), b'E')
       assert_eq(frozenset(str(p.relative_to(upper_tmpdir)) for p in upper_tmpdir.rglob('*')), frozenset(['a', 'a/d', 'e', 'E']))
       assert_eq((upper_tmpdir/'e').open('rb').read(), b'A')
       assert_eq((upper_tmpdir/'E').open('rb').read(), b'E')
-      assert_eq((upper_tmpdir/'a/d').open('rb').read(), b'D!')
+      assert_eq((upper_tmpdir/'a/d').open('rb').read(), b'D!!')
       assert_eq((lower_tmpdir/'a/d').open('rb').read(), b'D')
       assert_eq((lower_tmpdir/'e').open('rb').read(), b'E')
