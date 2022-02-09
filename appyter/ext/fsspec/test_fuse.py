@@ -26,8 +26,25 @@ def _test_ctx():
 
 def test_file_chroot_fuse():
   with _test_ctx() as tmpdir:
-    with sync_contextmanager(fs_mount(str(tmpdir))) as fs:
+    with sync_contextmanager(fs_mount(
+      str(tmpdir),
+      pathmap={'g': str(tmpdir/'e')},
+      cached=True,
+    )) as fs:
+      # reads work
       assert_eq(frozenset(str(p.relative_to(fs)) for p in fs.rglob('*')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e']))
       assert_eq((fs/'a'/'b'/'c').open('rb').read(), b'C')
       assert_eq((fs/'a'/'d').open('rb').read(), b'D')
       assert_eq((fs/'e').open('rb').read(), b'E')
+      # pathmap works
+      assert_eq((fs/'g').open('rb').read(), b'E')
+      # writes work
+      with (fs / 'f').open('wb') as fw:
+        fw.write(b'f')
+      assert_eq((fs/'f').open('rb').read(), b'f')
+      # overwrites work
+      with (fs / 'f').open('wb') as fw:
+        fw.write(b'F')
+      assert_eq((fs/'f').open('rb').read(), b'F')
+      # and make it to the underlying store
+      assert_eq((tmpdir/'f').open('rb').read(), b'F')
