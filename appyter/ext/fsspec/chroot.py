@@ -116,7 +116,7 @@ class ChrootFileSystem(AbstractFileSystem):
 
   def rmdir(self, path):
     with self.__masquerade_os_error(path=path):
-      return self.upper_fs.rmdir(self._resolve_path(path))
+      return self.fs.rmdir(self._resolve_path(path))
 
   def rm(self, path, recursive=False, maxdepth=None):
     with self.__masquerade_os_error(path=path):
