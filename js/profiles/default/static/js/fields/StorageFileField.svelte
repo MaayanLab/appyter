@@ -2,7 +2,7 @@
   export let window
   export let args
 
-  let value = args.value || args.default
+  let value = args.value || args.default || ''
   $: args.value = `${args.storage}${value}#${value.split('/').slice(-1)[0]}`
 
   let cwd = ''
