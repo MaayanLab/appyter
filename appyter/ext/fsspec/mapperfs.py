@@ -2,8 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from fsspec import AbstractFileSystem
-from fsspec.core import url_to_fs
-from appyter.ext.fsspec.util import split_protocol_opts
+from appyter.ext.fsspec.core import url_to_fs_ex
 
 class MapperFileSystem(AbstractFileSystem):
   ''' MapperFS is the inverse of a fsspec.mapper -- it lets you use a mapping to
@@ -46,9 +45,7 @@ class MapperFileSystem(AbstractFileSystem):
     ''' Return (fs, path) depending on whether we hit a mapped paths or not
     '''
     if path in self.pathmap:
-      from fsspec import filesystem
-      protocol, path, opts = split_protocol_opts(self.pathmap[path])
-      return url_to_fs(f"{protocol}://{path}", **opts)
+      return url_to_fs_ex(self.pathmap[path])
     else:
       raise FileNotFoundError(path)
 

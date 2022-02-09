@@ -1,8 +1,8 @@
 import re
 from flask import Blueprint, abort, jsonify, request
-from fsspec.core import url_to_fs
+from appyter.ext.fsspec.core import url_to_fs_ex
 from appyter.ext.flask import route_join_with_or_without_slash
-from appyter.ext.fsspec.util import split_protocol_opts
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -20,8 +20,7 @@ def index():
 @route_join_with_or_without_slash(StorageFileField, 'ls', '<path:path>', methods=['GET'])
 def ls(path=''):
   try:
-    protocol, path, opts = split_protocol_opts(path + '?' + request.query_string.decode(), default_protocol='storage')
-    fs, fs_path = url_to_fs(f"{protocol}://{path}", **opts)
+    fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
     return jsonify(fs.ls(fs_path))
   except Exception as e:
     import traceback
@@ -32,8 +31,7 @@ def ls(path=''):
 @route_join_with_or_without_slash(StorageFileField, 'info', '<path:path>', methods=['GET'])
 def info(path=''):
   try:
-    protocol, path, opts = split_protocol_opts(path + '?' + request.query_string.decode(), default_protocol='storage')
-    fs, fs_path = url_to_fs(f"{protocol}://{path}", **opts)
+    fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
     return jsonify(fs.info(fs_path))
   except Exception as e:
     import traceback
@@ -44,8 +42,7 @@ def info(path=''):
 @route_join_with_or_without_slash(StorageFileField, 'cat', '<path:path>', methods=['GET'])
 def cat(path=''):
   try:
-    protocol, path, opts = split_protocol_opts(path + '?' + request.query_string.decode(), default_protocol='storage')
-    fs, fs_path = url_to_fs(f"{protocol}://{path}", **opts)
+    fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
     return fs.cat(fs_path)
   except Exception as e:
     import traceback
@@ -58,8 +55,7 @@ def read_block(path=''):
   try:
     m = re.match(r'^(bytes )?(\d+)-(\d+)$', request.headers['Range'])
     _, start, end = m.groups()
-    protocol, path, opts = split_protocol_opts(path + '?' + request.query_string.decode(), default_protocol='storage')
-    fs, fs_path = url_to_fs(f"{protocol}://{path}", **opts)
+    fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
     return fs.read_block(fs_path, start, end - start)
   except Exception as e:
     import traceback
