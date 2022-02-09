@@ -43,7 +43,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
     nb = nb_from_ipynb_io(fr)
   #
   if 'appyter' not in nb.metadata:
-    logger.warn('detected legacy format, upgrading..')
+    logger.warning('detected legacy format, upgrading..')
     nb.metadata['appyter'] = {
       'nbconstruct': {
         'version': 'unknown',
@@ -56,7 +56,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
     }
   #
   if 'execution_info' in nb.metadata:
-    logger.warn('detected legacy format, upgrading..')
+    logger.warning('detected legacy format, upgrading..')
     nb.metadata['appyter']['nbexecute'].update(
       version='unknown',
       started=nb.metadata['execution_info'].get('started'),

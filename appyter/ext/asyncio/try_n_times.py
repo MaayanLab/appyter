@@ -11,7 +11,7 @@ def try_n_times(n, func, *args, **kwargs):
       n -= 1
       if n == 0:
         raise err
-      logger.warn(f"{func} failed, trying again in {backoff}s...")
+      logger.warning(f"{func} failed, trying again in {backoff}s...")
       time.sleep(backoff)
       backoff *= 2
 
@@ -25,6 +25,6 @@ async def async_try_n_times(n, coro, *args, **kwargs):
       n -= 1
       if n == 0:
         raise err
-      logger.warn(f"{coro} failed, trying again in {backoff}s...")
+      logger.warning(f"{coro} failed, trying again in {backoff}s...")
       await asyncio.sleep(backoff)
       backoff *= 2

@@ -32,7 +32,7 @@ class DockerExecutor(AbstractExecutor):
       self._args += ['--network', conf[0]['HostConfig']['NetworkMode']]
     except:
       import traceback
-      logger.warn(traceback.format_exc())
+      logger.warning(traceback.format_exc())
     return self
 
   async def __aexit__(self, type, value, traceback):
