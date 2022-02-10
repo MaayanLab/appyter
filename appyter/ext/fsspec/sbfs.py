@@ -1,139 +1,363 @@
-import sys
-import tempfile
-import contextlib
-from subprocess import Popen
+import logging
+logger = logging.getLogger(__name__)
+
+import aiohttp
 from pathlib import Path
-from fsspec.spec import AbstractFileSystem
-from appyter.ext.asyncio.try_n_times import try_n_times
+from fsspec.asyn import AsyncFileSystem, sync_wrapper
+from fsspec.spec import AbstractBufferedFile
 
-from appyter.ext.fsspec.chroot import ChrootFileSystem
-from appyter.ext.pathlib.assertions import assert_exists, assert_mounted, assert_unmounted
-from appyter.ext.pathlib.chroot import ChrootPurePosixPath
+class SBFSFileSystem(AsyncFileSystem):
+  CHUNK_SIZE = 8192
 
-class SBFSFileSystem(AbstractFileSystem):
   def __init__(self, *args, api_endpoint='', auth_token='', **storage_options):
     super().__init__(*args, api_endpoint=api_endpoint, auth_token=auth_token, **storage_options)
 
-  def __enter__(self):
-    ''' Mount sbfs into temporary directory
-    '''
-    self._tmpdir = Path(tempfile.mkdtemp())
-    self._proc = Popen([
-      'sbfs',
-      f"--api-endpoint={self.storage_options['api_endpoint']}",
-      f"--auth-token={self.storage_options['auth_token']}",
-      'mount',
-      '--foreground',
-      str(self._tmpdir),
-    ], stderr=sys.stderr, stdout=sys.stdout)
-    try_n_times(3, assert_mounted, self._tmpdir)
-    try_n_times(3, assert_exists, self._tmpdir / 'projects')
-    self.fs = ChrootFileSystem(
-      target_protocol='file',
-      fo=str(self._tmpdir),
-      target_options=dict(auto_mkdir=True),
-    )
+  async def __aenter__(self):
+    self._session_mgr = aiohttp.ClientSession(headers={
+      'X-SBG-Auth-Token': self.storage_options['auth_token'],
+    })
+    self._session = await self._session_mgr.__aenter__()
     return self
+  __enter__ = sync_wrapper(__aenter__)
+
+  async def __aexit__(self, exc_type, exc_value, traceback):
+    await self._session_mgr.__aexit__(exc_type, exc_value, traceback)
+  __exit__ = sync_wrapper(__aexit__)
   
-  def __exit__(self, exc_type, exc_value, traceback):
-    ''' Cleanly exit sbfs & cleanup temporary directory
-    '''
-    if self._proc.pid:
-      import os, signal
-      os.kill(self._proc.pid, signal.SIGINT)
-      self._proc.wait()
-    try_n_times(3, assert_unmounted, self._tmpdir)
-    self._tmpdir.rmdir()
-  
-  def _poll(self):
-    ''' Ensure sbfs is still running
-    '''
-    if getattr(self, '_proc', None) is None:
-      raise Exception('Contextmanager is required for sbfs')
-    if self._proc.poll() is not None:
-      raise Exception('sbfs exited')
-  
-  def _block_info(self, path):
-    ''' Report permission error if trying to access `.info`
-    '''
-    if str(ChrootPurePosixPath('/') / path) == '.info':
-      raise PermissionError
-  
-  @contextlib.asynccontextmanager
-  async def mount(self, mount_dir, fuse=True, **kwargs):
-    if fuse:
-      # forward existing mount
-      yield self._tmpdir
+  async def _mkdir(self, path, create_parents=True, exist_ok=True, **kwargs):
+    try:
+      path_info = await self._info(path)
+      if path_info['type'] == 'directory' and exist_ok:
+        return path_info
+      else:
+        raise FileExistsError
+    except FileNotFoundError:
+      pass
+    path_split = path.split('/')
+    if len(path_split) <= 2: raise PermissionError
+    if len(path_split) == 3:
+      user, project, directory = path_split
+      async with self._session.post(f"{self.storage_options['api_endpoint']}/files", json=dict(
+        project=f"{user}/{project}",
+        name=directory,
+        type='folder',
+      )) as req:
+        res = await req.json()
+      logger.debug(f"{res=}")
+      return {
+        '_id': res['id'],
+        'name': f"{user}/{project}/{res['name']}",
+        'type': 'directory',
+      }
     else:
-      async with super().mount(mount_dir, fuse=fuse, **kwargs) as mount_dir:
-        yield mount_dir
+      parent_directory_path = '/'.join(path_split[:-1])
+      directory = path_split[-1]
+      try:
+        parent_info = await self._info(parent_directory_path)
+      except FileNotFoundError:
+        if not create_parents:
+          raise
+        parent_info = await self._mkdir(parent_directory_path, create_parents=True, exist_ok=True)
+      
+      async with self._session.post(f"{self.storage_options['api_endpoint']}/files", json=dict(
+        parent=parent_info['_id'],
+        name=directory,
+        type='folder',
+      )) as req:
+        res = await req.json()
+      logger.debug(f"{res=}")
+      return {
+        '_id': res['id'],
+        'name': f"{parent_directory_path}/{res['name']}",
+        'type': 'directory',
+      }
+  mkdir = sync_wrapper(_mkdir)
 
-  def mkdir(self, path, **kwargs):
-    self._poll()
-    self._block_info(path)
-    return self.fs.mkdir(path, **kwargs)
+  async def _makedirs(self, path, exist_ok=False, **kwargs):
+    return await self._mkdir(path, create_parents=True, exist_ok=exist_ok, **kwargs)
+  makedirs = sync_wrapper(_makedirs)
 
-  def makedirs(self, path, exist_ok=False):
-    self._poll()
-    self._block_info(path)
-    return self.fs.makedirs(path, exist_ok=exist_ok)
+  async def _rmdir(self, path):
+    dir_info = await self._info(path)
+    if dir_info['type'] != 'directory': raise NotADirectoryError
+    async with self._session.delete(f"{self.storage_options['api_endpoint']}/files/{dir_info['_id']}") as res:
+      return await res.text()
+  rmdir = sync_wrapper(_rmdir)
 
-  def rmdir(self, path):
-    self._poll()
-    self._block_info(path)
-    return self.fs.rmdir(path)
+  async def _rm_file(self, path):
+    file_info = await self._info(path)
+    if file_info['type'] == 'directory': raise IsADirectoryError
+    async with self._session.delete(f"{self.storage_options['api_endpoint']}/files/{file_info['_id']}") as res:
+      return await res.text()
+  rm_file = sync_wrapper(_rm_file)
 
-  def rm(self, path, recursive=False, maxdepth=None):
-    self._poll()
-    self._block_info(path)
-    return self.fs.rm(path, recursive=recursive, maxdepth=maxdepth)
+  async def _cp_file(self, path1, path2, **kwargs):
+    file1_info = await self.info(path1)
+    path2_split = path2.split('/', maxsplit=2)
+    acc2, proj2, *proj_path2 = path2_split
+    async with self._session.post(f"{self.storage_options['api_endpoint']}/files/{file1_info['_id']}/actions/copy", json=dict(
+      project=f"{acc2}/{proj2}",
+      name='/'.join(proj_path2),
+    )) as res:
+      return await res.json()
+  cp_file = sync_wrapper(_cp_file)
 
-  def copy(self, path1, path2, recursive=False, on_error=None, **kwargs):
-    self._poll()
-    self._block_info(path1)
-    self._block_info(path2)
-    return self.fs.copy(path1, path2, recursive=recursive, on_error=on_error, **kwargs)
+  async def _download_info(self, file_info):
+    async with self._session.get(f"{self.storage_options['api_endpoint']}/files/{file_info['_id']}/download_info") as req:
+      return await req.json()
+  
+  async def _cat_file(self, path, start=None, end=None, **kwargs):
+    file_info = await self.info(path)
+    download_info = await self._download_info(file_info)
+    async with self._session.get(download_info['url'], headers={
+      'Range': f"bytes={start}-{end-1}"
+    }) as req:
+      return await req.read()
+  cat_file = sync_wrapper(_cat_file)
 
-  def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
-    self._poll()
-    self._block_info(path1)
-    self._block_info(path2)
-    return self.fs.mv(path1, path2, recursive=recursive, maxdepth=maxdepth, **kwargs)
+  async def _put_file(self, lpath, rpath, **kwargs):
+    lpath = Path(lpath)
+    lpath_stat = lpath.stat()
+    rpath_split = rpath.split('/')
+    acc, proj, *proj_path = rpath_split
+    rpath_info = dict(
+      project=f"{acc}/{proj}",
+      name='/'.join(proj_path),
+      size=lpath_stat.st_size,
+    )
+    # initiate multipart upload
+    logger.debug(f"Initiating multipart upload for {rpath_info}")
+    async with self._session.post(f"{self.storage_options['api_endpoint']}/upload/multipart", params=dict(
+      overwrite=True,
+    ), json=rpath_info) as req:
+      upload_info = await req.json()
+    with lpath.open('rb') as fr:
+      # for each chunk of size upload_info['part_size']
+      for i in range((lpath_stat.st_size // upload_info['part_size']) + 1 if lpath_stat.st_size % upload_info['part_size'] else 0):
+        # get part_info
+        logger.info(f"Initiating multipart part {i} upload for {rpath_info['name']}")
+        async with self._session.post(f"{self.storage_options['api_endpoint']}/upload/multipart/{upload_info['upload_id']}/part/{i+1}") as req:
+          part_info = await req.json()
+        # load buffer with upload_info['part_size']
+        buf = fr.read(upload_info['part_size'])
+        while len(buf) < upload_info['part_size']:
+          buf += fr.read(upload_info['part_size'] - len(buf))
+        # upload part
+        async with self._session.request(part_info['method'], part_info['url'], data=buf) as req:
+          await req.read()
+        # report uploaded part
+        async with self._session.post(f"{self.storage_options['api_endpoint']}/upload/multipart/{upload_info['upload_id']}/part", json=dict(
+          part_number=i+1,
+          response=part_info,
+        )) as req:
+          await req.read()
+    # report multipart completion
+    async with self._session.post(f"{self.storage_options['api_endpoint']}/upload/multipart/{upload_info['upload_id']}/complete") as req:
+      uploaded_info = await req.read()
+    if uploaded_info['size'] != lpath_stat.st_size:
+      logger.warn(f"Size mismatch after multipart upload! Got {uploaded_info['size']} expected {lpath_stat.st_size}")
+    logger.debug(f"Multipart upload for {rpath_info} completed")
+  put_file = sync_wrapper(_put_file)
 
-  def exists(self, path, **kwargs):
-    self._poll()
-    self._block_info(path)
-    return self.fs.exists(path, **kwargs)
+  async def _get_file(self, rpath, lpath, **kwargs):
+    file_info = await self.info(rpath)
+    download_info = await self._download_info(file_info)
+    lpath = Path(lpath)
+    async with self._session.get(download_info['url']) as req:
+      with lpath.open('wb') as fw:
+        async for data in req.content.iter_chunked(SBFSFileSystem.CHUNK_SIZE):
+          fw.write(data)
+  get_file = sync_wrapper(_get_file)
 
-  def info(self, path, **kwargs):
-    self._poll()
-    self._block_info(path)
-    return self.fs.info(path, **kwargs)
+  async def _info(self, path, **kwargs):
+    path_split = [] if path in {'', '.', '/', './'} else path.split('/')
+    if len(path_split) == 0:
+      return {'name': path, 'type': 'directory'}
+    elif len(path_split) == 1:
+      project_user, = path_split
+      async with self._session.get(f"{self.storage_options['api_endpoint']}/projects/{project_user}") as req:
+        projects = await req.json()
+      if len(projects['items']) == 0:
+        raise FileNotFoundError(path)
+      elif len(projects['items']) == 1:
+        raise Exception('Ambiguity')
+      else:
+        return {'name': project_user, 'type': 'directory'}
+    elif len(path_split) == 2:
+      project_user, proj_id = path_split
+      async with self._session.get(f"{self.storage_options['api_endpoint']}/projects/{project_user}", params=dict(
+        name=proj_id
+      )) as req:
+        projects = await req.json()
+      if len(projects['items']) == 0:
+        raise FileNotFoundError(path)
+      elif len(projects['items']) == 2:
+        raise Exception('Ambiguity')
+      else:
+        return {'name': f"{project_user}/{proj_id}", 'type': 'directory'}
+    elif len(path_split) == 3:
+      acc, proj_id, name = path_split
+      proj = acc + '/' + proj_id
+      async with self._session.get(f"{self.storage_options['api_endpoint']}/files", params=dict(
+        project=proj, name=name,
+      )) as req:
+        items = await req.json()
+      if len(items['items']) == 0:
+        raise FileNotFoundError(path)
+      elif len(items['items']) > 1:
+        raise Exception('Ambiguity error')
+      item = items['items'][0]
+      item_name = f"{proj}/{item['name']}"
+      if item['type'] == 'file':
+        async with self._session.get(f"{self.storage_options['api_endpoint']}/files/{item['_id']}", params=dict(
+          fields='size',
+        )) as req:
+          item_details = await req.json()
+        return {
+          '_id': item['id'],
+          'name': item_name,
+          'type': 'file',
+          'size': item_details['size'],
+        }
+      elif item['type'] == 'folder':
+        return {
+          '_id': item['id'],
+          'name': item_name,
+          'type': 'directory',
+        }
+      else:
+        raise NotImplementedError
+    elif len(path_split) > 3:
+      item_directory = '/'.join(path_split[:-1])
+      parent_info = await self._info(item_directory)
+      name = path_split[-1]
+      async with self._session.get(f"{self.storage_options['api_endpoint']}/files", params=dict(
+        parent=parent_info['_id'], name=name,
+      )) as req:
+        items = await req.json()
+      if len(items['items']) == 0:
+        raise FileNotFoundError(path)
+      elif len(items['items']) > 1:
+        raise Exception('Ambiguity error')
+      item = items['items'][0]
+      item_name = f"{item_directory}/{item['name']}"
+      if item['type'] == 'file':
+        async with self._session.get(f"{self.storage_options['api_endpoint']}/files/{item['_id']}", params=dict(
+          fields='size',
+        )) as req:
+          item_details = await req.json()
+        return {
+          '_id': item['id'],
+          'name': item_name,
+          'type': 'file',
+          'size': item_details['size'],
+        }
+      elif item['type'] == 'folder':
+        return {
+          '_id': item['id'],
+          'name': item_name,
+          'type': 'directory',
+        }
+      else:
+        raise NotImplementedError
+  info = sync_wrapper(_info)
 
-  def ls(self, path, detail=True, **kwargs):
-    ''' List all files except for special `.info` file
+  async def _ls(self, path, detail=True, **kwargs):
+    path_split = [] if path in {'', '.', '/', './'} else path.split('/')
+    results = {}
+    if len(path_split) == 0:
+      async with self._session.get(f"{self.storage_options['api_endpoint']}/projects") as req:
+        projects = await req.json()
+      for proj in projects['items']:
+        proj_id_split = proj['id'].split('/')
+        acc, _ = proj_id_split
+        results[acc] = {'name': acc, 'type': 'directory'} if detail else acc
+    elif len(path_split) == 1:
+      project_user, = path_split
+      async with self._session.get(f"{self.storage_options['api_endpoint']}/projects/{project_user}") as req:
+        projects = await req.json()
+      for proj in projects['items']:
+        proj_id_split = proj['id'].split('/')
+        if path_split[0] == proj_id_split[0]:
+          results[proj['id']] = {'name': proj['id'], 'type': 'directory'} if detail else proj['id']
+    elif len(path_split) == 2:
+      acc, proj_id = path_split
+      proj = f"{acc}/{proj_id}"
+      async with self._session.get(f"{self.storage_options['api_endpoint']}/files", params=dict(
+        project=proj,
+      )) as req:
+        items = await req.json()
+      for item in items['items']:
+        item_name = proj + '/' + item['name']
+        if detail:
+          if item['type'] == 'file':
+            async with self._session.get(f"{self.storage_options['api_endpoint']}/files/{item['id']}", params=dict(
+              fields='size',
+            )) as req:
+              file_details = await req.json()
+            results[item_name] = {
+              '_id': item['id'],
+              'name': item_name,
+              'type': 'file',
+              'size': file_details['size'],
+            }
+          elif item['type'] == 'folder':
+            results[item_name] = {
+              '_id': item['id'],
+              'name': item_name,
+              'type': 'directory',
+            }
+          else:
+            raise NotImplementedError
+        else:
+          results[item_name] = item_name
+    elif len(path_split) > 2:
+      path_info = await self._info(path)
+      if path_info['type'] == 'directory':
+        async with self._session.get(f"{self.storage_options['api_endpoint']}/files", params=dict(
+          parent=path_info['_id'],
+        )) as req:
+          items = await req.json()
+        for item in items['items']:
+          item_name = path_info['name'] + '/' + item['name']
+          if detail:
+            if item['type'] == 'file':
+              async with self._session.get(f"{self.storage_options['api_endpoint']}/files/{item['id']}", params=dict(
+                fields='size',
+              )) as req:
+                file_details = await req.json()
+              results[item_name] = {
+                '_id': item['id'],
+                'name': item_name,
+                'type': 'file',
+                'size': file_details['size'],
+              }
+            elif item['type'] == 'folder':
+              results[item_name] = {
+                '_id': item['id'],
+                'name': item_name,
+                'type': 'directory',
+              }
+            else:
+              raise NotImplementedError
+          else:
+            results[item_name] = item_name
+      else:
+        logger.warn('?')
+        return [path_info] if detail else [path_info['name']]
+    return list(results.values())
+  ls = sync_wrapper(_ls)
+
+  def _open(self, path, mode="rb", block_size=None, cache_options=None, **kwargs):
+    ''' Write access is possible with writecache
     '''
-    self._poll()
-    if detail:
-      return [
-        p
-        for p in self.fs.ls(path, detail=True, **kwargs)
-        if p['name'] != '.info'
-      ]
-    else:
-      return [
-        p
-        for p in self.fs.ls(path, detail=False, **kwargs)
-        if p != '.info'
-      ]
+    if mode != "rb":
+      raise NotImplementedError
+    return SBFSBufferedFile(self, path, mode=mode, block_size=block_size, cache_options=cache_options, **kwargs)
 
-  def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
-    self._poll()
-    self._block_info(path)
-    # NOTE: SBFS writes are immutable
-    if 'w' in mode:
-      if self.fs.exists(path):
-        self.fs.rm(path)
-    elif 'a' in mode:
-      raise Exception('Append not supported by sbfs')
-    return self.fs._open(path, mode=mode, block_size=block_size, autocommit=autocommit, cache_options=cache_options, **kwargs)
+class SBFSBufferedFile(AbstractBufferedFile):
+  def __init__(self, fs, path, mode="rb", **kwargs):
+      super().__init__(fs, path, mode=mode, **kwargs)
+
+  def _fetch_range(self, start, end):
+    return self.fs.cat_file(start=start, end=end)
