@@ -79,7 +79,7 @@ class WriteCacheFileSystem(AbstractFileSystem):
   def rmdir(self, path):
     path = self.fs.root_marker + path.lstrip('/')
     try:
-      self.upper_fs.rmdir(path)
+      self.fs.rmdir(path)
     except:
       raise
     else:
