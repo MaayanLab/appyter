@@ -6,6 +6,9 @@ import asyncio
 import datetime
 import traceback
 import logging
+
+from appyter.ext.fsspec.core import url_to_chroot_fs
+from appyter.ext.tempfile import tempdir
 logger = logging.getLogger(__name__)
 
 from appyter import __version__
@@ -14,7 +17,6 @@ from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io, nb_to_json
 from appyter.ext.click import click_option_setenv, click_argument_setenv
 from appyter.ext.urllib import join_url
-from appyter.ext.fsspec.fuse import fs_mount
 
 def cell_is_code(cell):
     return cell.get('cell_type') == 'code'
@@ -77,80 +79,82 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   try:
     files = nb.metadata['appyter']['nbconstruct'].get('files')
     logger.debug(f"{cwd=} {files=}")
-    async with fs_mount(cwd, pathmap=files, cached=True) as mnt:
-      # setup execution_info with start time
-      nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
-      with (mnt/ipynb).open('w') as fw:
-        nb_to_ipynb_io(nb, fw)
-      #
-      logger.info('initializing')
-      if callable(subscribe):
-        await subscribe(lambda: dict(nb=nb_to_json(nb), **state))
-      #
-      try:
-        iopub_hook = iopub_hook_factory(nb, emit)
-        client = NotebookClientIOPubHook(
-          nb,
-          allow_errors=True,
-          timeout=None,
-          kernel_name='python3',
-          resources={ 'metadata': {'path': str(mnt) } },
-          iopub_hook=iopub_hook,
-        )
-        await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
-        async with client.async_setup_kernel(
-          env=dict(
-            PYTHONPATH=':'.join(sys.path),
-            PATH=os.environ['PATH'],
-          ),
-        ):
-          logger.info('executing')
-          state.update(status='Executing...', progress=0)
-          await emit({ 'type': 'status', 'data': state['status'] })
-          await emit({ 'type': 'progress', 'data': state['progress'] })
-          n_cells = len(nb.cells)
-          exec_count = 1
-          for index, cell in enumerate(nb.cells):
-            logger.debug(f"executing cell {index}")
-            cell = await client.async_execute_cell(
-              cell, index,
-              execution_count=exec_count,
+    with url_to_chroot_fs(cwd, pathmap=files) as fs:
+      with tempdir() as mnt:
+        async with fs.mount(mnt, fuse=False) as mnt:
+          # setup execution_info with start time
+          nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
+          with (mnt/ipynb).open('w') as fw:
+            nb_to_ipynb_io(nb, fw)
+          #
+          logger.info('initializing')
+          if callable(subscribe):
+            await subscribe(lambda: dict(nb=nb_to_json(nb), **state))
+          #
+          try:
+            iopub_hook = iopub_hook_factory(nb, emit)
+            client = NotebookClientIOPubHook(
+              nb,
+              allow_errors=True,
+              timeout=None,
+              kernel_name='python3',
+              resources={ 'metadata': {'path': str(mnt) } },
+              iopub_hook=iopub_hook,
             )
-            if cell_is_code(cell):
-              if cell_has_error(cell):
-                raise Exception('Cell execution error on cell %d' % (exec_count))
-              exec_count += 1
-            if index < n_cells-1:
-              state['progress'] = index + 1
-              await emit({ 'type': 'progress', 'data': state['progress'] })
-            else:
-              state['status'] = 'Success'
+            await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
+            async with client.async_setup_kernel(
+              env=dict(
+                PYTHONPATH=':'.join(sys.path),
+                PATH=os.environ['PATH'],
+              ),
+            ):
+              logger.info('executing')
+              state.update(status='Executing...', progress=0)
               await emit({ 'type': 'status', 'data': state['status'] })
-      except asyncio.CancelledError:
-        logger.info('cancelled')
-        raise
-      except Exception as e:
-        logger.info('execution error')
-        await emit({ 'type': 'error', 'data': str(e) })
-      # Save execution completion time
-      logger.info('saving')
-      nb.metadata['appyter']['nbexecute']['completed'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
-      # save additional files
-      # TODO: in the future we should individual files and include the original urls here
-      nb.metadata['appyter']['nbexecute']['files'] = {
-        path: path
-        for path in (
-          str(p.relative_to(mnt))
-          for p in mnt.rglob('*')
-          if p.is_file()
-        )
-        if path not in (files.keys()|{ipynb})
-      }
-      #
-      with (mnt/ipynb).open('w') as fw:
-        nb_to_ipynb_io(nb, fw)
-      #
-      logger.info('finalized')
+              await emit({ 'type': 'progress', 'data': state['progress'] })
+              n_cells = len(nb.cells)
+              exec_count = 1
+              for index, cell in enumerate(nb.cells):
+                logger.debug(f"executing cell {index}")
+                cell = await client.async_execute_cell(
+                  cell, index,
+                  execution_count=exec_count,
+                )
+                if cell_is_code(cell):
+                  if cell_has_error(cell):
+                    raise Exception('Cell execution error on cell %d' % (exec_count))
+                  exec_count += 1
+                if index < n_cells-1:
+                  state['progress'] = index + 1
+                  await emit({ 'type': 'progress', 'data': state['progress'] })
+                else:
+                  state['status'] = 'Success'
+                  await emit({ 'type': 'status', 'data': state['status'] })
+          except asyncio.CancelledError:
+            logger.info('cancelled')
+            raise
+          except Exception as e:
+            logger.info('execution error')
+            await emit({ 'type': 'error', 'data': str(e) })
+          # Save execution completion time
+          logger.info('saving')
+          nb.metadata['appyter']['nbexecute']['completed'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
+          # save additional files
+          # TODO: in the future we should individual files and include the original urls here
+          nb.metadata['appyter']['nbexecute']['files'] = {
+            path: path
+            for path in (
+              str(p.relative_to(mnt))
+              for p in mnt.rglob('*')
+              if p.is_file()
+            )
+            if path not in (files.keys()|{ipynb})
+          }
+          #
+          with (mnt/ipynb).open('w') as fw:
+            nb_to_ipynb_io(nb, fw)
+          #
+          logger.info('finalized')
   except asyncio.CancelledError:
     logger.info(f"outer cancelled")
     raise

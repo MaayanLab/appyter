@@ -2,16 +2,19 @@ import shutil
 import pathlib
 import contextlib
 from fsspec import AbstractFileSystem
-from appyter.ext.urllib import join_slash, parent_url
-
 class AbstractFileSystemEx(AbstractFileSystem):
   @contextlib.asynccontextmanager
   async def mount(self, mount_dir: pathlib.Path, fuse=False, **kwargs):
     ''' Mount this filesystem
     '''
     if fuse:
-      # TODO: fuse mapping
-      raise NotImplementedError
+      from appyter.ext.fsspec.fuse import fs_mount
+      async with fs_mount(
+        f"{self.protocol}:://",
+        mount_dir=mount_dir,
+        **{ self.protocol: self.storage_options }
+      ) as mount_dir:
+        yield mount_dir
     else:
       # can't use fuse, default is to just copy files into the mount_dir
       for f1 in self.walk(''):
