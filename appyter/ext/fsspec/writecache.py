@@ -85,6 +85,15 @@ class WriteCacheFileSystem(AbstractFileSystem):
     else:
       self._dir_cache.discard(path)
 
+  def rm_file(self, path):
+    path = self.fs.root_marker + path.lstrip('/')
+    try:
+      self.fs.rm_file(path)
+    except:
+      raise
+    else:
+      self._local_cache.discard(path)
+
   def rm(self, path, recursive=False, maxdepth=None):
     path = self.fs.root_marker + path.lstrip('/')
     try:
@@ -96,6 +105,37 @@ class WriteCacheFileSystem(AbstractFileSystem):
         for d in list(self._dir_cache):
           if d.startswith(path):
             self._dir_cache.remove(d)
+
+  def cat_file(self, path, start=None, end=None, **kwargs):
+    path = self.fs.root_marker + path.lstrip('/')
+    try:
+      return self.fs.cat_file(path, start=start, end=end, **kwargs)
+    except:
+      if path in self._local_cache:
+        fh = self._local_cache[path]
+        cur = fh.tell()
+        fh.seek(start or 0)
+        if end is None:
+          contents = fh.read()
+        else:
+          contents = fh.read(end - (start or 0))
+        fh.seek(cur)
+        return contents
+      else:
+        raise
+
+  def put_file(self, lpath, rpath, **kwargs):
+    path = self.fs.root_marker + path.lstrip('/')
+    return self.fs.put_file(lpath, self._resolve_path(rpath), **kwargs)
+
+  def get_file(self, rpath, lpath, **kwargs):
+    path = self.fs.root_marker + path.lstrip('/')
+    return self.fs.get_file(self._resolve_path(rpath), lpath, **kwargs)
+
+  def cp_file(self, path1, path2, **kwargs):
+    path1 = self.fs.root_marker + path1.lstrip('/')
+    path2 = self.fs.root_marker + path2.lstrip('/')
+    return self.fs.cp_file(path1, path2, **kwargs)
 
   def copy(self, path1, path2, recursive=False, on_error=None, **kwargs):
     path1 = self.fs.root_marker + path1.lstrip('/')
@@ -112,7 +152,6 @@ class WriteCacheFileSystem(AbstractFileSystem):
           p = PurePath(d)
           if p.is_relative_to(p1):
             self._dir_cache.add(str(p2 / p.relative_to(path1)))
-
 
   def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
     path1 = self.fs.root_marker + path1.lstrip('/')

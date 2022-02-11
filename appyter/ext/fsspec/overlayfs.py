@@ -69,8 +69,39 @@ class OverlayFileSystem(AbstractFileSystemEx):
   def rmdir(self, path):
     return self.upper_fs.rmdir(path)
 
+  def rm_file(self, path):
+    return self.upper_fs.rm_file(path)
+
   def rm(self, path, recursive=False, maxdepth=None):
     return self.upper_fs.rm(path, recursive=recursive, maxdepth=maxdepth)
+
+  def cat_file(self, path, start=None, end=None, **kwargs):
+    if self.upper_fs.exists(path):
+      return self.upper_fs.cat(path, start=start, end=end, **kwargs)
+    elif self.lower_fs.exists(path):
+      return self.lower_fs.cat(path, start=start, end=end, **kwargs)
+    else:
+      raise FileNotFoundError
+
+  def put_file(self, lpath, rpath, **kwargs):
+    return self.upper_fs.put(lpath, rpath, **kwargs)
+
+  def get_file(self, rpath, lpath, **kwargs):
+    if self.upper_fs.exists(rpath):
+      return self.upper_fs.get_file(rpath, lpath, **kwargs)
+    elif self.lower_fs.exists(rpath):
+      return self.lower_fs.get_file(rpath, lpath, **kwargs)
+    else:
+      raise FileNotFoundError
+
+  def cp_file(self, path1, path2, **kwargs):
+    if self.upper_fs.exists(path1) or not self.lower_fs.exists(path1):
+      return self.upper_fs.cp_file(path1, path2, **kwargs)
+    else:
+      with self.lower_fs.open(path1, 'rb') as fr:
+        self.upper_fs.makedirs(parent_url(path2), exist_ok=True)
+        with self.upper_fs.open(path2, 'wb') as fw:
+          shutil.copyfileobj(fr, fw)
 
   def copy(self, path1, path2, recursive=False, on_error=None, maxdepth=None, **kwargs):
     if self.upper_fs.exists(path1) or not self.lower_fs.exists(path1):

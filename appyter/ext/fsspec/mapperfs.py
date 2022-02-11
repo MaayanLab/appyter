@@ -64,6 +64,9 @@ class MapperFileSystem(AbstractFileSystemEx):
   def rmdir(self, path):
     raise PermissionError(path)
 
+  def rm_file(self, path):
+    raise PermissionError(path)
+
   def rm(self, path, recursive=False, maxdepth=None):
     raise PermissionError(path)
 

@@ -125,9 +125,29 @@ class ChrootFileSystem(AbstractFileSystemEx):
     with self.__masquerade_os_error(path=path):
       return self.fs.rmdir(self._resolve_path(path))
 
+  def rm_file(self, path):
+    with self.__masquerade_os_error(path=path):
+      return self.fs.rm_file(self._resolve_path(path))
+
   def rm(self, path, recursive=False, maxdepth=None):
     with self.__masquerade_os_error(path=path):
       return self.fs.rm(self._resolve_path(path), recursive=recursive, maxdepth=maxdepth)
+
+  def cat_file(self, path, start=None, end=None, **kwargs):
+    with self.__masquerade_os_error():
+      return self.fs.cat_file(self._resolve_path(path), start=start, end=end, **kwargs)
+
+  def put_file(self, lpath, rpath, **kwargs):
+    with self.__masquerade_os_error():
+      return self.fs.put_file(lpath, self._resolve_path(rpath), **kwargs)
+
+  def get_file(self, rpath, lpath, **kwargs):
+    with self.__masquerade_os_error():
+      return self.fs.get_file(self._resolve_path(rpath), lpath, **kwargs)
+
+  def cp_file(self, path1, path2, **kwargs):
+    with self.__masquerade_os_error():
+      return self.fs.cp_file(self._resolve_path(path1), self._resolve_path(path2), **kwargs)
 
   def copy(self, path1, path2, recursive=False, on_error=None, **kwargs):
     with self.__masquerade_os_error():
