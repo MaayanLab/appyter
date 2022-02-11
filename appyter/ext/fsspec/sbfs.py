@@ -1,6 +1,7 @@
 import logging
 logger = logging.getLogger(__name__)
 
+import json
 import aiohttp
 from pathlib import Path
 from fsspec.asyn import AsyncFileSystem, sync_wrapper
@@ -43,7 +44,6 @@ class SBFSFileSystem(AsyncFileSystem):
         type='folder',
       )) as req:
         res = await req.json()
-      logger.debug(f"{res=}")
       return {
         '_id': res['id'],
         'name': f"{user}/{project}/{res['name']}",
@@ -65,7 +65,6 @@ class SBFSFileSystem(AsyncFileSystem):
         type='folder',
       )) as req:
         res = await req.json()
-      logger.debug(f"{res=}")
       return {
         '_id': res['id'],
         'name': f"{parent_directory_path}/{res['name']}",
@@ -77,19 +76,36 @@ class SBFSFileSystem(AsyncFileSystem):
     return await self._mkdir(path, create_parents=True, exist_ok=exist_ok, **kwargs)
   makedirs = sync_wrapper(_makedirs)
 
-  async def _rmdir(self, path):
-    dir_info = await self._info(path)
-    if dir_info['type'] != 'directory': raise NotADirectoryError
-    async with self._session.delete(f"{self.storage_options['api_endpoint']}/files/{dir_info['_id']}") as res:
+  async def _sbg_rm_file(self, file_id):
+    async with self._session.delete(f"{self.storage_options['api_endpoint']}/files/{file_id}", headers={
+      'Content-Type': 'application/json',
+    }) as res:
       return await res.text()
+
+  async def _rmdir(self, path):
+    info = await self._info(path)
+    if info['type'] != 'directory': raise NotADirectoryError
+    await self._sbg_rm_file(info['_id'])
   rmdir = sync_wrapper(_rmdir)
 
   async def _rm_file(self, path):
-    file_info = await self._info(path)
-    if file_info['type'] == 'directory': raise IsADirectoryError
-    async with self._session.delete(f"{self.storage_options['api_endpoint']}/files/{file_info['_id']}") as res:
-      return await res.text()
+    info = await self._info(path)
+    if info['type'] == 'directory': raise IsADirectoryError
+    await self._sbg_rm_file(info['_id'])
   rm_file = sync_wrapper(_rm_file)
+
+  async def _rm(self, path, recursive=False, **kargs):
+    info = await self._info(path)
+    if info['type'] == 'file':
+      await self._sbg_rm_file(info['_id'])
+    elif info['type'] == 'directory':
+      if recursive:
+        for child in await self._ls(info['name'], detail=False):
+          await self._rm(child)
+      await self._sbg_rm_file(info['_id'])
+    else:
+      raise NotImplementedError
+  rm = sync_wrapper(_rm)
 
   async def _cp_file(self, path1, path2, **kwargs):
     file1_info = await self.info(path1)
@@ -107,10 +123,10 @@ class SBFSFileSystem(AsyncFileSystem):
       return await req.json()
   
   async def _cat_file(self, path, start=None, end=None, **kwargs):
-    file_info = await self.info(path)
+    file_info = await self._info(path)
     download_info = await self._download_info(file_info)
     async with self._session.get(download_info['url'], headers={
-      'Range': f"bytes={start}-{end-1}"
+      'Range': f"bytes={start if start is not None else ''}-{end if end is not None else ''}"
     }) as req:
       return await req.read()
   cat_file = sync_wrapper(_cat_file)
@@ -119,44 +135,61 @@ class SBFSFileSystem(AsyncFileSystem):
     lpath = Path(lpath)
     lpath_stat = lpath.stat()
     rpath_split = rpath.split('/')
-    acc, proj, *proj_path = rpath_split
-    rpath_info = dict(
-      project=f"{acc}/{proj}",
-      name='/'.join(proj_path),
-      size=lpath_stat.st_size,
-    )
+    if len(rpath_split) == 3:
+      rpath_info = dict(
+        project='/'.join(rpath_split[:2]),
+        name=rpath_split[-1],
+        size=lpath_stat.st_size,
+        part_size=min(1073741824, lpath_stat.st_size),
+      )
+    elif len(rpath_split) > 3:
+      parent_info = await self._info('/'.join(rpath_split[:-1]))
+      rpath_info = dict(
+        parent=parent_info['_id'],
+        name=rpath_split[-1],
+        size=lpath_stat.st_size,
+        part_size=min(1073741824, lpath_stat.st_size),
+      )
+    else:
+      raise PermissionError
     # initiate multipart upload
-    logger.debug(f"Initiating multipart upload for {rpath_info}")
-    async with self._session.post(f"{self.storage_options['api_endpoint']}/upload/multipart", params=dict(
-      overwrite=True,
-    ), json=rpath_info) as req:
+    logger.debug(f"Initiating multipart upload for {rpath}: {rpath_info}")
+    async with self._session.post(f"{self.storage_options['api_endpoint']}/upload/multipart", params=dict(overwrite='true'), json=rpath_info) as req:
       upload_info = await req.json()
-    with lpath.open('rb') as fr:
-      # for each chunk of size upload_info['part_size']
-      for i in range((lpath_stat.st_size // upload_info['part_size']) + 1 if lpath_stat.st_size % upload_info['part_size'] else 0):
-        # get part_info
-        logger.info(f"Initiating multipart part {i} upload for {rpath_info['name']}")
-        async with self._session.post(f"{self.storage_options['api_endpoint']}/upload/multipart/{upload_info['upload_id']}/part/{i+1}") as req:
-          part_info = await req.json()
-        # load buffer with upload_info['part_size']
-        buf = fr.read(upload_info['part_size'])
-        while len(buf) < upload_info['part_size']:
-          buf += fr.read(upload_info['part_size'] - len(buf))
-        # upload part
-        async with self._session.request(part_info['method'], part_info['url'], data=buf) as req:
-          await req.read()
-        # report uploaded part
-        async with self._session.post(f"{self.storage_options['api_endpoint']}/upload/multipart/{upload_info['upload_id']}/part", json=dict(
-          part_number=i+1,
-          response=part_info,
-        )) as req:
-          await req.read()
-    # report multipart completion
-    async with self._session.post(f"{self.storage_options['api_endpoint']}/upload/multipart/{upload_info['upload_id']}/complete") as req:
-      uploaded_info = await req.read()
-    if uploaded_info['size'] != lpath_stat.st_size:
-      logger.warn(f"Size mismatch after multipart upload! Got {uploaded_info['size']} expected {lpath_stat.st_size}")
-    logger.debug(f"Multipart upload for {rpath_info} completed")
+    try:
+      with lpath.open('rb') as fr:
+        # for each chunk of size upload_info['part_size']
+        for i in range((lpath_stat.st_size // upload_info['part_size']) + 1 if lpath_stat.st_size % upload_info['part_size'] else 0):
+          # get part_info
+          logger.info(f"Initiating multipart part {i+1} upload for {rpath_info['name']}")
+          async with self._session.get(f"{self.storage_options['api_endpoint']}/upload/multipart/{upload_info['upload_id']}/part/{i+1}") as req:
+            part_info = await req.json()
+          # load buffer with upload_info['part_size']
+          buf = fr.read(upload_info['part_size'])
+          # upload part
+          async with self._session.request(part_info['method'], part_info['url'], data=buf) as req:
+            await req.read()
+            upload_response = {'headers': {k: json.loads(req.headers.get(k)) for k in part_info['report']['headers']}}
+          logger.debug(f"{upload_response=}")
+          # report uploaded part
+          async with self._session.post(f"{self.storage_options['api_endpoint']}/upload/multipart/{upload_info['upload_id']}/part", json=dict(
+            part_number=i+1,
+            response=upload_response,
+          )) as req:
+            await req.read()
+      # report multipart completion
+      async with self._session.post(f"{self.storage_options['api_endpoint']}/upload/multipart/{upload_info['upload_id']}/complete", headers={
+        'Content-Type': 'application/json',
+      }) as req:
+        await req.read()
+    except:
+      # abort multipart upload
+      async with self._session.delete(f"{self.storage_options['api_endpoint']}/upload/multipart/{upload_info['upload_id']}", headers={
+        'Content-Type': 'application/json',
+      }) as req:
+        await req.read()
+      raise
+    logger.debug(f"Multipart upload for {rpath} completed")
   put_file = sync_wrapper(_put_file)
 
   async def _get_file(self, rpath, lpath, **kwargs):
@@ -242,7 +275,7 @@ class SBFSFileSystem(AsyncFileSystem):
       item = items['items'][0]
       item_name = f"{item_directory}/{item['name']}"
       if item['type'] == 'file':
-        async with self._session.get(f"{self.storage_options['api_endpoint']}/files/{item['_id']}", params=dict(
+        async with self._session.get(f"{self.storage_options['api_endpoint']}/files/{item['id']}", params=dict(
           fields='size',
         )) as req:
           item_details = await req.json()
@@ -343,13 +376,13 @@ class SBFSFileSystem(AsyncFileSystem):
           else:
             results[item_name] = item_name
       else:
-        logger.warn('?')
         return [path_info] if detail else [path_info['name']]
     return list(results.values())
   ls = sync_wrapper(_ls)
 
   def _open(self, path, mode="rb", block_size=None, cache_options=None, **kwargs):
-    ''' Write access is possible with writecache
+    ''' Implements certain write ops, to use `open` with mode='w' or mode='a' use writecache,
+    i.e. writecache::chroot::sbfs://*
     '''
     if mode != "rb":
       raise NotImplementedError
@@ -360,4 +393,4 @@ class SBFSBufferedFile(AbstractBufferedFile):
       super().__init__(fs, path, mode=mode, **kwargs)
 
   def _fetch_range(self, start, end):
-    return self.fs.cat_file(start=start, end=end)
+    return self.fs.cat_file(self.path, start=start, end=end)
