@@ -18,7 +18,7 @@ def _fuse_run(url, mount_point, kwargs, alias_dump, singleton_dump):
       logger.debug('teardown..')
 
 @contextlib.asynccontextmanager
-async def fs_mount(url, **kwargs):
+async def fs_mount(url, mount_dir=None, **kwargs):
   import os
   import signal
   import asyncio
@@ -34,7 +34,7 @@ async def fs_mount(url, **kwargs):
   @run_in_executor
   def _assert_not_mounted(path):
     assert not path.is_mount()
-  with tempdir() as tmp:
+  with tempdir(mount_dir) as tmp:
     logger.debug(f'mounting {url} onto {tmp}')
     proc = Process(
       target=_fuse_run,

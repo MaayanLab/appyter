@@ -48,8 +48,23 @@ def SingletonFileSystemFactory(_proto, _fs_url, **_kwargs):
       def rmdir(self, path):
         return self.fs.rmdir(path)
 
+      def rm_file(self, path):
+        return self.fs.rm_file(path)
+
       def rm(self, path, recursive=False, maxdepth=None):
         return self.fs.rm(path, recursive=recursive, maxdepth=maxdepth)
+
+      def cat_file(self, path, start=None, end=None, **kwargs):
+        return self.fs.cat_file(path, start=start, end=end, **kwargs)
+
+      def put_file(self, lpath, rpath, **kwargs):
+        return self.fs.put_file(lpath, rpath, **kwargs)
+
+      def get_file(self, rpath, lpath, **kwargs):
+        return self.fs.get_file(rpath, lpath, **kwargs)
+
+      def cp_file(self, path1, path2, **kwargs):
+        return self.fs.cp_file(path1, path2, **kwargs)
 
       def copy(self, path1, path2, recursive=False, on_error=None, **kwargs):
         return self.fs.copy(path1, path2, recursive=recursive, on_error=on_error, **kwargs)
