@@ -24,6 +24,7 @@ def prepare_data(req):
 def prepare_results(data):
   results_hash = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data=data))
   with url_to_chroot_fs(join_url('storage://output/', results_hash)) as data_fs:
+    data_fs.makedirs('', exist_ok=True)
     if not data_fs.exists(current_app.config['IPYNB']):
       # construct notebook
       env = get_jinja2_env(config=current_app.config, context=data, session=results_hash)

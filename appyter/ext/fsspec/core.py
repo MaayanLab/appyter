@@ -22,8 +22,6 @@ def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):
   '''
   from appyter.ext.fsspec.chroot import ChrootFileSystem
   fs, fs_path = url_to_fs_ex(url, **kwargs)
-  # ensure auto_mkdir is set on files
-  if fs.protocol == 'file': fs.auto_mkdir = True
   # add chroot
   fs = ChrootFileSystem(fs=fs, fo=fs_path)
   # apply pathmap as needed
