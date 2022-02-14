@@ -15,9 +15,12 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
     super().__init__(*args, api_endpoint=api_endpoint, auth_token=auth_token, **storage_options)
 
   async def __aenter__(self):
-    self._session_mgr = aiohttp.ClientSession(headers={
-      'X-SBG-Auth-Token': self.storage_options['auth_token'],
-    })
+    self._session_mgr = aiohttp.ClientSession(
+      headers={
+        'X-SBG-Auth-Token': self.storage_options['auth_token'],
+      },
+      raise_for_status=True,
+    )
     self._session = await self._session_mgr.__aenter__()
     return self
   __enter__ = sync_wrapper(__aenter__)
@@ -126,8 +129,14 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
   async def _cat_file(self, path, start=None, end=None, **kwargs):
     file_info = await self._info(path)
     download_info = await self._download_info(file_info)
+    if end is None: end = file_info['size']
+    elif end > file_info['size']: end = file_info['size']
+    elif end < 0: raise Exception('Invalid end')
+    if start is None: start = 0
+    elif start >= end: return b''
+    elif start < 0: raise Exception('Invalid start')
     async with self._session.get(download_info['url'], headers={
-      'Range': f"bytes={start if start is not None else ''}-{end if end is not None else ''}"
+      'Range': f"bytes={start}-{end}"
     }) as req:
       return await req.read()
   cat_file = sync_wrapper(_cat_file)
