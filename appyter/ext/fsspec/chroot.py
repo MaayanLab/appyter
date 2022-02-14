@@ -7,11 +7,12 @@ from appyter.ext.urllib import join_slash
 logger = logging.getLogger(__name__)
 
 from pathlib import PurePosixPath
-from fsspec import filesystem
-from appyter.ext.fsspec.spec import AbstractFileSystemEx
+from fsspec import AbstractFileSystem, filesystem
+from appyter.ext.fsspec.spec import MountableAbstractFileSystem
 from appyter.ext.pathlib.chroot import ChrootPurePosixPath
+from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager_factory
 
-class ChrootFileSystem(AbstractFileSystemEx):
+class ChrootFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
   ''' chroot: update root and disallow access beyond chroot, only works on directories.
   '''
   root_marker = ''
@@ -108,10 +109,15 @@ class ChrootFileSystem(AbstractFileSystemEx):
         self.fs.__exit__(type, value, traceback)
 
   @contextlib.asynccontextmanager
-  async def mount(self, mount_dir, **kwargs):
-    _mount = self.fs.mount if getattr(self.fs, 'mount', None) else super().mount
-    async with _mount(mount_dir, **kwargs) as mount_dir:
-      yield mount_dir
+  async def _mount(self, mount_dir=None, fuse=True, **kwargs):
+    logger.debug(f"{self=} mount {mount_dir=} {fuse=}")
+    if not fuse and self.fs.protocol == 'file':
+      yield self.storage_options['fo']
+    else:
+      _mount = self.fs._mount if getattr(self.fs, '_mount', None) else MountableAbstractFileSystem._mount
+      async with _mount(mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+        yield mount_dir
+  mount = sync_contextmanager_factory(_mount)
 
   def mkdir(self, path, **kwargs):
     with self.__masquerade_os_error(path=path):

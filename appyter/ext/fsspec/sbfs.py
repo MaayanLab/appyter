@@ -5,9 +5,10 @@ import json
 import aiohttp
 from pathlib import Path
 from fsspec.asyn import AsyncFileSystem, sync_wrapper
+from appyter.ext.fsspec.spec import MountableAbstractFileSystem
 from fsspec.spec import AbstractBufferedFile
 
-class SBFSFileSystem(AsyncFileSystem):
+class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
   CHUNK_SIZE = 8192
 
   def __init__(self, *args, api_endpoint='', auth_token='', **storage_options):

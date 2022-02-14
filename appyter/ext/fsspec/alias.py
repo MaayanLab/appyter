@@ -1,13 +1,14 @@
 import logging
-
 logger = logging.getLogger(__name__)
 
 import fsspec
 import contextlib
-from appyter.ext.fsspec.spec import AbstractFileSystemEx
+from fsspec import AbstractFileSystem
+from appyter.ext.fsspec.spec import MountableAbstractFileSystem
 from appyter.ext.fsspec.core import url_to_chroot_fs
+from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager_factory
 
-class AliasFileSystemBase(AbstractFileSystemEx): pass
+class AliasFileSystemBase(MountableAbstractFileSystem, AbstractFileSystem): pass
 
 def AliasFileSystemFactory(_proto, _fs_url, **_kwargs):
   logger.debug(f"creating AliasFileSystem {_proto}://* => {_fs_url}*")
@@ -43,10 +44,11 @@ def AliasFileSystemFactory(_proto, _fs_url, **_kwargs):
         await self.fs.__aexit__(type, value, traceback)
 
     @contextlib.asynccontextmanager
-    async def mount(self, mount_dir, **kwargs):
-      _mount = self.fs.mount if getattr(self.fs, 'mount', None) else super().mount
-      async with _mount(mount_dir, **kwargs) as mount_dir:
+    async def _mount(self, mount_dir=None, **kwargs):
+      _mount = self.fs._mount if getattr(self.fs, '_mount', None) else MountableAbstractFileSystem._mount
+      async with _mount(mount_dir=mount_dir, **kwargs) as mount_dir:
         yield mount_dir
+    mount = sync_contextmanager_factory(_mount)
 
     def mkdir(self, path, **kwargs):
       return self.fs.mkdir(path, **kwargs)

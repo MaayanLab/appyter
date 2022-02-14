@@ -1,14 +1,15 @@
 import shutil
 import contextlib
 import logging
-
 logger = logging.getLogger(__name__)
 
 from fsspec import filesystem
-from appyter.ext.fsspec.spec import AbstractFileSystemEx
+from fsspec import AbstractFileSystem
+from appyter.ext.fsspec.spec import MountableAbstractFileSystem
 from appyter.ext.urllib import join_slash, parent_url
+from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager_factory
 
-class OverlayFileSystem(AbstractFileSystemEx):
+class OverlayFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
   ''' OverlayFS implemented with fsspec
   '''
   root_marker = ''
@@ -49,16 +50,17 @@ class OverlayFileSystem(AbstractFileSystemEx):
       self.lower_fs.__exit__(type, value, traceback)
 
   @contextlib.asynccontextmanager
-  async def mount(self, mount_dir, fuse=True, **kwargs):
+  async def _mount(self, mount_dir=None, fuse=True, **kwargs):
     if fuse:
-      async with super().mount(mount_dir, fuse=True, **kwargs) as mount_dir:
+      async with MountableAbstractFileSystem._mount(mount_dir=mount_dir, fuse=True, **kwargs) as mount_dir:
         yield mount_dir
     else:
-      _upper_mount = self.upper_fs.mount if getattr(self.upper_fs, 'mount', None) else super().mount
-      _lower_mount = self.lower_fs.mount if getattr(self.lower_fs, 'mount', None) else super().mount
-      async with _upper_mount(mount_dir, fuse=False, **kwargs) as mount_dir:
-        async with _lower_mount(mount_dir, fuse=False, **kwargs) as mount_dir:
+      _upper_mount = self.upper_fs._mount if getattr(self.upper_fs, '_mount', None) else MountableAbstractFileSystem._mount
+      _lower_mount = self.lower_fs._mount if getattr(self.lower_fs, '_mount', None) else MountableAbstractFileSystem._mount
+      async with _upper_mount(mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
+        async with _lower_mount(mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
           yield mount_dir
+  mount = sync_contextmanager_factory(_mount)
 
   def mkdir(self, path, **kwargs):
     return self.upper_fs.mkdir(path, **kwargs)

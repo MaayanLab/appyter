@@ -1,13 +1,15 @@
 import os
 import contextlib
 from pathlib import PurePath
-from fsspec import filesystem, AbstractFileSystem
+from fsspec import AbstractFileSystem, filesystem
+from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager_factory
+from appyter.ext.fsspec.spec import MountableAbstractFileSystem
 from appyter.ext.tempfile import mktemp
 
 import logging
 logger = logging.getLogger(__name__)
 
-class WriteCacheFileSystem(AbstractFileSystem):
+class WriteCacheFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
   protocol = 'writecache'
 
   def __init__(self, target_protocol=None, target_options=None, fs=None, **kwargs):
@@ -47,14 +49,16 @@ class WriteCacheFileSystem(AbstractFileSystem):
       self.fs.__exit__(type, value, traceback)
 
   @contextlib.asynccontextmanager
-  async def mount(self, mount_dir, fuse=True, **kwargs):
+  async def _mount(self, mount_dir=None, fuse=True, **kwargs):
+    logger.debug(f"{self=} mount {mount_dir=} {fuse=}")
     if fuse:
-      async with super().mount(mount_dir, fuse=fuse, **kwargs) as mount_dir:
+      async with MountableAbstractFileSystem._mount(mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
         yield mount_dir
     else:
-      _mount = self.fs.mount if getattr(self.fs, 'mount', None) else super().mount
+      _mount = self.fs._mount if getattr(self.fs, '_mount', None) else MountableAbstractFileSystem._mount
       async with _mount(mount_dir, fuse=fuse, **kwargs) as mount_dir:
         yield mount_dir
+  mount = sync_contextmanager_factory(_mount)
 
   def mkdir(self, path, **kwargs):
     path = self.fs.root_marker + path.lstrip('/')
