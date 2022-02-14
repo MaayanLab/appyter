@@ -1,6 +1,6 @@
-aiohttp<3.8.0
-aiohttp_remotes
-aiohttp-wsgi
+aiohttp==3.8.1
+aiohttp_remotes==1.2.0
+aiohttp-wsgi @ 'git+https://github.com/MaayanLab/aiohttp-wsgi.git@patch'
 bs4
 click
 click-default-group
@@ -17,6 +17,6 @@ nbconvert
 nbformat==5.0.8
 notebook
 python-dotenv
-python-engineio==4.0.0
-python-socketio==5.0.4
+python-engineio==4.3.1
+python-socketio==5.5.1
 watchgod
