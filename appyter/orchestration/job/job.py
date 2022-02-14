@@ -37,27 +37,24 @@ async def setup_evaluate_notebook(emitter, job):
 
 async def setup_socketio(emitter, job):
   from appyter.ext.socketio import AsyncClient
-  sio = AsyncClient()
-  #
-  @sio.event
-  async def joined(data):
-    if data['id'] != sio.sid:
-      await emitter.emit('joined', id=data['id'])
-  #
-  @emitter.on('msg')
-  async def on_msg(type=None, data=None, to=None, room=None, **kwargs):
-    if to is not None:
-      await sio.emit(type, data, priority=1, to=to, **kwargs)
-    else:
-      await sio.emit(type, data, priority=1, room=job['session'], **kwargs)
-  #
-  url = urllib.parse.urlparse(job['url'])
-  await sio.connect(f"{url.scheme}://{url.netloc}", socketio_path=url.path)
-  await sio.emit('join', job['session'])
-  await emitter.wait('stopped')
-  await emitter.flush()
-  await emitter.clear()
-  await sio.disconnect()
+  async with AsyncClient() as sio:
+    #
+    @sio.event
+    async def joined(data):
+      if data['id'] != sio.sid:
+        await emitter.emit('joined', id=data['id'])
+    #
+    @emitter.on('msg')
+    async def on_msg(type=None, data=None, to=None, **kwargs):
+      await sio.emit(type, data, priority=1, to=to if to is not None else job['session'], **kwargs)
+    #
+    url = urllib.parse.urlparse(job['url'])
+    await sio.connect(f"{url.scheme}://{url.netloc}", socketio_path=url.path)
+    await sio.emit('join', job['session'])
+    await emitter.wait('stopped')
+    await emitter.flush()
+    await emitter.clear()
+    await sio.disconnect()
 
 @contextlib.contextmanager
 def setup_storage(storage):

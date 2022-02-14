@@ -4,20 +4,26 @@ logger = logging.getLogger(__name__)
 
 from appyter.ext.socketio.priority_queued_emit import PriorityQueuedEmitMixin
 
-class AsyncServer(PriorityQueuedEmitMixin, socketio.AsyncServer):
-  ''' Server with packet forwarding
+class AsyncServer(
+  PriorityQueuedEmitMixin,
+  socketio.AsyncServer,
+):
+  ''' Server with packet forwarding.
+  `async with` is necessary for initialization
   '''
-  klass = socketio.AsyncServer
-
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
-    self._emit_enabled.set()
+
+  async def __aenter__(self):
+    await super().__aenter__()
     #
-    this = self
     @self.on('forward')
     async def forward(sid, data):
       logger.debug('Server forward')
-      if data.get('to'):
-        await this.emit(data['event'], data['data'], priority=max(0, data.get('priority', 0)) + 1, to=data['to'])
-      elif data.get('room'):
-        await this.emit(data['event'], data['data'], priority=max(0, data.get('priority', 0)) + 1, room=data['room'])
+      await self.emit(data['event'], data['data'], priority=max(0, data.get('priority', 0)) + 1, to=data['to'])
+    #
+    self._emit_enabled.set()
+    return self
+  
+  async def __aexit__(self, *args):
+    await super().__aexit__(*args)

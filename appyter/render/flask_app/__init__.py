@@ -67,6 +67,10 @@ def create_app(**kwargs):
   #
   logger.info('Initializing socketio...')
   socketio.attach(app, join_slash(config['PREFIX'], 'socket.io'))
+  @app.cleanup_ctx.append
+  async def initialize_socketio(app):
+    async with socketio:
+      yield
   #
   logger.info('Initializing flask...')
   flask_app = Flask(__name__, static_url_path=None, static_folder=None)

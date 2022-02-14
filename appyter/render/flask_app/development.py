@@ -38,24 +38,24 @@ async def app_messager(emitter, config):
   from appyter.ext.urllib import join_slash
   from appyter.ext.socketio import AsyncClient
   from appyter.ext.asyncio.try_n_times import async_try_n_times
-  sio = AsyncClient()
-  #
-  @emitter.on('livereload')
-  async def livereload(changes):
-    logger.info(f"LiveReload {changes}")
-    await sio.emit('livereload', {})
-  #
-  @emitter.on('quit')
-  async def quit():
-    logger.info('Disconnecting..')
-    await sio.disconnect()
-  #
-  origin = f"http://{config['HOST']}:{config['PORT']}"
-  path = join_slash(config['PREFIX'], "socket.io")
-  logger.info(f"Connecting to appyter server at {origin}{path}...")
-  await asyncio.sleep(1)
-  await async_try_n_times(3, sio.connect, origin, socketio_path=path)
-  await sio.wait()
+  async with AsyncClient() as sio:
+    #
+    @emitter.on('livereload')
+    async def livereload(changes):
+      logger.info(f"LiveReload {changes}")
+      await sio.emit('livereload', {})
+    #
+    @emitter.on('quit')
+    async def quit():
+      logger.info('Disconnecting..')
+      await sio.disconnect()
+    #
+    origin = f"http://{config['HOST']}:{config['PORT']}"
+    path = join_slash(config['PREFIX'], "socket.io")
+    logger.info(f"Connecting to appyter server at {origin}{path}...")
+    await asyncio.sleep(1)
+    await async_try_n_times(3, sio.connect, origin, socketio_path=path)
+    await sio.wait()
 
 async def file_watcher(emitter, evt, path, **kwargs):
   from watchgod import awatch

@@ -1,4 +1,3 @@
-import aiohttp
 import traceback
 import logging
 import shutil
@@ -11,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 from appyter.render.flask_app.core import core
 from appyter.render.flask_app.socketio import socketio
-from appyter.ext.flask import secure_filepath, secure_url, route_join_with_or_without_slash
+from appyter.ext.flask import secure_filepath, route_join_with_or_without_slash
 from appyter.ext.hashlib import sha1sum_io
 from appyter.ext.uuid import generate_uuid
 
@@ -57,11 +56,11 @@ async def siofu_start(sid, data):
         'id': data.get('id'),
         'name': None,
       },
-      room=sid,
+      to=sid,
     )
   except Exception as e:
     logger.error(traceback.format_exc())
-    await socketio.emit('siofu_error', str(e), room=sid)
+    await socketio.emit('siofu_error', str(e), to=sid)
 
 @socketio.on("siofu_progress")
 async def siofu_progress(sid, evt):
@@ -70,7 +69,7 @@ async def siofu_progress(sid, evt):
   logger.debug(f"progress: {evt}")
   await socketio.emit("siofu_chunk", dict(
     id=evt['id'],
-  ), room=sid)
+  ), to=sid)
 
 @socketio.on("siofu_done")
 async def siofu_done(sid, evt):
@@ -88,7 +87,7 @@ async def siofu_done(sid, evt):
   await socketio.emit('siofu_complete', dict(
     id=evt['id'],
     detail=dict(full_filename=full_filename)
-  ), room=sid)
+  ), to=sid)
 
 # upload from client with POST
 def upload_from_request(req, fname):

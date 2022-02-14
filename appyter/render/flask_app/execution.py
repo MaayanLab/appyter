@@ -49,4 +49,4 @@ async def submit(sid, data):
 @socketio.on('join')
 async def _(sid, data):
   socketio.enter_room(sid, data)
-  await socketio.emit('joined', dict(id=sid, session=data), room=data)
+  await socketio.emit('joined', dict(id=sid, session=data), to=data)
