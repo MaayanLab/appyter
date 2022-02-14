@@ -1,11 +1,11 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from fsspec import AbstractFileSystem
+from fsspec.asyn import AsyncFileSystem, sync_wrapper
 from appyter.ext.fsspec.spec import MountableAbstractFileSystem
 from appyter.ext.fsspec.core import url_to_fs_ex
 
-class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
+class MapperFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
   ''' MapperFS is the inverse of a fsspec.mapper -- it lets you use a mapping to
   define a virtual filesystem.
   '''
@@ -50,37 +50,47 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
     else:
       raise FileNotFoundError(path)
 
-  def __enter__(self):
+  async def __aenter__(self):
     return self
+  __enter__ = sync_wrapper(__aenter__)
   
-  def __exit__(self, type, value, traceback):
+  async def __aexit__(self, type, value, traceback):
     pass
+  __exit__ = sync_wrapper(__aexit__)
 
-  def mkdir(self, path, **kwargs):
+  async def _mkdir(self, path, **kwargs):
     raise PermissionError(path)
+  mkdir = sync_wrapper(_mkdir)
   
-  def makedirs(self, path, exist_ok=False):
+  async def _makedirs(self, path, exist_ok=False):
     raise PermissionError(path)
+  makedirs = sync_wrapper(_makedirs)
 
-  def rmdir(self, path):
+  async def _rmdir(self, path):
     raise PermissionError(path)
+  rmdir = sync_wrapper(_rmdir)
 
-  def rm_file(self, path):
+  async def _rm_file(self, path):
     raise PermissionError(path)
+  rm_file = sync_wrapper(_rm_file)
 
-  def rm(self, path, recursive=False, maxdepth=None):
+  async def _rm(self, path, recursive=False, maxdepth=None):
     raise PermissionError(path)
+  rm = sync_wrapper(_rm)
 
-  def copy(self, path1, path2, recursive=False, on_error=None, maxdepth=None, **kwargs):
+  async def _copy(self, path1, path2, recursive=False, on_error=None, maxdepth=None, **kwargs):
     raise PermissionError(path2)
+  copy = sync_wrapper(_copy)
 
-  def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
+  async def _mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
     raise PermissionError(path1)
+  mv = sync_wrapper(_mv)
 
-  def exists(self, path, **kwargs):
+  async def _exists(self, path, **kwargs):
     return path in self.listing or path in self.pathmap
+  exists = sync_wrapper(_exists)
 
-  def info(self, path, **kwargs):
+  async def _info(self, path, **kwargs):
     if path in self.listing:
       return {
         'name': path,
@@ -88,11 +98,15 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
       }
     else:
       fs, fs_path = self._pathmap(path)
-      info = fs.info(fs_path, **kwargs)
+      if getattr(fs, '_info', None) is not None:
+        info = await fs._info(fs_path, **kwargs)
+      else:
+        info = fs.info(fs_path, **kwargs)
       info = dict(info, name=path)
       return info
+  info = sync_wrapper(_info)
 
-  def ls(self, path, detail=False, **kwargs):
+  async def _ls(self, path, detail=False, **kwargs):
     ''' Aggregate results based on pathmap listing & underlying fs
     '''
     logger.debug(f"ls({path})")
@@ -100,10 +114,11 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
     if path in self.listing:
       for p in self.listing[path]:
         if detail:
-          results.append(self.info(p))
+          results.append(await self._info(p))
         else:
           results.append(p)
     return results
+  ls = sync_wrapper(_ls)
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
     fs, fs_path = self._pathmap(path)
