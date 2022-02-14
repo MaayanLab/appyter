@@ -8,7 +8,7 @@ NOTE: This application uses modern python features including async await (3.5) a
 # Install package from pip
 pip3 install --upgrade appyter
 
-# OR Install package from github repository master
+# OR Install package from github repository main
 pip3 install --upgrade git+https://github.com/Maayanlab/appyter.git
 ```
 
