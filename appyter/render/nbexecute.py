@@ -134,7 +134,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
             logger.info('cancelled')
             raise
           except Exception as e:
-            logger.info('execution error')
+            logger.info(f"execution error: {traceback.format_exc()}")
             await emit({ 'type': 'error', 'data': str(e) })
           # Save execution completion time
           logger.info('saving')
