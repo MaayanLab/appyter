@@ -107,8 +107,9 @@ def create_app(**kwargs):
       from appyter.ext.fsspec.singleton import SingletonFileSystemFactory
       with SingletonFileSystemFactory('storage', data_dir) as storage:
         fsspec.register_implementation('storage', storage)
-        storage.makedirs('input', exist_ok=True)
-        storage.makedirs('output', exist_ok=True)
+        _storage = storage()
+        _storage.makedirs('input', exist_ok=True)
+        _storage.makedirs('output', exist_ok=True)
         yield
     else:
       yield
