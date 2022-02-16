@@ -48,7 +48,7 @@
               <a
                 href="javascript:"
                 on:click={() => value = args.examples[example_name]}
-              >{example_name}</a>
+              >{Array.isArray(args.examples) ? args.examples[example_name] : example_name}</a>
             </span>
           {/each}
         </div>
