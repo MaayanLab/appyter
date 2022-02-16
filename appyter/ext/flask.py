@@ -1,4 +1,5 @@
 import logging
+import functools
 import urllib.parse
 from werkzeug.security import safe_join
 
@@ -42,3 +43,16 @@ def route_join_with_or_without_slash(blueprint, *routes, **kwargs):
     blueprint.route(routes_stripped + '/', **kwargs)(func)
     return func
   return wrapper
+
+def decorator_in_production(production_decorator):
+  def decorator(func):
+    production_func = production_decorator(func)
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+      from flask import current_app
+      if current_app.config['DEBUG']:
+        return func(*args, **kwargs)
+      else:
+        return production_func(*args, **kwargs)
+    return wrapper
+  return decorator

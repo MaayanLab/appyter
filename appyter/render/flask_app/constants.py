@@ -3,8 +3,9 @@ Constants that can be cached in thread-local storage
 '''
 
 from appyter.ext.functools import memcached
+from appyter.ext.flask import decorator_in_production
 
-@memcached
+@decorator_in_production(memcached)
 def get_cwd_fs():
   ''' Return fsspec compatible chroot to the current directory
   '''
@@ -12,7 +13,7 @@ def get_cwd_fs():
   from appyter.ext.fsspec.core import url_to_chroot_fs
   return url_to_chroot_fs(current_app.config['CWD'])
 
-@memcached
+@decorator_in_production(memcached)
 def get_static_fs():
   ''' Return fsspec compatible chroot to the static directory
   '''
@@ -20,21 +21,21 @@ def get_static_fs():
   from appyter.ext.fsspec.core import url_to_chroot_fs
   return url_to_chroot_fs(current_app.config['STATIC_DIR'])
 
-@memcached
+@decorator_in_production(memcached)
 def get_input_fs():
   ''' Return fsspec compatible chroot to the static directory
   '''
   from appyter.ext.fsspec.core import url_to_chroot_fs
   return url_to_chroot_fs('storage://input/')
 
-@memcached
+@decorator_in_production(memcached)
 def get_output_fs():
   ''' Return fsspec compatible chroot to the static directory
   '''
   from appyter.ext.fsspec.core import url_to_chroot_fs
   return url_to_chroot_fs('storage://output/')
 
-@memcached
+@decorator_in_production(memcached)
 def _get_ipynb_io():
   ''' Return byte stream for original ipynb
   '''
@@ -52,14 +53,14 @@ def get_ipynb_io():
   ipynb_io.seek(0)
   return ipynb_io
 
-@memcached
+@decorator_in_production(memcached)
 def get_nbtemplate():
   ''' Parse the ipynb
   '''
   from appyter.parse.nb import nb_from_ipynb_io
   return nb_from_ipynb_io(get_ipynb_io())
 
-@memcached
+@decorator_in_production(memcached)
 def get_j2_env():
   ''' Get an initialized bare jinja2 environment (no context)
   '''
@@ -67,42 +68,42 @@ def get_j2_env():
   from appyter.context import get_jinja2_env
   return get_jinja2_env(config=current_app.config)
 
-@memcached
+@decorator_in_production(memcached)
 def get_form():
   ''' Render a form for the nbtemplate
   '''
   from appyter.render.form import render_form_from_nbtemplate
   return render_form_from_nbtemplate(get_j2_env(), get_nbtemplate())
 
-@memcached
+@decorator_in_production(memcached)
 def get_nbtemplate_json():
   ''' Render the nbtemplate as nbtemplate_json
   '''
   from appyter.render.nbinspect import render_nbtemplate_json_from_nbtemplate
   return render_nbtemplate_json_from_nbtemplate(get_j2_env(), get_nbtemplate())
 
-@memcached
+@decorator_in_production(memcached)
 def get_fields():
   ''' Parse the nbtemplate fields
   '''
   from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
   return parse_fields_from_nbtemplate(get_j2_env(), get_nbtemplate(), deep=False)
 
-@memcached
+@decorator_in_production(memcached)
 def get_deep_fields():
   ''' Parse the nbtemplate fields
   '''
   from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
   return parse_fields_from_nbtemplate(get_j2_env(), get_nbtemplate(), deep=True)
 
-@memcached
+@decorator_in_production(memcached)
 def get_ipynb_hash():
   ''' A hash for the ipynb
   '''
   from appyter.ext.hashlib import sha1sum_io
   return sha1sum_io(get_ipynb_io())
 
-@memcached
+@decorator_in_production(memcached)
 def get_html_exporer():
   ''' nbconvert html export
   '''
@@ -111,7 +112,7 @@ def get_html_exporer():
   html_exporter.template_name = 'classic'
   return html_exporter
 
-@memcached
+@decorator_in_production(memcached)
 def get_base_files():
   ''' Include all (non-hidden) files in cwd (include requirements.txt, utils, etc..)
   '''
