@@ -79,9 +79,9 @@ class OverlayFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
 
   def cat_file(self, path, start=None, end=None, **kwargs):
     if self.upper_fs.exists(path):
-      return self.upper_fs.cat(path, start=start, end=end, **kwargs)
+      return self.upper_fs.cat_file(path, start=start, end=end, **kwargs)
     elif self.lower_fs.exists(path):
-      return self.lower_fs.cat(path, start=start, end=end, **kwargs)
+      return self.lower_fs.cat_file(path, start=start, end=end, **kwargs)
     else:
       raise FileNotFoundError
 
