@@ -59,10 +59,10 @@ a string field, and still accepts choices not being autocompleted.</p>
 <li><p><strong>constraint</strong> – A regular expression for validating the file name.</p></li>
 <li><p><strong>hint</strong> – A hint to put in the field prior to content.</p></li>
 <li><p><strong>file_path</strong> – (Optional[str]) A remote url to download the autocomplete list. Should resolve to a json list of terms.</p></li>
-<li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>choices</strong> – (Union[List[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
 <li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
-<li><p><strong>examples</strong> – (Optional[Dict[str, str]]) Named strings to provide as clickable examples</p></li>
+<li><p><strong>examples</strong> – (Optional[Union[List[str], Dict[str, str]]]) Named strings to provide as clickable examples</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
 <li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
@@ -131,7 +131,7 @@ Should be overridden by subclasses.</p>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
 <li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
-<li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>choices</strong> – (Union[List[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
@@ -194,7 +194,7 @@ Should be overridden by subclasses.</p>
 <span id="appyter-profiles-default-fields-filefield-module"></span><h2>appyter.profiles.default.fields.FileField module<a class="headerlink" href="#module-appyter.profiles.default.fields.FileField" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="appyter.profiles.default.fields.FileField.FileField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.FileField.</code><code class="sig-name descname">FileField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">'.*'</span></em>, <em class="sig-param"><span class="n">examples</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.FileField.</code><code class="sig-name descname">FileField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">'.*'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
 <p>Represing a uploadable File and facilitating that file upload.
 The field ends up being a string of the file path, for example:</p>
@@ -350,7 +350,7 @@ Like <a class="reference internal" href="#module-appyter.profiles.default.fields
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form to appear as a tooltip</p></li>
 <li><p><strong>descriptions</strong> – (Optional[Dict[str, str]]) A long human readable description for each choice to appear as a tooltip</p></li>
-<li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>choices</strong> – (Union[List[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
 <li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
@@ -397,7 +397,7 @@ The resulting selection is represented with a list of strings that were chosen.<
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
-<li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>choices</strong> – (Union[List[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
 <li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
@@ -479,10 +479,10 @@ When instantiating code, you should use safe_value.</p>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
 <li><p><strong>constraint</strong> – A regular expression for validating the file name.</p></li>
 <li><p><strong>hint</strong> – A hint to put in the field prior to content.</p></li>
-<li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>choices</strong> – (Union[List[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
 <li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
-<li><p><strong>examples</strong> – (Optional[Dict[str, str]]) Named strings to provide as clickable examples</p></li>
+<li><p><strong>examples</strong> – (Optional[Union[List[str], Dict[str, str]]]) Named strings to provide as clickable examples</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
 <li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
@@ -565,7 +565,7 @@ Should be overridden by subclasses.</p>
 <li><p><strong>constraint</strong> – (Regex[str]) A regular expression for validating the file name.</p></li>
 <li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
-<li><p><strong>examples</strong> – (Optional[Dict[str, str]]) Named strings to provide as clickable examples</p></li>
+<li><p><strong>examples</strong> – (Optional[Union[List[str], Dict[str, str]]]) Named strings to provide as clickable examples</p></li>
 <li><p><strong>hint</strong> – (Optional[str]) A hint to put in the field prior to content.</p></li>
 <li><p><strong>rows</strong> – (Optional[int]) The number of rows (lines) in the textarea</p></li>
 <li><p><strong>cols</strong> – (Optional[int]) The number of cols (horizontal characters) in the textarea</p></li>
@@ -610,7 +610,7 @@ Unlike <a class="reference internal" href="#module-appyter.profiles.default.fiel
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
 <li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
-<li><p><strong>choices</strong> – (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
+<li><p><strong>choices</strong> – (Union[List[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value</p></li>
 <li><p><strong>constraint</strong> – (Regex[str]) A regular expression for validating the file name.</p></li>
 <li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (List[str]) A default value as an example and for use during prototyping</p></li>
@@ -663,7 +663,6 @@ Usage:</p>
     name=&#39;file&#39;,
     label=&#39;File&#39;,
     default=&#39;file.txt&#39;,
-    examples={},
   ),
   default=[&#39;file.txt&#39;],
   min=0,
