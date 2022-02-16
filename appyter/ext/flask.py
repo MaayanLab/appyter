@@ -49,10 +49,12 @@ def decorator_in_production(production_decorator):
     production_func = production_decorator(func)
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-      from flask import current_app
-      if current_app.config['DEBUG']:
-        return func(*args, **kwargs)
-      else:
-        return production_func(*args, **kwargs)
+      try:
+        from flask import current_app
+        if current_app.config['DEBUG']:
+          return func(*args, **kwargs)
+      except:
+        pass
+      return production_func(*args, **kwargs)
     return wrapper
   return decorator
