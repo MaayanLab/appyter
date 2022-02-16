@@ -14,7 +14,6 @@ class VariableField(Field):
       name='file',
       label='File',
       default='file.txt',
-      examples={},
     ),
     default=['file.txt'],
     min=0,

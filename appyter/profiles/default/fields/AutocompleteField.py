@@ -15,7 +15,7 @@ class AutocompleteField(Field):
   :param constraint: A regular expression for validating the file name.
   :param hint: A hint to put in the field prior to content.
   :param file_path: (Optional[str]) A remote url to download the autocomplete list. Should resolve to a json list of terms.
-  :param choices: (Union[List[str], Set[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value
+  :param choices: (Union[List[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value
   :param required: (Optional[bool]) Whether or not this field is required (defaults to false)
   :param default: (str) A default value as an example and for use during prototyping
   :param examples: (Optional[Dict[str, str]]) Named strings to provide as clickable examples
