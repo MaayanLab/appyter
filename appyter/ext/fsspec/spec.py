@@ -2,9 +2,9 @@ import typing as t
 import pathlib
 import contextlib
 from fsspec import AbstractFileSystem
-from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager_factory
 from appyter.ext.tempfile import tempdir
 from appyter.ext.io import async_copyfileobj
+from appyter.ext.asyncio.helpers import ensure_sync
 
 import logging
 logger = logging.getLogger(__name__)
@@ -38,4 +38,4 @@ class MountableAbstractFileSystem:
                 await async_copyfileobj(fr, fw)
         logger.info('Ready')
         yield mount_dir
-  mount = sync_contextmanager_factory(_mount)
+  mount = ensure_sync(_mount)

@@ -8,6 +8,14 @@ from pathlib import Path
 import appyter.ext.fsspec
 from appyter.ext.fsspec.core import url_to_chroot_fs
 
+import pytest
+@pytest.fixture(scope="session", autouse=True)
+def setup():
+  from appyter.ext.asyncio.event_loop import new_event_loop
+  loop = new_event_loop()
+  yield
+  loop.close()
+
 def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
 
 @contextlib.contextmanager
@@ -65,13 +73,13 @@ def _http_serve_ctx(directory, port=8888):
   import signal
   from multiprocessing import Process
   from appyter.ext.asyncio.try_n_times import async_try_n_times
-  from appyter.ext.asyncio.sync_coro import sync_coro
+  from appyter.ext.asyncio.helpers import ensure_sync
   proc = Process(
     target=_http_serve, args=(directory, port)
   )
   proc.start()
   try:
-    sync_coro(async_try_n_times(3, _http_connect, f"http://localhost:{port}"))
+    ensure_sync(async_try_n_times(3, _http_connect, f"http://localhost:{port}"))
     yield
   finally:
     if proc.pid:

@@ -1,13 +1,14 @@
 import shutil
 import contextlib
 import logging
+
 logger = logging.getLogger(__name__)
 
 from fsspec import filesystem
 from fsspec import AbstractFileSystem
 from appyter.ext.fsspec.spec import MountableAbstractFileSystem
 from appyter.ext.urllib import join_slash, parent_url
-from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager_factory
+from appyter.ext.asyncio.helpers import ensure_sync
 
 class OverlayFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
   ''' OverlayFS implemented with fsspec
@@ -60,7 +61,7 @@ class OverlayFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
       async with _upper_mount(mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
         async with _lower_mount(mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
           yield mount_dir
-  mount = sync_contextmanager_factory(_mount)
+  mount = ensure_sync(_mount)
 
   def mkdir(self, path, **kwargs):
     return self.upper_fs.mkdir(path, **kwargs)

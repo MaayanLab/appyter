@@ -5,6 +5,14 @@ import pytest
 import os
 import logging
 
+import pytest
+@pytest.fixture(scope="session", autouse=True)
+def setup():
+  from appyter.ext.asyncio.event_loop import new_event_loop
+  loop = new_event_loop()
+  yield
+  loop.close()
+
 def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
 
 @pytest.mark.skipif(not os.environ.get('SBFS_URI'), reason='SBFS_URI necessary to test sbfs')

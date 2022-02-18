@@ -3,6 +3,7 @@ import logging
 import shutil
 from fsspec.core import url_to_fs
 from flask import request, jsonify, abort
+from appyter.ext.asyncio.helpers import ensure_async
 
 from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.render.flask_app.constants import get_input_fs
@@ -80,7 +81,7 @@ async def siofu_done(sid, evt):
     tmp_fs = sess['file_%d' % (evt['id'])]['tmp_fs']
     path = sess['file_%d' % (evt['id'])]['path']
     filename = sess['file_%d' % (evt['id'])]['name']
-    full_filename = await asyncio.get_event_loop().run_in_executor(None, organize_file_content, input_fs, tmp_fs, path, filename)
+    full_filename = await ensure_async(organize_file_content)(input_fs, tmp_fs, path, filename)
     tmp_fs.__exit__(None, None, None)
     del sess['file_%d' % (evt['id'])]
   #

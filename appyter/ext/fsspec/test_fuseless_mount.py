@@ -1,13 +1,19 @@
 import os
 import uuid
-import asyncio
 import logging
+
+import pytest
+@pytest.fixture(scope="session", autouse=True)
+def setup():
+  from appyter.ext.asyncio.event_loop import new_event_loop
+  loop = new_event_loop()
+  yield
+  loop.close()
 
 FSSPEC_URI = os.environ.get('FSSPEC_URI', f"file:///tmp/{str(uuid.uuid4())}")
 
 def test_fuseless_mount():
   from appyter.ext.fsspec.core import url_to_chroot_fs
-  loop = asyncio.new_event_loop()
   fs = url_to_chroot_fs(FSSPEC_URI)
   with fs as fs:
     try:

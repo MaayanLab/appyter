@@ -2,8 +2,8 @@ import asyncio
 import typing as t
 from nbclient import NotebookClient
 from nbformat import NotebookNode
-from nbclient.util import ensure_async
 from nbclient.exceptions import CellExecutionComplete, DeadKernelError, CellControlSignal
+from appyter.ext.asyncio.helpers import ensure_async
 
 class NotebookClientIOPubHook(NotebookClient):
   ''' A notebook client with the ability to hook into iopub updates
@@ -33,11 +33,6 @@ class NotebookClientIOPubHook(NotebookClient):
             await self.iopub_hook(cell, cell_index)
 
   def _kc_execute(self, *args, **kwargs):
-    try:
-      loop = asyncio.get_event_loop()
-    except (RuntimeError, AssertionError):
-      loop = asyncio.new_event_loop()
-      asyncio.set_event_loop(loop)
     return self.kc.execute(*args, **kwargs)
 
   async def async_execute_cell(

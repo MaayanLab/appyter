@@ -1,7 +1,11 @@
 import logging
+from functools import partial, partialmethod
+
+from appyter.ext.asyncio.helpers import ensure_async, ensure_sync
+
 logger = logging.getLogger(__name__)
 
-from fsspec.asyn import AsyncFileSystem, sync_wrapper
+from fsspec.asyn import AsyncFileSystem
 from appyter.ext.fsspec.spec import MountableAbstractFileSystem
 from appyter.ext.fsspec.core import url_to_fs_ex
 
@@ -52,43 +56,48 @@ class MapperFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
 
   async def __aenter__(self):
     return self
-  __enter__ = sync_wrapper(__aenter__)
+  __enter__ = ensure_sync(__aenter__)
   
   async def __aexit__(self, type, value, traceback):
     pass
-  __exit__ = sync_wrapper(__aexit__)
+  __exit__ = ensure_sync(__aexit__)
 
   async def _mkdir(self, path, **kwargs):
     raise PermissionError(path)
-  mkdir = sync_wrapper(_mkdir)
+  mkdir = ensure_sync(_mkdir)
   
   async def _makedirs(self, path, exist_ok=False):
     raise PermissionError(path)
-  makedirs = sync_wrapper(_makedirs)
+  makedirs = ensure_sync(_makedirs)
 
   async def _rmdir(self, path):
     raise PermissionError(path)
-  rmdir = sync_wrapper(_rmdir)
+  rmdir = ensure_sync(_rmdir)
 
   async def _rm_file(self, path):
     raise PermissionError(path)
-  rm_file = sync_wrapper(_rm_file)
+  rm_file = ensure_sync(_rm_file)
 
   async def _rm(self, path, recursive=False, maxdepth=None):
     raise PermissionError(path)
-  rm = sync_wrapper(_rm)
+  rm = ensure_sync(_rm)
+
+  async def _cat_file(self, path, start=None, end=None, **kwargs):
+    fs, fs_path = self._pathmap(path)
+    return await ensure_async(fs.cat_file)(fs_path, start=start, end=end, **kwargs)
+  cat_file = ensure_sync(_cat_file)
 
   async def _copy(self, path1, path2, recursive=False, on_error=None, maxdepth=None, **kwargs):
     raise PermissionError(path2)
-  copy = sync_wrapper(_copy)
+  copy = ensure_sync(_copy)
 
   async def _mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
     raise PermissionError(path1)
-  mv = sync_wrapper(_mv)
+  mv = ensure_sync(_mv)
 
   async def _exists(self, path, **kwargs):
     return path in self.listing or path in self.pathmap
-  exists = sync_wrapper(_exists)
+  exists = ensure_sync(_exists)
 
   async def _info(self, path, **kwargs):
     if path in self.listing:
@@ -98,13 +107,10 @@ class MapperFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
       }
     else:
       fs, fs_path = self._pathmap(path)
-      if getattr(fs, '_info', None) is not None:
-        info = await fs._info(fs_path, **kwargs)
-      else:
-        info = fs.info(fs_path, **kwargs)
+      info = await ensure_async(fs.info)(fs_path, **kwargs)
       info = dict(info, name=path)
       return info
-  info = sync_wrapper(_info)
+  info = ensure_sync(_info)
 
   async def _ls(self, path, detail=False, **kwargs):
     ''' Aggregate results based on pathmap listing & underlying fs
@@ -118,7 +124,7 @@ class MapperFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
         else:
           results.append(p)
     return results
-  ls = sync_wrapper(_ls)
+  ls = ensure_sync(_ls)
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
     fs, fs_path = self._pathmap(path)

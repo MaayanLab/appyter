@@ -6,11 +6,11 @@ from appyter.ext.urllib import join_slash
 
 logger = logging.getLogger(__name__)
 
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 from fsspec import AbstractFileSystem, filesystem
 from appyter.ext.fsspec.spec import MountableAbstractFileSystem
 from appyter.ext.pathlib.chroot import ChrootPurePosixPath
-from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager_factory
+from appyter.ext.asyncio.helpers import ensure_sync
 
 class ChrootFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
   ''' chroot: update root and disallow access beyond chroot, only works on directories.
@@ -112,12 +112,12 @@ class ChrootFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
   async def _mount(self, mount_dir=None, fuse=True, **kwargs):
     logger.debug(f"{self=} mount {mount_dir=} {fuse=}")
     if not fuse and self.fs.protocol == 'file':
-      yield self.storage_options['fo']
+      yield Path(self.storage_options['fo'])
     else:
       _mount = self.fs._mount if getattr(self.fs, '_mount', None) else MountableAbstractFileSystem._mount
       async with _mount(mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
         yield mount_dir
-  mount = sync_contextmanager_factory(_mount)
+  mount = ensure_sync(_mount)
 
   def mkdir(self, path, **kwargs):
     with self.__masquerade_os_error(path=path):

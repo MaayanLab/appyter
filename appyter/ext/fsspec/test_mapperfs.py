@@ -6,11 +6,18 @@ mp.set_start_method('spawn', True)
 import tempfile
 import contextlib
 from pathlib import Path
-from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager
 
 import appyter.ext.fsspec
 from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.fsspec.fuse import fs_mount
+
+import pytest
+@pytest.fixture(scope="session", autouse=True)
+def setup():
+  from appyter.ext.asyncio.event_loop import new_event_loop
+  loop = new_event_loop()
+  yield
+  loop.close()
 
 def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
 

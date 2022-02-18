@@ -1,4 +1,5 @@
 import logging
+
 logger = logging.getLogger(__name__)
 
 async def run_app(config):
@@ -68,10 +69,11 @@ def serve(app_path, **kwargs):
   import asyncio
   import appyter
   from appyter.ext.asyncio.event_emitter import EventEmitter
+  from appyter.ext.asyncio.event_loop import new_event_loop
   from appyter.ext.watchgod.watcher import GlobWatcher
   from appyter.context import get_env
+  loop = new_event_loop()
   config = get_env(**kwargs)
-  loop = asyncio.get_event_loop()
   emitter = EventEmitter()
   # run the app and reload it when necessary
   loop.create_task(app_runner(emitter, config))

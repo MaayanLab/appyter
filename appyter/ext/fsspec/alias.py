@@ -1,4 +1,5 @@
 import logging
+
 logger = logging.getLogger(__name__)
 
 import fsspec
@@ -6,7 +7,7 @@ import contextlib
 from fsspec import AbstractFileSystem
 from appyter.ext.fsspec.spec import MountableAbstractFileSystem
 from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager_factory
+from appyter.ext.asyncio.helpers import ensure_sync
 
 class AliasFileSystemBase(MountableAbstractFileSystem, AbstractFileSystem): pass
 
@@ -48,7 +49,7 @@ def AliasFileSystemFactory(_proto, _fs_url, **_kwargs):
       _mount = self.fs._mount if getattr(self.fs, '_mount', None) else MountableAbstractFileSystem._mount
       async with _mount(mount_dir=mount_dir, **kwargs) as mount_dir:
         yield mount_dir
-    mount = sync_contextmanager_factory(_mount)
+    mount = ensure_sync(_mount)
 
     def mkdir(self, path, **kwargs):
       return self.fs.mkdir(path, **kwargs)

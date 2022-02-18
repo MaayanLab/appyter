@@ -1,4 +1,6 @@
 import multiprocessing as mp
+
+from appyter.ext.asyncio.helpers import ensure_sync
 mp.set_start_method('spawn', True)
 
 import tempfile
@@ -6,8 +8,15 @@ import contextlib
 from pathlib import Path
 
 import appyter.ext.fsspec
-from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager
 from appyter.ext.fsspec.fuse import fs_mount
+
+import pytest
+@pytest.fixture(scope="session", autouse=True)
+def setup():
+  from appyter.ext.asyncio.event_loop import new_event_loop
+  loop = new_event_loop()
+  yield
+  loop.close()
 
 def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
 
@@ -26,7 +35,7 @@ def _test_ctx():
 
 def test_file_chroot_fuse():
   with _test_ctx() as tmpdir:
-    with sync_contextmanager(fs_mount(
+    with ensure_sync(fs_mount(
       str(tmpdir),
       pathmap={'g': str(tmpdir/'e')},
       cached=True,

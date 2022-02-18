@@ -2,7 +2,7 @@ import os
 import contextlib
 from pathlib import PurePath
 from fsspec import AbstractFileSystem, filesystem
-from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager_factory
+from appyter.ext.asyncio.helpers import ensure_sync
 from appyter.ext.fsspec.spec import MountableAbstractFileSystem
 from appyter.ext.tempfile import mktemp
 
@@ -58,7 +58,7 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
       _mount = self.fs._mount if getattr(self.fs, '_mount', None) else MountableAbstractFileSystem._mount
       async with _mount(mount_dir, fuse=fuse, **kwargs) as mount_dir:
         yield mount_dir
-  mount = sync_contextmanager_factory(_mount)
+  mount = ensure_sync(_mount)
 
   def mkdir(self, path, **kwargs):
     path = self.fs.root_marker + path.lstrip('/')

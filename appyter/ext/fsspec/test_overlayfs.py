@@ -9,6 +9,14 @@ from fsspec.core import url_to_fs
 import appyter.ext.fsspec
 from appyter.ext.fsspec.overlayfs import OverlayFileSystem
 
+import pytest
+@pytest.fixture(scope="session", autouse=True)
+def setup():
+  from appyter.ext.asyncio.event_loop import new_event_loop
+  loop = new_event_loop()
+  yield
+  loop.close()
+
 def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
 
 @contextlib.contextmanager

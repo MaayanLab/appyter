@@ -10,7 +10,7 @@ class PriorityQueuedEmitMixin:
     self._emit_enabled = asyncio.Event()
     self._emit_counter = iter(itertools.count())
     self._emit_queue = asyncio.PriorityQueue()
-    self._emit_dispatcher_task = asyncio.get_event_loop().create_task(self._emit_dispatcher())
+    self._emit_dispatcher_task = asyncio.create_task(self._emit_dispatcher())
 
   async def __aexit__(self, *args):
     try:

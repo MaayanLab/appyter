@@ -1,14 +1,23 @@
 import multiprocessing as mp
+
 mp.set_start_method('spawn', True)
 
 import tempfile
 import contextlib
 from pathlib import Path
-from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager
 
 import appyter.ext.fsspec
 from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.fsspec.fuse import fs_mount
+from appyter.ext.asyncio.helpers import ensure_sync
+
+import pytest
+@pytest.fixture(scope="session", autouse=True)
+def setup():
+  from appyter.ext.asyncio.event_loop import new_event_loop
+  loop = new_event_loop()
+  yield
+  loop.close()
 
 def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
 
@@ -37,7 +46,7 @@ def test_file_pathmap_chroot():
 
 def test_file_pathmap_chroot_fuse():
   with _test_ctx() as tmpdir:
-    with sync_contextmanager(fs_mount(str(tmpdir), pathmap={'E': str(tmpdir/'e')})) as fs:
+    with ensure_sync(fs_mount(str(tmpdir), pathmap={'E': str(tmpdir/'e')})) as fs:
       assert_eq(frozenset(str(p.relative_to(fs)) for p in fs.rglob('*')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e', 'E']))
       assert_eq((fs/'a'/'b'/'c').open('rb').read(), b'C')
       assert_eq((fs/'a'/'d').open('rb').read(), b'D')
@@ -74,13 +83,12 @@ def _http_serve_ctx(directory, port=8888):
   import signal
   from multiprocessing import Process
   from appyter.ext.asyncio.try_n_times import async_try_n_times
-  from appyter.ext.asyncio.sync_coro import sync_coro
   proc = Process(
     target=_http_serve, args=(directory, port)
   )
   proc.start()
   try:
-    sync_coro(async_try_n_times(3, _http_connect, f"http://localhost:{port}"))
+    ensure_sync(async_try_n_times(3, _http_connect, f"http://localhost:{port}"))
     yield
   finally:
     if proc.pid:

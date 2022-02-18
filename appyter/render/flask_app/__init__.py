@@ -4,6 +4,9 @@ import click
 import fsspec
 import logging
 import traceback
+
+from appyter.ext.asyncio.helpers import ensure_sync
+
 logger = logging.getLogger(__name__)
 
 from appyter.cli import cli
@@ -101,7 +104,7 @@ def create_app(**kwargs):
   app.router.add_route('*', join_slash(app['config']['PREFIX'], '{path_info:.*}'), wsgi_handler)
   if flask_app.config['PROXY']:
     logger.info('Applying proxy fix middleware...')
-    asyncio.get_event_loop().run_until_complete(setup(app, XForwardedRelaxed()))
+    ensure_sync(setup(app, XForwardedRelaxed()))
   #
   logger.info('Registering application storage handler')
   async def storage_ctx(app):
@@ -163,6 +166,9 @@ def flask_app(**kwargs):
     )
     logging.getLogger(__package__).setLevel(logging.INFO)
   #
+  from appyter.ext.asyncio.event_loop import new_event_loop
+  loop = new_event_loop()
+  #
   if kwargs.get('socket'):
     from aiohttp import web
     socket = kwargs['socket']
@@ -170,12 +176,12 @@ def flask_app(**kwargs):
     app = create_app(**kwargs)
     if ':' in socket:
       host, port = socket.split(':')
-      web.run_app(app, host=host, port=int(port))
+      web.run_app(app, host=host, port=int(port), loop=loop)
     else:
-      web.run_app(app, path=socket)
+      web.run_app(app, path=socket, loop=loop)
   elif kwargs.get('debug'):
     from appyter.render.flask_app.development import serve
-    serve(__file__, **kwargs)
+    serve(__file__, loop=loop, **kwargs)
   else:
     from appyter.render.flask_app.production import serve
-    serve(__file__, **kwargs)
+    serve(__file__, loop=loop, **kwargs)

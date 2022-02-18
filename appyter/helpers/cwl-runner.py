@@ -1,23 +1,11 @@
-import os
-import re
-import sys
 import click
-import shutil
-import fsspec
-import tempfile
-from pathlib import Path
 
 from appyter.cli import cli
-from appyter.ext.json import try_json_loads
-from appyter.context import get_env_from_kwargs, get_jinja2_env
-from appyter.ext.urllib import join_slash
-from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.ext.click import click_argument_setenv
-from appyter.render.nbinspect.nbtemplate_json import render_nbtemplate_json_from_nbtemplate
-from appyter.render.nbconstruct import render_nb_from_nbtemplate
-from appyter.render.nbexecute import nbexecute_async, json_emitter_factory
 
 def parse_cli(arg):
+  import re
+  from appyter.ext.json import try_json_loads
   m = re.match(r'^--([^=]+)(=(.*))?$', arg)
   if m and m.group(2) is not None:
     return (m.group(1), try_json_loads(m.group(3)))
@@ -34,6 +22,20 @@ def parse_cli(arg):
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 @click.argument('args', nargs=-1)
 def cwl_runner(ipynb, args):
+  import os
+  import sys
+  import shutil
+  import fsspec
+  import tempfile
+  from pathlib import Path
+  from appyter.context import get_env_from_kwargs, get_jinja2_env
+  from appyter.ext.urllib import join_slash
+  from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
+  from appyter.render.nbinspect.nbtemplate_json import render_nbtemplate_json_from_nbtemplate
+  from appyter.render.nbconstruct import render_nb_from_nbtemplate
+  from appyter.render.nbexecute import nbexecute_async, json_emitter_factory
+  from appyter.ext.asyncio.event_loop import new_event_loop
+  loop = new_event_loop()
   # prepare cwd/ipynb
   cwd = os.path.realpath(os.path.dirname(ipynb))
   ipynb = os.path.basename(ipynb)
@@ -65,8 +67,6 @@ def cwl_runner(ipynb, args):
   with (tmp_fs/ipynb).open('w') as fw:
     nb_to_ipynb_io(nb, fw)
   # nbexecute in temporary directory
-  import asyncio
-  loop = asyncio.get_event_loop()
   loop.run_until_complete(nbexecute_async(
     cwd=str(tmp_fs),
     ipynb=ipynb,

@@ -26,12 +26,9 @@ async def fs_mount(url, mount_dir=None, **kwargs):
   from appyter.ext.fsspec.alias import dump_aliases
   from appyter.ext.fsspec.singleton import dump_singletons
   from appyter.ext.asyncio.try_n_times import async_try_n_times
-  from appyter.ext.asyncio.run_in_executor import run_in_executor
+  from appyter.ext.asyncio.helpers import ensure_async
   from appyter.ext.tempfile import tempdir
-  @run_in_executor
-  def _assert_mounted(path):
-    assert path.is_mount()
-  @run_in_executor
+  @ensure_async
   def _assert_not_mounted(path):
     assert not path.is_mount()
   with tempdir(mount_dir) as tmp:
@@ -42,7 +39,7 @@ async def fs_mount(url, mount_dir=None, **kwargs):
     )
     proc.start()
     try:
-      await async_try_n_times(3, _assert_mounted, tmp)
+      await async_try_n_times(3, ensure_async(lambda path: path.is_mount()), tmp)
       logger.debug(f"fs mount ready on {tmp}")
       yield tmp
     except Exception as e:
@@ -53,6 +50,6 @@ async def fs_mount(url, mount_dir=None, **kwargs):
         logger.debug(f"unmounting fs from {tmp}")
         os.kill(proc.pid, signal.SIGINT) # SIGINT cleanly stops fsspec.fuse.run
         logger.debug(f"waiting for process to end")
-        await asyncio.get_running_loop().run_in_executor(None, proc.join)
+        await ensure_async(proc.join)()
         await async_try_n_times(3, _assert_not_mounted, tmp)
     logger.debug(f"done")
