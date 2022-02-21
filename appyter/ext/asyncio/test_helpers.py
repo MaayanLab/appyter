@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 from appyter.ext.asyncio import helpers
 
 import logging
@@ -43,3 +44,18 @@ def test_call_sync_from_async():
   ''' Test calling the asynchronous test suite
   '''
   helpers.ensure_sync(_test_call_sync_from_async)()
+
+
+@contextlib.contextmanager
+def _sync_context_manager():
+  yield 1
+
+@contextlib.asynccontextmanager
+async def _async_context_manager():
+  asyncio.sleep(1)
+  async with helpers.ensure_async(_sync_context_manager)() as v:
+    yield v
+
+def test_syned_ctxmanager():
+  with helpers.ensure_sync(_async_context_manager)() as v:
+    assert v == 1
