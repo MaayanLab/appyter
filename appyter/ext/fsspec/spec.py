@@ -4,7 +4,7 @@ import contextlib
 from fsspec import AbstractFileSystem
 from appyter.ext.tempfile import tempdir
 from appyter.ext.io import async_copyfileobj
-from appyter.ext.asyncio.helpers import ensure_sync
+from appyter.ext.asyncio.helpers import ensure_async, ensure_sync
 
 import logging
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ class MountableAbstractFileSystem:
       # can't use fuse, default is to just copy files into the mount_dir
       with tempdir(mount_dir) as mount_dir:
         logger.info(f"copying files over...")
-        for f1_rel in await self._glob('**/*'):
+        for f1_rel in await ensure_async(self.glob)('**/*'):
           logger.info(f"copying {f1_rel}")
           f2_rel = mount_dir / f1_rel
           f2_rel.parent.mkdir(parents=True, exist_ok=True)
