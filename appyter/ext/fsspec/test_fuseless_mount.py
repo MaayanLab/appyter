@@ -1,3 +1,6 @@
+import multiprocessing as mp
+mp.set_start_method('spawn', True)
+
 import os
 import uuid
 import logging

@@ -1,15 +1,11 @@
 import multiprocessing as mp
-
-from appyter.ext.fsspec.mapperfs import MapperFileSystem
 mp.set_start_method('spawn', True)
 
 import tempfile
 import contextlib
 from pathlib import Path
 
-import appyter.ext.fsspec
-from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.fsspec.fuse import fs_mount
+from appyter.ext.fsspec.mapperfs import MapperFileSystem
 
 import pytest
 @pytest.fixture(scope="session", autouse=True)
