@@ -68,7 +68,7 @@ async def ensure_async_generator(generator):
   logger.debug(f"ensure_async_generator")
   while True:
     try:
-      await anext(generator)
+      yield await anext(generator)
     except StopAsyncIteration:
       break
 
@@ -83,17 +83,19 @@ def ensure_sync_coro(coro):
 
 def ensure_sync_generator(asyncgenerator):
   logger.debug(f"ensure_sync_generator")
-  asyncgenerator_anext = functools.partial(ensure_sync_coro, asyncgenerator.__anext__)
+  __anext__ = ensure_sync_wrapper(asyncgenerator.__anext__)
   while True:
     try:
-      yield asyncgenerator_anext()
+      value = __anext__()
+      logger.debug(f"yield {value=} {dir(value)}")
+      yield value
     except StopAsyncIteration:
       break
 
 class _AsyncSyncContextManager:
   def __init__(self, contextmanager):
-    self._aenter = ensure_async(contextmanager.__enter__)
-    self._aexit = ensure_async(contextmanager.__exit__)
+    self._aenter = ensure_async_func(contextmanager.__enter__)
+    self._aexit = ensure_async_func(contextmanager.__exit__)
   async def __aenter__(self):
     return await self._aenter()
   async def __aexit__(self, typ, value, traceback):
@@ -105,8 +107,8 @@ def ensure_async_contextmanager(contextmanager):
 
 class _SyncAsyncContextManager:
   def __init__(self, asynccontextmanager):
-    self._enter = ensure_sync(asynccontextmanager.__aenter__)
-    self._exit = ensure_sync(asynccontextmanager.__aexit__)
+    self._enter = ensure_sync_wrapper(asynccontextmanager.__aenter__)
+    self._exit = ensure_sync_wrapper(asynccontextmanager.__aexit__)
   def __enter__(self):
     return self._enter()
   def __exit__(self, typ, value, traceback):
@@ -142,9 +144,11 @@ def ensure_async(obj):
     return ensure_async_generator(obj)
   elif iscontextmanager(obj):
     return ensure_async_contextmanager(obj)
-  elif ismethod(obj):
-    return ensure_async_func(obj)
-  elif isfunction(obj):
+  elif (
+    callable(obj)
+    or ismethod(obj)
+    or isfunction(obj)
+  ):
     return ensure_async_func(obj)
   else:
     return ensure_async_literal(obj)
@@ -159,20 +163,20 @@ def ensure_sync_wrapper(callable):
 
 def ensure_sync(obj):
   if (
-    isasyncgenfunction(obj)
-    or iscoroutinefunction(obj)
-    or isgeneratorfunction(obj)
+    isgeneratorfunction(obj)
+    or iscontextmanager(obj)
   ):
     return obj
-  elif (
-    ismethod(obj)
-    or isfunction(obj)
-  ):
-    return ensure_sync_wrapper(obj)
   elif isasynccontextmanager(obj):
     return ensure_sync_contextmanager(obj)
   elif isasyncgen(obj):
     return ensure_sync_generator(obj)
+  elif (
+    callable(obj)
+    or isfunction(obj)
+    or iscoroutinefunction(obj)
+  ):
+    return ensure_sync_wrapper(obj)
   elif iscoroutine(obj):
     return ensure_sync_coro(obj)
   elif isawaitable(obj):
