@@ -6,9 +6,11 @@ logger = logging.getLogger(__name__)
 
 def _fuse_run(url, mount_point, kwargs, alias_dump, singleton_dump):
   import fsspec.fuse
+  from appyter.ext.asyncio.event_loop import new_event_loop
   from appyter.ext.fsspec.core import url_to_chroot_fs
   from appyter.ext.fsspec.alias import register_aliases
   from appyter.ext.fsspec.singleton import register_singletons
+  loop = new_event_loop()
   register_aliases(alias_dump)
   logger.debug(f'preparing fs from {url} ({kwargs})..')
   with register_singletons(singleton_dump):
@@ -16,6 +18,7 @@ def _fuse_run(url, mount_point, kwargs, alias_dump, singleton_dump):
       logger.debug('launching fuse..')
       fsspec.fuse.run(fs, '', mount_point)
       logger.debug('teardown..')
+  loop.close()
 
 @contextlib.asynccontextmanager
 async def fs_mount(url, mount_dir=None, **kwargs):
@@ -36,7 +39,7 @@ async def fs_mount(url, mount_dir=None, **kwargs):
     )
     proc.start()
     try:
-      val = await async_try_n_times(3, ensure_async(lambda path: assert_true(path.is_mount())), tmp)
+      await async_try_n_times(3, ensure_async(lambda path: assert_true(path.is_mount())), tmp)
       logger.debug(f"fs mount ready on {tmp}")
       yield tmp
     except Exception as e:
