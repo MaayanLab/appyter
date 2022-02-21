@@ -21,16 +21,13 @@ def _fuse_run(url, mount_point, kwargs, alias_dump, singleton_dump):
 async def fs_mount(url, mount_dir=None, **kwargs):
   import os
   import signal
-  import asyncio
   import traceback
   from appyter.ext.fsspec.alias import dump_aliases
   from appyter.ext.fsspec.singleton import dump_singletons
   from appyter.ext.asyncio.try_n_times import async_try_n_times
   from appyter.ext.asyncio.helpers import ensure_async
   from appyter.ext.tempfile import tempdir
-  @ensure_async
-  def _assert_not_mounted(path):
-    assert not path.is_mount()
+  def assert_true(val): assert val
   with tempdir(mount_dir) as tmp:
     logger.debug(f'mounting {url} onto {tmp}')
     proc = Process(
@@ -39,7 +36,7 @@ async def fs_mount(url, mount_dir=None, **kwargs):
     )
     proc.start()
     try:
-      await async_try_n_times(3, ensure_async(lambda path: path.is_mount()), tmp)
+      val = await async_try_n_times(3, ensure_async(lambda path: assert_true(path.is_mount())), tmp)
       logger.debug(f"fs mount ready on {tmp}")
       yield tmp
     except Exception as e:
@@ -51,5 +48,5 @@ async def fs_mount(url, mount_dir=None, **kwargs):
         os.kill(proc.pid, signal.SIGINT) # SIGINT cleanly stops fsspec.fuse.run
         logger.debug(f"waiting for process to end")
         await ensure_async(proc.join)()
-        await async_try_n_times(3, _assert_not_mounted, tmp)
+        await async_try_n_times(3, ensure_async(lambda path: assert_true(not path.is_mount())), tmp)
     logger.debug(f"done")
