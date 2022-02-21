@@ -1,24 +1,43 @@
-import inspect
-import functools
-import logging
+''' Async helpers to convert anything sync to and from anything async without deadlocks.
+This requires that you initialize the event loop with the appyter.ext.asyncio.event_loop methods
+ which will run the event loop in a dedicated thread and ensure all `sync` methods are executed
+ on that dedicated event loop.
+You only need to use `ensure_async` or `ensure_sync` these methods will deal with dispatching to
+ the relevant handlers.
+It works with already-sync/async, context managers, generators, & functions of these.
+'''
 import asyncio
 import threading
+import functools
 
 from appyter.ext.asyncio.event_loop import get_event_loop
 
+import logging
 logger = logging.getLogger(__name__)
 
-def arg_compressor(func):
-  @functools.wraps(func)
-  def wrapper(args, kwargs):
-    return func(*args, **kwargs)
-  return wrapper
+from inspect import (
+  isasyncgen,
+  isasyncgenfunction,
+  isawaitable,
+  iscoroutine,
+  iscoroutinefunction,
+  isfunction,
+  isgenerator,
+  isgeneratorfunction,
+  ismethod,
+)
 
 def isasynccontextmanager(obj):
   return getattr(obj, '__aenter__', None) is not None
 
 def iscontextmanager(obj):
   return getattr(obj, '__enter__', None) is not None
+
+def _arg_compressor(func):
+  @functools.wraps(func)
+  def wrapper(args, kwargs):
+    return func(*args, **kwargs)
+  return wrapper
 
 async def ensure_async_literal(obj):
   logger.debug(f"ensure_async_literal")
@@ -32,7 +51,7 @@ def ensure_async_func(func):
   logger.debug(f"ensure_async_func")
   @functools.wraps(func)
   async def wrapper(*args, **kwargs):
-    return await get_event_loop().run_in_executor(None, arg_compressor(func), args, kwargs)
+    return await get_event_loop().run_in_executor(None, _arg_compressor(func), args, kwargs)
   return wrapper
 
 @ensure_async_func
@@ -95,8 +114,8 @@ def ensure_sync_contextmanager(asynccontextmanager):
   logger.debug(f"ensure_sync_contextmanager")
   return _SyncAsyncContextManager(asynccontextmanager)
 
-def _ensure_async_helper(callable):
-  logger.debug(f"_ensure_async_helper")
+def ensure_async_wrapper(callable):
+  logger.debug(f"ensure_async_wrapper")
   @functools.wraps(callable)
   def wrapper(*args, **kwargs):
     obj = callable(*args, **kwargs)
@@ -105,30 +124,29 @@ def _ensure_async_helper(callable):
 
 def ensure_async(obj):
   if (
-    inspect.isasyncgenfunction(obj)
-    or inspect.iscoroutinefunction(obj)
-    or inspect.isgeneratorfunction(obj)
+    isasyncgenfunction(obj)
+    or iscoroutinefunction(obj)
+    or isgeneratorfunction(obj)
   ):
-    return _ensure_async_helper(obj)
+    return ensure_async_wrapper(obj)
   elif (
-    inspect.isasyncgen(obj)
-    or inspect.iscoroutine(obj)
-    or inspect.isawaitable(obj)
+    isasyncgen(obj)
+    or iscoroutine(obj)
+    or isawaitable(obj)
     or isasynccontextmanager(obj)
   ):
     return obj
-  elif inspect.isgenerator(obj):
+  elif isgenerator(obj):
     return ensure_async_generator(obj)
   elif iscontextmanager(obj):
     return ensure_async_contextmanager(obj)
-  elif inspect.isfunction(obj) or inspect.ismethod(obj):
+  elif isfunction(obj) or ismethod(obj):
     return ensure_async_func(obj)
   else:
-    logger.warn(f"fallthrough: {obj}")
     return ensure_async_literal(obj)
 
-def _ensure_sync_helper(callable):
-  logger.debug(f"_ensure_sync_helper")
+def ensure_sync_wrapper(callable):
+  logger.debug(f"ensure_sync_wrapper")
   @functools.wraps(callable)
   def wrapper(*args, **kwargs):
     obj = callable(*args, **kwargs)
@@ -137,20 +155,20 @@ def _ensure_sync_helper(callable):
 
 def ensure_sync(obj):
   if (
-    inspect.isasyncgenfunction(obj)
-    or inspect.iscoroutinefunction(obj)
-    or inspect.isgeneratorfunction(obj)
-    or inspect.isfunction(obj)
-    or inspect.ismethod(obj)
+    isasyncgenfunction(obj)
+    or iscoroutinefunction(obj)
+    or isgeneratorfunction(obj)
+    or isfunction(obj)
+    or ismethod(obj)
   ):
-    return _ensure_sync_helper(obj)
+    return ensure_sync_wrapper(obj)
   elif isasynccontextmanager(obj):
     return ensure_sync_contextmanager(obj)
-  elif inspect.isasyncgen(obj):
+  elif isasyncgen(obj):
     return ensure_sync_generator(obj)
-  elif inspect.iscoroutine(obj):
+  elif iscoroutine(obj):
     return ensure_sync_coro(obj)
-  elif inspect.isawaitable(obj):
+  elif isawaitable(obj):
     return ensure_sync_coro(awaitable_identity(obj))
   else:
     return obj

@@ -14,7 +14,7 @@ class SharedEventLoopThreadPoolExecutor(ThreadPoolExecutor):
     self.loop = loop or asyncio.get_event_loop()
   
   def _initializer(self, *args, initializer=None, **kwargs):
-    logger.info(f"Thread initializer {self.loop=}")
+    logger.debug(f"Thread initializer {self.loop=}")
     asyncio.set_event_loop(self.loop)
     if initializer is not None:
       return initializer(*args, **kwargs)
@@ -47,7 +47,7 @@ def new_event_loop():
   if _LOOP is not None:
     logger.warning('Event loop already exists')
     return _LOOP
-  logger.info(f"New Event Loop")
+  logger.debug(f"New event loop")
   loop = asyncio.new_event_loop()
   asyncio.set_event_loop(loop)
   loop_executor = SharedEventLoopThreadPoolExecutor(loop=loop)
@@ -57,7 +57,7 @@ def new_event_loop():
   _loop_close = loop.close
   def loop_close(*args, **kwargs):
     global _LOOP
-    logger.info("Closing event loop...")
+    logger.debug("Closing event loop...")
     loop_thread.stop()
     _LOOP = None
     return _loop_close(*args, **kwargs)
