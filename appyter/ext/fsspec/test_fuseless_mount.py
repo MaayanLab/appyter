@@ -12,6 +12,19 @@ def setup():
 
 FSSPEC_URI = os.environ.get('FSSPEC_URI', f"file:///tmp/{str(uuid.uuid4())}")
 
+def test_fuse_mount():
+  from appyter.ext.fsspec.core import url_to_chroot_fs
+  fs = url_to_chroot_fs(FSSPEC_URI)
+  with fs as fs:
+    try:
+      fs.makedirs('', exist_ok=True)
+      fs.pipe('test', b'Hello World!')
+      with fs.mount(fuse=True) as mnt_dir:
+        assert mnt_dir.is_mount()
+        logging.debug(f"{mnt_dir=} {({p: p.open('r').read() for p in mnt_dir.glob('*')})}")
+    finally:
+      fs.rm('', recursive=True)
+
 def test_fuseless_mount():
   from appyter.ext.fsspec.core import url_to_chroot_fs
   fs = url_to_chroot_fs(FSSPEC_URI)
@@ -20,6 +33,7 @@ def test_fuseless_mount():
       fs.makedirs('', exist_ok=True)
       fs.pipe('test', b'Hello World!')
       with fs.mount(fuse=False) as mnt_dir:
+        assert not mnt_dir.is_mount()
         logging.debug(f"{mnt_dir=} {({p: p.open('r').read() for p in mnt_dir.glob('*')})}")
     finally:
       fs.rm('', recursive=True)
