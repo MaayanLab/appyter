@@ -58,6 +58,8 @@ def create_app(**kwargs):
 @click_option_setenv('--debug', envvar='APPYTER_DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
 @click_option_setenv('--dispatch', envvar='APPYTER_DISPATCH', type=str, default='local', help='The dispatcher mechanism to use (see list-dispatchers)')
 def dispatcher(*args, **kwargs):
-  from aiohttp import web
+  from appyter.ext.aiohttp import run_app
+  from appyter.ext.asyncio.event_loop import new_event_loop
+  loop = new_event_loop()
   app = create_app(**kwargs)
-  web.run_app(app, host=app['config']['HOST'], port=int(app['config']['PORT']))
+  run_app(app, host=app['config']['HOST'], port=int(app['config']['PORT']))

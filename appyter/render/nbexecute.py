@@ -8,7 +8,7 @@ import traceback
 import logging
 
 from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.tempfile import tempdir
+from appyter.ext.asyncio.helpers import ensure_async
 logger = logging.getLogger(__name__)
 
 from appyter import __version__
@@ -80,7 +80,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
     files = nb.metadata['appyter']['nbconstruct'].get('files')
     logger.debug(f"{cwd=} {files=}")
     with url_to_chroot_fs(cwd, pathmap=files) as fs:
-      async with fs._mount(fuse=False) as mnt:
+      async with ensure_async(fs.mount(fuse=False)) as mnt:
         # setup execution_info with start time
         nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
         with (mnt/ipynb).open('w') as fw:

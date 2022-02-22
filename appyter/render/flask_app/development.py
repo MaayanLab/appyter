@@ -1,3 +1,4 @@
+from appyter.ext.asyncio.helpers import ensure_sync
 import logging
 
 logger = logging.getLogger(__name__)
@@ -64,21 +65,20 @@ async def file_watcher(emitter, evt, path, **kwargs):
   async for changes in awatch(path, **kwargs):
     await emitter.emit(evt, changes=changes)
 
-def serve(app_path, **kwargs):
+@ensure_sync
+async def serve(app_path, **kwargs):
   import os
   import asyncio
   import appyter
   from appyter.ext.asyncio.event_emitter import EventEmitter
-  from appyter.ext.asyncio.event_loop import new_event_loop
   from appyter.ext.watchgod.watcher import GlobWatcher
   from appyter.context import get_env
-  loop = new_event_loop()
   config = get_env(**kwargs)
   emitter = EventEmitter()
   # run the app and reload it when necessary
-  loop.create_task(app_runner(emitter, config))
+  asyncio.create_task(app_runner(emitter, config))
   # the underlying appyter library
-  loop.create_task(
+  asyncio.create_task(
     file_watcher(emitter, 'reload', appyter.__path__[0],
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
@@ -90,7 +90,7 @@ def serve(app_path, **kwargs):
     )
   )
   # the underlying appyter library's templates/ipynb/staticfiles/...
-  loop.create_task(
+  asyncio.create_task(
     file_watcher(emitter, 'livereload', os.path.join(appyter.__path__[0], 'profiles'),
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
@@ -102,7 +102,7 @@ def serve(app_path, **kwargs):
     )
   )
   # the appyter itself's filters/blueprints
-  loop.create_task(
+  asyncio.create_task(
     file_watcher(emitter, 'reload', config['CWD'],
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
@@ -114,7 +114,7 @@ def serve(app_path, **kwargs):
     )
   )
   # the appyter itself's templates/ipynb/staticfiles/...
-  loop.create_task(
+  asyncio.create_task(
     file_watcher(emitter, 'livereload', config['CWD'],
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
@@ -125,8 +125,10 @@ def serve(app_path, **kwargs):
       ),
     )
   )
-  loop.create_task(app_messager(emitter, config))
-  loop.run_forever()
-  loop.run_until_complete(emitter.emit('quit'))
-  loop.run_until_complete(emitter.flush())
-  loop.run_until_complete(emitter.clear())
+  asyncio.create_task(app_messager(emitter, config))
+  try:
+    await asyncio.Event().wait()
+  finally:
+    await emitter.emit('quit')
+    await emitter.flush()
+    await emitter.clear()

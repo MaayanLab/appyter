@@ -63,9 +63,10 @@ def _http_serve(directory, port=8888):
   ''' Serve a simple static listing of the given directory on the specified port
   '''
   from aiohttp import web
+  from appyter.ext.aiohttp import run_app
   app = web.Application()
   app.add_routes([web.static('/subdir', str(directory), show_index=True)])
-  return web.run_app(app, port=port)
+  return run_app(app, port=port)
 
 async def _http_connect(url):
   ''' Successfully connect to and resolve a url

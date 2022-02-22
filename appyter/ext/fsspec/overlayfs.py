@@ -50,18 +50,17 @@ class OverlayFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
     if getattr(self.lower_fs, '__exit__', None) is not None:
       self.lower_fs.__exit__(type, value, traceback)
 
-  @contextlib.asynccontextmanager
-  async def _mount(self, mount_dir=None, fuse=True, **kwargs):
+  @contextlib.contextmanager
+  def mount(self, mount_dir=None, fuse=True, **kwargs):
     if fuse:
-      async with MountableAbstractFileSystem._mount(mount_dir=mount_dir, fuse=True, **kwargs) as mount_dir:
+      with super().mount(mount_dir=mount_dir, fuse=True, **kwargs) as mount_dir:
         yield mount_dir
     else:
-      _upper_mount = self.upper_fs._mount if getattr(self.upper_fs, '_mount', None) else MountableAbstractFileSystem._mount
-      _lower_mount = self.lower_fs._mount if getattr(self.lower_fs, '_mount', None) else MountableAbstractFileSystem._mount
-      async with _upper_mount(mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
-        async with _lower_mount(mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
+      upper_mount = self.upper_fs.mount if getattr(self.upper_fs, 'mount', None) else super().mount
+      lower_mount = self.lower_fs.mount if getattr(self.lower_fs, 'mount', None) else super().mount
+      with upper_mount(mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
+        with lower_mount(mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
           yield mount_dir
-  mount = ensure_sync(_mount)
 
   def mkdir(self, path, **kwargs):
     return self.upper_fs.mkdir(path, **kwargs)

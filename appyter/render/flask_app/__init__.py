@@ -170,15 +170,15 @@ def flask_app(**kwargs):
   loop = new_event_loop()
   #
   if kwargs.get('socket'):
-    from aiohttp import web
+    from appyter.ext.aiohttp import run_app
     socket = kwargs['socket']
     logging.info(f"Launching aiohttp server on {socket}")
     app = create_app(**kwargs)
     if ':' in socket:
       host, port = socket.split(':')
-      web.run_app(app, host=host, port=int(port), loop=loop)
+      run_app(app, host=host, port=int(port))
     else:
-      web.run_app(app, path=socket, loop=loop)
+      run_app(app, path=socket)
   elif kwargs.get('debug'):
     from appyter.render.flask_app.development import serve
     serve(__file__, loop=loop, **kwargs)
