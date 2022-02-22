@@ -2,6 +2,7 @@ import logging
 import asyncio
 import functools
 import threading
+import contextlib
 from concurrent.futures import ThreadPoolExecutor
 logger = logging.getLogger(__name__)
 
@@ -28,9 +29,8 @@ class EventLoopThread(threading.Thread):
     self.loop = loop or asyncio.get_event_loop()
 
   def run(self):
-    self.loop.run_until_complete(
-      self.loop.run_in_executor(None, self.close.wait)
-    )
+    self.loop.run_until_complete(self.loop.run_in_executor(None, self.close.wait))
+    self.loop.run_until_complete(asyncio.gather(*asyncio.all_tasks()))
 
   def stop(self):
     self.close.set()
@@ -73,3 +73,11 @@ def get_event_loop():
     return _LOOP
   else:
     return asyncio.get_running_loop()
+
+@contextlib.contextmanager
+def with_event_loop():
+  loop = new_event_loop()
+  try:
+    yield loop
+  finally:
+    loop.close()

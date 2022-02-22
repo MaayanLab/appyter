@@ -79,11 +79,12 @@ async def execute_async(job, debug=False):
     logger.debug('EXITING')
 
 def execute(job):
-  from appyter.ext.asyncio.event_loop import new_event_loop
+  from appyter.ext.asyncio.helpers import ensure_sync
+  from appyter.ext.asyncio.event_loop import with_event_loop
   debug = job.get('debug', False)
   logging.basicConfig(
     level=logging.DEBUG if debug else logging.WARNING,
     format='%(name)s %(message)s',
   )
-  loop = new_event_loop()
-  loop.run_until_complete(execute_async(job, debug=debug))
+  with with_event_loop():
+    ensure_sync(execute_async(job, debug=debug))

@@ -6,19 +6,18 @@ logger = logging.getLogger(__name__)
 
 def _fuse_run(url, mount_point, kwargs, alias_dump, singleton_dump):
   import fsspec.fuse
-  from appyter.ext.asyncio.event_loop import new_event_loop
+  from appyter.ext.asyncio.event_loop import with_event_loop
   from appyter.ext.fsspec.core import url_to_chroot_fs
   from appyter.ext.fsspec.alias import register_aliases
   from appyter.ext.fsspec.singleton import register_singletons
-  loop = new_event_loop()
-  register_aliases(alias_dump)
-  logger.debug(f'preparing fs from {url} ({kwargs})..')
-  with register_singletons(singleton_dump):
-    with url_to_chroot_fs(url, **kwargs) as fs:
-      logger.debug('launching fuse..')
-      fsspec.fuse.run(fs, '', mount_point)
-      logger.debug('teardown..')
-  loop.close()
+  with with_event_loop():
+    register_aliases(alias_dump)
+    logger.debug(f'preparing fs from {url} ({kwargs})..')
+    with register_singletons(singleton_dump):
+      with url_to_chroot_fs(url, **kwargs) as fs:
+        logger.debug('launching fuse..')
+        fsspec.fuse.run(fs, '', mount_point)
+        logger.debug('teardown..')
 
 @contextlib.asynccontextmanager
 async def fs_mount(url, mount_dir=None, **kwargs):

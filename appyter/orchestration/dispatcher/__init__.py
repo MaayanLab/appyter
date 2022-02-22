@@ -1,4 +1,3 @@
-import click
 import logging
 logger = logging.getLogger(__name__)
 
@@ -59,7 +58,7 @@ def create_app(**kwargs):
 @click_option_setenv('--dispatch', envvar='APPYTER_DISPATCH', type=str, default='local', help='The dispatcher mechanism to use (see list-dispatchers)')
 def dispatcher(*args, **kwargs):
   from appyter.ext.aiohttp import run_app
-  from appyter.ext.asyncio.event_loop import new_event_loop
-  loop = new_event_loop()
-  app = create_app(**kwargs)
-  run_app(app, host=app['config']['HOST'], port=int(app['config']['PORT']))
+  from appyter.ext.asyncio.event_loop import with_event_loop
+  with with_event_loop():
+    app = create_app(**kwargs)
+    run_app(app, host=app['config']['HOST'], port=int(app['config']['PORT']))

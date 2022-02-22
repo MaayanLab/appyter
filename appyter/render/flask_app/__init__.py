@@ -153,6 +153,7 @@ def create_app(**kwargs):
 @click_option_setenv('--static-dir', envvar='APPYTER_STATIC_DIR', default='static', help='The folder whether staticfiles are located')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def flask_app(**kwargs):
+  import sys
   import logging
   if kwargs.get('debug'):
     logging.basicConfig(
@@ -166,22 +167,24 @@ def flask_app(**kwargs):
     )
     logging.getLogger(__package__).setLevel(logging.INFO)
   #
-  from appyter.ext.asyncio.event_loop import new_event_loop
-  loop = new_event_loop()
-  #
-  if kwargs.get('socket'):
-    from appyter.ext.aiohttp import run_app
-    socket = kwargs['socket']
-    logging.info(f"Launching aiohttp server on {socket}")
-    app = create_app(**kwargs)
-    if ':' in socket:
-      host, port = socket.split(':')
-      run_app(app, host=host, port=int(port))
+  from appyter.ext.asyncio.event_loop import with_event_loop
+  with with_event_loop() as loop:
+    if kwargs.get('socket'):
+      from appyter.ext.aiohttp import run_app
+      socket = kwargs['socket']
+      logging.info(f"Launching aiohttp server on {socket}")
+      app = create_app(**kwargs)
+      if ':' in socket:
+        host, port = socket.split(':')
+        run_app(app, host=host, port=int(port))
+      else:
+        run_app(app, path=socket)
+      exit_code = 0
+    elif kwargs.get('debug'):
+      from appyter.render.flask_app.development import serve
+      exit_code = serve(__file__, loop=loop, **kwargs)
     else:
-      run_app(app, path=socket)
-  elif kwargs.get('debug'):
-    from appyter.render.flask_app.development import serve
-    serve(__file__, loop=loop, **kwargs)
-  else:
-    from appyter.render.flask_app.production import serve
-    serve(__file__, loop=loop, **kwargs)
+      from appyter.render.flask_app.production import serve
+      exit_code = serve(__file__, loop=loop, **kwargs)
+  #
+  sys.exit(exit_code)

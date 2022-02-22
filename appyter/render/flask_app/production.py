@@ -1,5 +1,4 @@
 import fsspec
-from pathlib import Path
 from appyter.ext.urllib import join_url
 from appyter.ext.tempfile import tempdir
 
@@ -50,4 +49,4 @@ def serve(app_path, **kwargs):
         proc.terminate()
         exit_code = proc.wait()
   #
-  sys.exit(exit_code)
+  return exit_code

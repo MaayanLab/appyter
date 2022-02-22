@@ -75,10 +75,11 @@ async def serve(app_path, **kwargs):
   from appyter.context import get_env
   config = get_env(**kwargs)
   emitter = EventEmitter()
+  tasks = []
   # run the app and reload it when necessary
-  asyncio.create_task(app_runner(emitter, config))
+  tasks.append(asyncio.create_task(app_runner(emitter, config)))
   # the underlying appyter library
-  asyncio.create_task(
+  tasks.append(asyncio.create_task(
     file_watcher(emitter, 'reload', appyter.__path__[0],
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
@@ -88,9 +89,9 @@ async def serve(app_path, **kwargs):
         exclude_file_glob=[],
       ),
     )
-  )
+  ))
   # the underlying appyter library's templates/ipynb/staticfiles/...
-  asyncio.create_task(
+  tasks.append(asyncio.create_task(
     file_watcher(emitter, 'livereload', os.path.join(appyter.__path__[0], 'profiles'),
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
@@ -100,9 +101,9 @@ async def serve(app_path, **kwargs):
         exclude_file_glob=['*.py'],
       ),
     )
-  )
+  ))
   # the appyter itself's filters/blueprints
-  asyncio.create_task(
+  tasks.append(asyncio.create_task(
     file_watcher(emitter, 'reload', config['CWD'],
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
@@ -112,9 +113,9 @@ async def serve(app_path, **kwargs):
         exclude_file_glob=[],
       ),
     )
-  )
+  ))
   # the appyter itself's templates/ipynb/staticfiles/...
-  asyncio.create_task(
+  tasks.append(asyncio.create_task(
     file_watcher(emitter, 'livereload', config['CWD'],
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
@@ -124,11 +125,18 @@ async def serve(app_path, **kwargs):
         exclude_file_glob=['*.py'],
       ),
     )
-  )
-  asyncio.create_task(app_messager(emitter, config))
+  ))
+  tasks.append(asyncio.create_task(app_messager(emitter, config)))
   try:
     await asyncio.Event().wait()
   finally:
     await emitter.emit('quit')
     await emitter.flush()
     await emitter.clear()
+    for task in tasks:
+      try:
+        task.cancel()
+        await task
+      except asyncio.CancelledError:
+        pass
+  return 0

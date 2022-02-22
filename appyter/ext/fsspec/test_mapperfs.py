@@ -8,12 +8,8 @@ from pathlib import Path
 from appyter.ext.fsspec.mapperfs import MapperFileSystem
 
 import pytest
-@pytest.fixture(scope="session", autouse=True)
-def setup():
-  from appyter.ext.asyncio.event_loop import new_event_loop
-  loop = new_event_loop()
-  yield
-  loop.close()
+from appyter.ext.asyncio.event_loop import with_event_loop
+pytest.fixture(scope="session", autouse=True)(with_event_loop)
 
 def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
 

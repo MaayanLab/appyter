@@ -8,7 +8,7 @@ import traceback
 import logging
 
 from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.asyncio.helpers import ensure_async
+from appyter.ext.asyncio.helpers import ensure_async, ensure_sync
 logger = logging.getLogger(__name__)
 
 from appyter import __version__
@@ -172,10 +172,9 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def nbexecute(ipynb, output, cwd, data_dir=None):
   import fsspec
-  from appyter.ext.asyncio.event_loop import new_event_loop
+  from appyter.ext.asyncio.event_loop import with_event_loop
   from appyter.ext.fsspec.singleton import SingletonFileSystemFactory
-  loop = new_event_loop()
-  with SingletonFileSystemFactory('storage', data_dir) as storage:
-    fsspec.register_implementation('storage', storage)
-    loop.run_until_complete(nbexecute_async(ipynb=ipynb, emit=json_emitter_factory(output), cwd=cwd))
-    loop.close()
+  with with_event_loop():
+    with SingletonFileSystemFactory('storage', data_dir) as storage:
+      fsspec.register_implementation('storage', storage)
+      ensure_sync(nbexecute_async(ipynb=ipynb, emit=json_emitter_factory(output), cwd=cwd))
