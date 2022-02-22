@@ -47,7 +47,11 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
         project=f"{user}/{project}",
         name=directory,
         type='folder',
-      )) as req:
+      ), raise_for_status=False) as req:
+        if req.status == 404:
+          raise NotADirectoryError
+        else:
+          req.raise_for_status()
         res = await req.json()
       return {
         '_id': res['id'],
@@ -223,15 +227,18 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
         projects = await req.json()
       if len(projects['items']) == 0:
         raise FileNotFoundError(path)
-      elif len(projects['items']) == 1:
+      elif len(projects['items']) > 1:
         raise Exception('Ambiguity')
-      else:
-        return {'name': project_user, 'type': 'directory'}
+      return {'name': project_user, 'type': 'directory'}
     elif len(path_split) == 2:
       project_user, proj_id = path_split
       async with self._session.get(f"{self.storage_options['api_endpoint']}/projects/{project_user}", params=dict(
         name=proj_id
-      )) as req:
+      ), raise_for_status=False) as req:
+        if req.status == 404:
+          raise FileNotFoundError(path)
+        else:
+          req.raise_for_status()
         projects = await req.json()
       if len(projects['items']) == 0:
         raise FileNotFoundError(path)
@@ -244,7 +251,11 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
       proj = acc + '/' + proj_id
       async with self._session.get(f"{self.storage_options['api_endpoint']}/files", params=dict(
         project=proj, name=name,
-      )) as req:
+      ), raise_for_status=False) as req:
+        if req.status == 404:
+          raise FileNotFoundError(path)
+        else:
+          req.raise_for_status()
         items = await req.json()
       if len(items['items']) == 0:
         raise FileNotFoundError(path)
@@ -277,7 +288,11 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
       name = path_split[-1]
       async with self._session.get(f"{self.storage_options['api_endpoint']}/files", params=dict(
         parent=parent_info['_id'], name=name,
-      )) as req:
+      ), raise_for_status=False) as req:
+        if req.status == 404:
+          raise FileNotFoundError(path)
+        else:
+          req.raise_for_status()
         items = await req.json()
       if len(items['items']) == 0:
         raise FileNotFoundError(path)
@@ -329,7 +344,11 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
       proj = f"{acc}/{proj_id}"
       async with self._session.get(f"{self.storage_options['api_endpoint']}/files", params=dict(
         project=proj,
-      )) as req:
+      ), raise_for_status=False) as req:
+        if req.status == 404:
+          raise FileNotFoundError(path)
+        else:
+          req.raise_for_status()
         items = await req.json()
       for item in items['items']:
         item_name = proj + '/' + item['name']

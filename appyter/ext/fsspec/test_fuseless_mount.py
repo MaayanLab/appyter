@@ -24,7 +24,9 @@ def test_fuse_mount():
       fs.pipe('test', b'Hello World!')
       with fs.mount(fuse=True) as mnt_dir:
         assert mnt_dir.is_mount()
-        logging.debug(f"{mnt_dir=} {({p: p.open('r').read() for p in mnt_dir.glob('*')})}")
+        logging.debug(f"{mnt_dir=}")
+        logging.debug(f"{list(mnt_dir.glob('*'))=}")
+        # logging.debug(f"{({p: p.open('rb').read() for p in mnt_dir.rglob('*') if p.is_file()})}")
     finally:
       fs.rm('', recursive=True)
 
@@ -37,6 +39,6 @@ def test_fuseless_mount():
       fs.pipe('test', b'Hello World!')
       with fs.mount(fuse=False) as mnt_dir:
         assert not mnt_dir.is_mount()
-        logging.debug(f"{mnt_dir=} {({p: p.open('r').read() for p in mnt_dir.glob('*')})}")
+        logging.debug(f"{mnt_dir=} {({p: p.open('r').read() for p in mnt_dir.rglob('*') if p.is_file()})}")
     finally:
       fs.rm('', recursive=True)
