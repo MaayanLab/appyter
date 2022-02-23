@@ -19,7 +19,8 @@ def AliasFileSystemFactory(_proto, _fs_url, **_kwargs):
     kwargs = _kwargs
 
     def __init__(self, **kwargs):
-      super().__init__(fs=url_to_fs_ex(_fs_url, **_kwargs), **kwargs)
+      fs, fo = url_to_fs_ex(_fs_url, **_kwargs)
+      super().__init__(fs=fs, fo=fo, **kwargs)
 
   return AliasFileSystem
 
