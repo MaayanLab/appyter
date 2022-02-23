@@ -23,16 +23,12 @@ class DockerExecutor(AbstractExecutor):
     ]
 
   async def __aenter__(self):
-    try:
-      proc = await asyncio.create_subprocess_exec(*[
-        'docker', 'inspect', os.environ['HOSTNAME'],
-      ], stdout=asyncio.subprocess.PIPE)
-      proc_stdout, _ = await proc.communicate()
-      conf = json.loads(proc_stdout.decode())
-      self._args += ['--network', conf[0]['HostConfig']['NetworkMode']]
-    except:
-      import traceback
-      logger.warning(traceback.format_exc())
+    proc = await asyncio.create_subprocess_exec(*[
+      'docker', 'inspect', os.environ['HOSTNAME'],
+    ], stdout=asyncio.subprocess.PIPE)
+    proc_stdout, _ = await proc.communicate()
+    conf = json.loads(proc_stdout.decode())
+    self._args += ['--network', conf[0]['HostConfig']['NetworkMode']]
     return self
 
   async def __aexit__(self, type, value, traceback):

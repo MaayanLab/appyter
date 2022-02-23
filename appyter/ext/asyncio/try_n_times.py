@@ -7,6 +7,8 @@ def try_n_times(n, func, *args, **kwargs):
   while n > 0:
     try:
       return func(*args, **kwargs)
+    except KeyboardInterrupt:
+      raise
     except Exception as err:
       n -= 1
       if n == 0:
@@ -21,6 +23,8 @@ async def async_try_n_times(n, coro, *args, **kwargs):
   while n > 0:
     try:
       return await coro(*args, **kwargs)
+    except asyncio.CancelledError:
+      raise
     except Exception as err:
       n -= 1
       if n == 0:

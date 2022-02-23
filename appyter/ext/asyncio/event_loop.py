@@ -1,5 +1,6 @@
 import logging
 import asyncio
+import traceback
 import functools
 import threading
 import contextlib
@@ -28,11 +29,35 @@ class EventLoopThread(threading.Thread):
     self.close = threading.Event()
     self.loop = loop or asyncio.get_event_loop()
 
+  async def _run(self):
+    logger.debug("Event loop started")
+    try:
+      await self.loop.run_in_executor(None, self.close.wait)
+    except:
+      logger.error(f"{traceback.format_exc()}")
+    finally:
+      logger.debug(f"Cancelling active tasks...")
+      # we omit our own task since that would cause a deadlock
+      #  and we cancel tasks in reverse which works well in python3.10,
+      #  typically cancelling tasks launched last first
+      tasks = reversed(list(asyncio.all_tasks() - {asyncio.current_task()}))
+      for task in tasks:
+        task.cancel()
+        try:
+          await task
+        except asyncio.CancelledError:
+          pass
+        except:
+          logger.error(traceback.format_exc())
+
   def run(self):
-    self.loop.run_until_complete(self.loop.run_in_executor(None, self.close.wait))
-    self.loop.run_until_complete(asyncio.gather(*asyncio.all_tasks()))
+    try:
+      self.loop.run_until_complete(self._run())
+    finally:
+      logger.debug(f"Event loop closed.")
 
   def stop(self):
+    logger.debug("Stopping event loop...")
     self.close.set()
     self.join()
 

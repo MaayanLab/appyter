@@ -30,7 +30,7 @@ def is_remote(url):
   try:
     secure_url(url)
     return True
-  except:
+  except AssertionError:
     return False
 
 def route_join_with_or_without_slash(blueprint, *routes, **kwargs):
@@ -53,7 +53,7 @@ def decorator_in_production(production_decorator):
         from flask import current_app
         if current_app.config['DEBUG']:
           return func(*args, **kwargs)
-      except:
+      except RuntimeError:
         pass
       return production_func(*args, **kwargs)
     return wrapper

@@ -12,7 +12,7 @@ def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
 def assert_exc(ExpectedException):
   try:
     yield
-    assert False, f"Expected {ExpectedException}"
+    assert False, f"Expected {ExpectedException}, got no error"
   except ExpectedException:
     assert True
 
@@ -26,7 +26,10 @@ async def alist(agen):
 
 import pytest
 from appyter.ext.asyncio.event_loop import with_event_loop
-pytest.fixture(scope="session", autouse=True)(with_event_loop)
+@pytest.fixture(scope="session", autouse=True)
+def _():
+  with with_event_loop():
+    yield
 
 @contextlib.asynccontextmanager
 async def asyncctx(a, *, b=1):
@@ -60,10 +63,12 @@ async def async_mixedfun(a, *, b=1):
   return await helpers.ensure_async(syncfun(a, b=b))
 
 def sync_exc():
-  raise RuntimeError
+  logger.info("Sync: Raising Runtime Error")
+  raise RuntimeError()
 
 async def async_exc():
-  raise RuntimeError
+  logger.info("Async: Raising Runtime Error")
+  raise RuntimeError()
 
 def test_ensure_sync_async_ctx():
   with helpers.ensure_sync(asyncctx(1)) as ctx: assert_eq(ctx, 2)
@@ -154,3 +159,33 @@ async def _test_ensure_async_mixed_fun():
   assert_eq(await helpers.ensure_async(async_mixedfun(0,b=2)), 2)
 def test_ensure_async_mixed_fun():
   helpers.ensure_sync(_test_ensure_async_mixed_fun)()
+
+async def _test_async_sync_bottom_up_exc():
+  try:
+    await helpers.ensure_async(sync_exc)()
+  except RuntimeError as e:
+    assert isinstance(e, RuntimeError)
+    logger.info(f"Async: Received {repr(e)}, Re-raising")
+    raise
+
+def test_async_sync_bottom_up_exc():
+  with assert_exc(RuntimeError):
+    logger.info("Starting async_sync_exc")
+    helpers.ensure_sync(_test_async_sync_bottom_up_exc)()
+    logger.info("Done.")
+
+
+@contextlib.asynccontextmanager
+async def _test_async_sync_top_down_exc():
+  try:
+    yield
+  except KeyboardInterrupt as e:
+    assert isinstance(e, KeyboardInterrupt)
+    logger.info(f"Async: Received {repr(e)}, Re-raising")
+    raise
+
+def test_async_sync_top_down_exc():
+  with assert_exc(KeyboardInterrupt):
+    with helpers.ensure_sync(_test_async_sync_top_down_exc()):
+      time.sleep(0.5)
+      raise KeyboardInterrupt

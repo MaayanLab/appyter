@@ -270,7 +270,7 @@ def get_env(**kwargs):
   #
   try:
     return get_env_from_flask()
-  except Exception:
+  except RuntimeError:
     pass
   #
   try:

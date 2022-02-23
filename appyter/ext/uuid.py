@@ -12,5 +12,5 @@ def sanitize_uuid(val):
   import uuid
   try:
     return str(uuid.UUID(val))
-  except:
+  except ValueError:
     return None

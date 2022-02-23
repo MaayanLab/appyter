@@ -22,6 +22,7 @@ async def with_app_running(app, host='127.0.0.1', port=5000, path=None):
   try:
     yield
   finally:
+    logger.info(f"Cleaning up server...")
     await runner.cleanup()
 
 @ensure_sync
@@ -29,5 +30,5 @@ async def run_app(app, host='127.0.0.1', port=5000, path=None):
   async with with_app_running(app, host=host, port=port, path=path):
     try:
       await asyncio.Event().wait()
-    except KeyboardInterrupt:
+    except asyncio.CancelledError:
       pass

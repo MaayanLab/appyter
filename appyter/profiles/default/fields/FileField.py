@@ -68,7 +68,7 @@ class FileField(Field):
     try:
       from flask import request
       return join_routes(request.base_url, self.value)[1:]
-    except:
+    except RuntimeError:
       from appyter.context import get_env
       config = get_env()
       return join_routes(config.get('PUBLIC_URL', 'file:///' + config.get('CWD')), self.value)[1:]

@@ -1,5 +1,5 @@
+import logging
 import traceback
-import fsspec
 from flask import Blueprint, request, redirect, abort, url_for, current_app, jsonify, make_response
 
 from appyter.context import get_jinja2_env
@@ -12,6 +12,8 @@ from appyter.render.flask_app.constants import get_fields, get_deep_fields, get_
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.ext.hashlib import sha1sum_dict
+
+logger = logging.getLogger(__name__)
 
 core = Blueprint('__main__', __name__)
 
@@ -48,8 +50,10 @@ def post_index():
     data = prepare_data(request)
     result_hash = prepare_results(data)
     error = None
+  except KeyboardInterrupt:
+    raise
   except Exception as e:
-    traceback.print_exc()
+    logger.error(traceback.format_exc())
     error = exception_as_dict(e)
   #
   if mimetype in {'text/html'}:
@@ -70,5 +74,7 @@ def post_ssr():
     ctx = request.get_json()
     assert ctx['field'].endswith('Field'), 'Invalid field'
     return env.globals[ctx['field']](**ctx['args']).render()
+  except KeyboardInterrupt:
+    raise
   except Exception as e:
     return make_response(jsonify(error=exception_as_dict(e)), 406)

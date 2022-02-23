@@ -60,10 +60,12 @@ def create_app(**kwargs):
     async def error_handler(request, handler):
       try:
         return await handler(request)
-      except HTTPException as e:
-        raise e
-      except Exception as e:
-        traceback.print_exc()
+      except asyncio.CancelledError:
+        raise
+      except HTTPException:
+        raise
+      except Exception:
+        logger.error(traceback.format_exc())
         await asyncio.sleep(1)
         raise web.HTTPFound(location=request.url)
     app.middlewares.append(error_handler)
@@ -168,23 +170,25 @@ def flask_app(**kwargs):
     logging.getLogger(__package__).setLevel(logging.INFO)
   #
   from appyter.ext.asyncio.event_loop import with_event_loop
-  with with_event_loop() as loop:
-    if kwargs.get('socket'):
-      from appyter.ext.aiohttp import run_app
-      socket = kwargs['socket']
-      logging.info(f"Launching aiohttp server on {socket}")
-      app = create_app(**kwargs)
-      if ':' in socket:
-        host, port = socket.split(':')
-        run_app(app, host=host, port=int(port))
+  exit_code = 0
+  try:
+    with with_event_loop():
+      if kwargs.get('socket'):
+        from appyter.ext.aiohttp import run_app
+        socket = kwargs['socket']
+        logging.info(f"Launching aiohttp server on {socket}")
+        app = create_app(**kwargs)
+        if ':' in socket:
+          host, port = socket.split(':')
+          run_app(app, host=host, port=int(port))
+        else:
+          run_app(app, path=socket)
+      elif kwargs.get('debug'):
+        from appyter.render.flask_app.development import serve
+        exit_code = serve(__file__, **kwargs)
       else:
-        run_app(app, path=socket)
-      exit_code = 0
-    elif kwargs.get('debug'):
-      from appyter.render.flask_app.development import serve
-      exit_code = serve(__file__, loop=loop, **kwargs)
-    else:
-      from appyter.render.flask_app.production import serve
-      exit_code = serve(__file__, loop=loop, **kwargs)
-  #
+        from appyter.render.flask_app.production import serve
+        exit_code = serve(__file__, **kwargs)
+  except KeyboardInterrupt:
+    pass
   sys.exit(exit_code)

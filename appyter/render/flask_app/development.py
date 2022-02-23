@@ -127,8 +127,13 @@ async def serve(app_path, **kwargs):
     )
   ))
   tasks.append(asyncio.create_task(app_messager(emitter, config)))
+  exit_code = 0
   try:
     await asyncio.Event().wait()
+  except asyncio.CancelledError:
+    pass
+  except:
+    exit_code = 1
   finally:
     await emitter.emit('quit')
     await emitter.flush()
@@ -139,4 +144,4 @@ async def serve(app_path, **kwargs):
         await task
       except asyncio.CancelledError:
         pass
-  return 0
+  return exit_code

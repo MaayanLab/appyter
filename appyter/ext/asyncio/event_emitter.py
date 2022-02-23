@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import traceback
 logger = logging.getLogger(__name__)
 
 class EventEmitter:
@@ -22,16 +23,14 @@ class EventEmitter:
       while True:
         evt = await event_queue.get()
         logger.debug(f"Calling listeners for {event}...")
-        try:
-          await asyncio.gather(*[
-            listener(**evt)
-            for listener in self._listeners.get(event, {}).values()
-          ])
-        except:
-          import traceback
-          logger.error(f"Error in listener for {event}: {traceback.format_exc()}")
-        finally:
-          event_queue.task_done()
+        results = await asyncio.gather(*[
+          listener(**evt)
+          for listener in self._listeners.get(event, {}).values()
+        ], return_exceptions=True)
+        for result in results:
+          if isinstance(result, Exception):
+            logger.error(f"Error in listener for {event}: {traceback.format_exception(result)}")
+        event_queue.task_done()
     return _consumer
   #
   def _ensure_consumer(self, event):
@@ -74,7 +73,7 @@ class EventEmitter:
     await asyncio.gather(*[
       event_queue.join()
       for event_queue in self._queues.values()
-    ])
+    ], return_exceptions=True)
   
   async def remove(self, event):
     try:
@@ -88,4 +87,4 @@ class EventEmitter:
 
   async def clear(self):
     logger.debug(f"Clearing...")
-    await asyncio.gather(*map(self.remove, self._consumers.keys()))
+    await asyncio.gather(*map(self.remove, self._consumers.keys()), return_exceptions=True)

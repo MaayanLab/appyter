@@ -9,7 +9,7 @@ def url_for(directory, public=False, **kwargs):
       from flask import url_for as _url_for
       modified_directory = '.'.join(('__main__', directory)) if directory == 'static' else directory
       url = _url_for(modified_directory, **kwargs)
-    except:
+    except RuntimeError:
       pass
   #
   if url is None:
@@ -23,6 +23,8 @@ def url_for(directory, public=False, **kwargs):
     try:
       from flask import request
       url = join_url(request.url_root, url)
+    except RuntimeError:
+      raise
     except:
       pass
   #

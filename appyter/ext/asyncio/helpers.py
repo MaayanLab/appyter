@@ -78,7 +78,18 @@ def ensure_sync_coro(coro):
   done = threading.Event()
   future = asyncio.run_coroutine_threadsafe(coro, loop)
   future.add_done_callback(lambda *args, **kwargs: done.set())
-  done.wait()
+  try:
+    done.wait()
+  except KeyboardInterrupt:
+    # Cancel the future if this was interrupted and give it time to handle
+    #  the cancel exception.
+    future.cancel()
+    done.wait()
+    raise KeyboardInterrupt
+  except Exception:
+    # Re-raise after cancel without future cancel handling
+    future.cancel()
+    raise
   return future.result()
 
 def ensure_sync_generator(asyncgenerator):

@@ -1,4 +1,5 @@
 import re
+import traceback
 from flask import Blueprint, abort, jsonify, request
 from appyter.ext.fsspec.core import url_to_fs_ex
 from appyter.ext.flask import route_join_with_or_without_slash
@@ -22,9 +23,10 @@ def ls(path=''):
   try:
     fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
     return jsonify(fs.ls(fs_path))
-  except Exception as e:
-    import traceback
-    traceback.print_exc()
+  except KeyboardInterrupt:
+    raise
+  except Exception:
+    logger.error(traceback.format_exc())
     abort(500)
 
 @route_join_with_or_without_slash(StorageFileField, 'info', methods=['GET'])
@@ -33,9 +35,10 @@ def info(path=''):
   try:
     fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
     return jsonify(fs.info(fs_path))
-  except Exception as e:
-    import traceback
-    traceback.print_exc()
+  except KeyboardInterrupt:
+    raise
+  except Exception:
+    logger.error(traceback.format_exc())
     abort(500)
 
 @route_join_with_or_without_slash(StorageFileField, 'cat', methods=['GET'])
@@ -44,9 +47,10 @@ def cat(path=''):
   try:
     fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
     return fs.cat(fs_path)
-  except Exception as e:
-    import traceback
-    traceback.print_exc()
+  except KeyboardInterrupt:
+    raise
+  except Exception:
+    logger.error(traceback.format_exc())
     abort(500)
 
 @route_join_with_or_without_slash(StorageFileField, 'read_block', methods=['GET'])
@@ -57,7 +61,8 @@ def read_block(path=''):
     _, start, end = m.groups()
     fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
     return fs.read_block(fs_path, start, end - start)
-  except Exception as e:
-    import traceback
-    traceback.print_exc()
+  except KeyboardInterrupt:
+    raise
+  except Exception:
+    logger.error(traceback.format_exc())
     abort(500)

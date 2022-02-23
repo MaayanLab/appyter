@@ -112,6 +112,8 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
     path = self.fs.root_marker + path.lstrip('/')
     try:
       return self.fs.cat_file(path, start=start, end=end, **kwargs)
+    except KeyboardInterrupt:
+      raise
     except:
       if path in self._local_cache:
         fh = self._local_cache[path]
