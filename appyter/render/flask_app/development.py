@@ -17,6 +17,7 @@ async def run_app(config):
 
 async def app_runner(emitter, config):
   import asyncio
+  from appyter.ext.subprocess import interrupt
   state_lock = asyncio.Lock()
   state = dict(proc=await run_app(config))
   #
@@ -26,14 +27,15 @@ async def app_runner(emitter, config):
     async with state_lock:
       if 'proc' in state:
         proc = state.pop('proc')
-        proc.kill()
+        interrupt(proc)
         state['proc'] = await run_app(config)
   #
   @emitter.on('quit')
   async def quit():
     logger.info('Stopping app..')
     async with state_lock:
-      state.pop('proc').kill()
+      proc = state.pop('proc')
+      interrupt(proc)
 
 async def app_messager(emitter, config):
   import asyncio
