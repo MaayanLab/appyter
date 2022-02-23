@@ -1,13 +1,13 @@
-import multiprocessing as mp
-mp.set_start_method('spawn', True)
-
 import os
 import uuid
 import logging
 
 import pytest
 from appyter.ext.asyncio.event_loop import with_event_loop
-pytest.fixture(scope="session", autouse=True)(with_event_loop)
+@pytest.fixture(scope="session", autouse=True)
+def event_loop_fixture():
+  with with_event_loop():
+    yield
 
 FSSPEC_URI = os.environ.get('FSSPEC_URI', f"file:///tmp/{str(uuid.uuid4())}")
 

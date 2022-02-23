@@ -1,3 +1,11 @@
+async def alist(agen):
+  ''' Resolve all values from an asynchronous generator like it was an iterator
+  '''
+  L = []
+  async for el in agen:
+    L.append(el)
+  return L
+
 def ensure_list(L):
   if type(L) == list:
     return L

@@ -1,15 +1,14 @@
-import multiprocessing as mp
-mp.set_start_method('spawn', True)
-
-import pytest
 import os
 import logging
 
 import pytest
+from appyter.ext.pytest import assert_eq
 from appyter.ext.asyncio.event_loop import with_event_loop
-pytest.fixture(scope="session", autouse=True)(with_event_loop)
+@pytest.fixture(scope="session", autouse=True)
+def event_loop_fixture():
+  with with_event_loop():
+    yield
 
-def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
 
 @pytest.mark.skipif(not (os.environ.get('FSSPEC_URI') and 'sbfs://' in os.environ.get('FSSPEC_URI')), reason='FSSPEC_URI with sbfs:// necessary to test sbfs')
 def test_sbfs():

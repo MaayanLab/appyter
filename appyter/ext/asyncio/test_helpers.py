@@ -2,32 +2,17 @@ import time
 import asyncio
 import contextlib
 from appyter.ext.asyncio import helpers
+from appyter.ext.itertools import alist
 
 import logging
 
 logger = logging.getLogger(__name__)
 
-def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
-@contextlib.contextmanager
-def assert_exc(ExpectedException):
-  try:
-    yield
-    assert False, f"Expected {ExpectedException}, got no error"
-  except ExpectedException:
-    assert True
-
-async def alist(agen):
-  ''' Resolve all values from an asynchronous generator like it was an iterator
-  '''
-  L = []
-  async for el in agen:
-    L.append(el)
-  return L
-
 import pytest
+from appyter.ext.pytest import assert_eq, assert_exc
 from appyter.ext.asyncio.event_loop import with_event_loop
 @pytest.fixture(scope="session", autouse=True)
-def _():
+def event_loop_fixture():
   with with_event_loop():
     yield
 
