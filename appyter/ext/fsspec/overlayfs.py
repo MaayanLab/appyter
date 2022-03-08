@@ -51,15 +51,15 @@ class OverlayFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSyste
       self.lower_fs.__exit__(type, value, traceback)
 
   @contextlib.contextmanager
-  def mount(self, mount_dir=None, fuse=True, **kwargs):
+  def mount(self, path='', mount_dir=None, fuse=True, **kwargs):
     if fuse:
-      with super().mount(mount_dir=mount_dir, fuse=True, **kwargs) as mount_dir:
+      with super().mount(path=path, mount_dir=mount_dir, fuse=True, **kwargs) as mount_dir:
         yield mount_dir
     else:
       upper_mount = self.upper_fs.mount if getattr(self.upper_fs, 'mount', None) else super().mount
       lower_mount = self.lower_fs.mount if getattr(self.lower_fs, 'mount', None) else super().mount
-      with upper_mount(mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
-        with lower_mount(mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
+      with upper_mount(path=path, mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
+        with lower_mount(path=path, mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
           yield mount_dir
 
   def mkdir(self, path, **kwargs):

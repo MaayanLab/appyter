@@ -49,14 +49,10 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSy
       self.fs.__exit__(type, value, traceback)
 
   @contextlib.contextmanager
-  def mount(self, mount_dir=None, fuse=True, **kwargs):
-    logger.debug(f"{self=} mount {mount_dir=} {fuse=}")
-    if getattr(self.fs, 'mount', None) is not None:
-      with self.fs.mount(mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
-        yield mount_dir
-    else:
-      with super().mount(mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
-        yield mount_dir
+  def mount(self, path='', mount_dir=None, fuse=True, **kwargs):
+    mount = self.fs.mount if getattr(self.fs, 'mount', None) is not None else super().mount
+    with mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+      yield mount_dir
 
   def mkdir(self, path, **kwargs):
     path = self.fs.root_marker + path.lstrip('/')

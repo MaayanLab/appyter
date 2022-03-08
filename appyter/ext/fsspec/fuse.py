@@ -4,7 +4,7 @@ import multiprocessing as mp
 
 logger = logging.getLogger(__name__)
 
-def _fuse_run(fs_json, mount_dir, alias_dump, singleton_dump):
+def _fuse_run(fs_json, fs_path, mount_dir, alias_dump, singleton_dump):
   import fsspec.fuse
   import appyter.ext.fsspec
   from appyter.ext.asyncio.event_loop import with_event_loop
@@ -18,11 +18,11 @@ def _fuse_run(fs_json, mount_dir, alias_dump, singleton_dump):
       logger.debug(f'preparing {fs}..')
       with fs as fs:
         logger.debug('launching fuse..')
-        fsspec.fuse.run(fs, '', mount_dir)
+        fsspec.fuse.run(fs, fs_path, mount_dir)
         logger.debug('teardown..')
 
 @contextlib.asynccontextmanager
-async def fs_mount(fs, mount_dir=None):
+async def fs_mount(fs, fs_path='', mount_dir=None):
   import os
   import signal
   import traceback
@@ -36,7 +36,7 @@ async def fs_mount(fs, mount_dir=None):
     logger.debug(f'mounting {fs} onto {mount_dir}')
     proc = mp.Process(
       target=_fuse_run,
-      args=(fs.to_json(), str(mount_dir), dump_aliases(), dump_singletons()),
+      args=(fs.to_json(), str(fs_path), str(mount_dir), dump_aliases(), dump_singletons()),
     )
     proc.start()
     try:
