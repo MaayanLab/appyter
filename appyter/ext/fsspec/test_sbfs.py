@@ -11,15 +11,15 @@ def event_loop_fixture():
   with with_event_loop():
     yield
 
+FSSPEC_URI = os.environ.get('FSSPEC_URI')
 
-@pytest.mark.skipif(not (os.environ.get('FSSPEC_URI') and 'sbfs://' in os.environ.get('FSSPEC_URI')), reason='FSSPEC_URI with sbfs:// necessary to test sbfs')
+@pytest.mark.skipif(not FSSPEC_URI or 'sbfs://' not in FSSPEC_URI, reason='FSSPEC_URI with sbfs:// necessary to test sbfs')
 def test_sbfs():
   import uuid
   import appyter.ext.fsspec
   from pathlib import PurePosixPath
   from appyter.ext.fsspec.core import url_to_fs_ex
-  sbfs_url = os.environ.get('FSSPEC_URI')
-  fs, fs_path = url_to_fs_ex(sbfs_url)
+  fs, fs_path = url_to_fs_ex(FSSPEC_URI)
   logging.debug(f"{fs=}")
   path = PurePosixPath(fs_path) / f"appyter-test-{str(uuid.uuid4())}"
   logging.debug(path)

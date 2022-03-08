@@ -2,7 +2,6 @@ import typing as t
 import pathlib
 import contextlib
 from fsspec import AbstractFileSystem
-from appyter.ext.urllib import join_slash
 
 import logging
 logger = logging.getLogger(__name__)
@@ -24,12 +23,13 @@ class MountableAbstractFileSystem:
       # can't use fuse, default is to just copy files into the mount_dir
       with tempdir(mount_dir) as mount_dir:
         logger.debug(f"copying files over...")
-        for f1_rel in self.glob(join_slash(path, '**'), detail=True).values():
-          f2_rel = mount_dir / f1_rel['name']
+        for f1_rel in self.glob('/'.join(filter(None, (path, '**',))), detail=True).values():
+          if not f1_rel['name'].startswith(path): raise RuntimeError
+          f2_rel = mount_dir / f1_rel['name'][len(path):]
           f2_rel.parent.mkdir(parents=True, exist_ok=True)
           if not f2_rel.exists():
             if f1_rel['type'] == 'file':
-              logger.debug(f"copying {f1_rel['name']}")
+              logger.debug(f"copying {f1_rel['name']} to {str(f2_rel)}")
               # TODO: if we're backed by a normal filesystem, make a link
               with self.open(f1_rel['name'], 'rb') as fr:
                 with f2_rel.open('wb') as fw:
