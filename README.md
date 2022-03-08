@@ -171,3 +171,15 @@ assert render_html_renderer(appyter, {
 ```
 
 `appyter` can be used to get these conversions, it can also be used to host standalone webapps using these mechanisms.
+
+## Development
+
+### Testing
+
+`pytest` is used for python testing. It can be invoked as follows:
+
+```bash
+# it is also prudent to test other protocols such as s3 (production) & sbfs (CAVATICA)
+export FSSPEC_URI='memory://'
+pytest --log-cli-level=DEBUG appyter
+```
