@@ -32,6 +32,7 @@ async def setup_evaluate_notebook(emitter, job):
     ipynb=job['ipynb'],
     emit=emit,
     subscribe=subscribe,
+    fuse=not job.get('debug', False),
   )
   await emitter.emit('stopped')
 

@@ -38,7 +38,7 @@ def json_emitter_factory(output):
     print(json.dumps(obj), file=output)
   return json_emitter
 
-async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='', subscribe=None):
+async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='', subscribe=None, fuse=False):
   logger.info('starting')
   assert callable(emit), 'Emit must be callable'
   with fsspec.open(join_url(cwd, ipynb), 'r') as fr:
@@ -79,81 +79,81 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   try:
     files = nb.metadata['appyter']['nbconstruct'].get('files')
     logger.debug(f"{cwd=} {files=}")
-    with url_to_chroot_fs(cwd, pathmap=files) as fs:
-      async with ensure_async(fs.mount(fuse=False)) as mnt:
-        # setup execution_info with start time
-        nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
-        with (mnt/ipynb).open('w') as fw:
-          nb_to_ipynb_io(nb, fw)
-        #
-        logger.info('initializing')
-        if callable(subscribe):
-          await subscribe(lambda: dict(nb=nb_to_json(nb), **state))
-        #
-        try:
-          iopub_hook = iopub_hook_factory(nb, emit)
-          client = NotebookClientIOPubHook(
-            nb,
-            allow_errors=True,
-            timeout=None,
-            kernel_name='python3',
-            resources={ 'metadata': {'path': str(mnt) } },
-            iopub_hook=iopub_hook,
-          )
-          await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
-          async with client.async_setup_kernel(
-            env=dict(
-              PYTHONPATH=':'.join(sys.path),
-              PATH=os.environ['PATH'],
-            ),
-          ):
-            logger.info('executing')
-            state.update(status='Executing...', progress=0)
-            await emit({ 'type': 'status', 'data': state['status'] })
-            await emit({ 'type': 'progress', 'data': state['progress'] })
-            n_cells = len(nb.cells)
-            exec_count = 1
-            for index, cell in enumerate(nb.cells):
-              logger.debug(f"executing cell {index}")
-              cell = await client.async_execute_cell(
-                cell, index,
-                execution_count=exec_count,
-              )
-              if cell_is_code(cell):
-                if cell_has_error(cell):
-                  raise Exception('Cell execution error on cell %d' % (exec_count))
-                exec_count += 1
-              if index < n_cells-1:
-                state['progress'] = index + 1
-                await emit({ 'type': 'progress', 'data': state['progress'] })
-              else:
-                state['status'] = 'Success'
-                await emit({ 'type': 'status', 'data': state['status'] })
-        except asyncio.CancelledError:
-          logger.info('cancelled')
-          raise
-        except Exception as e:
-          logger.info(f"execution error: {traceback.format_exc()}")
-          await emit({ 'type': 'error', 'data': str(e) })
-        # Save execution completion time
-        logger.info('saving')
-        nb.metadata['appyter']['nbexecute']['completed'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
-        # save additional files
-        # TODO: in the future we should individual files and include the original urls here
-        nb.metadata['appyter']['nbexecute']['files'] = {
-          path: path
-          for path in (
-            str(p.relative_to(mnt))
-            for p in mnt.rglob('*')
-            if p.is_file()
-          )
-          if path not in (files.keys()|{ipynb})
-        }
-        #
-        with (mnt/ipynb).open('w') as fw:
-          nb_to_ipynb_io(nb, fw)
-        #
-        logger.info('finalized')
+    fs = url_to_chroot_fs(cwd, pathmap=files)
+    async with ensure_async(fs.mount(fuse=fuse)) as mnt:
+      # setup execution_info with start time
+      nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
+      with (mnt/ipynb).open('w') as fw:
+        nb_to_ipynb_io(nb, fw)
+      #
+      logger.info('initializing')
+      if callable(subscribe):
+        await subscribe(lambda: dict(nb=nb_to_json(nb), **state))
+      #
+      try:
+        iopub_hook = iopub_hook_factory(nb, emit)
+        client = NotebookClientIOPubHook(
+          nb,
+          allow_errors=True,
+          timeout=None,
+          kernel_name='python3',
+          resources={ 'metadata': {'path': str(mnt) } },
+          iopub_hook=iopub_hook,
+        )
+        await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
+        async with client.async_setup_kernel(
+          env=dict(
+            PYTHONPATH=':'.join(sys.path),
+            PATH=os.environ['PATH'],
+          ),
+        ):
+          logger.info('executing')
+          state.update(status='Executing...', progress=0)
+          await emit({ 'type': 'status', 'data': state['status'] })
+          await emit({ 'type': 'progress', 'data': state['progress'] })
+          n_cells = len(nb.cells)
+          exec_count = 1
+          for index, cell in enumerate(nb.cells):
+            logger.debug(f"executing cell {index}")
+            cell = await client.async_execute_cell(
+              cell, index,
+              execution_count=exec_count,
+            )
+            if cell_is_code(cell):
+              if cell_has_error(cell):
+                raise Exception('Cell execution error on cell %d' % (exec_count))
+              exec_count += 1
+            if index < n_cells-1:
+              state['progress'] = index + 1
+              await emit({ 'type': 'progress', 'data': state['progress'] })
+            else:
+              state['status'] = 'Success'
+              await emit({ 'type': 'status', 'data': state['status'] })
+      except asyncio.CancelledError:
+        logger.info('cancelled')
+        raise
+      except Exception as e:
+        logger.info(f"execution error: {traceback.format_exc()}")
+        await emit({ 'type': 'error', 'data': str(e) })
+      # Save execution completion time
+      logger.info('saving')
+      nb.metadata['appyter']['nbexecute']['completed'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
+      # save additional files
+      # TODO: in the future we should individual files and include the original urls here
+      nb.metadata['appyter']['nbexecute']['files'] = {
+        path: path
+        for path in (
+          str(p.relative_to(mnt))
+          for p in mnt.rglob('*')
+          if p.is_file()
+        )
+        if path not in (files.keys()|{ipynb})
+      }
+      #
+      with (mnt/ipynb).open('w') as fw:
+        nb_to_ipynb_io(nb, fw)
+      #
+      logger.info('finalized')
   except asyncio.CancelledError:
     logger.info(f"outer cancelled")
     raise
@@ -169,12 +169,13 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
 @click.option('-o', '--output', default='-', type=click.File('w'), help='The output location to write dynamic updates')
 @click_option_setenv('--data-dir', envvar='APPYTER_DATA_DIR', default='data', help='The directory that storage:// uris correspond to')
 @click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
+@click_option_setenv('--fuse', envvar='APPYTER_FUSE', default=False, help='Use fuse for execution')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
-def nbexecute(ipynb, output, cwd, data_dir=None):
+def nbexecute(ipynb, output, cwd, fuse, data_dir=None):
   import fsspec
   from appyter.ext.asyncio.event_loop import with_event_loop
   from appyter.ext.fsspec.singleton import SingletonFileSystemFactory
   with with_event_loop():
     with SingletonFileSystemFactory('storage', data_dir) as storage:
       fsspec.register_implementation('storage', storage)
-      ensure_sync(nbexecute_async(ipynb=ipynb, emit=json_emitter_factory(output), cwd=cwd))
+      ensure_sync(nbexecute_async(ipynb=ipynb, emit=json_emitter_factory(output), cwd=cwd, fuse=fuse))

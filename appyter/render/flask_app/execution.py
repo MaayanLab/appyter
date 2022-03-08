@@ -36,6 +36,7 @@ async def submit(sid, data):
     url=request_url,
     image=config.get('DISPATCHER_IMAGE'),
     storage=config['DATA_DIR'],
+    debug=config['DEBUG'],
   )
   try:
     await executor.submit(job)

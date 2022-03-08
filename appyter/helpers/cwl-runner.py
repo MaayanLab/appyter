@@ -73,6 +73,7 @@ def cwl_runner(ipynb, args):
       ipynb=ipynb,
       # status updates go to stderr
       emit=json_emitter_factory(sys.stderr),
+      fuse=False,
     ))
   with (tmp_fs/ipynb).open('r') as fr:
     # write result to stdout
