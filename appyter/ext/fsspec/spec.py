@@ -15,11 +15,7 @@ class MountableAbstractFileSystem:
     if fuse:
       from appyter.ext.asyncio.helpers import ensure_sync
       from appyter.ext.fsspec.fuse import fs_mount
-      with ensure_sync(fs_mount(
-        f"{self.protocol}:://",
-        mount_dir=mount_dir,
-        **{ self.protocol: self.storage_options }
-      )) as mount_dir:
+      with ensure_sync(fs_mount(self, mount_dir=mount_dir)) as mount_dir:
         yield mount_dir
     else:
       import shutil

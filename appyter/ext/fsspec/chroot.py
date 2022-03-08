@@ -118,12 +118,8 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
     else:
       from appyter.ext.asyncio.helpers import ensure_sync
       from appyter.ext.fsspec.fuse import fs_mount
-      _, target_fo_path = self._target_fo()
-      with ensure_sync(fs_mount(
-        f"chroot::{self.fs.protocol}://{target_fo_path}",
-        mount_dir=mount_dir,
-        **{ self.protocol: self.kwargs }
-      )) as mount_dir:
+      # TODO: should this be self or self.fs?
+      with ensure_sync(fs_mount(self, mount_dir=mount_dir)) as mount_dir:
         yield mount_dir
 
   def mkdir(self, path, **kwargs):

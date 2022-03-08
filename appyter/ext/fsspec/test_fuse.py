@@ -3,6 +3,7 @@ import contextlib
 from pathlib import Path
 
 import appyter.ext.fsspec
+from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.fsspec.fuse import fs_mount
 from appyter.ext.asyncio.helpers import ensure_sync
 
@@ -29,11 +30,8 @@ def _test_ctx():
 
 def test_file_chroot_fuse():
   with _test_ctx() as tmpdir:
-    with ensure_sync(fs_mount(
-      str(tmpdir),
-      pathmap={'g': str(tmpdir/'e')},
-      cached=True,
-    )) as fs:
+    fs = url_to_chroot_fs(str(tmpdir), pathmap={'g': str(tmpdir/'e')}, cached=True)
+    with ensure_sync(fs_mount(fs)) as fs:
       # reads work
       assert_eq(frozenset(str(p.relative_to(fs)) for p in fs.rglob('*')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e', 'g']))
       assert_eq((fs/'a'/'b'/'c').open('rb').read(), b'C')

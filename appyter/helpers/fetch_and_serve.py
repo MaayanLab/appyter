@@ -5,6 +5,7 @@ from appyter import __version__
 from appyter.cli import cli
 from appyter.ext.asyncio.helpers import ensure_sync
 from appyter.ext.click import click_option_setenv, click_argument_setenv
+from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.fsspec.fuse import fs_mount
 
 logger = logging.getLogger(__name__)
@@ -34,7 +35,8 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
     # if data_dir doesn't exist, create it
     if data_dir is None: data_dir = 'tmpfs://'
     # mount the appyter into the data_dir
-    with ensure_sync(fs_mount(data_dir, appyter=uri)) as mnt:
+    fs = url_to_chroot_fs(data_dir, appyter=uri)
+    with ensure_sync(fs_mount(fs)) as mnt:
       logging.info(f"Starting `appyter serve`...")
       # serve the bundle in jupyter notebook
       from appyter.helpers.serve import serve

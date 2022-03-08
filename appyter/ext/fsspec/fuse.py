@@ -4,23 +4,25 @@ from multiprocessing import Process
 
 logger = logging.getLogger(__name__)
 
-def _fuse_run(url, mount_point, kwargs, alias_dump, singleton_dump):
+def _fuse_run(fs_json, mount_dir, alias_dump, singleton_dump):
   import fsspec.fuse
+  import appyter.ext.fsspec
   from appyter.ext.asyncio.event_loop import with_event_loop
-  from appyter.ext.fsspec.core import url_to_chroot_fs
   from appyter.ext.fsspec.alias import register_aliases
   from appyter.ext.fsspec.singleton import register_singletons
+  from appyter.ext.fsspec.spec import ComposableAbstractFileSystem
   with with_event_loop():
     register_aliases(alias_dump)
-    logger.debug(f'preparing fs from {url} ({kwargs})..')
     with register_singletons(singleton_dump):
-      with url_to_chroot_fs(url, **kwargs) as fs:
+      fs = ComposableAbstractFileSystem.from_json(fs_json)
+      logger.debug(f'preparing {fs}..')
+      with fs as fs:
         logger.debug('launching fuse..')
-        fsspec.fuse.run(fs, '', mount_point)
+        fsspec.fuse.run(fs, '', mount_dir)
         logger.debug('teardown..')
 
 @contextlib.asynccontextmanager
-async def fs_mount(url, mount_dir=None, **kwargs):
+async def fs_mount(fs, mount_dir=None):
   import os
   import signal
   import traceback
@@ -31,10 +33,10 @@ async def fs_mount(url, mount_dir=None, **kwargs):
   from appyter.ext.tempfile import tempdir
   def assert_true(val): assert val
   with tempdir(mount_dir) as tmp:
-    logger.debug(f'mounting {url} onto {tmp}')
+    logger.debug(f'mounting {fs} onto {tmp}')
     proc = Process(
       target=_fuse_run,
-      args=(url, str(tmp), kwargs, dump_aliases(), dump_singletons()),
+      args=(fs.to_json(), str(tmp), dump_aliases(), dump_singletons()),
     )
     proc.start()
     try:
