@@ -8,9 +8,10 @@ import aiohttp
 from pathlib import Path
 from fsspec.asyn import AsyncFileSystem
 from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
+from appyter.ext.fsspec.spec.sync_async import SyncAsyncFileSystem
 from fsspec.spec import AbstractBufferedFile
-from appyter.ext.asyncio.helpers import ensure_sync
-class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
+
+class SBFSFileSystem(SyncAsyncFileSystem, MountableAbstractFileSystem, AsyncFileSystem):
   CHUNK_SIZE = 8192
 
   def __init__(self, *args, api_endpoint='', auth_token='', **storage_options):
@@ -25,11 +26,9 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
     )
     self._session = await self._session_mgr.__aenter__()
     return self
-  __enter__ = ensure_sync(__aenter__)
 
   async def __aexit__(self, exc_type, exc_value, traceback):
     await self._session_mgr.__aexit__(exc_type, exc_value, traceback)
-  __exit__ = ensure_sync(__aexit__)
 
   async def _mkdir(self, path, create_parents=True, exist_ok=True, **kwargs):
     try:
@@ -80,11 +79,9 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
         'name': f"{parent_directory_path}/{res['name']}",
         'type': 'directory',
       }
-  mkdir = ensure_sync(_mkdir)
 
   async def _makedirs(self, path, exist_ok=False, **kwargs):
     return await self._mkdir(path, create_parents=True, exist_ok=exist_ok, **kwargs)
-  makedirs = ensure_sync(_makedirs)
 
   async def _sbg_rm_file(self, file_id):
     async with self._session.delete(f"{self.storage_options['api_endpoint']}/files/{file_id}", headers={
@@ -96,13 +93,11 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
     info = await self._info(path)
     if info['type'] != 'directory': raise NotADirectoryError
     await self._sbg_rm_file(info['_id'])
-  rmdir = ensure_sync(_rmdir)
 
   async def _rm_file(self, path):
     info = await self._info(path)
     if info['type'] == 'directory': raise IsADirectoryError
     await self._sbg_rm_file(info['_id'])
-  rm_file = ensure_sync(_rm_file)
 
   async def _rm(self, path, recursive=False, **kargs):
     info = await self._info(path)
@@ -115,7 +110,6 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
       await self._sbg_rm_file(info['_id'])
     else:
       raise NotImplementedError
-  rm = ensure_sync(_rm)
 
   async def _cp_file(self, path1, path2, **kwargs):
     file1_info = await self.info(path1)
@@ -126,7 +120,6 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
       name='/'.join(proj_path2),
     )) as res:
       return await res.json()
-  cp_file = ensure_sync(_cp_file)
 
   async def _download_info(self, file_info):
     async with self._session.get(f"{self.storage_options['api_endpoint']}/files/{file_info['_id']}/download_info") as req:
@@ -145,7 +138,6 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
       'Range': f"bytes={start}-{end}"
     }) as req:
       return await req.read()
-  cat_file = ensure_sync(_cat_file)
 
   async def _put_file(self, lpath, rpath, **kwargs):
     lpath = Path(lpath)
@@ -206,7 +198,6 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
         await req.read()
       raise
     logger.debug(f"Multipart upload for {rpath} completed")
-  put_file = ensure_sync(_put_file)
 
   async def _get_file(self, rpath, lpath, **kwargs):
     file_info = await self.info(rpath)
@@ -216,7 +207,6 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
       with lpath.open('wb') as fw:
         async for data in req.content.iter_chunked(SBFSFileSystem.CHUNK_SIZE):
           fw.write(data)
-  get_file = ensure_sync(_get_file)
 
   async def _info(self, path, **kwargs):
     path_split = [] if path in {'', '.', '/', './'} else path.split('/')
@@ -320,7 +310,6 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
         }
       else:
         raise NotImplementedError
-  info = ensure_sync(_info)
 
   async def _ls(self, path, detail=True, **kwargs):
     path_split = [] if path in {'', '.', '/', './'} else path.split('/')
@@ -409,7 +398,6 @@ class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
       else:
         return [path_info] if detail else [path_info['name']]
     return list(results.values())
-  ls = ensure_sync(_ls)
 
   def _open(self, path, mode="rb", block_size=None, cache_options=None, **kwargs):
     ''' Implements certain write ops, to use `open` with mode='w' or mode='a' use writecache,
