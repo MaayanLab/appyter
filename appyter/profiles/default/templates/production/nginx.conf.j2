@@ -144,6 +144,10 @@ http {
       {{ proxy('http://appyter', False) }}
     }
 
+    location ^~ {{ join_routes(_config.PREFIX, 'check') }}/ {
+      {{ proxy('http://appyter', False) }}
+    }
+
     location ~ ^{{ join_routes(_config.PREFIX, 'static') }}/(.*)$ {
       root "{{ _config.STATIC_DIR }}";
       try_files "/$1" @profile_static;
