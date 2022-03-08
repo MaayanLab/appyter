@@ -8,10 +8,10 @@ logger = logging.getLogger(__name__)
 
 from pathlib import Path, PurePosixPath
 from fsspec import AbstractFileSystem, filesystem
-from appyter.ext.fsspec.spec import MountableAbstractFileSystem
+from appyter.ext.fsspec.spec import MountableAbstractFileSystem, ComposableAbstractFileSystem
 from appyter.ext.pathlib.chroot import ChrootPurePosixPath
 
-class ChrootFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
+class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem, AbstractFileSystem):
   ''' chroot: update root and disallow access beyond chroot, only works on directories.
   '''
   root_marker = ''

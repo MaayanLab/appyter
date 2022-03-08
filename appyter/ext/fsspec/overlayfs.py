@@ -6,11 +6,10 @@ logger = logging.getLogger(__name__)
 
 from fsspec import filesystem
 from fsspec import AbstractFileSystem
-from appyter.ext.fsspec.spec import MountableAbstractFileSystem
+from appyter.ext.fsspec.spec import MountableAbstractFileSystem, ComposableAbstractFileSystem
 from appyter.ext.urllib import join_slash, parent_url
-from appyter.ext.asyncio.helpers import ensure_sync
 
-class OverlayFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
+class OverlayFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem, AbstractFileSystem):
   ''' OverlayFS implemented with fsspec
   '''
   root_marker = ''

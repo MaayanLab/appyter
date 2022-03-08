@@ -2,14 +2,13 @@ import os
 import contextlib
 from pathlib import PurePath
 from fsspec import AbstractFileSystem, filesystem
-from appyter.ext.asyncio.helpers import ensure_sync
-from appyter.ext.fsspec.spec import MountableAbstractFileSystem
+from appyter.ext.fsspec.spec import MountableAbstractFileSystem, ComposableAbstractFileSystem
 from appyter.ext.tempfile import mktemp
 
 import logging
 logger = logging.getLogger(__name__)
 
-class WriteCacheFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
+class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem, AbstractFileSystem):
   protocol = 'writecache'
 
   def __init__(self, target_protocol=None, target_options=None, fs=None, **kwargs):
