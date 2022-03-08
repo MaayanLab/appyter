@@ -1,3 +1,5 @@
+import appyter.ext.multiprocessing
+
 import os
 import logging
 

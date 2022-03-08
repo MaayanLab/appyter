@@ -1,3 +1,5 @@
+import appyter.ext.multiprocessing
+
 import tempfile
 import contextlib
 from pathlib import Path

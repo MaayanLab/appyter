@@ -1,6 +1,6 @@
 import contextlib
 import logging
-from multiprocessing import Process
+import multiprocessing as mp
 
 logger = logging.getLogger(__name__)
 
@@ -32,25 +32,25 @@ async def fs_mount(fs, mount_dir=None):
   from appyter.ext.asyncio.helpers import ensure_async
   from appyter.ext.tempfile import tempdir
   def assert_true(val): assert val
-  with tempdir(mount_dir) as tmp:
-    logger.debug(f'mounting {fs} onto {tmp}')
-    proc = Process(
+  with tempdir(mount_dir) as mount_dir:
+    logger.debug(f'mounting {fs} onto {mount_dir}')
+    proc = mp.Process(
       target=_fuse_run,
-      args=(fs.to_json(), str(tmp), dump_aliases(), dump_singletons()),
+      args=(fs.to_json(), str(mount_dir), dump_aliases(), dump_singletons()),
     )
     proc.start()
     try:
-      await async_try_n_times(3, ensure_async(lambda path: assert_true(path.is_mount())), tmp)
-      logger.debug(f"fs mount ready on {tmp}")
-      yield tmp
+      await async_try_n_times(3, ensure_async(lambda path: assert_true(path.is_mount())), mount_dir)
+      logger.debug(f"fs mount ready on {mount_dir}")
+      yield mount_dir
     except Exception as e:
       logger.error(traceback.format_exc())
       raise
     finally:
       if proc.pid:
-        logger.debug(f"unmounting fs from {tmp}")
+        logger.debug(f"unmounting fs from {mount_dir}")
         os.kill(proc.pid, signal.SIGINT) # SIGINT cleanly stops fsspec.fuse.run
         logger.debug(f"waiting for process to end")
         await ensure_async(proc.join)()
-        await async_try_n_times(3, ensure_async(lambda path: assert_true(not path.is_mount())), tmp)
+        await async_try_n_times(3, ensure_async(lambda path: assert_true(not path.is_mount())), mount_dir)
     logger.debug(f"done")

@@ -1,6 +1,5 @@
 def main():
-  import multiprocessing as mp
-  mp.set_start_method('spawn')
+  import appyter.ext.multiprocessing
   # load dotenv if present
   from dotenv import load_dotenv
   load_dotenv()
