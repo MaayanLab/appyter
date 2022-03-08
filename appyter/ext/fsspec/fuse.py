@@ -10,7 +10,7 @@ def _fuse_run(fs_json, mount_dir, alias_dump, singleton_dump):
   from appyter.ext.asyncio.event_loop import with_event_loop
   from appyter.ext.fsspec.alias import register_aliases
   from appyter.ext.fsspec.singleton import register_singletons
-  from appyter.ext.fsspec.spec import ComposableAbstractFileSystem
+  from appyter.ext.fsspec.spec.composable import ComposableAbstractFileSystem
   with with_event_loop():
     register_aliases(alias_dump)
     with register_singletons(singleton_dump):

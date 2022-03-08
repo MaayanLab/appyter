@@ -2,7 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from fsspec import AbstractFileSystem
-from appyter.ext.fsspec.spec import MountableAbstractFileSystem
+from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
 from appyter.ext.fsspec.core import url_to_fs_ex
 
 class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):

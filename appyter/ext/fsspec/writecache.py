@@ -2,7 +2,8 @@ import os
 import contextlib
 from pathlib import PurePath
 from fsspec import AbstractFileSystem, filesystem
-from appyter.ext.fsspec.spec import MountableAbstractFileSystem, ComposableAbstractFileSystem
+from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
+from appyter.ext.fsspec.spec.composable import ComposableAbstractFileSystem
 from appyter.ext.tempfile import mktemp
 
 import logging

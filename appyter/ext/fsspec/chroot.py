@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 
 from pathlib import Path, PurePosixPath
 from fsspec import AbstractFileSystem, filesystem
-from appyter.ext.fsspec.spec import MountableAbstractFileSystem, ComposableAbstractFileSystem
+from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
+from appyter.ext.fsspec.spec.composable import ComposableAbstractFileSystem
 from appyter.ext.pathlib.chroot import ChrootPurePosixPath
 
 class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem, AbstractFileSystem):

@@ -7,7 +7,7 @@ import json
 import aiohttp
 from pathlib import Path
 from fsspec.asyn import AsyncFileSystem
-from appyter.ext.fsspec.spec import MountableAbstractFileSystem
+from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
 from fsspec.spec import AbstractBufferedFile
 from appyter.ext.asyncio.helpers import ensure_sync
 class SBFSFileSystem(MountableAbstractFileSystem, AsyncFileSystem):
