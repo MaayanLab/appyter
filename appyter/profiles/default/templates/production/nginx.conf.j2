@@ -68,7 +68,7 @@ http {
   upstream appyter {
     {#- {% for n in range(1, _config.N_PROCS+1) %} #}
     {%- with n=1 %}
-    server "unix:{{ str(_tmp_dir) }}appyter_{{ n }}.sock" fail_timeout=0;
+    server "unix:{{ str(_tmp_dir/('appyter_' + str(n) + '.sock')) }}" fail_timeout=0;
     {%- endwith %}
     {#- {% endfor %} #}
   }
