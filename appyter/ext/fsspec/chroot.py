@@ -112,14 +112,9 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
     logger.debug(f"{self=} mount {mount_dir=} {fuse=}")
     if not fuse and self.fs.protocol == 'file':
       yield Path(self.storage_options['fo'])
-    elif getattr(self.fs, 'mount', None) is not None:
-      with self.fs.mount(mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
-        yield mount_dir
     else:
-      from appyter.ext.asyncio.helpers import ensure_sync
-      from appyter.ext.fsspec.fuse import fs_mount
-      # TODO: should this be self or self.fs?
-      with ensure_sync(fs_mount(self, mount_dir=mount_dir)) as mount_dir:
+      mount = self.fs.mount if getattr(self.fs, 'mount', None) is not None else super().mount
+      with mount(mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
         yield mount_dir
 
   def mkdir(self, path, **kwargs):
