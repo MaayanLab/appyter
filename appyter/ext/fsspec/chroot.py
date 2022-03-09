@@ -112,10 +112,9 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
   def mount(self, path='', mount_dir=None, fuse=True, passthrough=True, **kwargs):
     logger.debug(f"{self=} mount {mount_dir=} {fuse=}")
     with self.__masquerade_os_error(path=path):
-      if passthrough:
+      if passthrough and getattr(self.fs, 'mount', None) is not None:
         # try to use underlying fs mount
-        mount = self.fs.mount if getattr(self.fs, 'mount', None) is not None else super().mount
-        with mount(path=self._resolve_path(path), mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+        with self.fs.mount(path=self._resolve_path(path), mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
           yield mount_dir
       elif not fuse and self.fs.protocol == 'file':
         # shortcut if we're talking about `file://` -- just use the actual directory
