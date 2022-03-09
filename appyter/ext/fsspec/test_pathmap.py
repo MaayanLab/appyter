@@ -43,7 +43,7 @@ def test_file_pathmap_chroot():
 def test_file_pathmap_chroot_fuse():
   with _test_ctx() as tmpdir:
     fs = url_to_chroot_fs(str(tmpdir), pathmap={'E': str(tmpdir/'e')})
-    with ensure_sync(fs_mount(fs)) as fs:
+    with fs.mount(fuse=True) as fs:
       assert_eq(frozenset(str(p.relative_to(fs)) for p in fs.rglob('*')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e', 'E']))
       assert_eq((fs/'a'/'b'/'c').open('rb').read(), b'C')
       assert_eq((fs/'a'/'d').open('rb').read(), b'D')
