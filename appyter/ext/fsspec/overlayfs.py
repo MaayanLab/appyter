@@ -52,15 +52,15 @@ class OverlayFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSyste
 
   @contextlib.contextmanager
   def mount(self, path='', mount_dir=None, fuse=True, **kwargs):
-    if fuse:
-      with super().mount(path=path, mount_dir=mount_dir, fuse=True, **kwargs) as mount_dir:
-        yield mount_dir
-    else:
+    if not fuse:
       upper_mount = self.upper_fs.mount if getattr(self.upper_fs, 'mount', None) else super().mount
       lower_mount = self.lower_fs.mount if getattr(self.lower_fs, 'mount', None) else super().mount
-      with upper_mount(path=path, mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
-        with lower_mount(path=path, mount_dir=mount_dir, fuse=False, **kwargs) as mount_dir:
+      with upper_mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+        with lower_mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
           yield mount_dir
+    else:
+      with super().mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+        yield mount_dir
 
   def mkdir(self, path, **kwargs):
     return self.upper_fs.mkdir(path, **kwargs)

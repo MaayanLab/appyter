@@ -109,16 +109,50 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
         self.fs.__exit__(type, value, traceback)
 
   @contextlib.contextmanager
-  def mount(self, path='', mount_dir=None, fuse=True, **kwargs):
+  def mount(self, path='', mount_dir=None, fuse=True, passthrough=True, **kwargs):
     logger.debug(f"{self=} mount {mount_dir=} {fuse=}")
     with self.__masquerade_os_error(path=path):
-      if not fuse and self.fs.protocol == 'file':
+      if passthrough:
+        # try to use underlying fs mount
+        mount = self.fs.mount if getattr(self.fs, 'mount', None) is not None else super().mount
+        with mount(path=self._resolve_path(path), mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+          yield mount_dir
+      elif not fuse and self.fs.protocol == 'file':
+        # shortcut if we're talking about `file://` -- just use the actual directory
         yield Path(self._resolve_path(path))
-      elif getattr(self.fs, 'mount', None) is not None:
-        with self.fs.mount(path=self._resolve_path(path), mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+      elif path:
+        # just make another wrapper to deal with subpath mounting
+        with ChrootFileSystem(fs=self, fo=path).mount(path='', mount_dir=mount_dir, fuse=fuse, passthrough=passthrough, **kwargs) as mount_dir:
+          yield mount_dir
+      elif fuse:
+        # use fuse fs_mount
+        from appyter.ext.asyncio.helpers import ensure_sync
+        from appyter.ext.fsspec.fuse import fs_mount
+        with ensure_sync(fs_mount(self, path, mount_dir=mount_dir)) as mount_dir:
           yield mount_dir
       else:
-        with super().mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+        # no fuse -- resort to copying files
+        import shutil
+        from appyter.ext.tempfile import tempdir
+        # can't use fuse, default is to just copy files into the mount_dir
+        with tempdir(mount_dir) as mount_dir:
+          logger.debug(f"copying files over...")
+          for f1_rel in self.glob('**', detail=True).values():
+            f2_rel = mount_dir / f1_rel['name']
+            f2_rel.parent.mkdir(parents=True, exist_ok=True)
+            if not f2_rel.exists():
+              if f1_rel['type'] == 'file':
+                logger.debug(f"copying {f1_rel['name']} to {str(f2_rel)}")
+                # TODO: if we're backed by a normal filesystem, make a link
+                with self.open(f1_rel['name'], 'rb') as fr:
+                  with f2_rel.open('wb') as fw:
+                    shutil.copyfileobj(fr, fw)
+              elif f1_rel['type'] == 'directory':
+                logger.debug(f"making directory {f1_rel['name']}")
+                f2_rel.mkdir(exist_ok=True)
+              else:
+                raise NotImplementedError
+          logger.debug('Ready')
           yield mount_dir
 
   def mkdir(self, path, **kwargs):
