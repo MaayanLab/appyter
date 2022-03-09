@@ -37,7 +37,7 @@ def render_cwl_from_nbtemplate(env, nb, ipynb=None, cwd=None, info=None):
       "hints": [
         {
           "class": "DockerRequirement",
-          "dockerPull": f"maayanlab/appyter-{info['name'].lower()}:{info['version']}:{info['version']}-{__version__}"
+          "dockerPull": f"maayanlab/appyter-{info['name'].lower()}:{info['version']}-{__version__}"
         }
       ],
       "label": info['title'],
