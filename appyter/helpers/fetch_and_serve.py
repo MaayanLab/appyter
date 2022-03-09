@@ -28,10 +28,12 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
   import fsspec
   # TODO: can this be less reliant on the `appyter-catalog` storage setup
   uri_parsed = urllib.parse.urlparse(uri)
-  from appyter.ext.fsspec.singleton import SingletonFileSystemFactory
-  storage_uri = f"{uri_parsed.scheme}://{uri_parsed.netloc}/storage/appyters/"
-  with SingletonFileSystemFactory('storage', storage_uri) as storage:
-    fsspec.register_implementation('storage', storage)
+  from appyter.ext.fsspec.singleton import SingletonFileSystem
+  from appyter.ext.fsspec.core import url_to_chroot_fs
+  with SingletonFileSystem(
+    proto='storage',
+    fs=url_to_chroot_fs(f"{uri_parsed.scheme}://{uri_parsed.netloc}/storage/appyters/"),
+  ):
     # if data_dir doesn't exist, create it
     if data_dir is None: data_dir = 'tmpfs://'
     # mount the appyter into the data_dir

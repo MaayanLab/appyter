@@ -1,51 +1,43 @@
 import fsspec
-import contextlib
-import logging
-
-logger = logging.getLogger(__name__)
-
 from appyter.ext.fsspec.chroot import ChrootFileSystem
-from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.contextlib import with_many
 
-class SingletonFileSystemBase(ChrootFileSystem): pass
+_singletons = {}
 
-@contextlib.contextmanager
-def SingletonFileSystemFactory(_proto, _fs_url, **_kwargs):
-  logger.debug(f"creating SingletonFileSystem {_proto}://* => {_fs_url}*")
-  with url_to_chroot_fs(_fs_url, **_kwargs) as fs:
-    class SingletonFileSystem(SingletonFileSystemBase):
-      ''' passthrough to a filesystem instance
-      '''
-      root_marker = ''
-      protocol = _proto
-      fs_url = _fs_url
-      kwargs = _kwargs
+class SingletonFileSystem(ChrootFileSystem):
+  ''' Instantiation of a singleton filesystem will register it by protocol after which
+  the protocol can be used to re-instantiate the singleton instance. Serialization
+  works for this enabling the singleton to re-register itself across process boundaries.
+  '''
+  root_marker = ''
 
-      def __init__(self, **kwargs):
-        super().__init__(fs=fs, **kwargs)
+  def __init__(self, proto=None, fs=None, **kwargs):
+    global _singletons
+    if proto is None:
+      if self.__class__.protocol == 'chroot':
+        raise ValueError('proto is required')
+      proto = self.__class__.protocol
+    if fs is None:
+      fs = _singletons[proto]
+    super(SingletonFileSystem, self).__init__(fs=fs, **kwargs)
+    if proto not in _singletons:
+      _singletons[proto] = self
+      class SingletonFileSystem_(SingletonFileSystem):
+        protocol = proto
+        def to_json(self):
+          global _singletons
+          return _singletons[proto].to_json()
+      SingletonFileSystem_.__name__ = 'SingletonFileSystem'
+      fsspec.register_implementation(proto, SingletonFileSystem_)
+    self.protocol = proto
+    self.stack_count = 0
+  
+  def __enter__(self):
+    if not self.stack_count:
+      super(SingletonFileSystem, self).__enter__()
+    self.stack_count += 1
+    return self
 
-      # we've already setup the context for the filesystem
-      def __enter__(self):
-        return self
-      def __exit__(self, type, value, traceback):
-        pass
-
-    yield SingletonFileSystem
-
-def dump_singletons():
-  return {
-    k: [[cls.protocol, cls.fs_url], cls.kwargs]
-    for k, cls in fsspec.registry.target.items()
-    if issubclass(cls, SingletonFileSystemBase)
-  }
-
-@contextlib.contextmanager
-def register_singletons(singleton_dump):
-  with with_many(**{
-    k: SingletonFileSystemFactory(*args, **kwargs)
-    for k, (args, kwargs) in singleton_dump.items()
-  }) as singletons:
-    for k, singleton in singletons.items():
-      fsspec.register_implementation(k, singleton)
-    yield
+  def __exit__(self, type, value, traceback):
+    self.stack_count -= 1
+    if not self.stack_count:
+      super(SingletonFileSystem, self).__exit__(type, value, traceback)

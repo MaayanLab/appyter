@@ -113,12 +113,12 @@ def create_app(**kwargs):
     data_dir = app['config']['DATA_DIR']
     import fsspec
     if 'storage' not in fsspec.registry.target:
-      from appyter.ext.fsspec.singleton import SingletonFileSystemFactory
-      with SingletonFileSystemFactory('storage', data_dir) as storage:
-        fsspec.register_implementation('storage', storage)
-        _storage = storage()
-        _storage.makedirs('input', exist_ok=True)
-        _storage.makedirs('output', exist_ok=True)
+      from appyter.ext.fsspec.core import url_to_fs_ex
+      from appyter.ext.fsspec.singleton import SingletonFileSystem
+      fs, fo = url_to_fs_ex(data_dir)
+      with SingletonFileSystem(proto='storage', fs=fs, fo=fo) as fs:
+        fs.makedirs('input', exist_ok=True)
+        fs.makedirs('output', exist_ok=True)
         yield
     else:
       yield

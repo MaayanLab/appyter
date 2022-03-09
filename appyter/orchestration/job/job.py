@@ -61,9 +61,8 @@ async def setup_socketio(emitter, job):
 def setup_storage(storage):
   import fsspec
   if 'storage' not in fsspec.registry.target:
-    from appyter.ext.fsspec.singleton import SingletonFileSystemFactory
-    with SingletonFileSystemFactory('storage', storage) as storage:
-      fsspec.register_implementation('storage', storage)
+    from appyter.ext.fsspec.singleton import SingletonFileSystem
+    with SingletonFileSystem(proto='storage', fs=storage):
       yield
   else:
     yield
