@@ -7,6 +7,7 @@ from appyter.context import get_env, get_jinja2_env
 from appyter.ext.click import click_option_setenv, click_argument_setenv
 from appyter.parse.nb import nb_from_ipynb_io
 from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
+from appyter.ext.urllib import join_slash
 from appyter.render.nbinspect.cli import nbinspect
 
 def render_nbtemplate_json_from_nbtemplate(env, nb):
