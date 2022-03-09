@@ -28,7 +28,7 @@ def export(path):
       elif format == 'zip':
         metadata = nb.get('metadata', {}).get('appyter', {})
         files = metadata.get('nbexecute', {}).get('files', metadata.get('nbconstruct', {}).get('files', {}))
-        with url_to_chroot_fs('tmpfs://') as tmp_fs:
+        with url_to_chroot_fs('memory://') as tmp_fs:
           with tmp_fs.open('output.zip', 'wb') as fw:
             with zipfile.ZipFile(fw, 'a', zipfile.ZIP_DEFLATED, False) as zf:
               for f, b in get_base_files().items():

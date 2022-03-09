@@ -4,14 +4,12 @@ import multiprocessing as mp
 
 logger = logging.getLogger(__name__)
 
-def _fuse_run(fs_json, fs_path, mount_dir, alias_dump):
+def _fuse_run(fs_json, fs_path, mount_dir):
   import fsspec.fuse
   import appyter.ext.fsspec
   from appyter.ext.asyncio.event_loop import with_event_loop
-  from appyter.ext.fsspec.alias import register_aliases
   from appyter.ext.fsspec.spec.composable import ComposableAbstractFileSystem
   with with_event_loop():
-    register_aliases(alias_dump)
     fs = ComposableAbstractFileSystem.from_json(fs_json)
     logger.debug(f'preparing {fs}..')
     with fs as fs:
@@ -24,7 +22,6 @@ async def fs_mount(fs, fs_path='', mount_dir=None):
   import os
   import signal
   import traceback
-  from appyter.ext.fsspec.alias import dump_aliases
   from appyter.ext.asyncio.try_n_times import async_try_n_times
   from appyter.ext.asyncio.helpers import ensure_async
   from appyter.ext.tempfile import tempdir
@@ -33,7 +30,7 @@ async def fs_mount(fs, fs_path='', mount_dir=None):
     logger.debug(f'mounting {fs} onto {mount_dir}')
     proc = mp.Process(
       target=_fuse_run,
-      args=(fs.to_json(), str(fs_path), str(mount_dir), dump_aliases()),
+      args=(fs.to_json(), str(fs_path), str(mount_dir)),
     )
     proc.start()
     try:

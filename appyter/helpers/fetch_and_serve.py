@@ -35,10 +35,10 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
     fs=url_to_chroot_fs(f"{uri_parsed.scheme}://{uri_parsed.netloc}/storage/appyters/"),
   ):
     # if data_dir doesn't exist, create it
-    if data_dir is None: data_dir = 'tmpfs://'
+    if data_dir is None: data_dir = 'memory://'
     # mount the appyter into the data_dir
     fs = url_to_chroot_fs(data_dir, appyter=uri)
-    with ensure_sync(fs_mount(fs)) as mnt:
+    with fs.mount(fuse=False) as mnt:
       logging.info(f"Starting `appyter serve`...")
       # serve the bundle in jupyter notebook
       from appyter.helpers.serve import serve

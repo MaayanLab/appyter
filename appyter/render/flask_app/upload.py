@@ -41,7 +41,7 @@ async def siofu_start(sid, data):
   try:
     path = generate_uuid()
     filename = secure_filepath(data.get('name'))
-    tmp_fs = url_to_chroot_fs('tmpfs:///')
+    tmp_fs = url_to_chroot_fs('memory:///')
     async with socketio.session(sid) as sess:
       sess['file_%d' % (data.get('id'))] = dict(
         data,
@@ -98,7 +98,7 @@ def upload_from_request(req, fname):
     return None
   filename = secure_filepath(fh.filename)
   path = generate_uuid()
-  with url_to_chroot_fs('tmpfs:///') as tmp_fs:
+  with url_to_chroot_fs('memory:///') as tmp_fs:
     with tmp_fs.open(path, 'wb') as fw:
       fh.save(fw)
     return organize_file_content(input_fs, tmp_fs, path, filename)
