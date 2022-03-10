@@ -1,6 +1,7 @@
 import random
 import asyncio
 import fsspec
+import json
 import logging
 logger = logging.getLogger(__name__)
 
@@ -17,31 +18,39 @@ class WESExecutor(AbstractExecutor):
   def __init__(self, url=None, **kwargs) -> None:
     super().__init__(url=url, **kwargs)
     with fsspec.open(self.executor_options['cwl'], 'r') as fr:
-      self.cwl = fr.read()
+      self.cwl = json.loads(fr.read())
 
   async def submit(self, job):
     async def _submit():
       import aiohttp
+      logger.info(f"Submitting execution via WES")
+      execution = dict_merge(
+        self.executor_options.get('params', {}),
+        workflow_params=dict(
+          inputs=job,
+        ),
+        workflow_url='#/workflow_attachment/0',
+        workflow_attachment=[json.dumps(self.cwl)],
+        workflow_type='CWL',
+        workflow_type_version=self.cwl['cwlVersion'],
+      )
       async with aiohttp.ClientSession(
         headers=dict(
-          {'Content-Type': 'application/json'},
           **self.executor_options.get('headers', {}),
         )
       ) as client:
-        async with client.post(
-          join_slash(self.url, '/runs'),
-          json=dict_merge(
-            self.executor_options.get('params', {}),
-            workflow_params=dict(
-              inputs=job,
-            ),
-            # TODO: possibly create on the fly
-            workflow_url='#/workflow_attachment/0',
-            workflow_attachment=[self.cwl],
-          ),
-        ) as req:
-          res = await req.json()
-          return res['run_id']
+        data = aiohttp.FormData()
+        for k, v in execution.items():
+          if type(v) in {dict, list}:
+            data.add_field(k, json.dumps(v), content_type='application/json')
+          else:
+            data.add_field(k, v)
+          async with client.post(
+            join_slash(self.url, '/runs'),
+            data=data,
+          ) as req:
+            res = await req.json()
+            return res['run_id']
     return await async_try_n_times(3, _submit)
 
   async def wait_for(self, run_id):

@@ -1,4 +1,3 @@
-
 def dict_filter_none(d):
   return { k: v for k, v in d.items() if v }
 
@@ -9,14 +8,14 @@ def dict_collision_free_update(d, **kwargs):
 
 def dict_flatten(d):
   Q = [(tuple(), d)]
-  F = set()
+  F = []
   while Q:
     K, V = Q.pop()
     if type(V) == dict:
       for k, v in V.items():
         Q.append(((*K, k), v))
     else:
-      F.add((K, V))
+      F.append((K, V))
   return F
 
 def dict_unflatten(f):
@@ -31,4 +30,4 @@ def dict_unflatten(f):
   return D
 
 def dict_merge(d, **kwargs):
-  return dict_unflatten(dict_flatten(d) | dict_flatten(kwargs))
+  return dict_unflatten(dict_flatten(d) + dict_flatten(kwargs))
