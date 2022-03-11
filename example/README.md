@@ -11,7 +11,7 @@ DOCKER_TAG=maayanlab/appyter-$(jq -r '.name' appyter.json):${APPYTER_VERSION}-${
 
 # setup docker
 appyter dockerize example.ipynb > Dockerfile
-docker build -t $DOCKER_TAG .
+docker build --build-arg "appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter@v${LIBRARY_VERSION}" -t $DOCKER_TAG .
 docker push $DOCKER_TAG
 
 docker run \
@@ -27,7 +27,7 @@ docker run \
 appyter nbinspect cwl -i appyter.json example.ipynb | jq '.' > example.cwl
 
 # rebuild to include cwl in image
-docker build -t $DOCKER_TAG .
+docker build --build-arg "appyter_version=appyter[production]@git+https://github.com/Maayanlab/appyter@v${LIBRARY_VERSION}" -t $DOCKER_TAG .
 docker push $DOCKER_TAG
 
 
