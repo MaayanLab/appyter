@@ -6,7 +6,7 @@ from appyter.ext.click import click_argument_setenv
 def parse_cli(arg):
   import re
   from appyter.ext.json import try_json_loads
-  m = re.match(r'^--([^=]+)(=(.*))?$', arg)
+  m = re.match(r'^--([^=]+)(=((.|\n)*))?$', arg, re.MULTILINE)
   if m and m.group(2) is not None:
     return (m.group(1), try_json_loads(m.group(3)))
   else:
