@@ -125,6 +125,6 @@ class NotebookClientIOPubHook(NotebookClient):
 
     if execution_count:
       cell['execution_count'] = execution_count
-    self._check_raise_for_error(cell, exec_reply)
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
     self.nb['cells'][cell_index] = cell
     return cell
