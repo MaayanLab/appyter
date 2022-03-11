@@ -1,3 +1,5 @@
+import os
+import io
 import random
 import asyncio
 import fsspec
@@ -30,7 +32,12 @@ class WESExecutor(AbstractExecutor):
           inputs=job,
         ),
         workflow_url='#/workflow_attachment/0',
-        workflow_attachment=[json.dumps(self.cwl)],
+        workflow_attachment=[
+          [
+            os.path.basename(self.executor_options['cwl']),
+            io.BytesIO(json.dumps(self.cwl).encode()),
+          ],
+        ],
         workflow_type='CWL',
         workflow_type_version=self.cwl['cwlVersion'],
       )
@@ -40,17 +47,19 @@ class WESExecutor(AbstractExecutor):
         )
       ) as client:
         data = aiohttp.FormData()
+        for filename, bytesio in execution.pop('workflow_attachment'):
+          data.add_field('workflow_attachment', bytesio, filename=filename)
         for k, v in execution.items():
           if type(v) in {dict, list}:
             data.add_field(k, json.dumps(v), content_type='application/json')
           else:
             data.add_field(k, v)
-          async with client.post(
-            join_slash(self.url, '/runs'),
-            data=data,
-          ) as req:
-            res = await req.json()
-            return res['run_id']
+        async with client.post(
+          join_slash(self.url, '/runs'),
+          data=data,
+        ) as req:
+          res = await req.json()
+          return res['run_id']
     return await async_try_n_times(3, _submit)
 
   async def wait_for(self, run_id):
