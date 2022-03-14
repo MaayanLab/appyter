@@ -5,12 +5,14 @@ import asyncio
 import fsspec
 import json
 import logging
+
+from appyter.parse.nb import nb_from_ipynb_io
 logger = logging.getLogger(__name__)
 
 from appyter.execspec.spec import AbstractExecutor
 from appyter.ext.asyncio.try_n_times import async_try_n_times
 from appyter.ext.dict import dict_merge
-from appyter.ext.urllib import join_slash
+from appyter.ext.urllib import join_slash, join_url
 
 class WESExecutor(AbstractExecutor):
   ''' Run executions via a workflow execution service endpoint
@@ -26,11 +28,15 @@ class WESExecutor(AbstractExecutor):
     async def _submit():
       import aiohttp
       logger.info(f"Submitting execution via WES")
+      # NOTE: This is redundant, since the notebook was already created
+      #       but is necessary if we want to use the standard `cwl-runner`
+      # grab original inputs from notebook
+      with fsspec.open(join_url(job['cwd'], job['ipynb']), 'r') as fr:
+        nb = nb_from_ipynb_io(fr)
+      inputs = nb.metadata['appyter']['nbconstruct']['data']
       execution = dict_merge(
         self.executor_options.get('params', {}),
-        workflow_params=dict(
-          inputs=job,
-        ),
+        workflow_params=dict(inputs=inputs),
         workflow_url='#/workflow_attachment/0',
         workflow_attachment=[
           [
@@ -41,6 +47,7 @@ class WESExecutor(AbstractExecutor):
         workflow_type='CWL',
         workflow_type_version=self.cwl['cwlVersion'],
       )
+      logger.debug(f"{execution=}")
       async with aiohttp.ClientSession(
         headers=dict(
           **self.executor_options.get('headers', {}),
@@ -59,6 +66,7 @@ class WESExecutor(AbstractExecutor):
           data=data,
         ) as req:
           res = await req.json()
+          logger.debug(f"{res=}")
           return res['run_id']
     return await async_try_n_times(3, _submit)
 
