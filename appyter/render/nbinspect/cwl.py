@@ -31,8 +31,9 @@ def render_cwl_from_nbtemplate(env, nb, ipynb=None, cwd=None, info=None):
       'baseCommand': [
         'python3', '-u',
         '-m', 'appyter',
-        'cwl-runner',
+        'commandify',
         f"/app/{ipynb}",
+        "run"
       ],
       "hints": [
         {
@@ -52,28 +53,31 @@ def render_cwl_from_nbtemplate(env, nb, ipynb=None, cwd=None, info=None):
       'baseCommand': [
         sys.executable, '-u',
         '-m', 'appyter',
-        'cwl-runner',
+        'commandify',
         os.path.join(cwd, ipynb),
+        "run"
       ],
     })
   #
   schema.update({
-    'inputs': list(dict_filter_none({
-      field.args['name']: field.to_cwl()
-      for field in fields
-    }).values()),
-    'stderr': 'stderr.jsonl',
+    'inputs': [
+      *dict_filter_none({
+        field.args['name']: field.to_cwl()
+        for field in fields
+      }).values(),
+      {
+        'id': 's',
+        'inputBinding': {
+          'prefix': '-s',
+          'separate': True,
+          'shellQuote': True,
+        },
+        'type': 'str?',
+        'label': 'Location to send realtime update stream',
+      },
+    ],
     'stdout': ipynb,
     'outputs': [
-      {
-        'id': 'status',
-        'type': 'File',
-        'streamable': True,
-        'label': 'Realtime updates',
-        'outputBinding': {
-          'glob': 'stderr.jsonl',
-        },
-      },
       {
         'id': 'report',
         'type': 'File',
