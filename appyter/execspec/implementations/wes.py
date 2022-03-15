@@ -34,6 +34,9 @@ class WESExecutor(AbstractExecutor):
       with fsspec.open(join_url(job['cwd'], job['ipynb']), 'r') as fr:
         nb = nb_from_ipynb_io(fr)
       inputs = nb.metadata['appyter']['nbconstruct']['data']
+      # TODO: process inputs
+      inputs['s'] = job['url']
+      # prepare execution params
       execution = dict_merge(
         self.executor_options.get('params', {}),
         workflow_params=dict(inputs=inputs),
