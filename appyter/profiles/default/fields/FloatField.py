@@ -34,3 +34,8 @@ class FloatField(Field):
 
   def to_cwl(self):
     return dict(super().to_cwl(), type='float')
+
+  def to_click(self):
+    args, kwargs = super().to_click()
+    kwargs['type'] = float
+    return args, kwargs

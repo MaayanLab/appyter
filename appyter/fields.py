@@ -163,6 +163,26 @@ class Field(dict):
     if self.args.get('default'): schema['default'] = self.args['default']
     return schema
 
+  def to_click(self):
+    import click
+    args = (f"--{self.args['name']}",)
+    kwargs = dict()
+    #
+    if self.args.get('required') == True:
+      kwargs['required'] = True
+    #
+    if self.args.get('choices'):
+      kwargs['type'] = click.Choice(list(self.args['choices']))
+    else:
+      kwargs['type'] = click.STRING
+    #
+    if self.args.get('label'): kwargs['help'] = self.args['label']
+    if self.args.get('description'):
+      if 'help' in kwargs: kwargs['help'] += ': ' + self.args['description']
+      else: kwargs['help'] = self.args['description']
+    if self.args.get('default'): kwargs['default'] = self.args['default']
+    return args, kwargs
+
   @property
   def field(self):
     ''' Field name

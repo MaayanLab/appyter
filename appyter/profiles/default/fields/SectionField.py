@@ -24,3 +24,9 @@ class SectionField(Field):
 
   def to_jsonschema(self):
     return None
+
+  def to_cwl(self):
+    return None
+
+  def to_click(self):
+    return None

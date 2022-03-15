@@ -28,3 +28,6 @@ class DescriptionField(Field):
 
   def to_cwl(self):
     return None
+
+  def to_click(self):
+    return None

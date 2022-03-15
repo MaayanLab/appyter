@@ -39,3 +39,9 @@ class BoolField(Field):
     schema['type'] = 'boolean'
     schema['inputBinding']['prefix'] = f"--{self.args['name']}"
     return schema
+
+  def to_click(self):
+    args, kwargs = super().to_click()
+    kwargs['type'] = bool
+    kwargs['is_flag'] = True
+    return args, kwargs

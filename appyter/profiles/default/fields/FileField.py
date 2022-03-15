@@ -57,6 +57,12 @@ class FileField(Field):
     schema['type'] = f"File{'' if self.args.get('required') == True else '?'}"
     return schema
 
+  def to_click(self):
+    import click
+    args, kwargs = super().to_click()
+    kwargs['type'] = click.Path()
+    return args, kwargs
+
   @property
   def value(self):
     ret = super().value

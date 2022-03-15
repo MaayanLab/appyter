@@ -50,3 +50,8 @@ class IntField(Field):
 
   def to_cwl(self):
     return dict(super().to_cwl(), type='int')
+
+  def to_click(self):
+    args, kwargs = super().to_click()
+    kwargs['type'] = int
+    return args, kwargs

@@ -77,3 +77,8 @@ class MultiChoiceField(Field):
         },
       }]
     return schema
+
+  def to_click(self):
+    args, kwargs = super().to_click()
+    kwargs['multiple'] = True
+    return args, kwargs
