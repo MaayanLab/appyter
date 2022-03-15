@@ -65,13 +65,12 @@ def run(ctx, s=None, o=None, **kwargs):
   if o == '-': o = '/dev/stdout'
   import fsspec
   import shutil
-  import tempfile
-  from pathlib import Path
   from appyter.context import get_env, get_jinja2_env
   from appyter.ext.asyncio.helpers import ensure_sync
   from appyter.parse.nb import nb_to_ipynb_io
   from appyter.render.nbconstruct import render_nb_from_nbtemplate
   from appyter.render.nbexecute import nbexecute_async, json_emitter_factory
+  from appyter.ext.tempfile import tempdir
   # render notebook
   env = get_jinja2_env(
     config=get_env(ipynb=ctx['ipynb'], mode='construct'),
@@ -79,18 +78,18 @@ def run(ctx, s=None, o=None, **kwargs):
   )
   nb = render_nb_from_nbtemplate(env, ctx['nbtemplate'], data=kwargs)
   # write into temporary directory
-  tmp_fs = Path(tempfile.mkdtemp())
-  with (tmp_fs/ctx['ipynb']).open('w') as fw:
-    nb_to_ipynb_io(nb, fw)
-  # execute notebook, sending status updates to `s`
-  with fsspec.open(s, 'w') as fw:
-    ensure_sync(nbexecute_async(
-      cwd=str(tmp_fs),
-      ipynb=ctx['ipynb'],
-      emit=json_emitter_factory(fw),
-      fuse=False,
-    ))
-  # write output notebook, to `o`
-  with (tmp_fs/ctx['ipynb']).open('r') as fr:
-    with fsspec.open(o, 'w') as fw:
-      shutil.copyfileobj(fr, fw)
+  with tempdir() as tmp_dir:
+    with (tmp_dir/ctx['ipynb']).open('w') as fw:
+      nb_to_ipynb_io(nb, fw)
+    # execute notebook, sending status updates to `s`
+    with fsspec.open(s, 'w') as fw:
+      ensure_sync(nbexecute_async(
+        cwd=str(tmp_dir),
+        ipynb=ctx['ipynb'],
+        emit=json_emitter_factory(fw),
+        fuse=False,
+      ))
+    # write output notebook, to `o`
+    with (tmp_dir/ctx['ipynb']).open('r') as fr:
+      with fsspec.open(o, 'w') as fw:
+        shutil.copyfileobj(fr, fw)
