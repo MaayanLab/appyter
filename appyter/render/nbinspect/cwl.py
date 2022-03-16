@@ -72,7 +72,7 @@ def render_cwl_from_nbtemplate(env, nb, ipynb=None, cwd=None, info=None):
           'separate': True,
           'shellQuote': True,
         },
-        'type': 'str?',
+        'type': 'string?',
         'label': 'Location to send realtime update stream',
       },
     ],
