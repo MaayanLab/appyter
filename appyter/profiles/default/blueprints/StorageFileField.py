@@ -1,24 +1,27 @@
+'''
+WARNING: This blueprint may open an XSS vulnerability, and is thus opt-in through the storage-file-field extra, use with caution.
+'''
 import re
 import traceback
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, current_app, abort, jsonify, request
 from appyter.ext.fsspec.core import url_to_fs_ex
 from appyter.ext.flask import route_join_with_or_without_slash
 
 import logging
 logger = logging.getLogger(__name__)
 
-StorageFileField = Blueprint('StorageFileField', __name__)
+blueprint = Blueprint('StorageFileField', __name__)
 
-@route_join_with_or_without_slash(StorageFileField, '', methods=['GET'])
+def StorageFileField(flask_app, url_prefix=None):
+  if 'storage-file-field' in flask_app.config['EXTRAS']:
+    flask_app.register_blueprint(blueprint, url_prefix=url_prefix)
+
+@route_join_with_or_without_slash(blueprint, '', methods=['GET'])
 def index():
   abort(404)
 
-# TODO: worry about permissioned access to `storage://`
-# TODO: worry about access to `file://`
-# TODO: worry about access to other providers via API as a proxy
-
-@route_join_with_or_without_slash(StorageFileField, 'ls', methods=['GET'])
-@route_join_with_or_without_slash(StorageFileField, 'ls', '<path:path>', methods=['GET'])
+@route_join_with_or_without_slash(blueprint, 'ls', methods=['GET'])
+@route_join_with_or_without_slash(blueprint, 'ls', '<path:path>', methods=['GET'])
 def ls(path=''):
   try:
     fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
@@ -29,8 +32,8 @@ def ls(path=''):
     logger.error(traceback.format_exc())
     abort(500)
 
-@route_join_with_or_without_slash(StorageFileField, 'info', methods=['GET'])
-@route_join_with_or_without_slash(StorageFileField, 'info', '<path:path>', methods=['GET'])
+@route_join_with_or_without_slash(blueprint, 'info', methods=['GET'])
+@route_join_with_or_without_slash(blueprint, 'info', '<path:path>', methods=['GET'])
 def info(path=''):
   try:
     fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
@@ -41,28 +44,28 @@ def info(path=''):
     logger.error(traceback.format_exc())
     abort(500)
 
-@route_join_with_or_without_slash(StorageFileField, 'cat', methods=['GET'])
-@route_join_with_or_without_slash(StorageFileField, 'cat', '<path:path>', methods=['GET'])
-def cat(path=''):
-  try:
-    fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
-    return fs.cat(fs_path)
-  except KeyboardInterrupt:
-    raise
-  except Exception:
-    logger.error(traceback.format_exc())
-    abort(500)
+# @route_join_with_or_without_slash(blueprint, 'cat', methods=['GET'])
+# @route_join_with_or_without_slash(blueprint, 'cat', '<path:path>', methods=['GET'])
+# def cat(path=''):
+#   try:
+#     fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
+#     return fs.cat(fs_path)
+#   except KeyboardInterrupt:
+#     raise
+#   except Exception:
+#     logger.error(traceback.format_exc())
+#     abort(500)
 
-@route_join_with_or_without_slash(StorageFileField, 'read_block', methods=['GET'])
-@route_join_with_or_without_slash(StorageFileField, 'read_block', '<path:path>', methods=['GET'])
-def read_block(path=''):
-  try:
-    m = re.match(r'^(bytes )?(\d+)-(\d+)$', request.headers['Range'])
-    _, start, end = m.groups()
-    fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
-    return fs.read_block(fs_path, start, end - start)
-  except KeyboardInterrupt:
-    raise
-  except Exception:
-    logger.error(traceback.format_exc())
-    abort(500)
+# @route_join_with_or_without_slash(blueprint, 'read_block', methods=['GET'])
+# @route_join_with_or_without_slash(blueprint, 'read_block', '<path:path>', methods=['GET'])
+# def read_block(path=''):
+#   try:
+#     m = re.match(r'^(bytes )?(\d+)-(\d+)$', request.headers['Range'])
+#     _, start, end = m.groups()
+#     fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
+#     return fs.read_block(fs_path, start, end - start)
+#   except KeyboardInterrupt:
+#     raise
+#   except Exception:
+#     logger.error(traceback.format_exc())
+#     abort(500)
