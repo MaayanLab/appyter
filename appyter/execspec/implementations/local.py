@@ -1,4 +1,3 @@
-import asyncio
 from appyter.execspec.spec import AbstractExecutor
 
 class LocalExecutor(AbstractExecutor):
@@ -12,12 +11,24 @@ class LocalExecutor(AbstractExecutor):
 
   def __init__(self, url=None, **kwargs) -> None:
     super().__init__(url=url, **kwargs)
-    self._tasks = {}
 
-  async def submit(self, job):
-    from appyter.orchestration.job.job import execute_async
-    self._tasks[job['id']] = asyncio.create_task(execute_async(job))
-    return job['id']
+  async def _submit(self, emit=None, **job):
+    from appyter.render.nbexecute import nbexecute_async
+    await nbexecute_async(
+      cwd=job['cwd'],
+      ipynb=job['ipynb'],
+      emit=emit,
+      fuse=not job.get('debug', False),
+    )
+    await emit(None)
 
-  async def wait_for(self, run_id):
-    return await self._tasks.pop(run_id)
+  async def _run(self, **job):
+    import asyncio
+    msg_queue = asyncio.Queue()
+    task = asyncio.create_task(self._submit(emit=msg_queue.put, **job))
+    while True:
+      msg = await msg_queue.get()
+      if msg: yield msg
+      msg_queue.task_done()
+      if not msg: break
+    await task

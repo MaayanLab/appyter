@@ -4,6 +4,7 @@ import random
 import asyncio
 import fsspec
 import json
+import aiohttp
 import logging
 
 from appyter.parse.nb import nb_from_ipynb_io
@@ -19,79 +20,117 @@ class WESExecutor(AbstractExecutor):
   '''
   protocol = 'wes'
 
-  def __init__(self, url=None, **kwargs) -> None:
+  def __init__(self, url=None, config={}, **kwargs) -> None:
     super().__init__(url=url, **kwargs)
     with fsspec.open(self.executor_options['cwl'], 'r') as fr:
       self.cwl = json.loads(fr.read())
+    from appyter.parse.nb import nb_from_ipynb_io
+    from appyter.context import get_env, get_jinja2_env
+    from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
+    env = get_jinja2_env(config=get_env(cwd=config['CWD'], ipynb=config['IPYNB'], mode='inspect', **kwargs))
+    with fsspec.open(join_slash(config['CWD'], config['IPYNB']), 'r') as fr:
+      nbtemplate = nb_from_ipynb_io(fr)
+    self.fields = parse_fields_from_nbtemplate(env, nbtemplate, deep=True)
 
-  async def submit(self, job):
-    async def _submit():
-      import aiohttp
-      logger.info(f"Submitting execution via WES")
-      # NOTE: This is redundant, since the notebook was already created
-      #       but is necessary if we want to use the standard `cwl-runner`
-      # grab original inputs from notebook
-      with fsspec.open(join_url(job['cwd'], job['ipynb']), 'r') as fr:
-        nb = nb_from_ipynb_io(fr)
-      inputs = nb.metadata['appyter']['nbconstruct']['data']
-      # TODO: process inputs
-      inputs['s'] = job['url']
-      # prepare execution params
-      execution = dict_merge(
-        self.executor_options.get('params', {}),
-        workflow_params=dict(inputs=inputs),
-        workflow_url='#/workflow_attachment/0',
-        workflow_attachment=[
-          [
-            os.path.basename(self.executor_options['cwl']),
-            io.BytesIO(json.dumps(self.cwl).encode()),
-          ],
-        ],
-        workflow_type='CWL',
-        workflow_type_version=self.cwl['cwlVersion'],
-      )
-      logger.debug(f"{execution=}")
-      async with aiohttp.ClientSession(
-        headers=dict(
-          **self.executor_options.get('headers', {}),
-        )
-      ) as client:
-        data = aiohttp.FormData()
-        for filename, bytesio in execution.pop('workflow_attachment'):
-          data.add_field('workflow_attachment', bytesio, filename=filename)
-        for k, v in execution.items():
-          if type(v) in {dict, list}:
-            data.add_field(k, json.dumps(v), content_type='application/json')
-          else:
-            data.add_field(k, v)
-        async with client.post(
-          join_slash(self.url, '/runs'),
-          data=data,
-        ) as req:
-          res = await req.json()
-          logger.debug(f"{res=}")
-          return res['run_id']
-    return await async_try_n_times(3, _submit)
-
-  async def wait_for(self, run_id):
-    import aiohttp
-    async with aiohttp.ClientSession(
+  async def __aenter__(self):
+    self.session = aiohttp.ClientSession(
       headers=dict(
         {'Content-Type': 'application/json'},
         **self.executor_options.get('headers', {}),
       )
-    ) as client:
-      while True:
-        await asyncio.sleep(30 * (0.5 + random.random()))
-        logger.debug(f"Checking status of job {run_id=}")
-        async with client.get(join_slash(self.url, run_id, 'status')) as req:
-          res = await req.json()
-          state = res['state']
-        logger.debug(f"{state=}")
-        #
-        if state == 'COMPLETE':
-          return 0
-        elif state == 'CANCELED':
-          return 1
-        elif state == 'EXECUTOR_ERROR':
-          return -1
+    )
+    self.client = await self.session.__aenter__()
+  
+  async def __aexit__(self, type, value, traceback):
+    await self.session.__aexit__(type, value, traceback)
+    await super().__aexit__(type, value, traceback)
+
+  async def _submit(self, job):
+    # NOTE: This is redundant, since the notebook was already created
+    #       but is necessary if we want to use the standard `cwl-runner`
+    # grab original inputs from notebook
+    with fsspec.open(join_url(job['cwd'], job['ipynb']), 'r') as fr:
+      nb = nb_from_ipynb_io(fr)
+    inputs = nb.metadata['appyter']['nbconstruct']['data']
+    for field in self.fields:
+      if field.field == 'IntField' and field.args['name'] in inputs:
+        inputs[field.args['name']] = int(inputs[field.args['name']])
+      if field.field == 'FloatField' and field.args['name'] in inputs:
+        inputs[field.args['name']] = float(inputs[field.args['name']])
+      if field.field in {'FileField', 'StorageFieldField'} and field.args['name'] in inputs:
+        # TODO: transfer file
+        del inputs[field.args['name']]
+      if field.field in {'MultiChoiceField', 'MultiCheckboxField'} and field.args['name'] in inputs:
+        # TODO: fix these
+        del inputs[field.args['name']]
+    # TODO: process inputs
+    inputs['s'] = join_url(job['url'], job['session'])
+    # prepare execution params
+    execution = dict_merge(
+      self.executor_options.get('params', {}),
+      workflow_params=dict(inputs=inputs),
+      workflow_url='#/workflow_attachment/0',
+      workflow_attachment=[
+        [
+          os.path.basename(self.executor_options['cwl']),
+          io.BytesIO(json.dumps(self.cwl).encode()),
+        ],
+      ],
+      workflow_type='CWL',
+      workflow_type_version=self.cwl['cwlVersion'],
+    )
+    logger.info(f"{execution=}")
+    data = aiohttp.FormData()
+    for filename, bytesio in execution.pop('workflow_attachment'):
+      data.add_field('workflow_attachment', bytesio, filename=filename)
+    for k, v in execution.items():
+      if type(v) in {dict, list}:
+        data.add_field(k, json.dumps(v), content_type='application/json')
+      else:
+        data.add_field(k, v)
+    async with self.client.post(
+      join_slash(self.url, '/runs'),
+      data=data,
+    ) as req:
+      res = await req.json()
+      logger.info(f"{res=}")
+      return res['run_id']
+
+  async def _wait_for(self, run_id):
+    current_state = None
+    while True:
+      await asyncio.sleep(15 * (0.5 + random.random()))
+      logger.debug(f"Checking status of job {run_id=}")
+      async with self.client.get(join_slash(self.url, run_id, 'status')) as req:
+        res = await req.json()
+        state = res['state']
+      logger.debug(f"{state=}")
+      if current_state != state:
+        current_state = state
+        yield current_state
+
+  async def _run(self, **job):
+    yield dict(type='status', data=f"Dispatching job using WES")
+    run_id = await async_try_n_times(3, self._submit, job)
+    yield dict(type='status', data=f"Dispatched successfully, your execution will begin soon..")
+    async for state in self._watch_state(run_id):
+      if state == 'QUEUED':
+        yield dict(type='status', data=f"Queued successfully..")
+      elif state == 'INITIALIZING':
+        yield dict(type='status', data=f"Computational resources are being initialized..")
+      elif state == 'RUNNING':
+        yield dict(type='status', data=f"Task is now running..")
+      elif state == 'CANCELING':
+        yield dict(type='error', data=f"Task is being cancelled!")
+        break
+      elif state == 'CANCELED':
+        yield dict(type='error', data=f"Task was cancelled!")
+        break
+      elif state == 'EXECUTOR_ERROR':
+        yield dict(type='error', data=f"Task had an error and did not complete successfully!")
+        break
+      elif state == 'COMPLETE':
+        break
+      else:
+        logger.warn(f"Unhandled state received: {state}")
+        yield dict(type='status', data=f"Task completed")

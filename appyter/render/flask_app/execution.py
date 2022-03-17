@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 from appyter.render.flask_app.core import prepare_data, prepare_results
 from appyter.render.flask_app.socketio import socketio
 from appyter.ext.uuid import sanitize_sha1sum, generate_uuid
-from appyter.ext.urllib import join_slash, join_url
+from appyter.ext.urllib import join_url
 
 # construct/join a notebook
 @socketio.on('submit')
@@ -26,28 +26,22 @@ async def submit(sid, data):
   else:
     raise Exception('Unrecognized data type')
   #
-  socketio.enter_room(sid, result_hash)
-  await socketio.emit('status', 'Queuing execution', to=sid)
-  job = dict(
-    cwd=join_url('storage://output/', result_hash),
-    ipynb=os.path.basename(config['IPYNB']),
-    session=result_hash,
-    id=generate_uuid(),
-    url=request_url,
-    image=config.get('DISPATCHER_IMAGE'),
-    storage=config['DATA_DIR'],
-    debug=config['DEBUG'],
-  )
   try:
-    await executor.submit(job)
-    await socketio.emit('status', f"Queued successfully, your execution will begin when resources are available.", to=sid)
+    await socketio.emit('status', 'Submitting execution', to=result_hash)
+    job = dict(
+      cwd=join_url('storage://output/', result_hash),
+      ipynb=os.path.basename(config['IPYNB']),
+      session=result_hash,
+      id=generate_uuid(),
+      url=request_url,
+      image=config.get('DISPATCHER_IMAGE'),
+      storage=config['DATA_DIR'],
+      debug=config['DEBUG'],
+    )
+    async for msg in executor._run(**job):
+      await socketio.emit(msg['type'], msg['data'], to=result_hash)
   except asyncio.CancelledError:
     raise
   except Exception:
     logger.error(traceback.format_exc())
-    await socketio.emit('error', 'Failed to submit job, please try again later.', to=sid)
-
-@socketio.on('join')
-async def _(sid, data):
-  socketio.enter_room(sid, data)
-  await socketio.emit('joined', dict(id=sid, session=data), to=data)
+    await socketio.emit('error', 'An unhandled executor error occurred, please try again later.', to=sid)

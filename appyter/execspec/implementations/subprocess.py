@@ -9,12 +9,9 @@ class SubprocessExecutor(AbstractExecutor):
   '''
   protocol = 'subprocess'
 
-  def __init__(self, url=None, **kwargs) -> None:
-    super().__init__(url=url, **kwargs)
-    self._procs = {}
-
-  async def submit(self, job):
-    self._procs[job['id']] = await asyncio.create_subprocess_exec(
+  async def _run(self, **job):
+    yield dict(type='status', data=f"Launching job...")
+    proc = await asyncio.create_subprocess_exec(
       sys.executable, '-u', '-m',
       'appyter', 'orchestration', 'job', json.dumps(job),
       stdout=sys.stdout,
@@ -24,7 +21,7 @@ class SubprocessExecutor(AbstractExecutor):
         PATH=os.environ['PATH'],
       ),
     )
-    return job['id']
-
-  async def wait_for(self, run_id):
-    return await (self._procs.pop(run_id)).wait()
+    # TODO: capturing stdout here of nbexecute is probably better here
+    #       than having the subprocess connect back over websocket
+    await proc.wait()
+    yield dict(type='status', data=f"Subprocess exited.")

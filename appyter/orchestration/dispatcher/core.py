@@ -98,7 +98,9 @@ async def dispatcher(queued=None, tasks=None, executor=None, jobs_per_image=1):
     #
     try:
       logger.info(f"Dispatching job {job_id}")
-      await executor.run(job)
+      async for status in executor.run(job):
+        # TODO: phone-home with status?
+        pass
     except asyncio.CancelledError:
       raise
     except:

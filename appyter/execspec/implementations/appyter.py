@@ -10,22 +10,33 @@ class AppyterExecutor(AbstractExecutor):
   '''
   protocol = 'appyter'
 
-  async def submit(self, job):
-    async def _submit():
-      import aiohttp
-      async with aiohttp.ClientSession(
-        headers=dict(
-          {'Content-Type': 'application/json'},
-          **self.executor_options.get('headers', {}),
-        )
-      ) as client:
-        async with client.post(
-          self.url,
-          json=dict_merge(
-            self.executor_options.get('params',{}),
-            **job,
-          ),
-        ) as resp:
-          queue_size = await resp.json()
-          return job['id']
-    return await async_try_n_times(3, _submit)
+  async def __aenter__(self):
+    import aiohttp
+    self.session = aiohttp.ClientSession(
+      headers=dict(
+        {'Content-Type': 'application/json'},
+        **self.executor_options.get('headers', {}),
+      )
+    )
+    self.client = await self.session.__aenter__()
+  
+  async def __aexit__(self, type, value, traceback):
+    await self.session.__aexit__(type, value, traceback)
+    await super().__aexit__(type, value, traceback)
+
+  async def _submit(self, job):
+    async with self.client.post(
+      self.url,
+      json=dict_merge(
+        self.executor_options.get('params',{}),
+        **job,
+      ),
+    ) as resp:
+      queue_size = await resp.json()
+      return queue_size
+
+  async def _run(self, **job):
+    yield dict(type='status', data=f"Submitting appyter for execution..")
+    queue_size = await async_try_n_times(3, self._submit, job)
+    yield dict(type='status', data=f"Queued successfully, you are at position {queue_size}, your execution will begin when resources are available..")
+    # TODO: track queue position

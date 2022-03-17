@@ -1,4 +1,5 @@
 from appyter.ext.urllib import parse_qs
+from appyter.ext.asyncio.helpers import ensure_sync
 
 class AbstractExecutor:
   protocol = None
@@ -15,16 +16,12 @@ class AbstractExecutor:
 
   async def __aenter__(self):
     return self
+  __enter__ = ensure_sync(__aenter__)
 
   async def __aexit__(self, type, value, traceback):
     pass
+  __exit__ = ensure_sync(__aexit__)
 
-  async def submit(self, job):
+  async def _run(self, **job):
     raise NotImplementedError
-  
-  async def wait_for(self, id):
-    raise NotImplementedError
-
-  async def run(self, job):
-    id = await self.submit(job)
-    return await self.wait_for(id)
+  run = ensure_sync(_run)

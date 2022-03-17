@@ -12,36 +12,30 @@ class DockerExecutor(AbstractExecutor):
   '''
   protocol = 'docker'
 
-  def __init__(self, url=None, **kwargs) -> None:
-    super().__init__(url=url, **kwargs)
-    self._procs = {}
-    self._args = [
-      'docker', 'run',
-      '--device', '/dev/fuse',
-      '--cap-add', 'SYS_ADMIN',
-      '--security-opt', 'apparmor:unconfined',
-    ]
-
   async def __aenter__(self):
     proc = await asyncio.create_subprocess_exec(*[
       'docker', 'inspect', os.environ['HOSTNAME'],
     ], stdout=asyncio.subprocess.PIPE)
     proc_stdout, _ = await proc.communicate()
     conf = json.loads(proc_stdout.decode())
-    self._args += ['--network', conf[0]['HostConfig']['NetworkMode']]
+    self._args = [
+      'docker', 'run',
+      '--device', '/dev/fuse',
+      '--cap-add', 'SYS_ADMIN',
+      '--security-opt', 'apparmor:unconfined',
+      '--network', conf[0]['HostConfig']['NetworkMode']
+    ]
     return self
 
-  async def __aexit__(self, type, value, traceback):
-    pass
-
-  async def submit(self, job):
-    self._procs[job['id']] = await asyncio.create_subprocess_exec(
+  async def _run(self, **job):
+    yield dict(type='status', data=f"Launching container...")
+    proc = await asyncio.create_subprocess_exec(
       *self._args, job['image'],
       'appyter', 'orchestration', 'job', json.dumps(job),
       stdout=sys.stdout,
       stderr=sys.stderr,
     )
-    return job['id']
-
-  async def wait_for(self, run_id):
-    return await (self._procs.pop(run_id)).wait()
+    # TODO: capturing stdout here of nbexecute is probably better here
+    #       than having the subprocess connect back over websocket
+    await proc.wait()
+    yield dict(type='status', data=f"Container exited.")
