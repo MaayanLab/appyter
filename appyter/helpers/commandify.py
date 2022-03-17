@@ -6,7 +6,7 @@ from appyter.ext.click import click_argument_setenv
 def ipynb_options_from_sys_argv(func):
   import sys
   if len(sys.argv) >= 3 and sys.argv[1] == 'commandify' and sys.argv[2][0] != '-':
-    ipynb = sys.argv[2]
+    import os
     import fsspec
     import functools
     from appyter.context import get_env_from_kwargs, get_jinja2_env
@@ -14,23 +14,29 @@ def ipynb_options_from_sys_argv(func):
     from appyter.ext.dict import dict_filter_none
     from appyter.parse.nb import nb_from_ipynb_io
     from appyter.ext.asyncio.event_loop import with_event_loop
+    from appyter.ext.urllib import parent_url
+    #
+    ipynb = sys.argv[2]
+    cwd = parent_url(ipynb) or os.cwd
+    #
     with with_event_loop():
       with fsspec.open(ipynb, 'r') as fr:
         nbtemplate = nb_from_ipynb_io(fr)
-      env = get_jinja2_env(
-        config=get_env_from_kwargs(ipynb=ipynb, mode='inspect'),
-      )
-      fields = list(dict_filter_none({
-        field.args['name']: field.to_click()
-        for field in parse_fields_from_nbtemplate(env, nbtemplate, deep=True)
-      }).values())
-      for field in fields:
-        func = click.option(*field[0], **field[1])(func)
+    #
+    env = get_jinja2_env(
+      config=get_env_from_kwargs(cwd=cwd, ipynb=ipynb, mode='inspect'),
+    )
+    fields = list(dict_filter_none({
+      field.args['name']: field.to_click()
+      for field in parse_fields_from_nbtemplate(env, nbtemplate, deep=True)
+    }).values())
+    for field in fields:
+      func = click.option(*field[0], **field[1])(func)
     #
     @functools.wraps(func)
     def wrapper(**kwargs):
       with with_event_loop():
-        return func(dict(ipynb=ipynb, nbtemplate=nbtemplate), **kwargs)
+        return func(dict(cwd=cwd, ipynb=ipynb, nbtemplate=nbtemplate), **kwargs)
     return wrapper
   return func
 
@@ -73,7 +79,7 @@ def run(ctx, s=None, o=None, **kwargs):
   from appyter.ext.tempfile import tempdir
   # render notebook
   env = get_jinja2_env(
-    config=get_env(ipynb=ctx['ipynb'], mode='construct'),
+    config=get_env(cwd=ctx['cwd'], ipynb=ctx['ipynb'], mode='construct'),
     context=kwargs,
   )
   nb = render_nb_from_nbtemplate(env, ctx['nbtemplate'], data=kwargs)
