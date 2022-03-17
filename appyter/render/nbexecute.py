@@ -7,6 +7,7 @@ import datetime
 import traceback
 import logging
 
+from appyter.ext.emitter import json_emitter_factory
 from appyter.ext.fsspec.core import url_to_chroot_fs, url_to_fs_ex
 from appyter.ext.asyncio.helpers import ensure_async, ensure_sync
 logger = logging.getLogger(__name__)
@@ -31,12 +32,6 @@ def iopub_hook_factory(nb, emit):
   async def iopub_hook(cell, cell_index):
     await emit({ 'type': 'cell', 'data': [cell, cell_index] })
   return iopub_hook
-
-def json_emitter_factory(output):
-  async def json_emitter(obj):
-    import json
-    print(json.dumps(obj), file=output)
-  return json_emitter
 
 async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='', subscribe=None, fuse=False):
   logger.info('starting')

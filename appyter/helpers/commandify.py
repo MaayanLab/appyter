@@ -63,20 +63,22 @@ def nbconstruct(ctx, o=None, **kwargs):
     nb_to_ipynb_io(nb, fw)
 
 @commandify.command(help='Construct and execute an appyter')
-@click.option('-s', type=str, metavar='FILE', default='-', help='Status output')
-@click.option('-o', type=str, metavar='FILE', default='-', help='Output notebook')
+@click.option('-s', type=str, metavar='URI', default='file:///dev/stderr', help='Status stream')
+@click.option('-e', type=str, metavar='URI', default='local://', help='Executor')
+@click.option('-o', type=str, metavar='FILE', default='file:///dev/stdout', help='Output notebook')
 @ipynb_options_from_sys_argv
-def run(ctx, s=None, o=None, **kwargs):
+def run(ctx, s=None, e=None, o=None, **kwargs):
   if s == '-': s = '/dev/stderr'
   if o == '-': o = '/dev/stdout'
   import fsspec
   import shutil
   from appyter.context import get_env, get_jinja2_env
-  from appyter.ext.asyncio.helpers import ensure_sync
   from appyter.parse.nb import nb_to_ipynb_io
   from appyter.render.nbconstruct import render_nb_from_nbtemplate
-  from appyter.render.nbexecute import nbexecute_async, json_emitter_factory
+  from appyter.ext.emitter import url_to_emitter
+  from appyter.execspec.core import url_to_executor
   from appyter.ext.tempfile import tempdir
+  from appyter.ext.asyncio.helpers import ensure_sync
   # render notebook
   env = get_jinja2_env(
     config=get_env(cwd=ctx['cwd'], ipynb=ctx['ipynb'], mode='construct'),
@@ -88,13 +90,14 @@ def run(ctx, s=None, o=None, **kwargs):
     with (tmp_dir/ctx['ipynb']).open('w') as fw:
       nb_to_ipynb_io(nb, fw)
     # execute notebook, sending status updates to `s`
-    with fsspec.open(s, 'w') as fw:
-      ensure_sync(nbexecute_async(
-        cwd=str(tmp_dir),
-        ipynb=ctx['ipynb'],
-        emit=json_emitter_factory(fw),
-        fuse=False,
-      ))
+    with ensure_sync(url_to_emitter(s)) as emitter:
+      with url_to_executor(e) as executor:
+        executor.run(
+          cwd=str(tmp_dir),
+          ipynb=ctx['ipynb'],
+          emit=emitter,
+          fuse=False,
+        )
     # write output notebook, to `o`
     with (tmp_dir/ctx['ipynb']).open('r') as fr:
       with fsspec.open(o, 'w') as fw:
