@@ -36,7 +36,7 @@ async def submit(sid, data):
         ipynb=os.path.basename(config['IPYNB']),
         session=result_hash,
         id=generate_uuid(),
-        url=request_url,
+        url=join_url(request_url, result_hash),
         image=config.get('DISPATCHER_IMAGE'),
         storage=config['DATA_DIR'],
         debug=config['DEBUG'],

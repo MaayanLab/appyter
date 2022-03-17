@@ -25,8 +25,7 @@ class AsyncServer(
     await super().__aexit__(*args)
 
   async def forward(self, sid, data):
-    logger.info(f"{sid} forward to {data['to']}")
-    await self.emit(data['event'], data['data'], priority=max(0, data.get('priority', 0)) + 1, to=data['to'])
+    await self.emit(data['event'], data['data'], priority=max(0, data.get('priority', 0)) + 1, to=data['to'], skip_sid=sid)
     for listener in self._listeners['forward']:
       await listener(sid, data)
 

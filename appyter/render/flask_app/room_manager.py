@@ -33,7 +33,7 @@ async def remove_client_from_room(room_id, client_id):
 async def enter_room(client_id, room_id):
   room = await ensure_room(room_id)
   if client_id not in room['clients']:
-    logger.debug(f"client joined room {room}")
+    logger.debug(f"client joined room {room_id}")
     # add client to room and relay old messages to the client
     room['clients'].add(client_id)
     socketio.enter_room(client_id, room_id)

@@ -97,10 +97,11 @@ async def dispatcher(queued=None, tasks=None, executor=None, jobs_per_image=1):
         ).isoformat()
     #
     try:
-      logger.info(f"Dispatching job {job_id}")
-      async for status in executor.run(job):
-        # TODO: phone-home with status?
-        pass
+      from appyter.ext.emitter import url_to_emitter
+      async with url_to_emitter(job['url']) as emitter:
+        logger.info(f"Dispatching job {job_id}")
+        async for msg in executor._run(**job):
+          await emitter(msg)
     except asyncio.CancelledError:
       raise
     except:
