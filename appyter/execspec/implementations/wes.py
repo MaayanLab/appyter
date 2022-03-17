@@ -65,7 +65,7 @@ class WESExecutor(AbstractExecutor):
         # TODO: fix these
         del inputs[field.args['name']]
     # TODO: process inputs
-    inputs['s'] = join_url(job['url'], job['session'])
+    inputs['s'] = job['url']
     # prepare execution params
     execution = dict_merge(
       self.executor_options.get('params', {}),
