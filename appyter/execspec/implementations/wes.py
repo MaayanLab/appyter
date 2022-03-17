@@ -40,6 +40,7 @@ class WESExecutor(AbstractExecutor):
       )
     )
     self.client = await self.session.__aenter__()
+    return await super().__aenter__()
   
   async def __aexit__(self, type, value, traceback):
     await self.session.__aexit__(type, value, traceback)

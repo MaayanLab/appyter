@@ -25,7 +25,7 @@ class DockerExecutor(AbstractExecutor):
       '--security-opt', 'apparmor:unconfined',
       '--network', conf[0]['HostConfig']['NetworkMode']
     ]
-    return self
+    return await super().__aenter__()
 
   async def _run(self, **job):
     yield dict(type='status', data=f"Launching container...")

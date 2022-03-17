@@ -1,3 +1,7 @@
+import traceback
+import logging
+logger = logging.getLogger(__name__)
+
 from appyter.execspec.spec import AbstractExecutor
 
 class LocalExecutor(AbstractExecutor):
@@ -14,13 +18,18 @@ class LocalExecutor(AbstractExecutor):
 
   async def _submit(self, emit=None, **job):
     from appyter.render.nbexecute import nbexecute_async
-    await nbexecute_async(
-      cwd=job['cwd'],
-      ipynb=job['ipynb'],
-      emit=emit,
-      fuse=not job.get('debug', False),
-    )
-    await emit(None)
+    try:
+      await nbexecute_async(
+        cwd=job['cwd'],
+        ipynb=job['ipynb'],
+        emit=emit,
+        fuse=not job.get('debug', False),
+      )
+    except:
+      logger.error(traceback.format_exc())
+      await emit({ 'type': 'error', 'data': 'An error occurred while initializing the execution...' })
+    finally:
+      await emit(None)
 
   async def _run(self, **job):
     import asyncio
