@@ -6,6 +6,7 @@ logger = logging.getLogger(__name__)
 
 from appyter.render.flask_app.core import prepare_data, prepare_results
 from appyter.render.flask_app.socketio import socketio
+from appyter.render.flask_app.room_manager import enter_room
 from appyter.ext.uuid import sanitize_sha1sum, generate_uuid
 from appyter.ext.urllib import join_url
 
@@ -26,6 +27,7 @@ async def submit(sid, data):
   else:
     raise Exception('Unrecognized data type')
   #
+  await enter_room(sid, result_hash)
   try:
     await socketio.emit('status', 'Submitting execution', to=result_hash)
     job = dict(
