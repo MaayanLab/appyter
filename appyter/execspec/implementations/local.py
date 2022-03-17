@@ -1,3 +1,4 @@
+import contextlib
 import traceback
 import logging
 logger = logging.getLogger(__name__)
@@ -31,13 +32,26 @@ class LocalExecutor(AbstractExecutor):
     finally:
       await emit(None)
 
+  @contextlib.contextmanager
+  def _storage(self, storage):
+    import fsspec
+    if 'storage' not in fsspec.registry.target:
+      from appyter.ext.fsspec.core import url_to_fs_ex
+      from appyter.ext.fsspec.singleton import SingletonFileSystem
+      fs, fo = url_to_fs_ex(storage)
+      with SingletonFileSystem(proto='storage', fs=fs, fo=fo):
+        yield
+    else:
+      yield
+
   async def _run(self, **job):
     import asyncio
-    msg_queue = asyncio.Queue()
-    task = asyncio.create_task(self._submit(emit=msg_queue.put, **job))
-    while True:
-      msg = await msg_queue.get()
-      if msg: yield msg
-      msg_queue.task_done()
-      if not msg: break
-    await task
+    with self._storage(job['storage']):
+      msg_queue = asyncio.Queue()
+      task = asyncio.create_task(self._submit(emit=msg_queue.put, **job))
+      while True:
+        msg = await msg_queue.get()
+        if msg: yield msg
+        msg_queue.task_done()
+        if not msg: break
+      await task
