@@ -9,19 +9,31 @@ class SubprocessExecutor(AbstractExecutor):
   '''
   protocol = 'subprocess'
 
-  async def _run(self, **job):
-    yield dict(type='status', data=f"Launching job...")
+  async def _submit(self, **job):
     proc = await asyncio.create_subprocess_exec(
       sys.executable, '-u', '-m',
-      'appyter', 'orchestration', 'job', json.dumps(job),
-      stdout=sys.stdout,
+      'appyter', 'nbexecute',
+      '--cwd', job['cwd'],
+      '--data-dir', job['storage'],
+      job['ipynb'],
+      stdout=asyncio.subprocess.PIPE,
       stderr=sys.stderr,
       env=dict(
         PYTHONPATH=':'.join(sys.path),
         PATH=os.environ['PATH'],
       ),
     )
-    # TODO: capturing stdout here of nbexecute is probably better here
-    #       than having the subprocess connect back over websocket
-    await proc.wait()
-    yield dict(type='status', data=f"Subprocess exited.")
+    while True:
+      line = await proc.stdout.readline()
+      if not line: break
+      yield json.loads(line), False
+    yield await proc.wait(), True
+
+  async def _run(self, **job):
+    yield dict(type='status', data=f"Launching subprocess...")
+    async for msg, done in self._submit(**job):
+      if not done: yield msg
+    if msg == 0:
+      yield dict(type='status', data=f"Subprocess exited")
+    else:
+      yield dict(type='error', data=f"Subprocess exited with error code")

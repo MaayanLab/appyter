@@ -116,8 +116,6 @@ def create_app(**kwargs):
   logger.info('Registering application executor handler')
   async def executor_ctx(app):
     dispatcher = app['config'].get('DISPATCHER') or 'local'
-    if dispatcher != 'local' and '::' not in dispatcher:
-      dispatcher = 'appyter::' + dispatcher
     from appyter.execspec.core import url_to_executor
     async with url_to_executor(dispatcher) as executor:
       app['executor'] = executor
