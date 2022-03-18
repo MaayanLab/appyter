@@ -2,8 +2,8 @@ def testdash(app, url_prefix='/testdash', DATA_DIR=''):
   import pandas as pd
   import dash
   from dash.dependencies import Input, Output
-  import dash_core_components as dcc
-  import dash_html_components as html
+  from dash import dcc
+  from dash import html
 
   df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/dash-stock-ticker-demo.csv')
 
