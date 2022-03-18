@@ -16,12 +16,18 @@ class AbstractExecutor:
 
   async def __aenter__(self):
     return self
-  __enter__ = ensure_sync(__aenter__)
+
+  def __enter__(self):
+    return ensure_sync(self.__aenter__())
 
   async def __aexit__(self, type, value, traceback):
     pass
-  __exit__ = ensure_sync(__aexit__)
+
+  def __exit__(self, type, value, traceback):
+    return ensure_sync(self.__aexit__(type, value, traceback))
 
   async def _run(self, **job):
     raise NotImplementedError
-  run = ensure_sync(_run)
+
+  def run(self, **job):
+    return ensure_sync(self._run(**job))

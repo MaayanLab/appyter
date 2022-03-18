@@ -98,7 +98,6 @@ def ensure_sync_generator(asyncgenerator):
   while True:
     try:
       value = __anext__()
-      logger.debug(f"yield {value=} {dir(value)}")
       yield value
     except StopAsyncIteration:
       break

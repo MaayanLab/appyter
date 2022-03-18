@@ -46,7 +46,7 @@ class LocalExecutor(AbstractExecutor):
 
   async def _run(self, **job):
     import asyncio
-    with self._storage(job['storage']):
+    with self._storage(job.get('storage', 'file://')):
       msg_queue = asyncio.Queue()
       task = asyncio.create_task(self._submit(emit=msg_queue.put, **job))
       while True:

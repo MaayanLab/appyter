@@ -1,4 +1,5 @@
 import click
+import pathlib
 
 from appyter.cli import cli
 from appyter.ext.click import click_argument_setenv
@@ -16,15 +17,17 @@ def ipynb_options_from_sys_argv(func):
     from appyter.ext.asyncio.event_loop import with_event_loop
     from appyter.ext.urllib import parent_url
     #
-    ipynb = sys.argv[2]
-    cwd = parent_url(ipynb) or os.cwd
+    arg = pathlib.Path(sys.argv[2])
+    assert arg.exists()
+    ipynb = arg.name
+    cwd = arg.parent
     #
     with with_event_loop():
-      with fsspec.open(ipynb, 'r') as fr:
+      with fsspec.open(str(cwd / ipynb), 'r') as fr:
         nbtemplate = nb_from_ipynb_io(fr)
     #
     env = get_jinja2_env(
-      config=get_env_from_kwargs(cwd=cwd, ipynb=ipynb, mode='inspect'),
+      config=get_env_from_kwargs(cwd=str(cwd), ipynb=ipynb, mode='inspect'),
     )
     fields = list(dict_filter_none({
       field.args['name']: field.to_click()
@@ -36,7 +39,7 @@ def ipynb_options_from_sys_argv(func):
     @functools.wraps(func)
     def wrapper(**kwargs):
       with with_event_loop():
-        return func(dict(cwd=cwd, ipynb=ipynb, nbtemplate=nbtemplate), **kwargs)
+        return func(dict(cwd=str(cwd), ipynb=ipynb, nbtemplate=nbtemplate), **kwargs)
     return wrapper
   return func
 
@@ -64,7 +67,7 @@ def nbconstruct(ctx, o=None, **kwargs):
 
 @commandify.command(help='Construct and execute an appyter')
 @click.option('-s', type=str, metavar='URI', default='file:///dev/stderr', help='Status stream')
-@click.option('-e', type=str, metavar='URI', default='local://', help='Executor')
+@click.option('-e', type=str, metavar='URI', default='local', help='Executor')
 @click.option('-o', type=str, metavar='FILE', default='file:///dev/stdout', help='Output notebook')
 @ipynb_options_from_sys_argv
 def run(ctx, s=None, e=None, o=None, **kwargs):
@@ -91,13 +94,14 @@ def run(ctx, s=None, e=None, o=None, **kwargs):
       nb_to_ipynb_io(nb, fw)
     # execute notebook, sending status updates to `s`
     with ensure_sync(url_to_emitter(s)) as emitter:
+      emitter = ensure_sync(emitter)
       with url_to_executor(e) as executor:
-        executor.run(
+        for msg in executor.run(
           cwd=str(tmp_dir),
           ipynb=ctx['ipynb'],
-          emit=emitter,
           fuse=False,
-        )
+        ):
+          emitter(msg)
     # write output notebook, to `o`
     with (tmp_dir/ctx['ipynb']).open('r') as fr:
       with fsspec.open(o, 'w') as fw:
