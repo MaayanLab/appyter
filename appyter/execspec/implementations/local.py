@@ -24,7 +24,7 @@ class LocalExecutor(AbstractExecutor):
         cwd=job['cwd'],
         ipynb=job['ipynb'],
         emit=emit,
-        fuse=not job.get('debug', False),
+        fuse=job.get('fuse', not job.get('debug', False)),
       )
     except:
       logger.error(traceback.format_exc())
