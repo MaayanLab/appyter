@@ -42,7 +42,7 @@ async def submit(sid, data):
         debug=config['DEBUG'],
       )
       async for msg in executor._run(**job):
-        await socketio.forward(sid, dict(event=msg['type'], data=msg['data'], to=result_hash))
+        await socketio.forward(None, dict(event=msg['type'], data=msg['data'], to=result_hash))
     except asyncio.CancelledError:
       raise
     except Exception:
