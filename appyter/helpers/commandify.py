@@ -10,24 +10,23 @@ def ipynb_options_from_sys_argv(func):
     import os
     import fsspec
     import functools
-    from appyter.context import get_env_from_kwargs, get_jinja2_env
+    from appyter.context import get_env, get_jinja2_env
     from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
     from appyter.ext.dict import dict_filter_none
     from appyter.parse.nb import nb_from_ipynb_io
     from appyter.ext.asyncio.event_loop import with_event_loop
-    from appyter.ext.urllib import parent_url
     #
     arg = pathlib.Path(sys.argv[2])
     assert arg.exists()
     ipynb = arg.name
-    cwd = arg.parent
+    cwd = arg.parent.absolute()
     #
     with with_event_loop():
       with fsspec.open(str(cwd / ipynb), 'r') as fr:
         nbtemplate = nb_from_ipynb_io(fr)
     #
     env = get_jinja2_env(
-      config=get_env_from_kwargs(cwd=str(cwd), ipynb=ipynb, mode='inspect'),
+      config=get_env(cwd=str(cwd), ipynb=ipynb, mode='inspect'),
     )
     fields = list(dict_filter_none({
       field.args['name']: field.to_click()
@@ -58,7 +57,7 @@ def nbconstruct(ctx, o=None, **kwargs):
   from appyter.render.nbconstruct import render_nb_from_nbtemplate
   from appyter.parse.nb import nb_to_ipynb_io
   env = get_jinja2_env(
-    config=get_env(ipynb=ctx['ipynb'], mode='construct'),
+    config=get_env(cwd=ctx['cwd'], ipynb=ctx['ipynb'], mode='construct'),
     context=kwargs,
   )
   nb = render_nb_from_nbtemplate(env, ctx['nbtemplate'], data=kwargs)
