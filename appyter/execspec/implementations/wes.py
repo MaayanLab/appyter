@@ -35,7 +35,7 @@ class WESExecutor(AbstractExecutor):
   async def __aenter__(self):
     self.session = aiohttp.ClientSession(
       headers=dict(
-        {'Content-Type': 'application/json'},
+        {'Accept': 'application/json'},
         **self.executor_options.get('headers', {}),
       )
     )
@@ -97,12 +97,12 @@ class WESExecutor(AbstractExecutor):
       logger.info(f"{res=}")
       return res['run_id']
 
-  async def _wait_for(self, run_id):
+  async def _watch_state(self, run_id):
     current_state = None
     while True:
       await asyncio.sleep(15 * (0.5 + random.random()))
       logger.debug(f"Checking status of job {run_id=}")
-      async with self.client.get(join_slash(self.url, run_id, 'status')) as req:
+      async with self.client.get(join_slash(self.url, 'runs', run_id, 'status')) as req:
         res = await req.json()
         state = res['state']
       logger.debug(f"{state=}")

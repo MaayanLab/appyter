@@ -117,7 +117,7 @@ def create_app(**kwargs):
   async def executor_ctx(app):
     dispatcher = app['config'].get('DISPATCHER') or 'local'
     from appyter.execspec.core import url_to_executor
-    async with url_to_executor(dispatcher) as executor:
+    async with url_to_executor(dispatcher, config=app['config']) as executor:
       app['executor'] = executor
       yield
   app.cleanup_ctx.append(executor_ctx)
