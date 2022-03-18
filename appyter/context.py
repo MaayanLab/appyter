@@ -233,7 +233,7 @@ def get_env_from_kwargs(mode='default', **kwargs):
     STATIC_PREFIX=STATIC_PREFIX,
   )
 
-def get_env_from_click():
+def get_env_from_click(**kwargs):
   ''' Traverse click context and use params for get_env_from_kwargs
   '''
   click_ctx = click.get_current_context()
@@ -247,7 +247,7 @@ def get_env_from_click():
     }
     click_ctx = click_ctx.parent
   # use aggregated params to get env
-  return get_env_from_kwargs(**params)
+  return get_env_from_kwargs(dict(kwargs, **params))
 
 def get_env_from_flask():
   ''' If we're running in flask, current_app.config should be available
@@ -262,11 +262,14 @@ def get_env(**kwargs):
   (different based on whether we're in a flask thread/somewhere else)
   '''
   #
+  global config
+  if not kwargs and config:
+    return config
+  #
   try:
-    global config
-    config = get_env_from_kwargs(**kwargs)
+    config.update(get_env_from_kwargs(**kwargs))
   except AssertionError:
-    pass
+    raise
   #
   try:
     return get_env_from_flask()
@@ -274,7 +277,7 @@ def get_env(**kwargs):
     pass
   #
   try:
-    return get_env_from_click()
+    return get_env_from_click(**kwargs)
   except RuntimeError:
     pass
   except AssertionError:
