@@ -12,11 +12,6 @@ def create_app(**kwargs):
   from appyter.orchestration.dispatcher.socketio import socketio
   from appyter.ext.urllib import join_slash
   #
-  logging.basicConfig(
-    level=logging.DEBUG if kwargs.get('debug') else logging.WARNING,
-    format='%(name)s %(message)s',
-  )
-  #
   logger.info('Initializing aiohttp...')
   config = dict(
     HOST=kwargs.get('host'),

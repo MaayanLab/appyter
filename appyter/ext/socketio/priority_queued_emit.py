@@ -34,7 +34,6 @@ class PriorityQueuedEmitMixin:
         self._emit_queue.task_done()
 
   async def emit(self, evt, data, priority=0, **kwargs):
-    logger.debug('Priority queued emit')
     await self._emit_queue.put((
       priority, next(self._emit_counter), 
       (evt, data),

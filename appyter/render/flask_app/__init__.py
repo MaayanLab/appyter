@@ -39,18 +39,6 @@ def create_app(**kwargs):
   from appyter.ext.urllib import join_slash
   config = get_env(**kwargs)
   #
-  if config['DEBUG']:
-    logging.basicConfig(
-      level=logging.DEBUG,
-      format='%(name)s %(message)s',
-    )
-  else:
-    logging.basicConfig(
-      level=logging.WARNING,
-      format='%(name)s %(message)s',
-    )
-    logging.getLogger(__package__).setLevel(logging.INFO)
-  #
   logger.info('Initializing aiohttp...')
   app = web.Application()
   app['config'] = config
@@ -157,19 +145,6 @@ def create_app(**kwargs):
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def flask_app(**kwargs):
   import sys
-  import logging
-  if kwargs.get('debug'):
-    logging.basicConfig(
-      level=logging.DEBUG,
-      format='%(name)s %(message)s',
-    )
-  else:
-    logging.basicConfig(
-      level=logging.WARNING,
-      format='%(name)s %(message)s',
-    )
-    logging.getLogger(__package__).setLevel(logging.INFO)
-  #
   from appyter.ext.asyncio.event_loop import with_event_loop
   exit_code = 0
   try:
@@ -177,7 +152,7 @@ def flask_app(**kwargs):
       if kwargs.get('socket'):
         from appyter.ext.aiohttp import run_app
         socket = kwargs['socket']
-        logging.info(f"Launching aiohttp server on {socket}")
+        logger.info(f"Launching aiohttp server on {socket}")
         app = create_app(**kwargs)
         if ':' in socket:
           host, port = socket.split(':')
