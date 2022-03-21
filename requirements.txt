@@ -11,6 +11,7 @@ fusepy
 ipython
 jinja2
 jupyter_client
+jwcrypto==1.0
 lxml
 nbclient==0.5.13
 nbconvert
