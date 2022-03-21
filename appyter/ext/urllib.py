@@ -10,6 +10,10 @@ def parent_url(url):
   parent, *filename = url.rsplit('/', maxsplit=1)
   return parent if filename else ''
 
+def url_filename(url):
+  parent, *filename = url.rsplit('/', maxsplit=1)
+  return filename[0] if filename else parent
+
 def join_slash(*parts):
   if not parts: return ''
   part0, *parts = parts
