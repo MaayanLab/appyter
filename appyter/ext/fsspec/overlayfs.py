@@ -132,6 +132,12 @@ class OverlayFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSyste
   def exists(self, path, **kwargs):
     return self.upper_fs.exists(path, **kwargs) or self.lower_fs.exists(path, **kwargs)
 
+  def get_drs(self, path, **kwargs):
+    if self.upper_fs.exists(path) or not self.lower_fs.exists(path):
+      return self.upper_fs.get_drs(path, **kwargs)
+    else:
+      return self.lower_fs.get_drs(path, **kwargs)
+
   def info(self, path, **kwargs):
     logger.debug(f"info({path})")
     if self.upper_fs.exists(path) or not self.lower_fs.exists(path):

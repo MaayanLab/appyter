@@ -176,6 +176,9 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSy
       return True
     return self.fs.exists(path, **kwargs)
 
+  def get_drs(self, path, **kwargs):
+    return self.fs.get_drs(path, **kwargs)
+
   def info(self, path, **kwargs):
     path = self.fs.root_marker + path.lstrip('/')
     if path in self._local_cache:

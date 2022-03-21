@@ -1,6 +1,4 @@
-import asyncio
 import logging
-
 logger = logging.getLogger(__name__)
 
 import json
@@ -9,6 +7,7 @@ from pathlib import Path
 from fsspec.asyn import AsyncFileSystem
 from appyter.ext.fsspec.spec.sync_async import SyncAsyncFileSystem
 from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
+from appyter.ext.asyncio.helpers import ensure_sync
 from fsspec.spec import AbstractBufferedFile
 
 class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFileSystem):
@@ -16,12 +15,14 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
 
   def __init__(self, *args,
     api_endpoint='https://cavatica-api.sbgenomics.com',
+    drs_endpoint='drs://cavatica-ga4gh-api.sbgenomics.com',
     auth_token=None,
     **storage_options,
   ):
     assert auth_token is not None, 'SBFS auth_token is required'
     super().__init__(*args,
       api_endpoint=api_endpoint,
+      drs_endpoint=drs_endpoint,
       auth_token=auth_token,
       **storage_options,
     )
@@ -216,6 +217,13 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
       with lpath.open('wb') as fw:
         async for data in req.content.iter_chunked(SBFSFileSystem.CHUNK_SIZE):
           fw.write(data)
+
+  async def _get_drs(self, path, **kwargs):
+    file_info = await self._info(path, **kwargs)
+    return f"{self.storage_options['drs_endpoint']}/{file_info['_id']}"
+
+  def get_drs(self, path, **kwargs):
+    return ensure_sync(self._get_drs(path, **kwargs))
 
   async def _info(self, path, **kwargs):
     path_split = [] if path in {'', '.', '/', './'} else path.split('/')

@@ -202,6 +202,10 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
     with self.__masquerade_os_error(path=path):
       return self.fs.exists(self._resolve_path(path), **kwargs)
 
+  def get_drs(self, path, **kwargs):
+    with self.__masquerade_os_error(path=path):
+      return self.fs.get_drs(self._resolve_path(path), **kwargs)
+
   def info(self, path, **kwargs):
     with self.__masquerade_os_error(path=path):
       info = self.fs.info(self._resolve_path(path), **kwargs)

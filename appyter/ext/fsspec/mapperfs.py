@@ -84,6 +84,13 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
   def exists(self, path, **kwargs):
     return path in self.listing or path in self.pathmap
 
+  def get_drs(self, path, **kwargs):
+    if path in self.listing:
+      raise IsADirectoryError
+    else:
+      fs, fs_path = self._pathmap(path)
+      return fs.get_drs(fs_path, **kwargs)
+
   def info(self, path, **kwargs):
     if path in self.listing:
       return {
