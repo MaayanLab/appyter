@@ -162,7 +162,7 @@ class Field(dict):
     #
     if self.args.get('label'): schema['label'] = self.args['label']
     if self.args.get('description'): schema['doc'] = self.args['description']
-    if self.args.get('default'): schema['default'] = self.args['default']
+    if self.args.get('default'): schema['default'] = self.to_cwl_value()
     return schema
 
   def to_cwl_value(self):
