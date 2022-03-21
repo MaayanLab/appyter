@@ -132,6 +132,7 @@ def create_app(**kwargs):
 @click_option_setenv('--host', envvar='APPYTER_HOST', default='127.0.0.1', help='The host the flask server should run on')
 @click_option_setenv('--socket', envvar='APPYTER_SOCKET', default=None, help='The socket to mount to (when running in production)')
 @click_option_setenv('--port', envvar='APPYTER_PORT', type=int, default=5000, help='The port this flask server should run on')
+@click_option_setenv('--public-url', envvar='APPYTER_PUBLIC_URL', default=None, help='The public url users use to access the appyter (like when behind a load balancer)')
 @click_option_setenv('--proxy', envvar='APPYTER_PROXY', type=bool, default=False, help='Whether this is running behind a proxy and the IP should be fixed for CORS')
 @click_option_setenv('--data-dir', envvar='APPYTER_DATA_DIR', default='data', help='The directory to store data of executions')
 @click_option_setenv('--dispatcher', envvar='APPYTER_DISPATCHER', type=str, help='The URL to the dispatcher, otherwise use an embedded dispatcher')
