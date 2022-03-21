@@ -12,6 +12,7 @@ known_implementations = {
   'local': {'class': 'appyter.execspec.implementations.local.LocalExecutor'},
   'subprocess': {'class': 'appyter.execspec.implementations.subprocess.SubprocessExecutor'},
   'wes': {'class': 'appyter.execspec.implementations.wes.WESExecutor'},
+  'cavatica': {'class': 'appyter.execspec.implementations.cavatica.CavaticaExecutor'},
 }
 
 def get_executor_class(protocol):

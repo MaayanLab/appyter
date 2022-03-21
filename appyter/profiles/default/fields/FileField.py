@@ -58,8 +58,7 @@ class FileField(Field):
     return schema
 
   def to_cwl_value(self):
-    from appyter.ext.drs import ensure_drs
-    return { 'class': 'File', 'path': ensure_drs(self.args['value']) }
+    return { 'class': 'File', 'path': self.args['value'] }
 
   def to_click(self):
     import click

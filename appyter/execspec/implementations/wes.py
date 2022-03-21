@@ -6,6 +6,7 @@ import fsspec
 import json
 import aiohttp
 import logging
+import functools
 
 from appyter.parse.nb import nb_from_ipynb_io
 logger = logging.getLogger(__name__)
@@ -20,7 +21,7 @@ class WESExecutor(AbstractExecutor):
   '''
   protocol = 'wes'
 
-  def __init__(self, url=None, config={}, **kwargs) -> None:
+  def __init__(self, url=None, config={}, **kwargs):
     super().__init__(url=url, **kwargs)
     self.config = config
     with fsspec.open(self.executor_options['cwl'], 'r') as fr:
@@ -43,7 +44,7 @@ class WESExecutor(AbstractExecutor):
     await self.session.__aexit__(type, value, traceback)
     await super().__aexit__(type, value, traceback)
 
-  async def _submit(self, job):
+  async def _prepare(self, job):
     # NOTE: This is redundant, since the notebook was already created
     #       but is necessary if we want to use the standard `cwl-runner`
     from appyter.context import get_jinja2_env
@@ -56,26 +57,27 @@ class WESExecutor(AbstractExecutor):
       for field in parse_fields_from_nbtemplate(env, self.nbtemplate, deep=True)
     }
     inputs['s'] = job['url']
-    # prepare execution params
-    execution = dict_merge(
+    return dict_merge(
       self.executor_options.get('params', {}),
       workflow_params=dict(inputs=inputs),
       workflow_url='#/workflow_attachment/0',
       workflow_attachment=[
         [
           os.path.basename(self.executor_options['cwl']),
-          io.BytesIO(json.dumps(self.cwl).encode()),
+          functools.partial(io.BytesIO, json.dumps(self.cwl).encode()),
         ],
       ],
       workflow_type='CWL',
       workflow_type_version=self.cwl['cwlVersion'],
     )
-    logger.info(f"{execution=}")
+
+  async def _submit(self, wes_job):
     data = aiohttp.FormData()
-    for filename, bytesio in execution.pop('workflow_attachment'):
-      data.add_field('workflow_attachment', bytesio, filename=filename)
-    for k, v in execution.items():
-      if type(v) in {dict, list}:
+    for k, v in wes_job.items():
+      if k == 'workflow_attachment':
+        for filename, bytesio in v:
+          data.add_field('workflow_attachment', bytesio(), filename=filename)
+      elif type(v) in {dict, list}:
         data.add_field(k, json.dumps(v), content_type='application/json')
       else:
         data.add_field(k, v)
@@ -101,8 +103,11 @@ class WESExecutor(AbstractExecutor):
         yield current_state
 
   async def _run(self, **job):
-    yield dict(type='status', data=f"Dispatching job using WES")
-    run_id = await async_try_n_times(3, self._submit, job)
+    yield dict(type='status', data=f"Preparing WES parameters...")
+    wes_job = await async_try_n_times(3, self._prepare, job)
+    yield dict(type='status', data=f"Dispatching WES execution...")
+    logger.info(f"{wes_job=}")
+    run_id = await async_try_n_times(3, self._submit, wes_job)
     yield dict(type='status', data=f"Dispatched successfully, your execution will begin soon..")
     async for state in self._watch_state(run_id):
       if state == 'QUEUED':
