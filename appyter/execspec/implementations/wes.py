@@ -90,7 +90,7 @@ class WESExecutor(AbstractExecutor):
       else:
         data.add_field(k, v)
     async with self.client.post(
-      join_slash(self.url, '/runs'),
+      join_slash(self.url, 'v1', 'runs'),
       data=data,
     ) as req:
       res = await req.json()
@@ -102,7 +102,7 @@ class WESExecutor(AbstractExecutor):
     while True:
       await asyncio.sleep(15 * (0.5 + random.random()))
       logger.debug(f"Checking status of job {run_id=}")
-      async with self.client.get(join_slash(self.url, 'runs', run_id, 'status')) as req:
+      async with self.client.get(join_slash(self.url, 'v1', 'runs', run_id, 'status')) as req:
         res = await req.json()
         state = res['state']
       logger.debug(f"{state=}")
