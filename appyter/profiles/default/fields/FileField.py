@@ -57,6 +57,10 @@ class FileField(Field):
     schema['type'] = f"File{'' if self.args.get('required') == True else '?'}"
     return schema
 
+  def to_cwl_value(self):
+    from appyter.ext.drs import ensure_drs
+    return { 'class': 'File', 'path': ensure_drs(self.args['value']) }
+
   def to_click(self):
     import click
     args, kwargs = super().to_click()
