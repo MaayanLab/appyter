@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 from appyter.execspec.spec import AbstractExecutor
 from appyter.ext.asyncio.try_n_times import async_try_n_times
 from appyter.ext.dict import dict_merge
-from appyter.ext.urllib import join_slash, join_url
+from appyter.ext.urllib import join_slash
 
 class WESExecutor(AbstractExecutor):
   ''' Run executions via a workflow execution service endpoint
@@ -22,15 +22,12 @@ class WESExecutor(AbstractExecutor):
 
   def __init__(self, url=None, config={}, **kwargs) -> None:
     super().__init__(url=url, **kwargs)
+    self.config = config
     with fsspec.open(self.executor_options['cwl'], 'r') as fr:
       self.cwl = json.loads(fr.read())
     from appyter.parse.nb import nb_from_ipynb_io
-    from appyter.context import get_env, get_jinja2_env
-    from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
-    env = get_jinja2_env(config=get_env(cwd=config['CWD'], ipynb=config['IPYNB'], mode='inspect', **kwargs))
     with fsspec.open(join_slash(config['CWD'], config['IPYNB']), 'r') as fr:
-      nbtemplate = nb_from_ipynb_io(fr)
-    self.fields = parse_fields_from_nbtemplate(env, nbtemplate, deep=True)
+      self.nbtemplate = nb_from_ipynb_io(fr)
 
   async def __aenter__(self):
     self.session = aiohttp.ClientSession(
@@ -49,22 +46,15 @@ class WESExecutor(AbstractExecutor):
   async def _submit(self, job):
     # NOTE: This is redundant, since the notebook was already created
     #       but is necessary if we want to use the standard `cwl-runner`
-    # grab original inputs from notebook
-    with fsspec.open(join_url(job['cwd'], job['ipynb']), 'r') as fr:
+    from appyter.context import get_jinja2_env
+    from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
+    with fsspec.open(join_slash(job['cwd'], job['ipynb']), 'r') as fr:
       nb = nb_from_ipynb_io(fr)
-    inputs = nb.metadata['appyter']['nbconstruct']['data']
-    for field in self.fields:
-      if field.field == 'IntField' and field.args['name'] in inputs:
-        inputs[field.args['name']] = int(inputs[field.args['name']])
-      if field.field == 'FloatField' and field.args['name'] in inputs:
-        inputs[field.args['name']] = float(inputs[field.args['name']])
-      if field.field in {'FileField', 'StorageFieldField'} and field.args['name'] in inputs:
-        # TODO: transfer file
-        del inputs[field.args['name']]
-      if field.field in {'MultiChoiceField', 'MultiCheckboxField'} and field.args['name'] in inputs:
-        # TODO: fix these
-        del inputs[field.args['name']]
-    # TODO: process inputs
+    env = get_jinja2_env(config=self.config, context=nb.metadata['appyter']['nbconstruct']['data'], session=job['session'])
+    inputs = {
+      field.args['name']: field.to_cwl_value()
+      for field in parse_fields_from_nbtemplate(env, self.nbtemplate, deep=True)
+    }
     inputs['s'] = job['url']
     # prepare execution params
     execution = dict_merge(

@@ -163,6 +163,9 @@ class Field(dict):
     if self.args.get('default'): schema['default'] = self.args['default']
     return schema
 
+  def to_cwl_value(self):
+    return self.raw_value
+
   def to_click(self):
     import click
     args = (f"--{self.args['name']}",)
