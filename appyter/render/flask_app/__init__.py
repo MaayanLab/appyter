@@ -32,6 +32,7 @@ def create_app(**kwargs):
   import appyter.render.flask_app.upload
   import appyter.render.flask_app.execution
   import appyter.render.flask_app.room_manager
+  import appyter.render.flask_app.drs
   if kwargs['debug']:
     import appyter.render.flask_app.livereload
   #
