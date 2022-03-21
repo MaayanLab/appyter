@@ -88,6 +88,8 @@ class Field(dict):
       )
     )
     assert name is not None, "Name should be defined and unique"
+    assert not name.startswith('_'), "Names with _ prefix are reserved"
+    assert len(name) > 1, "Names should use more than 1 character"
     self._env = _env
   
   @property
