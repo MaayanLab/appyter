@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 from appyter.execspec.spec import AbstractExecutor
 from appyter.ext.asyncio.try_n_times import async_try_n_times
-from appyter.ext.dict import dict_merge
+from appyter.ext.dict import dict_filter_none, dict_merge
 from appyter.ext.urllib import join_slash
 
 class WESExecutor(AbstractExecutor):
@@ -53,10 +53,10 @@ class WESExecutor(AbstractExecutor):
     with fsspec.open(join_slash(job['cwd'], job['ipynb']), 'r') as fr:
       nb = nb_from_ipynb_io(fr)
     env = get_jinja2_env(config=self.config, context=nb.metadata['appyter']['nbconstruct']['data'], session=job['session'])
-    inputs = {
+    inputs = dict_filter_none({
       field.args['name']: field.to_cwl_value()
       for field in parse_fields_from_nbtemplate(env, self.nbtemplate, deep=True)
-    }
+    })
     inputs['s'] = job['url']
     inputs['w'] = f"appyter-output-{job['session']}"
     return dict_merge(
