@@ -174,3 +174,41 @@ def test_async_sync_top_down_exc():
     with helpers.ensure_sync(_test_async_sync_top_down_exc()):
       time.sleep(0.5)
       raise KeyboardInterrupt
+
+
+def test_async_sync_async_ctx():
+  class MyAsynCls:
+    def __init__(self):
+      logger.debug("MyAsynCls()")
+
+    async def __aenter__(self):
+      logger.debug("MyAsynCls.__aenter__")
+      await asyncio.sleep(0.1)
+      return self
+    async def __aexit__(self, *args):
+      logger.debug("MyAsynCls.__aexit__")
+      await asyncio.sleep(0.1)
+  class MySynCls:
+    def __init__(self):
+      logger.debug("MySynCls()")
+      self.asyn = MyAsynCls()
+
+    def __enter__(self):
+      logger.debug("MySynCls.__enter__")
+      helpers.ensure_sync(self.asyn.__aenter__())
+      time.sleep(0.1)
+
+    def __exit__(self, *args):
+      logger.debug("MySynCls.__exit__")
+      time.sleep(0.1)
+      helpers.ensure_sync(self.asyn.__aexit__(*args))
+
+  async def _test():
+    syn = MySynCls()
+    logger.debug("with MySynCls")
+    # with syn: # NOTE: this would cause a hang
+    async with helpers.ensure_async(syn):
+      logger.debug("entered")
+      await asyncio.sleep(0.1)
+      logger.debug("exited")
+  helpers.ensure_sync(_test())
