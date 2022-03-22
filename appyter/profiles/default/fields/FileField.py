@@ -58,8 +58,10 @@ class FileField(Field):
     return schema
 
   def to_cwl_value(self):
+    if not self.args['value']:
+      return None
     uri_parsed = parse_file_uri(self.args['value'])
-    name = uri_parsed.fragment
+    name = uri_parsed.fragment or self.args['value']
     uri_parsed.fragment = None
     path = str(uri_parsed)
     return {
