@@ -1,12 +1,13 @@
+import re
 from appyter.execspec.registry import get_executor_class
 
 def url_to_executor(url, **kwargs):
-  if '::' in url:
-    proto, _, url = url.partition('::')
-  elif '?' in url:
-    proto, *conf = url.partition('?')
-    url = ''.join(conf)
+  m = re.match(r"^([^:?]+)(::|://)?(.*)$", url)
+  assert m is not None, "Invalid executor spec"
+  proto = m.group(1)
+  if m.group(2) == '::':
+    url = m.group(3)
   else:
-    proto, url = url, ''
+    url = m.group(0)
   cls = get_executor_class(proto)
   return cls(**cls.parse(url), **kwargs)

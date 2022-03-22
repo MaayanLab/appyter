@@ -1,5 +1,6 @@
 import os
 import io
+import re
 import random
 import asyncio
 import fsspec
@@ -22,7 +23,7 @@ class WESExecutor(AbstractExecutor):
   protocol = 'wes'
 
   def __init__(self, url=None, config={}, **kwargs):
-    super().__init__(url=url, **kwargs)
+    super().__init__(url=re.sub(r'^wes://', 'https://', url), **kwargs)
     self.config = config
     with fsspec.open(self.executor_options['cwl'], 'r') as fr:
       self.cwl = json.loads(fr.read())
@@ -82,7 +83,7 @@ class WESExecutor(AbstractExecutor):
       else:
         data.add_field(k, v)
     async with self.client.post(
-      join_slash(self.url, 'v1', 'runs'),
+      join_slash(self.url, 'ga4gh/wes/v1', 'runs'),
       data=data,
     ) as req:
       res = await req.json()
@@ -94,7 +95,7 @@ class WESExecutor(AbstractExecutor):
     while True:
       await asyncio.sleep(15 * (0.5 + random.random()))
       logger.debug(f"Checking status of job {run_id=}")
-      async with self.client.get(join_slash(self.url, 'v1', 'runs', run_id, 'status')) as req:
+      async with self.client.get(join_slash(self.url, 'ga4gh/wes/v1', 'runs', run_id, 'status')) as req:
         res = await req.json()
         state = res['state']
       logger.debug(f"{state=}")
