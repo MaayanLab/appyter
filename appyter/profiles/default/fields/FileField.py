@@ -35,7 +35,11 @@ class FileField(Field):
   def raw_value(self):
     if type(self.args['value']) == str and self.args['value']:
       uri_parsed = parse_file_uri(self.args['value'])
-      return secure_filepath(uri_parsed.fragment or self.args['value'])
+      filename = uri_parsed.fragment or self.args['value']
+      if self._env.globals['_config']['SAFE_MODE']:
+        return secure_filepath(filename)
+      else:
+        return filename
     else:
       return None
 

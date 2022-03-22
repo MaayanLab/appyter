@@ -180,6 +180,8 @@ def get_env_from_kwargs(**kwargs):
   global _config
   if 'mode' in kwargs or 'MODE' not in _config:
     _config['MODE'] = kwargs.get('mode', 'default')
+  if 'safe_mode' in kwargs or 'SAFE_MODE' not in _config:
+    _config['SAFE_MODE'] = kwargs.get('safe_mode', True)
   if 'prefix' in kwargs or 'PREFIX' not in _config:
     _config['PREFIX'] = try_json_loads(kwargs.get('prefix', os.environ.get('APPYTER_PREFIX', '/')))
   if 'profile' in kwargs or 'PROFILE' not in _config:

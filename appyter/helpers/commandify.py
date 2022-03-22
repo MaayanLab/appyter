@@ -26,7 +26,7 @@ def ipynb_options_from_sys_argv(func):
         nbtemplate = nb_from_ipynb_io(fr)
     #
     env = get_jinja2_env(
-      config=get_env(cwd=str(cwd), ipynb=ipynb, mode='inspect'),
+      config=get_env(cwd=str(cwd), ipynb=ipynb, mode='inspect', safe_mode=False),
     )
     fields = list(dict_filter_none({
       field.args['name']: field.to_click()
@@ -83,7 +83,7 @@ def run(ctx, s=None, e=None, o=None, **kwargs):
   from appyter.ext.asyncio.helpers import ensure_sync
   # render notebook
   env = get_jinja2_env(
-    config=get_env(cwd=ctx['cwd'], ipynb=ctx['ipynb'], mode='construct'),
+    config=get_env(cwd=ctx['cwd'], ipynb=ctx['ipynb'], mode='construct', safe_mode=False),
     context=kwargs,
   )
   nb = render_nb_from_nbtemplate(env, ctx['nbtemplate'], data=kwargs)
