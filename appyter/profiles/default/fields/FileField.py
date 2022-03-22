@@ -58,7 +58,15 @@ class FileField(Field):
     return schema
 
   def to_cwl_value(self):
-    return { 'class': 'File', 'path': self.args['value'] }
+    uri_parsed = parse_file_uri(self.args['value'])
+    name = uri_parsed.fragment
+    uri_parsed.fragment = None
+    path = str(uri_parsed)
+    return {
+      'class': 'File',
+      'path': path,
+      'name': name,
+    }
 
   def to_click(self):
     import click

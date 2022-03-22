@@ -90,8 +90,7 @@ class CavaticaExecutor(WESExecutor):
       if type(v) == dict and v.get('class') == 'File':
         if not v['path'].startswith(self.executor_options['drs_endpoint']):
           logger.getChild(k).debug(f"identified file path {v['path']}...")
-          uri_parsed = parse_file_uri(v['path'])
-          filename = uri_parsed.fragment or url_filename(v['path'])
+          filename = v['name']
           fs, fspath = url_to_fs_ex(v['path'])
           if getattr(fs, '__enter__', None) is not None: fs.__enter__()
           try:
