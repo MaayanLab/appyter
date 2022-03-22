@@ -8,9 +8,8 @@ from appyter.ext.fsspec.core import url_to_fs_ex
 from appyter.ext.fsspec.sbfs import SBFSFileSystem
 from appyter.ext.fsspec.chroot import ChrootFileSystem
 from appyter.ext.fsspec.writecache import WriteCacheFileSystem
-from appyter.ext.urllib import join_slash, url_filename
+from appyter.ext.urllib import join_slash, join_url
 from appyter.ext.asyncio.helpers import ensure_async
-from appyter.ext.urllib import parse_file_uri
 
 
 class CavaticaExecutor(WESExecutor):
@@ -51,7 +50,7 @@ class CavaticaExecutor(WESExecutor):
           api_endpoint='https://cavatica-api.sbgenomics.com',
           drs_endpoint='drs://cavatica-ga4gh-api.sbgenomics.com',
         ),
-        fo=join_slash(self.executor_options['project'], 'appyter'),
+        fo=self.executor_options['project'],
       ),
     )
     await ensure_async(self.fs.__enter__)()
@@ -79,12 +78,6 @@ class CavaticaExecutor(WESExecutor):
 
   async def _prepare(self, job):
     wes_job = await super()._prepare(job)
-    base_path = join_slash('output', job['session'])
-    await ensure_async(self.fs.mkdir)(
-      base_path,
-      create_parents=True,
-      exist_ok=True,
-    )
     # TODO: could potentially use CAVATICA's DRS import for this
     for k, v in wes_job['workflow_params']['inputs'].items():
       if type(v) == dict and v.get('class') == 'File':
@@ -101,12 +94,13 @@ class CavaticaExecutor(WESExecutor):
             # fall back to copying over to CAVATICA-fs
             if drs_uri is None or not drs_uri.startswith(self.executor_options['drs_endpoint']):
               logger.getChild(k).debug('copying to sbfs...')
+              await ensure_async(self.fs.mkdir)(f"appyter-input-{job['session']}", create_parents=True, exist_ok=True)
               fr = await ensure_async(fs.open)(fspath, 'rb')
-              fw = await ensure_async(self.fs.open)(join_slash(base_path, filename), 'wb')
+              fw = await ensure_async(self.fs.open)(join_url(f"appyter-input-{job['session']}", filename), 'wb')
               await ensure_async(shutil.copyfileobj)(fr, fw)
               await ensure_async(fw.close)()
               await ensure_async(fr.close)()
-              drs_uri = await ensure_async(self.fs.get_drs)(join_slash(base_path, filename))
+              drs_uri = await ensure_async(self.fs.get_drs)(join_url(f"appyter-input-{job['session']}", filename))
           except:
             if getattr(fs, '__exit__', None) is not None: fs.__exit__(sys.exc_info())
             raise
@@ -114,9 +108,5 @@ class CavaticaExecutor(WESExecutor):
             if getattr(fs, '__exit__', None) is not None: fs.__exit__(None, None, None)
           # use the drs uri
           logger.getChild(k).debug(f"{drs_uri=}")
-          if drs_uri.startswith(self.executor_options['drs_endpoint']):
-            # CAVATICA works better with just the id..
-            v['path'] = drs_uri[len(self.executor_options['drs_endpoint']):]
-          else:
-            v['path'] = drs_uri
+          v['path'] = drs_uri
     return wes_job
