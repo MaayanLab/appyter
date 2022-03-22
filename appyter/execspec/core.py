@@ -6,5 +6,7 @@ def url_to_executor(url, **kwargs):
   elif '?' in url:
     proto, *conf = url.partition('?')
     url = ''.join(conf)
+  else:
+    proto, url = url, ''
   cls = get_executor_class(proto)
   return cls(**cls.parse(url), **kwargs)
