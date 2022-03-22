@@ -38,7 +38,7 @@ export CAVATICA_API_KEY=
 export CAVATICA_PROJECT=
 
 export APPYTER_DATA_DIR="sbfs://${CAVATICA_PROJECT}/?api_endpoint=https://cavatica-api.sbgenomics.com&auth_token=${CAVATICA_API_KEY}"
-export APPYTER_DISPATCHER="wes::https://cavatica-ga4gh-api.sbgenomics.com/ga4gh/wes/?cwl=example.cwl&params.workflow_params.project=${CAVATICA_PROJECT}&headers.X-SBG-Auth-Token=${CAVATICA_API_KEY}"
+export APPYTER_DISPATCHER="cavatica?cwl=example.cwl&project=${CAVATICA_PROJECT}&auth_token=${CAVATICA_API_KEY}"
 
 docker run \
   -e APPYTER_DATA_DIR \
