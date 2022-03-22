@@ -114,5 +114,9 @@ class CavaticaExecutor(WESExecutor):
             if getattr(fs, '__exit__', None) is not None: fs.__exit__(None, None, None)
           # use the drs uri
           logger.getChild(k).debug(f"{drs_uri=}")
-          v['path'] = drs_uri
+          if drs_uri.startswith(self.executor_options['drs_endpoint']):
+            # CAVATICA works better with just the id..
+            v['path'] = drs_uri[len(self.executor_options['drs_endpoint']):]
+          else:
+            v['path'] = drs_uri
     return wes_job
