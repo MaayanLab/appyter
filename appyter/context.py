@@ -101,7 +101,7 @@ def filter_blueprints(m, k, v):
   if isinstance(v, Blueprint):
     return True
   elif callable(v):
-    if m.__name__.startswith('blueprints') and 'blueprints.' + k == m.__name__:
+    if m.__name__.endswith('blueprints.' + k):
       return True
   return False
 
