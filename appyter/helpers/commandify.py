@@ -67,11 +67,19 @@ def nbconstruct(ctx, o=None, **kwargs):
 @commandify.command(help='Construct and execute an appyter')
 @click.option('-s', type=str, metavar='URI', default='file:///dev/stderr', help='Status stream')
 @click.option('-e', type=str, metavar='URI', default='local', help='Executor')
-@click.option('-o', type=str, metavar='FILE', default='file:///dev/stdout', help='Output notebook')
+@click.option('-o', type=str, metavar='FILE', default=None, help='Output notebook')
+@click.option('-w', type=str, metavar='DIR', default=None, help='Working directory')
 @ipynb_options_from_sys_argv
-def run(ctx, s=None, e=None, o=None, **kwargs):
-  if s == '-': s = '/dev/stderr'
-  if o == '-': o = '/dev/stdout'
+def run(ctx, s=None, e=None, o=None, w=None, **kwargs):
+  if s == '-':
+    s = 'file:///dev/stderr'
+  #
+  if o is None:
+    if w is None:
+      o = 'file:///dev/stdout'
+  elif o == '-':
+    o = 'file:///dev/stdout'
+  #
   import fsspec
   import shutil
   from appyter.context import get_env, get_jinja2_env
@@ -88,7 +96,7 @@ def run(ctx, s=None, e=None, o=None, **kwargs):
   )
   nb = render_nb_from_nbtemplate(env, ctx['nbtemplate'], data=kwargs)
   # write into temporary directory
-  with tempdir() as tmp_dir:
+  with tempdir(w) as tmp_dir:
     with (tmp_dir/ctx['ipynb']).open('w') as fw:
       nb_to_ipynb_io(nb, fw)
     # execute notebook, sending status updates to `s`
@@ -102,6 +110,7 @@ def run(ctx, s=None, e=None, o=None, **kwargs):
         ):
           emitter(msg)
     # write output notebook, to `o`
-    with (tmp_dir/ctx['ipynb']).open('r') as fr:
-      with fsspec.open(o, 'w') as fw:
-        shutil.copyfileobj(fr, fw)
+    if o:
+      with (tmp_dir/ctx['ipynb']).open('r') as fr:
+        with fsspec.open(o, 'w') as fw:
+          shutil.copyfileobj(fr, fw)

@@ -77,17 +77,24 @@ def render_cwl_from_nbtemplate(env, nb, ipynb=None, cwd=None, info=None):
         'type': 'string?',
         'label': 'Location to send realtime update stream',
       },
+      {
+        'id': 'w',
+        'inputBinding': {
+          'prefix': '-w',
+          'separate': True,
+          'shellQuote': True,
+        },
+        'type': 'string',
+        'default': 'output',
+        'label': 'Work directory (all files are collected/output here)',
+      },
     ],
-    'stdout': ipynb,
     'outputs': [
       {
         'id': 'report',
-        'type': 'File',
-        'streamable': True,
-        # 'format': '',
-        'label': 'A jupyter notebook',
+        'type': 'Directory',
         'outputBinding': {
-          'glob': ipynb,
+          'glob': '$(inputs.w)',
         },
       },
     ],
