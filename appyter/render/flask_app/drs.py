@@ -59,7 +59,7 @@ def parse_id(id):
       import sys
       fs.__exit__(*sys.exc_info())
 
-@core.route('/ga4gh/v1/objects/<string:id>', methods=['GET'])
+@core.route('/ga4gh/drs/v1/objects/<string:id>', methods=['GET'])
 def drs_objects(id):
   with parse_id(id) as (fs, file_info):
     logger.info(f"{file_info=}")
@@ -76,7 +76,7 @@ def drs_objects(id):
           #       be able to passthrough the underlying provider (like s3 or whatnot)
           'type': 'https',
           'access_url': {
-            'url': f"{current_app.config['PUBLIC_URL']}/ga4gh/v1/objects/{id}/fetch",
+            'url': f"{current_app.config['PUBLIC_URL']}/ga4gh/drs/v1/objects/{id}/fetch",
           },
         },
       ],
@@ -96,7 +96,7 @@ def drs_objects(id):
     logger.info(f"{res=}")
     return res
 
-@core.route('/ga4gh/v1/objects/<string:id>/fetch', methods=['GET'])
+@core.route('/ga4gh/drs/v1/objects/<string:id>/fetch', methods=['GET'])
 def drs_object_fetch(id):
   with parse_id(id) as (fs, file_info):
     if file_info['type'] != 'file': return abort(404)
