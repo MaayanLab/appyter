@@ -28,6 +28,7 @@ def render_cwl_from_nbtemplate(env, nb, ipynb=None, cwd=None, info=None):
     info = nb.metadata['appyter']['info']
   if info is not None:
     schema.update({
+      'id': f"appyter-{info['name'].lower()}",
       'baseCommand': [
         'python3', '-u',
         '-m', 'appyter',
@@ -43,6 +44,7 @@ def render_cwl_from_nbtemplate(env, nb, ipynb=None, cwd=None, info=None):
       ],
       "label": info['title'],
       "doc": info['description'],
+      "s:version": f"{info['version']}-{__version__}",
       "s:author": ', '.join(author['name'] for author in info['authors']),
       "s:license": info['license'],
       "s:codeRepository": info['url'],
