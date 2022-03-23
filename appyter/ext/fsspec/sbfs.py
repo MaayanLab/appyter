@@ -121,6 +121,22 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
     else:
       raise NotImplementedError
 
+  async def _mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
+    file1_info = await self._info(path1)
+    path2_split = path2.split('/', maxsplit=2)
+    acc2, proj2, *proj_path2 = path2_split
+    project2 = f"{acc2}/{proj2}"
+    if path1.startswith(project2):
+      # moves only allowed within the same project
+      async with self._session.post(f"{self.storage_options['api_endpoint']}/v2/files/{file1_info['_id']}/actions/move", json=dict(
+        project=project2,
+        name='/'.join(proj_path2),
+      )) as res:
+        return await res.json()
+    else:
+      await self._cp_file(path1, path2, recursive=recursive, maxdepth=maxdepth)
+      await self._rm(path1, recursive=recursive)
+
   async def _cp_file(self, path1, path2, **kwargs):
     file1_info = await self._info(path1)
     path2_split = path2.split('/', maxsplit=2)

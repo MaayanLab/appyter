@@ -60,6 +60,14 @@ class SyncAsyncFileSystem:
     else:
       raise NotImplementedError
   
+  def mv(self, *args, **kwargs):
+    if getattr(self, '_mv', None) is not None:
+      return ensure_sync(self._mv(*args, **kwargs))
+    elif getattr(super(), 'mv', None) is not None:
+      return super().mv(*args, **kwargs)
+    else:
+      raise NotImplementedError
+  
   def cp_file(self, *args, **kwargs):
     if getattr(self, '_cp_file', None) is not None:
       return ensure_sync(self._cp_file(*args, **kwargs))
