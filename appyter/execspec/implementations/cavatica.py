@@ -97,9 +97,9 @@ class CavaticaExecutor(WESExecutor):
               left_fs=fs,
               left_fo=fspath,
               right_fs=self.fs,
-              right_fo=join_url(f"appyter-input-{job['session']}", filename),
+              right_fo=f"appyter/input/{job['session']}-{filename}",
             )
-            drs_uri = await ensure_async(self.fs.get_drs)(join_url(f"appyter-input-{job['session']}", filename))
+            drs_uri = await ensure_async(self.fs.get_drs)(f"appyter/input/{job['session']}-{filename}")
           # use the drs uri
           logger.getChild(k).debug(f"{drs_uri=}")
           v['path'] = drs_uri
