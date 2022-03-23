@@ -1,6 +1,6 @@
 <script>
   import { tick, onMount, setContext } from 'svelte'
-  import { hash } from '@/lib/stores'
+  import hash from '@/lib/stores/url_hash_store'
   import Cells from '@/components/jupyter/Cells.svelte'
   import Cell from '@/components/jupyter/Cell.svelte'
   import Input from '@/components/jupyter/Input.svelte'

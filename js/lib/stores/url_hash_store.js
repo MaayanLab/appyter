@@ -21,7 +21,6 @@ function hash_parse(hash_encoded) {
   if (q === -1) {
     return { path: hash_encoded, params: {} }
   } else {
-    const [path, params_encoded] = [hash_encoded.slice(0, q), hash_encoded.slice(q+1)]
     const params = params_parse(params_encoded)
     return { path, params }
   }
@@ -74,4 +73,5 @@ function url_hash_store() {
   }
 }
 
-export const hash = url_hash_store()
+const hash = url_hash_store()
+export default hash
