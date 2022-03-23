@@ -104,3 +104,7 @@ class CavaticaExecutor(WESExecutor):
           logger.getChild(k).debug(f"{drs_uri=}")
           v['path'] = drs_uri
     return wes_job
+
+  async def _finalize(self, job, wes_job):
+    await super()._finalize(job, wes_job)
+    # TODO: move wes_job['w'] to storage

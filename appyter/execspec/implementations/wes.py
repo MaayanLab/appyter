@@ -102,6 +102,9 @@ class WESExecutor(AbstractExecutor):
         current_state = state
         yield current_state
 
+  async def _finalize(self, job, wes_job):
+    pass
+
   async def _run(self, **job):
     yield dict(type='status', data=f"Preparing WES parameters...")
     wes_job = await async_try_n_times(3, self._prepare, job)
@@ -128,5 +131,9 @@ class WESExecutor(AbstractExecutor):
       elif state == 'COMPLETE':
         break
       else:
-        logger.warn(f"Unhandled state received: {state}")
-        yield dict(type='status', data=f"Task completed")
+        yield dict(type='error', data=f"An unknown state reported by WES")
+        logger.warning(f"Unhandled state received: {state}")
+        break
+    #
+    await self._finalize(job, wes_job)
+    yield dict(type='status', data=f"Task completed")
