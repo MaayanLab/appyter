@@ -87,6 +87,7 @@ def new_event_loop():
     _LOOP = None
     return _loop_close(*args, **kwargs)
   setattr(loop, 'close', loop_close)
+  setattr(loop, '_thread_id', loop_thread.ident)
   _LOOP = loop
   return _LOOP
 

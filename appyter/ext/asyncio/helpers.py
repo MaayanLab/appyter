@@ -75,6 +75,7 @@ async def ensure_async_generator(generator):
 def ensure_sync_coro(coro):
   logger.debug(f"ensure_sync_coro")
   loop = get_event_loop()
+  assert loop._thread_id != threading.current_thread().ident, "Can't run sync coro in async thread!"
   done = threading.Event()
   future = asyncio.run_coroutine_threadsafe(coro, loop)
   future.add_done_callback(lambda *args, **kwargs: done.set())
