@@ -11,6 +11,20 @@
     <script>
       window._config = {
         STATIC_URL: {{ url_for('static', filename='')|jsonify }},
+        {% if 'catalog-integration' in _config.EXTRAS %}
+        keycloak: {
+          {# TODO: parameterize #}
+          params: {
+            url: 'https://keycloak.maayanlab.cloud/auth/',
+            realm: 'appyter',
+            clientId: 'appyter-library',
+          },
+          init: {
+            onLoad: 'check-sso',
+            silentCheckSsoRedirectUri: window.location.origin + {{ url_for('static', filename='silent-check-sso.html')|jsonify }}`,
+          },
+        },
+        {% endif %}
       }
     </script>
     <script src="{{ url_for('static', filename='js/lib/requirejs/require.js') }}"></script>
