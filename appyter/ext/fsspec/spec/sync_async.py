@@ -92,6 +92,14 @@ class SyncAsyncFileSystem:
     else:
       raise NotImplementedError
   
+  def exists(self, *args, **kwargs):
+    if getattr(self, '_exists', None) is not None:
+      return ensure_sync(self._exists(*args, **kwargs))
+    elif getattr(super(), 'exists', None) is not None:
+      return super().exists(*args, **kwargs)
+    else:
+      raise NotImplementedError
+  
   def info(self, *args, **kwargs):
     if getattr(self, '_info', None) is not None:
       return ensure_sync(self._info(*args, **kwargs))
