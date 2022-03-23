@@ -72,8 +72,14 @@ def test_ensure_sync_async_exc():
     helpers.ensure_sync(async_exc)()
 
 def test_ensure_sync_sync_ctx():
-  with helpers.ensure_sync(syncctx(1)) as ctx: assert_eq(ctx, 2)
-  with helpers.ensure_sync(syncctx)(0,b=2) as ctx: assert_eq(ctx, 2)
+  i = 0
+  with helpers.ensure_sync(syncctx(1)) as ctx:
+    assert_eq(ctx, 2)
+    i += 1
+  with helpers.ensure_sync(syncctx)(0,b=2) as ctx:
+    assert_eq(ctx, 2)
+    i += 1
+  assert_eq(i, 2)
 
 def test_ensure_sync_sync_gen():
   assert_eq(list(helpers.ensure_sync(syncgenfun)(1)), [1,2])
@@ -91,9 +97,13 @@ def test_ensure_sync_mixed_fun():
   assert_eq(helpers.ensure_sync(async_mixedfun(0,b=2)), 2)
 
 async def _test_ensure_async_async_ctx():
-  async with helpers.ensure_async(asyncctx(1)) as ctx: assert_eq(ctx, 2)
+  i = 0
+  async with helpers.ensure_async(asyncctx(1)) as ctx:
+    i += 1
+    assert_eq(ctx, 2)
   # Not supported
   # async with helpers.ensure_async(asyncctx)(0,b=2) as ctx: assert_eq(ctx, 2)
+  assert_eq(i, 1)
 def test_ensure_async_async_ctx():
   helpers.ensure_sync(_test_ensure_async_async_ctx)()
 
@@ -116,9 +126,14 @@ def test_ensure_async_async_exc():
   helpers.ensure_sync(_test_ensure_async_async_exc)()
 
 async def _test_ensure_async_sync_ctx():
-  async with helpers.ensure_async(syncctx(1)) as ctx: assert_eq(ctx, 2)
+  i = 0
+  async with helpers.ensure_async(syncctx(1)) as ctx:
+    i += 1
+    assert_eq(ctx, 2)
   # Not supported
   # async with helpers.ensure_async(syncctx)(0,b=2) as ctx: assert_eq(ctx, 2)
+  assert_eq(i, 1)
+
 def test_ensure_async_sync_ctx():
   helpers.ensure_sync(_test_ensure_async_sync_ctx)()
 
@@ -199,9 +214,9 @@ def test_async_sync_async_ctx():
       time.sleep(0.1)
 
     def __exit__(self, *args):
-      logger.debug("MySynCls.__exit__")
-      time.sleep(0.1)
       helpers.ensure_sync(self.asyn.__aexit__(*args))
+      time.sleep(0.1)
+      logger.debug("MySynCls.__exit__")
 
   async def _test():
     syn = MySynCls()
