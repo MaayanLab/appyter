@@ -104,12 +104,13 @@ def create_app(**kwargs):
       yield
   app.cleanup_ctx.append(storage_ctx)
   #
-  logger.info('Registering application executor handler')
   async def executor_ctx(app):
+    logger.info('Registering application executor handler')
     dispatcher = app['config'].get('DISPATCHER') or 'local'
     from appyter.execspec.core import url_to_executor
     async with url_to_executor(dispatcher, config=app['config']) as executor:
       app['executor'] = executor
+      logger.info('Executor ready')
       yield
   app.cleanup_ctx.append(executor_ctx)
   return app

@@ -3,7 +3,6 @@ import io
 import re
 import random
 import asyncio
-import fsspec
 import json
 import aiohttp
 import logging
@@ -13,6 +12,7 @@ from appyter.parse.nb import nb_from_ipynb_io
 logger = logging.getLogger(__name__)
 
 from appyter.execspec.spec import AbstractExecutor
+from appyter.ext.fsspec.util import fsspec_read_and_run
 from appyter.ext.asyncio.try_n_times import async_try_n_times
 from appyter.ext.dict import dict_filter_none, dict_merge
 from appyter.ext.urllib import join_slash
@@ -25,13 +25,12 @@ class WESExecutor(AbstractExecutor):
   def __init__(self, url=None, config={}, **kwargs):
     super().__init__(url=re.sub(r'^wes://', 'https://', url), **kwargs)
     self.config = config
-    with fsspec.open(self.executor_options['cwl'], 'r') as fr:
-      self.cwl = json.loads(fr.read())
-    from appyter.parse.nb import nb_from_ipynb_io
-    with fsspec.open(join_slash(config['CWD'], config['IPYNB']), 'r') as fr:
-      self.nbtemplate = nb_from_ipynb_io(fr)
 
   async def __aenter__(self):
+    await super().__aenter__()
+    from appyter.parse.nb import nb_from_ipynb_io
+    self.cwl = await fsspec_read_and_run(self.executor_options['cwl'], lambda fr: json.load(fr))
+    self.nbtemplate = await fsspec_read_and_run(join_slash(self.config['CWD'], self.config['IPYNB']), nb_from_ipynb_io)
     self.session = aiohttp.ClientSession(
       headers=dict(
         {'Accept': 'application/json'},
@@ -39,7 +38,7 @@ class WESExecutor(AbstractExecutor):
       )
     )
     self.client = await self.session.__aenter__()
-    return await super().__aenter__()
+    return self
   
   async def __aexit__(self, type, value, traceback):
     await self.session.__aexit__(type, value, traceback)
@@ -50,8 +49,7 @@ class WESExecutor(AbstractExecutor):
     #       but is necessary if we want to use the standard `cwl-runner`
     from appyter.context import get_jinja2_env
     from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
-    with fsspec.open(join_slash(job['cwd'], job['ipynb']), 'r') as fr:
-      nb = nb_from_ipynb_io(fr)
+    nb = await fsspec_read_and_run(join_slash(job['cwd'], job['ipynb']), nb_from_ipynb_io)
     env = get_jinja2_env(config=self.config, context=nb.metadata['appyter']['nbconstruct']['data'], session=job['session'])
     inputs = dict_filter_none({
       field.args['name']: field.to_cwl_value()
