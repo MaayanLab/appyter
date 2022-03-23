@@ -176,7 +176,6 @@ _config = {}
 def get_env_from_kwargs(**kwargs):
   import os
   import sys
-  import uuid
   global _config
   if 'mode' in kwargs or 'MODE' not in _config:
     _config['MODE'] = kwargs.get('mode', 'default')
@@ -208,14 +207,9 @@ def get_env_from_kwargs(**kwargs):
     _config['DISPATCHER_IMAGE'] = try_json_loads(kwargs.get('dispatcher_image', os.environ.get('APPYTER_DISPATCHER_IMAGE')))
   if 'secret_key' in kwargs or 'SECRET_KEY' not in _config:
     secret_key = kwargs.get('secret_key', os.environ.get('APPYTER_SECRET_KEY', None))
-    from jwcrypto import jwk
     if secret_key is None:
-      # generate a 256 bit symmetric key for the secret key
-      secret_key = jwk.JWK.generate(kty='oct', size=256).k
-    else:
-      # ensure the secret key is compatible with jwk
-      import json
-      jwk.JWK.from_json(json.dumps({ 'kty': 'oct', 'k': secret_key }))
+      import uuid
+      secret_key = str(uuid.uuid4())
     _config['SECRET_KEY'] = secret_key
   if 'debug' in kwargs or 'DEBUG' not in _config:
     _config['DEBUG'] = try_json_loads(kwargs.get('debug', os.environ.get('APPYTER_DEBUG', 'true')))

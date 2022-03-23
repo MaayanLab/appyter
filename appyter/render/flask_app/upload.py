@@ -16,14 +16,14 @@ from appyter.ext.hashlib import sha1sum_io
 from appyter.ext.uuid import generate_uuid
 
 # organize file by content hash
-def organize_file_content(data_fs, tmp_fs, tmp_path, filename):
+def organize_file_content(data_fs, tmp_fs, tmp_path, filename=None):
   with tmp_fs.open(tmp_path, 'rb') as fr:
     content_hash = sha1sum_io(fr)
   if not data_fs.exists(content_hash):
     with tmp_fs.open(tmp_path, 'rb') as fr:
       with data_fs.open(content_hash, 'wb') as fw:
         shutil.copyfileobj(fr, fw)
-  return f"storage://input/{content_hash}#{filename}"
+  return f"storage://input/{content_hash}{('#' + filename) if filename else ''}"
 
 @route_join_with_or_without_slash(core, 'check', '<path:path>', methods=['GET'])
 def check(path):

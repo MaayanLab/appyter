@@ -1,103 +1,73 @@
 '''
-A DRS endpoint which supports arbitrary serialized fsspec uris.
-The id is a HS256 encrypted JWT with the actual json of the form
-`{ "fs": { fsspec_serialized }, "fo": "path" }`
-The encrypted JWT allows us to not have to worry about sensitive credentials
-  in the file storage spec and also ensures we won't receive untrusted input
-  which would otherwise open this endpoint to XSS vulnerabilities.
+A DRS endpoint for accessing `storage://input`
 '''
 
 import re
-import traceback
-import contextlib
 import datetime as dt
 import logging
-
 logger = logging.getLogger(__name__)
-from flask import current_app, send_file, abort
-from appyter.ext.fsspec.spec.composable import ComposableAbstractFileSystem
+
+from flask import current_app, request, send_file, abort
 from appyter.render.flask_app.core import core
-from appyter.ext.hashlib import hashsum_io
+from appyter.render.flask_app.constants import get_input_fs
 from appyter.ext.urllib import url_filename
 
-
-@contextlib.contextmanager
-def parse_id(id):
-  import json
-  from jwcrypto import jwk, jwe
-  logger.info(f"DRS Parsing {id=}")
+@core.route('/ga4gh/drs/v1/objects/<string:file_id>', methods=['GET'])
+def drs_objects(file_id):
   try:
-    key = jwk.JWK.from_json(json.dumps({ 'kty': 'oct', 'k': current_app.config['SECRET_KEY'] }))
-    jwetoken = jwe.JWE()
-    jwetoken.deserialize(id)
-    jwetoken.decrypt(key)
-    payload = json.loads(jwetoken.payload)
+    fs = get_input_fs()
+    file_info = fs.info(file_id)
+    assert file_info['type'] == 'file', 'NotAFile'
   except:
-    logger.warning(traceback.format_exc())
-    abort(404)
-  #
-  try:
-    fs, fo = ComposableAbstractFileSystem.from_json(json.dumps(payload['fs'])), payload['fo']
-  except KeyError:
-    logger.warning(traceback.format_exc())
-    abort(400)
-  except:
-    logger.error(traceback.format_exc())
-    abort(500)
-  #
-  if getattr(fs, '__enter__', None):
-    fs.__enter__()
-  try:
-    file_info = fs.info(fo)
-  except FileNotFoundError:
-    logger.warning(traceback.format_exc())
     return abort(404)
+  #
+  res = {
+    'id': file_id,
+    'self_uri': f"{re.sub(r'^https?://', 'drs://', (current_app.config.get('PUBLIC_URL') or request.url_root).strip('/'))}/{file_id}",
+    'access_methods': [
+      {
+        'access_id': 'primary',
+        'type': 'https',
+      },
+    ],
+    'checksums': [
+      {
+        'type': 'sha-1',
+        'checksum': file_id,
+      }
+    ],
+    'created_time': (
+      dt.datetime.fromtimestamp(file_info['created'])
+      if 'created' in file_info else
+      dt.datetime.now()
+    ).strftime('%Y-%m-%dT%H:%M:%SZ'),
+    'size': file_info['size'],
+  }
+  return res
+
+@core.route('/ga4gh/drs/v1/objects/<string:file_id>/access/<string:access_id>', methods=['GET'])
+def drs_objects_access(file_id, access_id):
+  if access_id != 'primary':
+    return abort(404)
+  #
   try:
-    yield fs, file_info
-  finally:
-    if getattr(fs, '__exit__', None):
-      import sys
-      fs.__exit__(*sys.exc_info())
+    fs = get_input_fs()
+    file_info = fs.info(file_id)
+    assert file_info['type'] == 'file', 'NotAFile'
+  except:
+    return abort(404)
+  #
+  return {
+    'url': f"{(current_app.config.get('PUBLIC_URL') or request.url_root).strip('/')}/ga4gh/drs/v1/objects/{file_id}/fetch",
+  }
 
-@core.route('/ga4gh/drs/v1/objects/<string:id>', methods=['GET'])
-def drs_objects(id):
-  with parse_id(id) as (fs, file_info):
-    logger.info(f"{file_info=}")
-    if file_info['type'] != 'file': return abort(404)
-    # TODO: hash calculation here is likely expensive..
-    with fs.open(file_info['name'], 'rb') as fr:
-      sha256 = hashsum_io('sha256', fr)
-    res = {
-      'id': id,
-      'self_uri': f"{re.sub(r'^https?://', 'drs://', current_app.config['PUBLIC_URL'])}/{id}",
-      'access_methods': [
-        {
-          # TODO: this can be a last resort but in certain circumstances we should
-          #       be able to passthrough the underlying provider (like s3 or whatnot)
-          'type': 'https',
-          'access_url': {
-            'url': f"{current_app.config['PUBLIC_URL']}/ga4gh/drs/v1/objects/{id}/fetch",
-          },
-        },
-      ],
-      'checksums': [
-        {
-          'type': 'sha-256',
-          'checksum': sha256,
-        }
-      ],
-      'created_time': (
-        dt.datetime.from_timestamp(file_info['created'])
-        if 'created' in file_info else
-        dt.datetime.now()
-      ).strftime('%Y-%m-%dT%H:%M:%SZ'),
-      'size': file_info['size'],
-    }
-    logger.info(f"{res=}")
-    return res
-
-@core.route('/ga4gh/drs/v1/objects/<string:id>/fetch', methods=['GET'])
-def drs_object_fetch(id):
-  with parse_id(id) as (fs, file_info):
-    if file_info['type'] != 'file': return abort(404)
-    return send_file(fs.open(file_info['name'], 'rb'), attachment_filename=url_filename(file_info['name']))
+@core.route('/ga4gh/drs/v1/objects/<string:file_id>/fetch', methods=['GET'])
+def drs_objects_fetch(file_id):
+  try:
+    fs = get_input_fs()
+    file_info = fs.info(file_id)
+    assert file_info['type'] == 'file', 'NotAFile'
+  except:
+    return abort(404)
+  #
+  return send_file(fs.open(file_info['name'], 'rb'), attachment_filename=url_filename(file_info['name']))
