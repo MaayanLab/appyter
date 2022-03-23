@@ -32,21 +32,10 @@ class LocalExecutor(AbstractExecutor):
     finally:
       await emit(None)
 
-  @contextlib.contextmanager
-  def _storage(self, storage):
-    import fsspec
-    if 'storage' not in fsspec.registry.target:
-      from appyter.ext.fsspec.core import url_to_fs_ex
-      from appyter.ext.fsspec.singleton import SingletonFileSystem
-      fs, fo = url_to_fs_ex(storage)
-      with SingletonFileSystem(proto='storage', fs=fs, fo=fo):
-        yield
-    else:
-      yield
-
   async def _run(self, **job):
     import asyncio
-    with self._storage(job.get('storage', 'file://')):
+    from appyter.ext.fsspec.storage import ensure_storage
+    async with ensure_storage(job.get('storage', 'file://')):
       msg_queue = asyncio.Queue()
       task = asyncio.create_task(self._submit(emit=msg_queue.put, **job))
       while True:

@@ -1,12 +1,6 @@
 import os
-import uuid
-import click
-import fsspec
 import logging
 import traceback
-
-from appyter.ext.asyncio.helpers import ensure_sync
-
 logger = logging.getLogger(__name__)
 
 from appyter.cli import cli
@@ -38,6 +32,7 @@ def create_app(**kwargs):
   #
   from appyter.context import get_env, find_blueprints
   from appyter.ext.urllib import join_slash
+  from appyter.ext.asyncio.helpers import ensure_async, ensure_sync
   config = get_env(**kwargs)
   #
   logger.info('Initializing aiohttp...')
@@ -98,19 +93,14 @@ def create_app(**kwargs):
     logger.info('Applying proxy fix middleware...')
     ensure_sync(setup(app, XForwardedRelaxed()))
   #
-  logger.info('Registering application storage handler')
   async def storage_ctx(app):
+    logger.info('Registering application storage handler')
     data_dir = app['config']['DATA_DIR']
-    import fsspec
-    if 'storage' not in fsspec.registry.target:
-      from appyter.ext.fsspec.core import url_to_fs_ex
-      from appyter.ext.fsspec.singleton import SingletonFileSystem
-      fs, fo = url_to_fs_ex(data_dir)
-      with SingletonFileSystem(proto='storage', fs=fs, fo=fo) as fs:
-        fs.makedirs('input', exist_ok=True)
-        fs.makedirs('output', exist_ok=True)
-        yield
-    else:
+    from appyter.ext.fsspec.storage import ensure_storage
+    async with ensure_storage(data_dir) as fs:
+      await ensure_async(fs.makedirs)('input', exist_ok=True)
+      await ensure_async(fs.makedirs)('output', exist_ok=True)
+      logger.info('Storage ready')
       yield
   app.cleanup_ctx.append(storage_ctx)
   #

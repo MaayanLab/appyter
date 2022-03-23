@@ -3,10 +3,7 @@ import click
 import logging
 from appyter import __version__
 from appyter.cli import cli
-from appyter.ext.asyncio.helpers import ensure_sync
 from appyter.ext.click import click_option_setenv, click_argument_setenv
-from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.fsspec.fuse import fs_mount
 
 logger = logging.getLogger(__name__)
 
@@ -28,12 +25,10 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
   import fsspec
   # TODO: can this be less reliant on the `appyter-catalog` storage setup
   uri_parsed = urllib.parse.urlparse(uri)
-  from appyter.ext.fsspec.singleton import SingletonFileSystem
+  from appyter.ext.fsspec.storage import ensure_storage
+  from appyter.ext.asyncio.helpers import ensure_sync_contextmanager
   from appyter.ext.fsspec.core import url_to_chroot_fs
-  with SingletonFileSystem(
-    proto='storage',
-    fs=url_to_chroot_fs(f"{uri_parsed.scheme}://{uri_parsed.netloc}/storage/appyters/"),
-  ):
+  with ensure_sync_contextmanager(ensure_storage(f"{uri_parsed.scheme}://{uri_parsed.netloc}/storage/appyters/")):
     # if data_dir doesn't exist, create it
     if data_dir is None: data_dir = 'memory://'
     # mount the appyter into the data_dir
