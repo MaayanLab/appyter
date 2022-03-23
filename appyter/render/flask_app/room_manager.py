@@ -40,6 +40,9 @@ async def enter_room(client_id, room_id):
     for msg in room['messages']:
       await socketio.emit(msg['event'], msg['data'], to=client_id)
 
+async def find_room(room_id):
+  global rooms
+  return room_id in rooms
 
 @contextlib.asynccontextmanager
 async def room_lock(room_id):
