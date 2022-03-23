@@ -1,6 +1,7 @@
 <script>
   import SectionField from './fields/SectionField.svelte'
   import Loader from '@/components/Loader.svelte'
+  import auth from '@/lib/stores/keycloak_auth_store'
   export let extras
   export let debug
   export let fields = []
@@ -26,7 +27,8 @@
       const res = await fetch(window.location.href, {
         method: 'POST',
         headers: {
-          Accept: 'application/json',
+          'Accept': 'application/json',
+          'Authorization': $auth.state === 'auth' ? `Bearer ${$auth.keycloak.token}` : null,
         },
         body: formData,
       })

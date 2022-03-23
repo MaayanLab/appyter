@@ -1,4 +1,5 @@
 <script>
+  import auth from '@/lib/stores/keycloak_auth_store'
   export let window
   export let args
 
@@ -12,7 +13,11 @@
 
   let ls = {}
   $: if (!(cwd in ls)) {
-    fetch(`StorageFileField/ls/${args.storage}${cwd}`)
+    fetch(`StorageFileField/ls/${args.storage}${cwd}`, {
+      headers: {
+        'Authorization': $auth.state === 'auth' ? `Bearer ${$auth.keycloak.token}` : null,
+      },
+    })
       .then(res => res.json())
       .then(res => ls[cwd] = res)
       .catch(err => ls[cwd] = [])
