@@ -122,7 +122,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
       raise NotImplementedError
 
   async def _cp_file(self, path1, path2, **kwargs):
-    file1_info = await self.info(path1)
+    file1_info = await self._info(path1)
     path2_split = path2.split('/', maxsplit=2)
     acc2, proj2, *proj_path2 = path2_split
     async with self._session.post(f"{self.storage_options['api_endpoint']}/v2/files/{file1_info['_id']}/actions/copy", json=dict(
@@ -210,7 +210,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
     logger.debug(f"Multipart upload for {rpath} completed")
 
   async def _get_file(self, rpath, lpath, **kwargs):
-    file_info = await self.info(rpath)
+    file_info = await self._info(rpath)
     download_info = await self._download_info(file_info)
     lpath = Path(lpath)
     async with self._session.get(download_info['url']) as req:
