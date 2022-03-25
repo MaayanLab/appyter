@@ -2,7 +2,6 @@
   import { onMount } from "svelte"
   import get_require from '@/utils/get_require'
 
-  export let window
   export let args
 
   // file field DOM element
@@ -98,7 +97,7 @@
       }
     })
 
-    const [socket, SocketIOFileUpload] = await get_require(window, ['socket', 'socketio-file-upload'])
+    const [socket, SocketIOFileUpload] = await get_require(window, ['appyter_socket', 'socketio-file-upload'])
     await setup_upload(new SocketIOFileUpload(socket))
   })
 </script>

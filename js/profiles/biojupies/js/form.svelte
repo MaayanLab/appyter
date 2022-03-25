@@ -2,8 +2,6 @@
   import SectionField from './fields/SectionField.svelte'
   import Loader from '@/components/Loader.svelte'
   import auth from '@/lib/stores/keycloak_auth_store'
-  export let extras
-  export let debug
   export let fields = []
 
   let submitting = false

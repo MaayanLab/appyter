@@ -38,11 +38,14 @@ def static(filename):
   static = get_static_fs()
   if static.exists(filename):
     return send_file(static.open(filename, 'rb'), attachment_filename=filename)
-  #
+    #
   try:
-    return send_from_directory(get_appyter_directory(f"profiles/{current_app.config['PROFILE']}/static"), path=filename)
-  except NotFound:
-    return send_from_directory(get_appyter_directory('profiles/default/static'), path=filename)
+    return send_from_directory(get_appyter_directory('static'), path=filename)
+  except:
+    try:
+      return send_from_directory(get_appyter_directory(f"static/profiles/{current_app.config['PROFILE']}"), path=filename)
+    except NotFound:
+      return send_from_directory(get_appyter_directory('static/profiles/default'), path=filename)
 
 @route_join_with_or_without_slash(core, '<path:path>', methods=['GET'])
 def data_files(path):

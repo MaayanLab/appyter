@@ -12,7 +12,7 @@
 <script>
   require.config({
     paths: {
-      'bootstrap': {{ url_for('static', filename='js/lib/bootstrap/bootstrap.bundle.min')|jsonify }},
+      'bootstrap': {{ url_for('static', filename='js/lib/bootstrap')|jsonify }},
     },
     shim: {
       'bootstrap': ['jquery'],

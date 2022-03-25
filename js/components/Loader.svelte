@@ -1,6 +1,6 @@
 <!-- Credit: https://loading.io/css/ -->
 
-<style>
+<style global land="scss">
 .lds-ellipsis {
   display: inline-block;
   position: relative;
@@ -58,5 +58,9 @@
 }
 </style>
 
-<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-
+<div class="lds-ellipsis">
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+</div>

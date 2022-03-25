@@ -1,12 +1,4 @@
-<div id={{ this.args.name|jsonify }} class="loading">
-  <div class="text-center"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>
-  <script>
-    require(['svelte'], function(svelte) {
-      svelte.render(
-        document.getElementById({{ this.args.name|jsonify }}),
-        {{ this.js_url|jsonify }},
-        JSON.parse(atob('{{ this|jsonify|btoa }}'))
-      )
-    })
-  </script>
+<div id={{ this.args.name|jsonify }} class="svelte loading">
+  {% include "fragments/loader.j2" %}
+  <script type="application/json">{{ dict(this, js_url=this.js_url)|jsonify }}</script>
 </div>

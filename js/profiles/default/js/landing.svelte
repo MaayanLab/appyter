@@ -1,30 +1,12 @@
 <script>
-  import { tick, onMount, setContext } from 'svelte'
+  import { tick, onMount } from 'svelte'
   import auth from '@/lib/stores/keycloak_auth_store'
   import hash from '@/lib/stores/url_hash_store'
-  import Cells from '@/components/jupyter/Cells.svelte'
-  import Cell from '@/components/jupyter/Cell.svelte'
-  import Input from '@/components/jupyter/Input.svelte'
-  import Prompt from '@/components/jupyter/Prompt.svelte'
-  import Source from '@/components/jupyter/Source.svelte'
-  import Outputs from '@/components/jupyter/Outputs.svelte'
-  import Markdown from '@/components/Markdown.svelte'
+  import Lazy from '@/components/Lazy.svelte'
   import Loader from '@/components/Loader.svelte'
-  import collapse from '@/utils/collapse'
-  import any from '@/utils/any'
   import get_require from '@/utils/get_require'
   import { setup_chunking } from '@/lib/socketio'
-  import MarkdownItFactory from '@/lib/markdown_it'
-  import {
-    markdown_it as markdown_it_ctx,
-    report_error as report_error_ctx,
-    debug as debug_ctx,
-  } from '@/lib/appyter_context'
-
-  export let window
   export let nbdownload
-  export let extras = []
-  export let debug = false
 
   const paths = window.location.pathname.split('/').filter(p => p)
   const session_id = paths[paths.length - 1]
@@ -33,31 +15,10 @@
   let notebookRef
   let local_run_url
 
-  setContext(markdown_it_ctx, MarkdownItFactory())
-
-  setContext(debug_ctx, debug)
-
-  setContext(report_error_ctx, async ({ type, error }) => {
-    console.error(`[${type}]`, error)
-    if (extras.indexOf('catalog-integration') !== -1) {
-      try {
-        const report_error = await get_require(window, 'report_error')
-        report_error({
-          appyter: ((nb || {}).metadata || {}).appyter || null,
-          url: window.location.href,
-          type,
-          error,
-        })
-      } catch (e) {
-        console.error('catalog-integration: failed to locate report_error handler')
-      }
-    }
-  })
-
   // table of contents
   let toc
   onMount(() => {
-    if (extras.indexOf('toc') !== -1 && notebookRef !== undefined) {
+    if (window._config.EXTRAS.indexOf('toc') !== -1 && notebookRef !== undefined) {
       const observer = new MutationObserver(mutations => {
         // look through mutations and update update toc iff a header element was added/removed
         for (const mutation of mutations) {
@@ -138,7 +99,7 @@
 
   let connect_init = false
   async function connect(execute) {
-    const socket = await get_require(window, 'socket')
+    const socket = await get_require(window, 'appyter_socket')
     if (!connect_init) {
       connect_init = true
       // ensure we're connected
@@ -210,7 +171,7 @@
       statusBg = 'danger'
     }
 
-    if (extras.indexOf('catalog-integration') !== -1) {
+    if (window._config.EXTRAS.indexOf('catalog-integration') !== -1) {
       // setup local run appyter link
       try {
         const slug = paths[paths.length - 2] || ''
@@ -257,7 +218,7 @@
     status = 'Loading...'
     statusBg = 'primary'
     if (show_code === undefined) {
-      show_code = extras.indexOf('hide-code') === -1
+      show_code = window._config.EXTRAS.indexOf('hide-code') === -1
     }
     await init()
     // trigger scroll handler
@@ -405,7 +366,7 @@
         </div>
       </div>
     </div>
-    {#if extras.indexOf('toggle-code') !== -1}
+    {#if window._config.EXTRAS.indexOf('toggle-code') !== -1}
       <a
         href="javascript:"
         class="btn btn-secondary white"
@@ -417,7 +378,7 @@
         Toggle Code
       </a>
     {/if}
-    {#if extras.indexOf('catalog-integration') !== -1}
+    {#if window._config.EXTRAS.indexOf('catalog-integration') !== -1}
     <a
       id="run-notebook-locally"
       class="btn btn-primary"
@@ -464,51 +425,12 @@
     class:col-xl-10={toc !== undefined}
   >
     {#if nb}
-      <Cells>
-        {#each nb.cells as cell (cell.index)}
-          {#if collapse(cell.source) !== ''}
-            {#if cell.cell_type === 'code'}
-              <Cell type="code">
-                {#if show_code}
-                  <Input>
-                    <Prompt
-                      prompt_type="input"
-                      index={cell.index}
-                      running={current_code_cell !== undefined ? cell.index >= current_code_cell : undefined}
-                      error={any(cell.outputs.map(({ output_type }) => output_type === 'error'))}
-                      counter={cell.execution_count}
-                      cell_type={cell.cell_type}
-                    />
-                    <Source
-                      language="python"
-                      source={collapse(cell.source)}
-                    />
-                  </Input>
-                {/if}
-                <Outputs
-                  index={cell.index}
-                  data={cell.outputs || []}
-                  loading={current_code_cell}
-                />
-              </Cell>
-            {:else if cell.cell_type === 'markdown'}
-              <Cell type="text">
-                <Input>
-                  <Prompt
-                    prompt_type="input"
-                    index={cell.index}
-                  />
-                  <div class="inner_cell">
-                    <div class="text_cell_render border-box-sizing rendered_html">
-                      <Markdown data={collapse(cell.source)} />
-                    </div>
-                  </div>
-                </Input>
-              </Cell>
-            {/if}
-          {/if}
-        {/each}
-      </Cells>
+      <Lazy
+        module={() => import('@/components/jupyter/Notebook.svelte')}
+        props={{
+          nb, show_code, current_code_cell
+        }}
+      />
     {/if}
   </div>
 </div>

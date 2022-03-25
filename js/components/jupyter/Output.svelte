@@ -1,8 +1,6 @@
 <script>
   import output_types from './output_type'
-  import { getContext } from 'svelte'
-  import { report_error as report_error_ctx } from '@/lib/appyter_context.js'
-  const report_error = getContext(report_error_ctx)
+  import report_error from '@/lib/report_error'
 
   export let data
 

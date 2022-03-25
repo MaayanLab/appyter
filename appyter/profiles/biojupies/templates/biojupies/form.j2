@@ -1,16 +1,8 @@
 {% extends "default/form.j2" %}
 
 {% block body %}
-<div id="_content" class="container loading">
-  <div class="text-center"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>
-  <script>
-    require(['svelte'], function(svelte) {
-      svelte.render(
-        document.getElementById("_content"),
-        '{{ url_for('static', filename='js/form.js') }}',
-        JSON.parse(atob('{{ ({ 'fields': _fields, 'extras': _config.EXTRAS, 'debug': _config.DEBUG })|jsonify|btoa }}'))
-      )
-    })
-  </script>
+<div id="_content" class="svelte container loading">
+  {% include "fragments/loader.j2" %}
+  <script type="application/json">{{ dict(fields=_fields, js_url=url_for('static', filename='js/form.js'))|jsonify }}</script>
 </div>
 {% endblock %}

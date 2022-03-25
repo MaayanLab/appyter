@@ -1,7 +1,5 @@
 <script>
-  import { getContext } from 'svelte'
-  import { markdown_it as markdown_it_ctx } from '@/lib/appyter_context.js'
-  const markdown_it = getContext(markdown_it_ctx)
+  import markdown_it from '@/lib/markdown_it'
 
   export let data
   let rendered

@@ -6,17 +6,9 @@
   <div class="col-sm-12">
     {% include "fragments/jupyter.j2" %}
 
-    <div id="_content" class="container loading">
-      <div class="text-center"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>
-      <script>
-        require(['svelte'], function(svelte) {
-          svelte.render(
-            document.getElementById("_content"),
-            '{{ url_for('static', filename='js/landing.js') }}',
-            JSON.parse(atob('{{ ({'nbdownload': _nb, 'extras': _config.EXTRAS, 'debug': _config.DEBUG })|jsonify|btoa }}'))
-          )
-        })
-      </script>
+    <div id="_content" class="svelte container loading">
+      {% include "fragments/loader.j2" %}
+      <script type="application/json">{{ dict(nbdownload=_nb, js_url='js/landing.js')|jsonify }}</script>
     </div>
   </div>
 </div>
