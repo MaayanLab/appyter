@@ -1,6 +1,6 @@
 <script>
   import { output_mimetypes, ignored_mimetypes } from './output_mimetype'
-  import report_error from '@/lib/report_error'
+  import report_error from '@/extras/catalog-integration/report_error'
 
   export let data
   let mimetype

@@ -8,7 +8,7 @@ def url_for(directory, public=False, **kwargs):
     try:
       from flask import url_for as _url_for
       modified_directory = '.'.join(('__main__', directory)) if directory == 'static' else directory
-      url = _url_for(modified_directory, **kwargs)
+      url = _url_for(modified_directory, **kwargs).rstrip('/')
     except RuntimeError:
       pass
   #

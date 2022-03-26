@@ -1,1 +1,1 @@
-__webpack_public_path__ = window._config.STATIC
+__webpack_public_path__ = `${window._config.STATIC}/`

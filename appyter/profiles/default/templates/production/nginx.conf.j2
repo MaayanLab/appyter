@@ -159,16 +159,13 @@ http {
     }
 
     location @profile_static {
-      rewrite ^{{ join_routes(_config.PREFIX, 'static') }}/(.*)$ "{{ join_routes(_config.PREFIX, 'profile', 'static') }}/$1";
-    }
-
-    location ~ ^{{ join_routes(_config.PREFIX, 'profile') }}/(.*)$ {
-      root "{{ get_appyter_directory('profiles') }}";
+      root "{{ get_appyter_directory('static') }}";
       try_files
+        "/$1"
         {%- if _config.PROFILE != 'default' %}
-        "/{{ _config.PROFILE }}/$1"
+        "/profiles/{{ _config.PROFILE }}/$1"
         {%- endif %}
-        "/default/$1"
+        "/profiles/default/$1"
         =404;
     }
 
