@@ -1,2 +1,2 @@
-import '@/profiles/bootstrap/css/bootstrap.scss'
+import '@/profiles/bootstrap/css/index.scss'
 export * from '@/profiles/default/js/index'

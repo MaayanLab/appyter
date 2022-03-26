@@ -19,7 +19,7 @@ export default function (_env, argv) {
         ...glob.sync('profiles/**/*.svelte'),
       ]) {
         entrypoints[entrypoint.replace(/\.(js|svelte)$/, '')] = {
-          import: `./${entrypoint}`,
+          import: ['./lib/webpack_public_path.js', `./${entrypoint}`],
           filename: entrypoint.replace(/\.(js|svelte)$/, '.js'),
         }
       }
@@ -28,9 +28,9 @@ export default function (_env, argv) {
     output: {
       path: path.resolve(__dirname, '../appyter/static'),
       filename: 'profiles/default/js/base.js',
-      assetModuleFilename: 'profiles/default/js/assets/[name].js',
-      chunkFilename: 'profiles/default/js/assets/chunks/[name].js',
-      publicPath: './static/',
+      assetModuleFilename: 'profiles/default/assets/[name].js',
+      chunkFilename: 'profiles/default/js/chunks/[name].js',
+      publicPath: '',
       library: {
         type: 'umd',
         umdNamedDefine: true,
@@ -76,7 +76,7 @@ export default function (_env, argv) {
         {
           test: /\.s[ac]ss$/i,
           use: [
-            "style-loader",
+            MiniCssExtractPlugin.loader,
             "css-loader",
             "sass-loader",
           ],
@@ -91,9 +91,8 @@ export default function (_env, argv) {
       ]
     },
     plugins: [
-      isProduction && new MiniCssExtractPlugin({
-        filename: 'css/[name].css',
-        chunkFilename: 'css/[name].[contenthash:8].chunk.css'
+      new MiniCssExtractPlugin({
+        filename: ({ chunk }) => `${chunk.name.replace(/js(\/[^\/]+)$/, 'css/$1.css')}`,
       }),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(
@@ -113,6 +112,14 @@ export default function (_env, argv) {
           {
             from: path.resolve(__dirname, 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js'),
             to: path.resolve(__dirname, '../appyter/static/profiles/biojupies/js/lib/bootstrap.js'),
+          },
+          {
+            from: path.resolve(__dirname, 'node_modules/@fortawesome/fontawesome-free/css/all.min.css'),
+            to: path.resolve(__dirname, '../appyter/static/profiles/biojupies/css/fontawesome.css'),
+          },
+          {
+            from: path.resolve(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'),
+            to: path.resolve(__dirname, '../appyter/static/profiles/biojupies/webfonts'),
           },
           {
             from: path.resolve(__dirname, 'utils/silent-check-sso.html'),

@@ -1,6 +1,5 @@
 <script>
   import { onMount } from "svelte"
-  import get_require from '@/utils/get_require'
 
   export let args
 
@@ -86,18 +85,8 @@
   }
 
   onMount(async () => {
-    window.require.config({
-      paths: {
-        'socketio-file-upload': `${window._config.STATIC_URL}/js/lib/socketio-file-upload/client.min`,
-      },
-      shim: {
-        'socketio-file-upload': {
-          exports: 'SocketIOFileUpload'
-        },
-      }
-    })
-
-    const [socket, SocketIOFileUpload] = await get_require(window, ['appyter_socket', 'socketio-file-upload'])
+    const { default: SocketIOFileUpload } = await import('socketio-file-upload')
+    const { default: socket } = await import('@/lib/socket')
     await setup_upload(new SocketIOFileUpload(socket))
   })
 </script>

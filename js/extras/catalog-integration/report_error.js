@@ -1,3 +1,5 @@
+import get_require from '@/utils/get_require'
+
 export default function report_error({ type, error }) {
   console.error(`[${type}]`, error)
   if (window._config.EXTRAS.indexOf('catalog-integration') !== -1) {

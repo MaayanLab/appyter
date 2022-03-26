@@ -5,7 +5,7 @@
     <title>Appyter</title>
   {% endblock %}
   {% block style %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" />
   {% endblock %}
   {% block script_head %}
     <script src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
@@ -25,25 +25,28 @@
   {% block footer %}{% endblock %}
   {% block script %}
     <script>
-      require([{{ url_for('static', filename='js/index.js')|jsonify }}], function (appyter) {
-        appyter.init(window, {
-          DEBUG: {{ _config.DEBUG|jsonify }},
-          PROFILE: {{ _config.PROFILE|jsonify }},
-          EXTRAS: {{ _config.EXTRAS|jsonify }},
-          {% if 'catalog-integration' in _config.EXTRAS %}
-          keycloak: {
-            params: {
-              url: 'https://keycloak.maayanlab.cloud/auth/',
-              realm: 'appyter',
-              clientId: 'appyter-library',
-            },
-            init: {
-              onLoad: 'check-sso',
-              silentCheckSsoRedirectUri: window.location.origin + {{ url_for('static', filename='silent-check-sso.html')|jsonify }}`,
-            },
+      window._config = {
+        DEBUG: {{ _config.DEBUG|jsonify }},
+        PROFILE: {{ _config.PROFILE|jsonify }},
+        EXTRAS: {{ _config.EXTRAS|jsonify }},
+        PREFIX: {{ _config.PREFIX|jsonify }},
+        STATIC: {{ url_for('static', filename='')|jsonify }},
+        {% if 'catalog-integration' in _config.EXTRAS %}
+        keycloak: {
+          params: {
+            url: 'https://keycloak.maayanlab.cloud/auth/',
+            realm: 'appyter',
+            clientId: 'appyter-library',
           },
-          {% endif %}
-        })
+          init: {
+            onLoad: 'check-sso',
+            silentCheckSsoRedirectUri: window.location.origin + {{ url_for('static', filename='silent-check-sso.html')|jsonify }}`,
+          },
+        },
+        {% endif %}
+      }
+      require([{{ url_for('static', filename='js/index.js')|jsonify }}], function (appyter) {
+        appyter.init(window)
       })
     </script>
   {% endblock %}

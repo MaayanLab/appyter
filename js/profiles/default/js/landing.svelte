@@ -4,8 +4,8 @@
   import hash from '@/lib/stores/url_hash_store'
   import Lazy from '@/components/Lazy.svelte'
   import Loader from '@/components/Loader.svelte'
-  import get_require from '@/utils/get_require'
   import { setup_chunking } from '@/lib/socketio'
+  import pagehit from '@/extras/catalog-integration/pagehit'
   export let nbdownload
 
   const paths = window.location.pathname.split('/').filter(p => p)
@@ -99,7 +99,7 @@
 
   let connect_init = false
   async function connect(execute) {
-    const socket = await get_require(window, 'appyter_socket')
+    const { default: socket } = await import('@/lib/socket')
     if (!connect_init) {
       connect_init = true
       // ensure we're connected
@@ -189,14 +189,7 @@
         console.error(e)
       }
 
-      // trigger pagehit
-      try {
-        const pagehit = await get_require(window, 'pagehit')
-        pagehit(pagehit_type)
-      } catch (e) {
-        console.error('catalog-integration: pagehit error')
-        console.error(e)
-      }
+      pagehit(pagehit_type)
     }
   }
 

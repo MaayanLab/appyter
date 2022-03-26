@@ -1,7 +1,5 @@
-import io from 'socket.io-client'
-
 export default async function livereload(window) {
-  const socket = io({ path: window._config.PREFIX + 'socket.io' })
+  const { default: socket } = await import('@/lib/socket')
   let first_connect = true
   socket.on('connect', () => {
     if (first_connect) {

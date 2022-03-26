@@ -1,6 +1,7 @@
-export function init(window, config) {
+import '@/profiles/default/css/index.scss'
+
+export function init(window) {
   console.debug('Loading...')
-  window._config = config
   asyncInit(window)
     .then(function () {
       console.debug('loaded')

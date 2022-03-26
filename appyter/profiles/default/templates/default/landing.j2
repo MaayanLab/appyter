@@ -8,7 +8,7 @@
 
     <div id="_content" class="svelte container loading">
       {% include "fragments/loader.j2" %}
-      <script type="application/json">{{ dict(nbdownload=_nb, js_url='js/landing.js')|jsonify }}</script>
+      <script type="application/json">{{ dict(nbdownload=_nb, js_url=url_for('static', filename='js/landing.js'))|jsonify }}</script>
     </div>
   </div>
 </div>

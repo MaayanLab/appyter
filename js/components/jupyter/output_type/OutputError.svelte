@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import Ansi from '@/components/Ansi.svelte'
   import collapse from '@/utils/collapse.js'
-  import report_error from '@/lib/report_error'
+  import report_error from '@/extras/catalog-integration/report_error'
 
   export let data
 
