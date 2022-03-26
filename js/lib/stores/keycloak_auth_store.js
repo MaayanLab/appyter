@@ -2,7 +2,7 @@ import { writable } from 'svelte/store'
 
 function keycloak_auth_store() {
   const { subscribe, set } = writable({ state: 'init', keycloak: {} })
-  if (window._config.keycloak !== undefined) {
+  if (window._config.EXTRAS.indexOf('catalog-integration') !== -1 && window._config.keycloak !== undefined) {
     import('keycloak-js').then(async ({ default: Keycloak }) => {
       const keycloak = new Keycloak(window._config.keycloak.params)
       const authenticated = await keycloak.init(window._config.keycloak.init)
@@ -35,5 +35,4 @@ function keycloak_auth_store() {
 }
 
 const auth = keycloak_auth_store()
-
 export default auth
