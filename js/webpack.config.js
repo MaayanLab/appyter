@@ -48,37 +48,40 @@ export default function (_env, argv) {
       rules: [
         {
           test: /\.m?js$/,
-          exclude: /node_modules/,
-          use: {
-            loader: 'babel-loader',
-            options: {
-              presets: ['@babel/preset-env']
-            }
-          }
+          exclude: [
+            {
+              and: [path.resolve(__dirname, 'node_modules')],
+              not: [/node_modules(\/|\\)svelte/],
+            },
+          ],
+          use: 'babel-loader',
         },
         {
           test: /\.svelte$/,
-          use: {
-            loader: 'svelte-loader',
-            options: {
-              compilerOptions: {
-                dev: isDevelopment,
+          use: [
+            'babel-loader',
+            {
+              loader: 'svelte-loader',
+              options: {
+                compilerOptions: {
+                  dev: isDevelopment,
+                },
+                emitCss: false,
+                hotReload: isDevelopment,
               },
-              emitCss: isProduction,
-              hotReload: isDevelopment,
             },
-          },
+          ],
         },
         {
           test: /\.(png|jpg|gif|svg)$/,
           type: 'asset/resource',
         },
         {
-          test: /\.s[ac]ss$/i,
+          test: /\.(css|s[ac]ss)$/i,
           use: [
             MiniCssExtractPlugin.loader,
-            "css-loader",
-            "sass-loader",
+            'css-loader',
+            'sass-loader',
           ],
         },
         {
@@ -92,7 +95,7 @@ export default function (_env, argv) {
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: ({ chunk }) => `${chunk.name.replace(/js(\/[^\/]+)$/, 'css/$1.css')}`,
+        filename: ({ chunk }) => `${chunk.name.replace(/js\/(.+)$/, 'css/$1.css')}`,
       }),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(
