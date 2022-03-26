@@ -12,9 +12,9 @@ async def _(sid, environ):
   async with socketio.session(sid) as sess:
     sess['request_url'] = request_url = f"{request.scheme}://{request.host}{request.path}"
     if not request.app['config']['DEBUG']:
-      public_url = request.app['config']['PUBLIC_URL']
+      public_url = request.app['config'].get('PUBLIC_URL')
       request_url = sess['request_url']
-      if not request_url.startswith(public_url):
+      if not public_url or not request_url.startswith(public_url):
         logger.warning(f"This could cause issues in production:\n{request_url=} {public_url=}")
     sess['config'] = request.app['config']
     sess['executor'] = request.app['executor']
