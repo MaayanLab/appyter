@@ -1,6 +1,5 @@
 <script>
   import auth from '@/lib/stores/keycloak_auth_store'
-  export let window
   export let args
 
   let value = args.value || args.default || ''
@@ -60,22 +59,22 @@
     <ul style="list-style: none;" class="pl-0">
       <li> [D] . {cwd}</li>
       {#if parent !== cwd}
-        <li> [D] <a href="javascript:" on:click={()=>{ cwd = parent }}>.. {parent}</a></li>
+        <li> [D] <button type="button" class="text-btn" on:click={()=>{ cwd = parent }}>.. {parent}</button></li>
       {/if}
       {#each (ls[cwd]||[]) as p}
         {#if p.type === 'directory'}
-          <li> [D] <a href="javascript:" on:click={()=>{ cwd = p.name }}>{p.name}</a></li>
+          <li> [D] <button type="button" class="text-btn" on:click={()=>{ cwd = p.name }}>{p.name}</button></li>
         {/if}
       {/each}
       {#each (ls[cwd]||[]) as p}
         {#if p.type === 'file'}
-          <li> [F] <a href="javascript:" on:click={()=>{ value = p.name }}>
+          <li> [F] <button type="button" class="text-btn" on:click={()=>{ value = p.name }}>
             {#if value === p.name}
               <b>{p.name} ({human_size(p.size)})</b>
             {:else}
               {p.name} ({human_size(p.size)})
             {/if}
-          </a></li>
+          </button></li>
         {/if}
       {/each}
     </ul>

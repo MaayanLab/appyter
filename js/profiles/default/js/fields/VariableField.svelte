@@ -29,8 +29,8 @@
   </div>
   <div class="col-lg-6 pt-2 pt-lg-0">
     {#each Object.keys(fields) as value_id (value_id)}
-    <a
-      href="javascript:"
+    <button
+      type="button"
       class="btn btn-sm btn-danger"
       style="float: right"
       data-target={value_id}
@@ -38,14 +38,13 @@
         delete fields[value_id]
         fields = fields
       }}
-    ><i class="fas fa-trash text-white"></i></a>
+    ><i class="fas fa-trash text-white"></i></button>
       <SSRField
         field={fields[value_id].field}
         args={fields[value_id].args}
       />
     {/each}
-    <a
-      href="javascript:"
+    <button
       class="btn btn-sm btn-success"
       style="float: right"
       class:disabled={args.max && fields.length > args.max}
@@ -54,7 +53,7 @@
         if (args.max && fields.length > args.max) return
         fields[id_counter++] = {...args.field, args: {...args.field.args, name: `${args.field.args.name}${id_counter}`}}
       }}
-    ><i class="fas fa-plus text-white"></i></a>
+    ><i class="fas fa-plus text-white"></i></button>
   </div>
 </div>
 

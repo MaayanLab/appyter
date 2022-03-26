@@ -27,7 +27,10 @@ const md = new MarkdownIt({
     return ''
   }
 }).use(MarkdownItAnchor, {
-  permalink: true,
+  permalink: MarkdownItAnchor.permalink.linkInsideHeader({
+    symbol: `¶`,
+    placement: 'after',
+  }),
   slugify: label => uniqueSlug(slugify(label)),
 })
 

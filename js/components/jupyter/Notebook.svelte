@@ -1,13 +1,11 @@
 <script>
   import Lazy from '@/components/Lazy.svelte'
 
-  // import Cells from '@/components/jupyter/Cells.svelte'
   import Cell from '@/components/jupyter/Cell.svelte'
   import Input from '@/components/jupyter/Input.svelte'
   import Prompt from '@/components/jupyter/Prompt.svelte'
   import Source from '@/components/jupyter/Source.svelte'
   import Outputs from '@/components/jupyter/Outputs.svelte'
-  // import Markdown from '@/components/Markdown.svelte'
 
   import collapse from '@/utils/collapse'
   import any from '@/utils/any'
@@ -19,6 +17,7 @@
 
 <Lazy
   module={() => import('@/components/jupyter/Cells.svelte')}
+  children
 >
   {#each nb.cells as cell (cell.index)}
     {#if collapse(cell.source) !== ''}

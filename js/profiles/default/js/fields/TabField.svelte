@@ -18,16 +18,16 @@
       role="tablist"
     >
       {#each Object.keys(args.choices) as choice_name}
-        <a
-          href="javascript:"
-          class="nav-link{args.value == choice_name ? ' active' : ''}"
+        <button
+          type="button"
+          class="text-btn nav-link{args.value == choice_name ? ' active' : ''}"
           aria-controls="tab-content-{args.name}-{choice_name}"
           data-toggle="tab"
           role="tab"
           on:click={() => args.value = choice_name}
-       >
+        >
           {choice_name}
-       </a>
+        </button>
       {/each}
     </div>
   </div>

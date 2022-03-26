@@ -44,10 +44,9 @@
         <div class="d-table-cell table-grow d-flex flex-wrap justify-content-start align-items-center">
           {#each Object.keys(args.examples) as example_name}
             <span class="text-sm m-1 p-1" style="white-space: nowrap;">
-              <a
-                href="javascript:"
+              <button type="button" class="text-btn"
                 on:click={() => value = args.examples[example_name]}
-              >{Array.isArray(args.examples) ? args.examples[example_name] : example_name}</a>
+              >{Array.isArray(args.examples) ? args.examples[example_name] : example_name}</button>
             </span>
           {/each}
         </div>

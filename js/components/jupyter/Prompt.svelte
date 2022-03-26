@@ -1,10 +1,10 @@
 <script>
   export let index
   export let prompt_type
-  export let cell_type
-  export let counter
-  export let running
-  export let error
+  export let cell_type = undefined
+  export let counter = undefined
+  export let running = undefined
+  export let error = undefined
 </script>
 
 <div id="{prompt_type}-prompt-{index}" class="prompt {prompt_type}_prompt">

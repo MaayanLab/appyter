@@ -5,6 +5,17 @@ pre code {
   overflow-x: scroll !important;
 }
 
+.text-btn {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  color: #007bff;
+  font-weight: 300 !important;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 /* Credit: https://loading.io/css/ */
 .lds-ellipsis {
   display: inline-block;

@@ -2,7 +2,8 @@
   import { onMount } from 'svelte'
   import Loader from '@/components/Loader.svelte'
   export let module
-  export let props
+  export let props = {}
+  export let children = false
 
   let component
   onMount(() =>
@@ -13,9 +14,13 @@
 </script>
 
 {#if component !== undefined}
-  <svelte:component this={component} {...props}>
-    <slot></slot>
-  </svelte:component>
+  {#if children}
+    <svelte:component this={component} {...props}>
+      <slot></slot>
+    </svelte:component>
+  {:else}
+    <svelte:component this={component} {...props} />
+  {/if}
 {:else}
   <Loader />
 {/if}

@@ -53,10 +53,9 @@
         <div class="d-table-cell table-grow d-flex flex-wrap justify-content-start align-items-center">
           {#each Object.keys(args.examples) as example_name}
             <span class="text-sm m-1 p-1" style="white-space: nowrap;">
-              <a
-                href="javascript:"
+              <button type="button" class="text-btn"
                 on:click={() => value = args.examples[example_name].join('\n')}
-              >{example_name}</a>
+              >{example_name}</button>
             </span>
           {/each}
         </div>

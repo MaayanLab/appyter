@@ -14,7 +14,7 @@
       <div class="d-table w-100 py-2 px-2 py-md-0 px-md-0">
         <div class="d-table-cell align-middle card-icon px-3 py-3">
           {#if args.img}
-            <img src="{url_for('static', args.img)}" class="w-100 px-1 py-1 rounded bg-white border-grey">
+            <img src="{url_for('static', args.img)}" alt="Section icon" class="w-100 px-1 py-1 rounded bg-white border-grey">
           {/if}
         </div>
         <div class="d-table-cell align-middle">

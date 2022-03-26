@@ -69,7 +69,7 @@
       statusBg = 'primary'
       if (status === 'Success') {
         current_code_cell = undefined
-        if (!debug) {
+        if (!window._config.DEBUG) {
           socket.disconnect()
         }
       }
@@ -360,8 +360,8 @@
       </div>
     </div>
     {#if window._config.EXTRAS.indexOf('toggle-code') !== -1}
-      <a
-        href="javascript:"
+      <button
+        type="button"  
         class="btn btn-secondary white"
         on:click={() => {
           $hash.params.show_code = JSON.stringify(!show_code)
@@ -369,7 +369,7 @@
         }}
       >
         Toggle Code
-      </a>
+      </button>
     {/if}
     {#if window._config.EXTRAS.indexOf('catalog-integration') !== -1}
     <a
