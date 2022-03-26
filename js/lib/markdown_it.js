@@ -1,7 +1,14 @@
 import MarkdownIt from 'markdown-it'
 import MarkdownItAnchor from 'markdown-it-anchor'
-import hljs from 'highlight.js'
 import slugify from '@/utils/slugify'
+
+import hljs from 'highlight.js/lib/core'
+import hljs_python from 'highlight.js/lib/languages/python'
+import hljs_markdown from 'highlight.js/lib/languages/markdown'
+import hljs_bash from 'highlight.js/lib/languages/bash'
+hljs.registerLanguage('python', hljs_python)
+hljs.registerLanguage('markdown', hljs_markdown)
+hljs.registerLanguage('bash', hljs_bash)
 
 const slugs = {}
 function uniqueSlug (slug) {
