@@ -83,7 +83,7 @@ def create_app(**kwargs):
     async def redirect_to_prefix(request):
       path = request.match_info['path']
       if path == app['config']['PREFIX'].strip('/'): path = ''
-      raise web.HTTPFound(join_slash(app['config']['PREFIX'], path) + '/')
+      raise web.HTTPFound(join_slash(app['config']['PREFIX'], path).rstrip('/') + '/')
     app.router.add_get('/{path:[^/]*}', redirect_to_prefix)
   #
   logger.info('Registering flask with aiohttp...')
