@@ -60,8 +60,9 @@
       args={{
         name: '_primary',
         section: null,
-        title: 'Customize Your Notebook',
+        title: 'Appyter',
         subtitle: 'Customize your notebook',
+        icon: 'cogs',
       }}
       fields={orphaned_fields.map(field => with_error(field, error))}
     />

@@ -12,9 +12,11 @@
   <div class="col-sm-12">
     <div class="mt-3 mb-0 w-100 border-custom rounded bg-lightgrey" data-toggle="collapse" data-target="#{args.name}">
       <div class="d-table w-100 py-2 px-2 py-md-0 px-md-0">
-        <div class="d-table-cell align-middle card-icon px-3 py-3">
+        <div class="d-table-cell align-middle card-icon px-3 py-3 text-center">
           {#if args.img}
             <img src="{url_for('static', args.img)}" alt="Section icon" class="w-100 px-1 py-1 rounded bg-white border-grey">
+          {:else if args.icon}
+            <i class="fas fa-{args.icon} fa-2x" />
           {/if}
         </div>
         <div class="d-table-cell align-middle">
