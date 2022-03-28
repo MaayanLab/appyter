@@ -32,7 +32,8 @@ function svelte_component_mount_from_dom(window, target) {
 
 async function svelte_component_mount(window, target, propsNode) {
   const { js_url, ...props } = JSON.parse(propsNode.textContent)
-  while (target.children.length > 0) target.children[0].remove()
   const { default: Component } = await get_require(window, js_url)
+  const currentChildren = [...target.children]
   const component = new Component({ target, props })
+  for (const child of currentChildren) child.remove()
 }
