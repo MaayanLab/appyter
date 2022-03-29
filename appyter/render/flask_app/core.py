@@ -19,13 +19,32 @@ core = Blueprint('__main__', __name__)
 
 def prepare_data(req):
   data = {}
+  #
   for field in get_fields():
     dict_collision_free_update(data, **field.prepare(req))
+  #
+  if 'catalog-integration' in current_app.config['EXTRAS']:
+    from appyter.extras.catalog_integration.request import prepare_data as prepare_data_catalog
+    dict_collision_free_update(data, **prepare_data_catalog(req))
+  #
   return data
+
+def prepare_storage(id, data):
+  storage = None
+  #
+  if 'catalog-integration' in current_app.config['EXTRAS']:
+    from appyter.extras.catalog_integration.storage import prepare_storage as prepare_storage_catalog
+    storage = prepare_storage_catalog(id, data)
+  #
+  if storage is None:
+    storage = url_to_chroot_fs(join_url('storage://output/', id))
+  #
+  return storage
+
 
 def prepare_results(data):
   results_hash = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data=data))
-  with url_to_chroot_fs(join_url('storage://output/', results_hash)) as data_fs:
+  with prepare_storage(results_hash, data) as data_fs:
     data_fs.makedirs('', exist_ok=True)
     if not data_fs.exists(current_app.config['IPYNB']):
       # construct notebook
