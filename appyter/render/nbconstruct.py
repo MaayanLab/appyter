@@ -86,7 +86,12 @@ def render_nb_from_nbtemplate(env, nbtemplate, data={}, deep_fields=None):
     created=datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat(),
     filename=env.globals['_config']['IPYNB'],
     files=files,
-    data=data,
+    # don't include private fields in nbconstruct
+    data={
+      k: v
+      for k, v in data.items()
+      if not k.startswith('_')
+    },
   )
   return nb
 
