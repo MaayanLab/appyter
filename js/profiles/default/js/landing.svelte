@@ -6,6 +6,7 @@
   import Loader from '@/components/Loader.svelte'
   import { setup_chunking } from '@/lib/socketio'
   import pagehit from '@/extras/catalog-integration/pagehit'
+  import toc from '@/extras/catalog-integration/toc'
   export let nbdownload
 
   const paths = window.location.pathname.split('/').filter(p => p)
@@ -16,28 +17,7 @@
   let local_run_url
 
   // table of contents
-  let toc
-  onMount(() => {
-    if (window._config.EXTRAS.indexOf('toc') !== -1 && notebookRef !== undefined) {
-      const observer = new MutationObserver(mutations => {
-        // look through mutations and update update toc iff a header element was added/removed
-        for (const mutation of mutations) {
-          if (mutation.type !== 'childList') continue
-          for (const e of [...mutation.addedNodes, ...mutation.removedNodes]) {
-            if (e.tagName !== undefined && e.tagName.startsWith('H')) {
-              toc = [...notebookRef.querySelectorAll('h1,h2,h3,h4,h5,h6')].map(e => ({
-                h: e.tagName.slice(1),
-                textContent: e.textContent.replace(/ ¶$/, ''),
-                id: e.id,
-              })).filter(({ id }) => id)
-              return
-            }
-          }
-        }
-      })
-      observer.observe(notebookRef, { childList: true, subtree: true })
-    }
-  })
+  $: if (window._config.EXTRAS.indexOf('toc') !== -1) toc.attach(notebookRef)
 
   // dynamic notebook
   let status
@@ -219,46 +199,6 @@
   })
 </script>
 
-{#if toc !== undefined}
-  <style>
-    .toc {
-      display: block;
-      font-weight: bold;
-    }
-    .toc.h1 {
-      font-size: 100%;
-      text-indent: 0em;
-    }
-    .toc.h2 {
-      font-size: 90%;
-      text-indent: 1em;
-    }
-    .toc.h3 {
-      font-size: 80%;
-      text-indent: 1.5em;
-    }
-    .toc.h4 {
-      font-size: 70%;
-      text-indent: 1.75em;
-    }
-    .toc.h5 {
-      font-size: 60%;
-      text-indent: 1.85em;
-    }
-    .toc.h6 {
-      font-size: 50%;
-      text-indent: 2em;
-    }
-    /* ensure menu appears over toc */
-    .sticky-top {
-      z-index: 1020;
-    }
-    .dropdown-menu {
-      z-index: 1021;
-    }
-  </style>
-{/if}
-
 <style>
   /* markdown-it-anchors */
   :global(a.header-anchor) {
@@ -331,6 +271,11 @@
   :global(.prompt):hover :global(.prompt-anchor) {
     visibility: visible;
   }
+
+  /* ensure menu appears over toc */
+  .dropdown-menu {
+    z-index: 1021;
+  }
 </style>
 
 <div class="row">
@@ -390,21 +335,11 @@
     </div>
   {/if}
   <div class="w-100"></div>
-  {#if toc !== undefined}
-    <div class="col-sm-12 col-md-3 col-xl-2">
-      <div class="row sticky-top">
-        <div class="offset-sm-2 col-sm-8 col-md-12">
-          <div class="mt-5">
-            <legend>Table Of Contents</legend>
-            {#each toc as {h, id, textContent}}
-              <a href="#{id}" class="toc h{h}">
-                {textContent}
-              </a>
-            {/each}
-          </div>
-        </div>
-      </div>
-    </div>
+  {#if $toc !== undefined}
+    <Lazy
+      module={() => import('@/extras/catalog-integration/TableOfContents.svelte')}
+      props={{ toc: $toc }}
+    />
   {/if}
   {#if status === 'Loading...'}
     <div class="col-sm-12 text-center">
@@ -414,8 +349,8 @@
   <div
     bind:this={notebookRef}
     class="col-sm-12"
-    class:col-md-9={toc !== undefined}
-    class:col-xl-10={toc !== undefined}
+    class:col-md-9={$toc !== undefined}
+    class:col-xl-10={$toc !== undefined}
   >
     {#if nb}
       <Lazy
