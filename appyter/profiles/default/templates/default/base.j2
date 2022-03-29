@@ -17,13 +17,6 @@
         waitSeconds: 200,
       })
     </script>
-  {% endblock %}
-</head>
-<body>
-  {% block header %}{% endblock %}
-  {% block body %}{% endblock %}
-  {% block footer %}{% endblock %}
-  {% block script %}
     <script>
       window._config = {
         DEBUG: {{ _config.DEBUG|jsonify }},
@@ -45,6 +38,15 @@
         },
         {% endif %}
       }
+    </script>
+  {% endblock %}
+</head>
+<body>
+  {% block header %}{% endblock %}
+  {% block body %}{% endblock %}
+  {% block footer %}{% endblock %}
+  {% block script %}
+    <script>
       require([{{ url_for('static', filename='js/index.js')|jsonify }}], function (appyter) {
         appyter.init(window)
       })
