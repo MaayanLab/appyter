@@ -4,7 +4,7 @@ defined in :mod:`appyter.profiles.default.fields`.
 ``` '''
 
 from flask import Markup
-from appyter.ext.itertools import collapse
+from appyter.ext.flask import request_get
 
 class PartialField:
   ''' Partial instantiation of a field
@@ -101,15 +101,7 @@ class Field(dict):
   def prepare(self, req):
     ''' Given a flask request, capture relevant variables for this field
     '''
-    data = {}
-    if type(req) == dict:
-      value = req.get(self.args['name']) if self.args['name'] in req else self.args.get('default')
-    elif req.json:
-      value = req.json.get(self.args['name']) if self.args['name'] in req.json else self.args.get('default')
-    elif req.form:
-      value = collapse(req.form.getlist(self.args['name'])) if self.args['name'] in req.form else self.args.get('default')
-    else:
-      raise NotImplementedError
+    value = request_get(req, self.args['name'], self.args.get('default'))
     #
     self.args['value'] = value
     return { self.args['name']: value }
