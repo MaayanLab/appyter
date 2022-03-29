@@ -56,8 +56,9 @@ async def room_lock(room_id):
 
 
 @socketio.on('join')
-async def on_join(client_id, room_id):
-  await enter_room(client_id, room_id)
+async def on_join(client_id, room_data):
+  if type(room_data) == str: room_data = {'_id': room_data}
+  await enter_room(client_id, room_data['_id'])
 
 @socketio.on('forward')
 async def forward(client_id, data):

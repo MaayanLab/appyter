@@ -89,11 +89,12 @@
       })
       await setup_async_exec(socket)
     }
-    if (execute) {
-      socket.emit('submit', session_id)
-    } else {
-      socket.emit('join', session_id)
-    }
+    const evt = execute ? 'submit' : 'join'
+    socket.emit(evt, {
+      _id: session_id,
+      _auth: $auth.keycloak.token,
+      _storage: $hash.params.storage,
+    })
   }
 
   async function init() {

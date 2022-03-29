@@ -18,14 +18,17 @@ async def submit(sid, data):
     request_url = sess['request_url']
     executor = sess['executor']
   #
-  if type(data) == dict:
-    data = prepare_data(data)
-    result_hash = prepare_results(data)
-  elif type(data) == str:
-    result_hash = sanitize_sha1sum(data)
+  if type(data) == str:
+    data = { '_id': data }
+  elif type(data) != dict:
+    raise Exception('Unrecognized data type')
+  #
+  if '_id' in data:
+    result_hash = sanitize_sha1sum(data['_id'])
     assert result_hash is not None, 'Invalid session id'
   else:
-    raise Exception('Unrecognized data type')
+    data = prepare_data(data)
+    result_hash = prepare_results(data)
   #
   if await find_room(result_hash):
     await socketio.emit('status', 'Joining existing execution...', to=sid)
