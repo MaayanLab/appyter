@@ -38,10 +38,13 @@ def is_remote(url):
 def request_get(request, key, default=None):
   if type(request) == dict:
     return request.get(key) if key in request else default
-  elif request.json:
-    return request.json.get(key) if key in request.json else default
-  elif request.form:
-    return collapse(request.form.getlist(key)) if key in request.form else default
+  elif getattr(request, 'method', None) is not None:
+    if request.method == 'GET':
+      return collapse(request.args.getlist(key)) if key in request.args else default
+    elif request.is_json:
+      return request.json.get(key) if key in request.json else default
+    else:
+      return collapse(request.form.getlist(key)) if key in request.form else default
   else:
     raise NotImplementedError
 
