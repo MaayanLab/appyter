@@ -21,7 +21,6 @@ def create_app(**kwargs):
     JOBS_PER_IMAGE=kwargs.get('jobs_per_image'),
     DEBUG=kwargs.get('debug'),
     PREFIX=kwargs.get('prefix', '').rstrip('/'),
-    DISPATCH=kwargs.get('dispatch'),
   )
   if config['PREFIX']:
     app = web.Application()
@@ -50,7 +49,6 @@ def create_app(**kwargs):
 @click_option_setenv('--jobs', envvar='APPYTER_JOBS', type=int, default=2, help='Number of concurrent jobs to dispatch')
 @click_option_setenv('--jobs-per-image', envvar='APPYTER_JOBS_PER_IMAGE', type=int, default=1, help='Number of concurrent jobs to dispatch for any individual appyter image')
 @click_option_setenv('--debug', envvar='APPYTER_DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
-@click_option_setenv('--dispatch', envvar='APPYTER_DISPATCH', type=str, default='local', help='The dispatcher mechanism to use (see list-dispatchers)')
 def dispatcher(*args, **kwargs):
   from appyter.ext.aiohttp import run_app
   from appyter.ext.asyncio.event_loop import with_event_loop

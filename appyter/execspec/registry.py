@@ -6,7 +6,7 @@ def register_implementation(name, cls):
   _registry[name] = cls
 
 known_implementations = {
-  'appyter': {'class': 'appyter.execspec.implementations.appyter.AppyterExecutor'},
+  'dispatch': {'class': 'appyter.execspec.implementations.dispatch.DispatchExecutor'},
   'docker': {'class': 'appyter.execspec.implementations.docker.DockerExecutor'},
   'kube': {'class': 'appyter.execspec.implementations.kube.KubernetesExecutor'},
   'local': {'class': 'appyter.execspec.implementations.local.LocalExecutor'},

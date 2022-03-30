@@ -35,15 +35,6 @@ async def on_submit(request):
   return web.json_response(core['dispatch_queue'].qsize() + 1)
 
 @core.cleanup_ctx.append
-async def executor_ctx(app):
-  logger.info('Initializing executor...')
-  dispatch = app['config'].get('DISPATCH') or 'local'
-  from appyter.execspec.core import url_to_executor
-  async with url_to_executor(dispatch) as executor:
-    app['executor'] = executor
-    yield
-
-@core.cleanup_ctx.append
 async def dispatcher_ctx(app):
   logger.info('Initializing dispatcher...')
   #
@@ -56,7 +47,6 @@ async def dispatcher_ctx(app):
       dispatcher(
         queued=app['dispatch_queue'],
         tasks=app['tasks'],
-        executor=app['executor'],
         jobs_per_image=app['config']['JOBS_PER_IMAGE'],
       )
     )
@@ -79,7 +69,7 @@ async def slow_put(queue, item):
   await asyncio.sleep(0.5 + random.random())
   await queue.put(item)
 
-async def dispatcher(queued=None, tasks=None, executor=None, jobs_per_image=1):
+async def dispatcher(queued=None, tasks=None, jobs_per_image=1):
   while True:
     job_id = await queued.get()
     async with tasks.lock:
@@ -98,10 +88,12 @@ async def dispatcher(queued=None, tasks=None, executor=None, jobs_per_image=1):
     #
     try:
       from appyter.ext.emitter import url_to_emitter
-      async with url_to_emitter(job['url']) as emitter:
-        logger.info(f"Dispatching job {job_id}")
-        async for msg in executor._run(**job):
-          await emitter(msg)
+      from appyter.execspec.core import url_to_executor
+      async with url_to_executor(job['executor']) as executor:
+        async with url_to_emitter(job['url']) as emitter:
+          logger.info(f"Dispatching job {job_id}")
+          async for msg in executor._run(**job):
+            await emitter(msg)
     except asyncio.CancelledError:
       raise
     except:

@@ -107,9 +107,9 @@ def create_app(**kwargs):
   #
   async def executor_ctx(app):
     logger.info('Registering application executor handler')
-    dispatcher = app['config'].get('DISPATCHER') or 'local'
+    executor_uri = app['config'].get('EXECUTOR') or 'local'
     from appyter.execspec.core import url_to_executor
-    async with url_to_executor(dispatcher, config=app['config']) as executor:
+    async with url_to_executor(executor_uri, config=app['config']) as executor:
       app['executor'] = executor
       logger.info('Executor ready')
       yield
@@ -128,7 +128,7 @@ def create_app(**kwargs):
 @click_option_setenv('--public-url', envvar='APPYTER_PUBLIC_URL', default=None, help='The public url users use to access the appyter (like when behind a load balancer)')
 @click_option_setenv('--proxy', envvar='APPYTER_PROXY', type=bool, default=False, help='Whether this is running behind a proxy and the IP should be fixed for CORS')
 @click_option_setenv('--data-dir', envvar='APPYTER_DATA_DIR', default='data', help='The directory to store data of executions')
-@click_option_setenv('--dispatcher', envvar='APPYTER_DISPATCHER', type=str, help='The URL to the dispatcher, otherwise use an embedded dispatcher')
+@click_option_setenv('--executor', envvar='APPYTER_EXECUTOR', type=str, help='The executor URI which controls how executions are performed')
 @click_option_setenv('--secret-key', envvar='APPYTER_SECRET_KEY', default=None, help='A secret key for flask')
 @click_option_setenv('--debug', envvar='APPYTER_DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
 @click_option_setenv('--static-dir', envvar='APPYTER_STATIC_DIR', default='static', help='The folder whether staticfiles are located')

@@ -2,13 +2,16 @@ from appyter.execspec.spec import AbstractExecutor
 from appyter.ext.asyncio.try_n_times import async_try_n_times
 from appyter.ext.dict import dict_merge
 
-class AppyterExecutor(AbstractExecutor):
-  ''' Submit executions to be run by an appyter orchestrator
+class DispatchExecutor(AbstractExecutor):
+  ''' Submit executions to be run by an appyter orchestration dispatcher
 
   This executor only supports submit and not wait_for/run
    as it submits jobs to a queue which manages the execution.
+  
+  usage:
+  dispatch::http://appyter-orchestrator:5000?params.executor=docker::maayanlab/appyter-example:latest
   '''
-  protocol = 'appyter'
+  protocol = 'dispatch'
 
   async def __aenter__(self):
     import aiohttp
