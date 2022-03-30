@@ -32,3 +32,13 @@ def ensure_context(obj):
   else:
     if getattr(obj, '__exit__', None) is not None:
       obj.__exit__(None, None, None)
+
+class ContextManagerAsHandle:
+  def __init__(self, inner):
+    self.inner = inner
+  
+  def open(self):
+    return self.inner.__enter__()
+  
+  def close(self):
+    return self.inner.__exit__(None, None, None)
