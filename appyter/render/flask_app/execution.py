@@ -44,7 +44,6 @@ async def submit(sid, data):
           session=result_hash,
           id=generate_uuid(),
           url=join_url(request_url, result_hash),
-          image=config.get('DISPATCHER_IMAGE'),
           storage=config['DATA_DIR'],
           debug=config['DEBUG'],
         )

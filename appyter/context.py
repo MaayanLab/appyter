@@ -201,10 +201,6 @@ def get_env_from_kwargs(**kwargs):
     _config['DATA_DIR'] = try_json_loads(kwargs.get('data_dir', os.environ.get('APPYTER_DATA_DIR', 'data')))
   if 'dispatcher' in kwargs or 'DISPATCHER' not in _config:
     _config['DISPATCHER'] = try_json_loads(kwargs.get('dispatcher', os.environ.get('APPYTER_DISPATCHER')))
-  if 'dispatcher_url' in kwargs or 'DISPATCHER_URL' not in _config:
-    _config['DISPATCHER_URL'] = try_json_loads(kwargs.get('dispatcher_url', os.environ.get('APPYTER_DISPATCHER_URL')))
-  if 'dispatcher_image' in kwargs or 'DISPATCHER_IMAGE' not in _config:
-    _config['DISPATCHER_IMAGE'] = try_json_loads(kwargs.get('dispatcher_image', os.environ.get('APPYTER_DISPATCHER_IMAGE')))
   if 'secret_key' in kwargs or 'SECRET_KEY' not in _config:
     secret_key = kwargs.get('secret_key', os.environ.get('APPYTER_SECRET_KEY', None))
     if secret_key is None:

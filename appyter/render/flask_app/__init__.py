@@ -129,8 +129,6 @@ def create_app(**kwargs):
 @click_option_setenv('--proxy', envvar='APPYTER_PROXY', type=bool, default=False, help='Whether this is running behind a proxy and the IP should be fixed for CORS')
 @click_option_setenv('--data-dir', envvar='APPYTER_DATA_DIR', default='data', help='The directory to store data of executions')
 @click_option_setenv('--dispatcher', envvar='APPYTER_DISPATCHER', type=str, help='The URL to the dispatcher, otherwise use an embedded dispatcher')
-@click_option_setenv('--dispatcher-url', envvar='APPYTER_DISPATCHER_URL', type=str, help='The URL that the internal dispatcher would contact')
-@click_option_setenv('--dispatcher-image', envvar='APPYTER_DISPATCHER_IMAGE', type=str, help='The docker image that the internal dispatcher would use')
 @click_option_setenv('--secret-key', envvar='APPYTER_SECRET_KEY', default=None, help='A secret key for flask')
 @click_option_setenv('--debug', envvar='APPYTER_DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
 @click_option_setenv('--static-dir', envvar='APPYTER_STATIC_DIR', default='static', help='The folder whether staticfiles are located')
