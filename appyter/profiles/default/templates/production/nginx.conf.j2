@@ -96,7 +96,7 @@ http {
 
     set $parsed_method "${request_method}:${http_accept}";
 
-    location = {{ _config.PREFIX.rstrip('/') }}/ {
+    location = {{ _config.PREFIX }}/ {
       if ($parsed_method = 'GET:text/html') {
         rewrite ^(.*)/$ "$1/index.html";
       }
@@ -198,11 +198,11 @@ http {
       {{ proxy('http://appyter', False, 'appyter-data') }}
     }
 
-    location {{ _config.PREFIX }} {
+    location {{ join_routes(_config.PREFIX) }} {
       {{ proxy('http://appyter', False, 'appyter-core') }}
     }
 
-    {%- if _config.PREFIX != '/' %}
+    {%- if _config.PREFIX %}
     location / {
       {%- if _config.PROXY %}
       rewrite ^/?(.*)$ $proxied_proto://$proxied_host{{ _config.PREFIX }}$1 redirect;

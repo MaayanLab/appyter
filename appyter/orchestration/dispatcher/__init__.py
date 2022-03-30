@@ -20,10 +20,10 @@ def create_app(**kwargs):
     JOBS=kwargs.get('jobs'),
     JOBS_PER_IMAGE=kwargs.get('jobs_per_image'),
     DEBUG=kwargs.get('debug'),
-    PREFIX=kwargs.get('prefix'),
+    PREFIX=kwargs.get('prefix', '').rstrip('/'),
     DISPATCH=kwargs.get('dispatch'),
   )
-  if config['PREFIX'].rstrip('/'):
+  if config['PREFIX']:
     app = web.Application()
     app['config'] = core['config'] = config
     #
@@ -32,7 +32,7 @@ def create_app(**kwargs):
       path = request.match_info['path']
       raise web.HTTPFound(join_slash(app['config']['PREFIX'], path) + '/')
     app.router.add_get('/{path:[^/]*}', redirect_to_prefix)
-    app.add_subapp(config['PREFIX'].rstrip('/'), core)
+    app.add_subapp(config['PREFIX'], core)
   else:
     app = core
     app['config'] = config

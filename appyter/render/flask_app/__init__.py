@@ -32,6 +32,7 @@ def create_app(**kwargs):
   #
   from appyter.context import get_env, find_blueprints
   from appyter.ext.urllib import join_slash
+  from appyter.ext.flask import join_routes
   from appyter.ext.asyncio.helpers import ensure_async, ensure_sync
   config = get_env(**kwargs)
   #
@@ -72,9 +73,9 @@ def create_app(**kwargs):
   flask_app.register_blueprint(core)
   for blueprint_name, blueprint in find_blueprints(config=flask_app.config).items():
     if isinstance(blueprint, Blueprint):
-      flask_app.register_blueprint(blueprint, url_prefix='/'+blueprint_name.strip('/'))
+      flask_app.register_blueprint(blueprint, url_prefix=join_routes(blueprint_name))
     elif callable(blueprint):
-      blueprint(flask_app, url_prefix='/'+blueprint_name.strip('/'))
+      blueprint(flask_app, url_prefix=join_routes(blueprint_name))
     else:
       raise Exception('Unrecognized blueprint type: ' + blueprint_name)
   #
@@ -83,7 +84,7 @@ def create_app(**kwargs):
     async def redirect_to_prefix(request):
       path = request.match_info['path']
       if path == app['config']['PREFIX'].strip('/'): path = ''
-      raise web.HTTPFound(join_slash(app['config']['PREFIX'], path).rstrip('/') + '/')
+      raise web.HTTPFound(join_routes(app['config']['PREFIX'], path) + '/')
     app.router.add_get('/{path:[^/]*}', redirect_to_prefix)
   #
   logger.info('Registering flask with aiohttp...')

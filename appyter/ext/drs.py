@@ -23,5 +23,5 @@ def ensure_drs(url):
     storage_id = organize_file_content(get_input_fs(), fs, fo)
   #
   env = get_env()
-  drs_id = re.sub(r"^storage://input/", re.sub(r'^https?://', 'drs://', env['PUBLIC_URL']), storage_id)
+  drs_id = re.sub(r"^storage://input/", re.sub(r'^https?://', 'drs://', env['PUBLIC_URL'] + '/'), storage_id)
   return drs_id

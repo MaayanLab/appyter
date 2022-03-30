@@ -182,7 +182,7 @@ def get_env_from_kwargs(**kwargs):
   if 'safe_mode' in kwargs or 'SAFE_MODE' not in _config:
     _config['SAFE_MODE'] = kwargs.get('safe_mode', True)
   if 'prefix' in kwargs or 'PREFIX' not in _config:
-    _config['PREFIX'] = try_json_loads(kwargs.get('prefix', os.environ.get('APPYTER_PREFIX', '/')))
+    _config['PREFIX'] = try_json_loads(kwargs.get('prefix', os.environ.get('APPYTER_PREFIX', ''))).rstrip('/')
   if 'profile' in kwargs or 'PROFILE' not in _config:
     _config['PROFILE'] = try_json_loads(kwargs.get('profile', os.environ.get('APPYTER_PROFILE', 'default')))
   if 'extras' in kwargs or 'EXTRAS' not in _config:
@@ -192,7 +192,7 @@ def get_env_from_kwargs(**kwargs):
   if 'port' in kwargs or 'PORT' not in _config:
     _config['PORT'] = try_json_loads(kwargs.get('port', os.environ.get('APPYTER_PORT', 5000)))
   if 'public_url' in kwargs or 'PUBLIC_URL' not in _config:
-    _config['PUBLIC_URL'] = try_json_loads(kwargs.get('public_url', os.environ.get('APPYTER_PUBLIC_URL', f"http://{_config['HOST']}:{_config['PORT']}")))
+    _config['PUBLIC_URL'] = try_json_loads(kwargs.get('public_url', os.environ.get('APPYTER_PUBLIC_URL', f"http://{_config['HOST']}:{_config['PORT']}"))).rstrip('/')
   if 'proxy' in kwargs or 'PROXY' not in _config:
     _config['PROXY'] = try_json_loads(kwargs.get('proxy', os.environ.get('APPYTER_PROXY', False)))
   if 'cwd' in kwargs or 'CWD' not in _config:
