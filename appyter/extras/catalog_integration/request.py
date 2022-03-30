@@ -17,7 +17,8 @@ def prepare_data(req):
   if not data.get('_auth') and type(req) != None:
     authorization = req.headers.get('Authorization')
     if authorization:
-      m = re.compile(r'^Bearer (.+)$')
-      if m: data['_auth'] = m.group(1)
+      m = re.match(r'^Bearer (.+)$', authorization)
+      if m:
+        data['_auth'] = m.group(1)
   #
   return data
