@@ -29,22 +29,22 @@ def prepare_data(req):
   #
   return data
 
-def prepare_storage(id, data):
+def prepare_storage(data):
   storage = None
   #
   if 'catalog-integration' in current_app.config['EXTRAS']:
     from appyter.extras.catalog_integration.storage import prepare_storage as prepare_storage_catalog
-    storage = prepare_storage_catalog(id, data)
+    storage = prepare_storage_catalog(data)
   #
   if storage is None:
-    storage = url_to_chroot_fs(join_url('storage://output/', id))
+    storage = url_to_chroot_fs(join_url('storage://output', data.get('_id', '')))
   #
   return storage
 
-
 def prepare_results(data):
   results_hash = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data=data))
-  with prepare_storage(results_hash, data) as data_fs:
+  data['_id'] = results_hash
+  with prepare_storage(data) as data_fs:
     data_fs.makedirs('', exist_ok=True)
     if not data_fs.exists(current_app.config['IPYNB']):
       # construct notebook
