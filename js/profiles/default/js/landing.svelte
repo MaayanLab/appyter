@@ -289,17 +289,17 @@
         <div class="dropdown-menu">
           <a
             class="dropdown-item"
-            href="{nbdownload}"
+            href={`${nbdownload}${window.location.search}`}
             title="The standalone jupyter notebook as shown"
           >Jupyter Notebook (.ipynb)</a>
           <a
             class="dropdown-item"
-            href="../export/{session_id}/?format=html"
+            href={`../export/${session_id}/${window.location.search ? `${window.location.search}&` : '?'}format=html`}
             title="An nbconvert HTML export of the notebook for easy viewing in browser"
           >HTML Export (.html)</a>
           <a
             class="dropdown-item"
-            href="../export/{session_id}/?format=zip"
+            href={`../export/${session_id}/${window.location.search ? `${window.location.search}&` : '?'}format=zip`}
             title="An archive with the notebook and dependent files for running it"
           >Notebook Bundle (.zip)</a>
         </div>
