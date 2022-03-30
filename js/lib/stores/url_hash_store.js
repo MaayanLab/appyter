@@ -44,28 +44,19 @@ function url_hash_store() {
   let init = hash_get()
   const { path: initPath, params: initParams } = hash_parse(init)
   const { subscribe, update, set } = writable({ path: initPath, params: initParams })
-  const last = { path: initPath, params: initParams }
+  let lastPath = initPath
   subscribe(({ path, params }) => {
     const newHash = hash_stringify({ path, params })
-    if (path !== last.path) {
+    if (path !== lastPath) {
       // add changes to path to history
-      window.location.hash = newHash !== '' ? newHash : undefined
-      last.path = path
+      window.location.hash = newHash
+      lastPath = path
     } else {
       // don't add changes to params to history, but modify the hash url
-      history.replaceState(undefined, undefined, newHash !== '' ? `#${newHash}` : '')
+      history.replaceState(undefined, undefined, newHash !== '' ? `#${newHash}` : '.')
     }
   })
-  window.addEventListener('hashchange', () => {
-    const current = hash_parse(hash_get())
-    // restore params if completely removed
-    if (Object.keys(current.params).length === 0) {
-      current.params = last.params
-    } else {
-      last.params = current.params
-    }
-    set(current)
-  })
+  window.addEventListener('hashchange', () => set(hash_parse(hash_get())))
 
   return {
     subscribe,
