@@ -5,7 +5,7 @@ async def get_user_config(auth):
   import aiohttp
   async with aiohttp.ClientSession(
     headers={
-      'Authorization': auth
+      'Authorization': f"Bearer {auth}",
     },
     raise_for_status=True,
   ) as session:
@@ -13,6 +13,7 @@ async def get_user_config(auth):
       join_url(
         parent_url(current_app.config['PUBLIC_URL']),
         'postgrest/rpc/user_config',
-      )
+      ),
+      json={ 'config': None },
     ) as res:
       return await res.json()
