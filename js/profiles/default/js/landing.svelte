@@ -20,7 +20,7 @@
   $: if (window._config.EXTRAS.indexOf('toc') !== -1) toc.attach(notebookRef)
 
   // dynamic notebook
-  let status
+  let status = 'Loading...'
   let statusBg = 'primary'
   var current_code_cell
 
@@ -187,16 +187,18 @@
   }
 
   // initialization
+  $: if ($auth.state !== 'init') {
+    init()
+      .then(() => {
+        // trigger scroll handler
+        path = undefined
+      })
+  }
+
   onMount(async () => {
-    await tick()
-    status = 'Loading...'
-    statusBg = 'primary'
     if (show_code === undefined) {
       show_code = window._config.EXTRAS.indexOf('hide-code') === -1
     }
-    await init()
-    // trigger scroll handler
-    path = undefined
   })
 </script>
 
