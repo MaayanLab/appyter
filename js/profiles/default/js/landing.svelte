@@ -164,7 +164,7 @@
         if (nb.metadata.appyter.nbexecute !== undefined) library_version = nb.metadata.appyter.nbexecute.version || ''
         else if (nb.metadata.appyter.nbconstruct !== undefined) library_version = nb.metadata.appyter.nbconstruct.version || ''
 
-        local_run_url = `${window.location.origin}/#/running-appyters/?slug=${slug}&appyter_version=${appyter_version}&library_version=${library_version}&id=${session_id}`
+        local_run_url = `${window._config.CATALOG_ORIGIN}/#/running-appyters/?slug=${slug}&appyter_version=${appyter_version}&library_version=${library_version}&id=${session_id}`
       } catch (e) {
         console.error('catalog-integration: local_run_url setup error')
         console.error(e)

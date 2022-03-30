@@ -4,7 +4,7 @@
   export let args
 
   function url_for(directory, path) {
-    return `${window.location.href.replace(/\/$/, '')}/${directory}/${path}`
+    return `${window._config.ORIGIN}/${directory}/${path}`
   }
 </script>
 

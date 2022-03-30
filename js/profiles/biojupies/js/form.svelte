@@ -37,7 +37,7 @@
       } else {
         const { session_id } = await res.json()
         error = undefined
-        window.location.href = `${window.location.href.replace(/\/$/, '')}/${session_id}/`
+        window.location.href = `${window._config.ORIGIN}/${session_id}/`
       }
     } catch (e) {
       error = { cls: 'FrontendException', message: e.toString() }

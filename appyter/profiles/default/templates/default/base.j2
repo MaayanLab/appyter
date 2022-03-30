@@ -24,7 +24,9 @@
         EXTRAS: {{ _config.EXTRAS|jsonify }},
         PREFIX: {{ _config.PREFIX|jsonify }},
         STATIC: {{ url_for('static', filename='')|jsonify }},
+        ORIGIN: (window.location.origin + {{ _config.PREFIX|jsonify }}).replace(/\/$/, ''),
         {% if 'catalog-integration' in _config.EXTRAS %}
+        CATALOG_ORIGIN: window.location.origin,
         keycloak: {
           params: {
             url: 'https://keycloak.maayanlab.cloud/auth',
