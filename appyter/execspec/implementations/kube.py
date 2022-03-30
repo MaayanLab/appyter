@@ -21,6 +21,8 @@ def endless_watch(*args, **kwargs):
 
 class KubernetesExecutor(AbstractExecutor):
   ''' Run executions as kubernetes jobs
+  Example uri:
+  kube::maayanlab/myimage:latest?namespace=default
   '''
   protocol = 'kube'
 
@@ -29,7 +31,7 @@ class KubernetesExecutor(AbstractExecutor):
     from kubernetes import config
     config.load_incluster_config()
 
-  def _submit(job, namespace='default'):
+  def _submit(self, job, namespace='default'):
     from kubernetes import client
     batchV1 = client.BatchV1Api()
     batchV1.create_namespaced_job(
@@ -50,7 +52,7 @@ class KubernetesExecutor(AbstractExecutor):
               containers=[
                 client.V1Container(
                   name=f"appyter-{job['id']}",
-                  image=job['image'],
+                  image=self.url,
                   command=['appyter', 'orchestration', 'job', json.dumps(job)],
                   security_context=client.V1SecurityContext(
                     privileged=True,
