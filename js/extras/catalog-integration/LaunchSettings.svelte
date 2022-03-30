@@ -51,7 +51,10 @@
               </div>
             {:else}
               <div class="col col-lg-9 px-lg-3 my-auto px-4 text-center alert alert-info">
-                <button onClick={() => $auth.keycloak.login()} class="text-btn">Login</button> to configure launch settings.
+                <button
+                  type="button" class="text-btn"
+                  on:click={() => $auth.keycloak.login()}
+                >Login</button> to configure launch settings.
               </div>
             {/if}
           </div>
