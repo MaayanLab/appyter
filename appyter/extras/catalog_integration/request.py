@@ -14,11 +14,16 @@ def prepare_data(req):
     ]
   })
   #
-  if not data.get('_auth') and type(req) != None:
+  if not data.get('_auth') and getattr(req, 'headers', None) is not None:
     authorization = req.headers.get('Authorization')
     if authorization:
       m = re.match(r'^Bearer (.+)$', authorization)
       if m:
         data['_auth'] = m.group(1)
+  #
+  if not data.get('_storage') and getattr(req, 'args', None) is not None:
+    storage = req.args.get('storage')
+    if storage:
+      data['_storage'] = storage
   #
   return data
