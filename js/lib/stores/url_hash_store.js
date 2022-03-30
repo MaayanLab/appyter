@@ -53,7 +53,8 @@ function url_hash_store() {
       lastPath = path
     } else {
       // don't add changes to params to history, but modify the hash url
-      history.replaceState(undefined, undefined, newHash !== '' ? `#${newHash}` : '.')
+      const url = `${window.location.origin}${window.location.pathname}${window.location.search}`
+      history.replaceState(undefined, undefined, newHash !== '' ? `${url}#${newHash}` : url)
     }
   })
   window.addEventListener('hashchange', () => set(hash_parse(hash_get())))

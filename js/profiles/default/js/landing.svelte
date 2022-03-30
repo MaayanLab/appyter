@@ -103,7 +103,7 @@
       // Load notebook
       // https://developer.mozilla.org/en-US/docs/Web/API/Request/cache
       // no-cache implies a check with the remote server no matter what, it still uses the cache if the resource hasn't changed
-      const req = await fetch(nbdownload, {
+      const req = await fetch(`${nbdownload}${window.location.search}`, {
           cache: 'no-cache',
           headers: {
             'Authorization': $auth.state === 'auth' ? `Bearer ${$auth.keycloak.token}` : null,
