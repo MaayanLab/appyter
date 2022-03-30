@@ -45,6 +45,12 @@ function keycloak_auth_store() {
   }
   return { subscribe }
 }
-
 const auth = keycloak_auth_store()
+
+auth.subscribe(auth => {
+  if (auth.state === 'auth' && document.cookie.match(/^(.*;)?\s*authorization\s*=\s*[^;]+(.*)?$/) === null) {
+    document.cookie = `authorization=${auth.keycloak.token}; expires=${(new Date(auth.keycloak.tokenParsed.exp*1000)).toUTCString()}; secure`
+  }
+})
+
 export default auth

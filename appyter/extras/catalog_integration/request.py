@@ -14,6 +14,11 @@ def prepare_data(req):
     ]
   })
   #
+  if not data.get('_auth') and getattr(req, 'cookies', None) is not None:
+    authorization = req.cookies.get('authorization')
+    if authorization:
+      data['_auth'] = authorization
+
   if not data.get('_auth') and getattr(req, 'headers', None) is not None:
     authorization = req.headers.get('Authorization')
     if authorization:
