@@ -47,7 +47,7 @@ class DockerExecutor(AbstractExecutor):
         for k, v in dict_merge(
           {
             'cwd': job['cwd'],
-            'data-dir': job['storage'],
+            'data-dir': str(job['storage']),
           },
           **self.executor_options.get('args', {})
         ).items()

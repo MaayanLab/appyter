@@ -65,6 +65,12 @@ class URIParsed:
     elif self.fragment_query:
       out += '#?' + self.fragment_query
     return out
+  
+  def join(self, *parts):
+    return URIParsed(join_url(self.url, *parts), self.query, self.fragment, self.fragment_query)
+  
+  def __div__(self, part):
+    return self.join(part)
 
 uri_re = re.compile(r'^(?P<url>[^\?#]+)(\?(?P<query>[^#]*))?(#(?P<fragment>[^\?]*?))?(\?(?P<fragment_query>.*?))?$')
 

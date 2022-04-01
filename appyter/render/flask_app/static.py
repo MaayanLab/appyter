@@ -5,11 +5,13 @@ from flask import request, current_app, send_file, send_from_directory, abort, j
 from werkzeug.exceptions import NotFound
 
 from appyter.ext.urllib import join_url
-from appyter.render.flask_app.constants import get_form, get_ipynb_io, get_nbtemplate_json, get_output_fs, get_static_fs, get_j2_env
-from appyter.render.flask_app.core import core, prepare_storage
+from appyter.render.flask_app.constants import get_form, get_ipynb_io, get_nbtemplate_json, get_static_fs, get_j2_env
+from appyter.render.flask_app.core import core
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.context import get_appyter_directory
 from appyter.ext.contextlib import ContextManagerAsHandle
+from appyter.ext.fsspec.core import url_to_chroot_fs
+from appyter.render.flask_app.prepare import prepare_request, prepare_storage
 
 @route_join_with_or_without_slash(core, methods=['GET'])
 def get_index():
@@ -50,10 +52,7 @@ def static(filename):
 
 @route_join_with_or_without_slash(core, '<path:path>', methods=['GET'])
 def data_files(path):
-  data = {}
-  if 'catalog-integration' in current_app.config['EXTRAS']:
-    from appyter.extras.catalog_integration.request import prepare_data as prepare_data_catalog
-    data.update(prepare_data_catalog(request))
+  data = prepare_request(request)
   #
   if path.endswith('/'):
     mimetype = request.accept_mimetypes.best_match([
@@ -66,7 +65,7 @@ def data_files(path):
         _nb=current_app.config['IPYNB'],
       )
     else:
-      output_fs_ctx = ContextManagerAsHandle(prepare_storage(data))
+      output_fs_ctx = ContextManagerAsHandle(url_to_chroot_fs(str(prepare_storage(data).join('output'))))
       output_fs = output_fs_ctx.open()
       path = join_url(path, current_app.config['IPYNB'])
       if output_fs.exists(path):
@@ -76,7 +75,7 @@ def data_files(path):
       else:
         output_fs_ctx.close()
   else:
-    output_fs_ctx = ContextManagerAsHandle(prepare_storage(data))
+    output_fs_ctx = ContextManagerAsHandle(url_to_chroot_fs(str(prepare_storage(data).join('output'))))
     output_fs = output_fs_ctx.open()
     if output_fs.exists(path):
       response = send_file(output_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))

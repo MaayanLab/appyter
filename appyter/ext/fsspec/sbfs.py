@@ -26,11 +26,14 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
       auth_token=auth_token,
       **storage_options,
     )
+    self.auth_token = auth_token
+    self.drs_endpoint = drs_endpoint
+    self.api_endpoint = api_endpoint
 
   async def __aenter__(self):
     self._session_mgr = aiohttp.ClientSession(
       headers={
-        'X-SBG-Auth-Token': self.storage_options['auth_token'],
+        'X-SBG-Auth-Token': self.auth_token,
       },
       raise_for_status=True,
     )
@@ -53,7 +56,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
     if len(path_split) <= 2: raise PermissionError
     if len(path_split) == 3:
       user, project, directory = path_split
-      async with self._session.post(f"{self.storage_options['api_endpoint']}/v2/files", json=dict(
+      async with self._session.post(f"{self.api_endpoint}/v2/files", json=dict(
         project=f"{user}/{project}",
         name=directory,
         type='folder',
@@ -78,7 +81,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
           raise
         parent_info = await self._mkdir(parent_directory_path, create_parents=True, exist_ok=True)
       
-      async with self._session.post(f"{self.storage_options['api_endpoint']}/v2/files", json=dict(
+      async with self._session.post(f"{self.api_endpoint}/v2/files", json=dict(
         parent=parent_info['_id'],
         name=directory,
         type='folder',
@@ -94,7 +97,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
     return await self._mkdir(path, create_parents=True, exist_ok=exist_ok, **kwargs)
 
   async def _sbg_rm_file(self, file_id):
-    async with self._session.delete(f"{self.storage_options['api_endpoint']}/v2/files/{file_id}", headers={
+    async with self._session.delete(f"{self.api_endpoint}/v2/files/{file_id}", headers={
       'Content-Type': 'application/json',
     }) as res:
       return await res.text()
@@ -128,7 +131,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
     project2 = f"{acc2}/{proj2}"
     if path1.startswith(project2):
       # moves only allowed within the same project
-      async with self._session.post(f"{self.storage_options['api_endpoint']}/v2/files/{file1_info['_id']}/actions/move", json=dict(
+      async with self._session.post(f"{self.api_endpoint}/v2/files/{file1_info['_id']}/actions/move", json=dict(
         project=project2,
         name='/'.join(proj_path2),
       )) as res:
@@ -141,14 +144,14 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
     file1_info = await self._info(path1)
     path2_split = path2.split('/', maxsplit=2)
     acc2, proj2, *proj_path2 = path2_split
-    async with self._session.post(f"{self.storage_options['api_endpoint']}/v2/files/{file1_info['_id']}/actions/copy", json=dict(
+    async with self._session.post(f"{self.api_endpoint}/v2/files/{file1_info['_id']}/actions/copy", json=dict(
       project=f"{acc2}/{proj2}",
       name='/'.join(proj_path2),
     )) as res:
       return await res.json()
 
   async def _download_info(self, file_info):
-    async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/files/{file_info['_id']}/download_info") as req:
+    async with self._session.get(f"{self.api_endpoint}/v2/files/{file_info['_id']}/download_info") as req:
       return await req.json()
   
   async def _cat_file(self, path, start=None, end=None, **kwargs):
@@ -188,7 +191,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
       raise PermissionError
     # initiate multipart upload
     logger.debug(f"Initiating multipart upload for {rpath}: {rpath_info}")
-    async with self._session.post(f"{self.storage_options['api_endpoint']}/v2/upload/multipart", params=dict(overwrite='true'), json=rpath_info) as req:
+    async with self._session.post(f"{self.api_endpoint}/v2/upload/multipart", params=dict(overwrite='true'), json=rpath_info) as req:
       upload_info = await req.json()
     try:
       with lpath.open('rb') as fr:
@@ -196,7 +199,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
         for i in range((lpath_stat.st_size // upload_info['part_size']) + 1 if lpath_stat.st_size % upload_info['part_size'] else 0):
           # get part_info
           logger.info(f"Initiating multipart part {i+1} upload for {rpath_info['name']}")
-          async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/upload/multipart/{upload_info['upload_id']}/part/{i+1}") as req:
+          async with self._session.get(f"{self.api_endpoint}/v2/upload/multipart/{upload_info['upload_id']}/part/{i+1}") as req:
             part_info = await req.json()
           # load buffer with upload_info['part_size']
           buf = fr.read(upload_info['part_size'])
@@ -206,19 +209,19 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
             upload_response = {'headers': {k: json.loads(req.headers.get(k)) for k in part_info['report']['headers']}}
           logger.debug(f"{upload_response=}")
           # report uploaded part
-          async with self._session.post(f"{self.storage_options['api_endpoint']}/v2/upload/multipart/{upload_info['upload_id']}/part", json=dict(
+          async with self._session.post(f"{self.api_endpoint}/v2/upload/multipart/{upload_info['upload_id']}/part", json=dict(
             part_number=i+1,
             response=upload_response,
           )) as req:
             await req.read()
       # report multipart completion
-      async with self._session.post(f"{self.storage_options['api_endpoint']}/v2/upload/multipart/{upload_info['upload_id']}/complete", headers={
+      async with self._session.post(f"{self.api_endpoint}/v2/upload/multipart/{upload_info['upload_id']}/complete", headers={
         'Content-Type': 'application/json',
       }) as req:
         await req.read()
     except:
       # abort multipart upload
-      async with self._session.delete(f"{self.storage_options['api_endpoint']}/v2/upload/multipart/{upload_info['upload_id']}", headers={
+      async with self._session.delete(f"{self.api_endpoint}/v2/upload/multipart/{upload_info['upload_id']}", headers={
         'Content-Type': 'application/json',
       }) as req:
         await req.read()
@@ -236,7 +239,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
 
   async def _get_drs(self, path, **kwargs):
     file_info = await self._info(path, **kwargs)
-    return f"{self.storage_options['drs_endpoint']}/{file_info['_id']}"
+    return f"{self.drs_endpoint}/{file_info['_id']}"
 
   def get_drs(self, path, **kwargs):
     return ensure_sync(self._get_drs(path, **kwargs))
@@ -247,7 +250,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
       return {'name': path, 'type': 'directory'}
     elif len(path_split) == 1:
       project_user, = path_split
-      async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/projects/{project_user}") as req:
+      async with self._session.get(f"{self.api_endpoint}/v2/projects/{project_user}") as req:
         projects = await req.json()
       if len(projects['items']) == 0:
         raise FileNotFoundError(path)
@@ -256,7 +259,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
       return {'name': project_user, 'type': 'directory'}
     elif len(path_split) == 2:
       project_user, proj_id = path_split
-      async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/projects/{project_user}", params=dict(
+      async with self._session.get(f"{self.api_endpoint}/v2/projects/{project_user}", params=dict(
         name=proj_id
       ), raise_for_status=False) as req:
         if req.status == 404:
@@ -273,7 +276,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
     elif len(path_split) == 3:
       acc, proj_id, name = path_split
       proj = acc + '/' + proj_id
-      async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/files", params=dict(
+      async with self._session.get(f"{self.api_endpoint}/v2/files", params=dict(
         project=proj, name=name,
       ), raise_for_status=False) as req:
         if req.status == 404:
@@ -288,7 +291,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
       item = items['items'][0]
       item_name = f"{proj}/{item['name']}"
       if item['type'] == 'file':
-        async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/files/{item['_id']}", params=dict(
+        async with self._session.get(f"{self.api_endpoint}/v2/files/{item['_id']}", params=dict(
           fields='size',
         )) as req:
           item_details = await req.json()
@@ -310,7 +313,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
       item_directory = '/'.join(path_split[:-1])
       parent_info = await self._info(item_directory)
       name = path_split[-1]
-      async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/files", params=dict(
+      async with self._session.get(f"{self.api_endpoint}/v2/files", params=dict(
         parent=parent_info['_id'], name=name,
       ), raise_for_status=False) as req:
         if req.status == 404:
@@ -325,7 +328,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
       item = items['items'][0]
       item_name = f"{item_directory}/{item['name']}"
       if item['type'] == 'file':
-        async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/files/{item['id']}", params=dict(
+        async with self._session.get(f"{self.api_endpoint}/v2/files/{item['id']}", params=dict(
           fields='size',
         )) as req:
           item_details = await req.json()
@@ -348,7 +351,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
     path_split = [] if path in {'', '.', '/', './'} else path.split('/')
     results = {}
     if len(path_split) == 0:
-      async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/projects") as req:
+      async with self._session.get(f"{self.api_endpoint}/v2/projects") as req:
         projects = await req.json()
       for proj in projects['items']:
         proj_id_split = proj['id'].split('/')
@@ -356,7 +359,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
         results[acc] = {'name': acc, 'type': 'directory'} if detail else acc
     elif len(path_split) == 1:
       project_user, = path_split
-      async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/projects/{project_user}") as req:
+      async with self._session.get(f"{self.api_endpoint}/v2/projects/{project_user}") as req:
         projects = await req.json()
       for proj in projects['items']:
         proj_id_split = proj['id'].split('/')
@@ -365,7 +368,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
     elif len(path_split) == 2:
       acc, proj_id = path_split
       proj = f"{acc}/{proj_id}"
-      async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/files", params=dict(
+      async with self._session.get(f"{self.api_endpoint}/v2/files", params=dict(
         project=proj,
       ), raise_for_status=False) as req:
         if req.status == 404:
@@ -377,7 +380,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
         item_name = proj + '/' + item['name']
         if detail:
           if item['type'] == 'file':
-            async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/files/{item['id']}", params=dict(
+            async with self._session.get(f"{self.api_endpoint}/v2/files/{item['id']}", params=dict(
               fields='size',
             )) as req:
               file_details = await req.json()
@@ -400,7 +403,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
     elif len(path_split) > 2:
       path_info = await self._info(path)
       if path_info['type'] == 'directory':
-        async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/files", params=dict(
+        async with self._session.get(f"{self.api_endpoint}/v2/files", params=dict(
           parent=path_info['_id'],
         )) as req:
           items = await req.json()
@@ -408,7 +411,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
           item_name = path_info['name'] + '/' + item['name']
           if detail:
             if item['type'] == 'file':
-              async with self._session.get(f"{self.storage_options['api_endpoint']}/v2/files/{item['id']}", params=dict(
+              async with self._session.get(f"{self.api_endpoint}/v2/files/{item['id']}", params=dict(
                 fields='size',
               )) as req:
                 file_details = await req.json()

@@ -3,6 +3,7 @@
   import Loader from '@/components/Loader.svelte'
   import auth from '@/lib/stores/keycloak_auth_store'
   import Lazy from '@/components/Lazy.svelte'
+  import url_for from '@/utils/url_for'
   export let fields = []
 
   let submitting = false
@@ -35,9 +36,9 @@
         const { error: _error } = await res.json()
         error = _error
       } else {
-        const { _id, _storage } = await res.json()
+        const { _id, _storage, _executor } = await res.json()
         error = undefined
-        window.location.href = `${window._config.ORIGIN}/${_id}/${_storage ? `?storage=${_storage}` : ''}`
+        window.location.href = url_for({ path: `${window._config.ORIGIN}/${_id}/`, params: { storage: _storage, executor: _executor } })
       }
     } catch (e) {
       error = { cls: 'FrontendException', message: e.toString() }

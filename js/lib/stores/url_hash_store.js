@@ -15,7 +15,7 @@ function params_stringify(params) {
     .join('&')
 }
 
-function hash_parse(hash_encoded) {
+function fragment_parse(hash_encoded) {
   // if (!hash_encoded.startsWith('/')) hash_encoded = `/${hash_encoded}`
   const q = hash_encoded.indexOf('?')
   if (q === -1) {
@@ -36,16 +36,19 @@ function hash_stringify({ path, params }) {
   }
 }
 
-function hash_get() {
+function fragment_get() {
   return (window.location.hash || '#').slice(1)
 }
 
+function server_get() {
+  return `${window.location.pathname}${window.location.search}`
+}
+
 function url_hash_store() {
-  let init = hash_get()
-  const { path: initPath, params: initParams } = hash_parse(init)
-  const { subscribe, update, set } = writable({ path: initPath, params: initParams })
+  const { path: initPath, params: initParams, server: initServer } = { ...fragment_parse(fragment_get()), server: fragment_parse(server_get()) }
+  const { subscribe, update, set } = writable({ path: initPath, params: initParams, server: initServer })
   let lastPath = initPath
-  subscribe(({ path, params }) => {
+  subscribe(({ path, params, server }) => {
     const newHash = hash_stringify({ path, params })
     if (path !== lastPath) {
       // add changes to path to history
@@ -57,7 +60,7 @@ function url_hash_store() {
       history.replaceState(undefined, undefined, newHash !== '' ? `${url}#${newHash}` : url)
     }
   })
-  window.addEventListener('hashchange', () => set(hash_parse(hash_get())))
+  window.addEventListener('hashchange', () => set({ ...fragment_parse(fragment_get()), initServer }))
 
   return {
     subscribe,

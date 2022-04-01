@@ -10,7 +10,7 @@
   export let nbdownload
 
   const paths = window.location.pathname.split('/').filter(p => p)
-  const session_id = paths[paths.length - 1]
+  const instance_id = paths[paths.length - 1]
 
   let nb
   let notebookRef
@@ -91,9 +91,10 @@
     }
     const evt = execute ? 'submit' : 'join'
     socket.emit(evt, {
-      _id: session_id,
+      _id: instance_id,
       _auth: $auth.keycloak.token,
-      _storage: $hash.params.storage,
+      _storage: $hash.server.params.storage,
+      _executor: $hash.server.params.executor,
     })
   }
 
@@ -164,7 +165,7 @@
         if (nb.metadata.appyter.nbexecute !== undefined) library_version = nb.metadata.appyter.nbexecute.version || ''
         else if (nb.metadata.appyter.nbconstruct !== undefined) library_version = nb.metadata.appyter.nbconstruct.version || ''
 
-        local_run_url = `${window._config.CATALOG_ORIGIN}/#/running-appyters/?slug=${slug}&appyter_version=${appyter_version}&library_version=${library_version}&id=${session_id}`
+        local_run_url = `${window._config.CATALOG_ORIGIN}/#/running-appyters/?slug=${slug}&appyter_version=${appyter_version}&library_version=${library_version}&id=${instance_id}`
       } catch (e) {
         console.error('catalog-integration: local_run_url setup error')
         console.error(e)
@@ -296,12 +297,12 @@
           >Jupyter Notebook (.ipynb)</a>
           <a
             class="dropdown-item"
-            href={`../export/${session_id}/${window.location.search ? `${window.location.search}&` : '?'}format=html`}
+            href={`../export/${instance_id}/${window.location.search ? `${window.location.search}&` : '?'}format=html`}
             title="An nbconvert HTML export of the notebook for easy viewing in browser"
           >HTML Export (.html)</a>
           <a
             class="dropdown-item"
-            href={`../export/${session_id}/${window.location.search ? `${window.location.search}&` : '?'}format=zip`}
+            href={`../export/${instance_id}/${window.location.search ? `${window.location.search}&` : '?'}format=zip`}
             title="An archive with the notebook and dependent files for running it"
           >Notebook Bundle (.zip)</a>
         </div>

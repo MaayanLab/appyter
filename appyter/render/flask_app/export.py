@@ -7,20 +7,19 @@ from flask import request, current_app, send_file, abort
 
 from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.render.flask_app.constants import get_base_files, get_html_exporer
-from appyter.render.flask_app.core import core, prepare_storage
+from appyter.render.flask_app.core import core
+from appyter.render.flask_app.prepare import prepare_storage, prepare_request
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.parse.nb import nb_from_ipynb_io
 
 @route_join_with_or_without_slash(core, 'export', '<path:path>', methods=['GET'])
 def export(path):
   if path.endswith('/'):
-    data = { '_id': path }
-    if 'catalog-integration' in current_app.config['EXTRAS']:
-      from appyter.extras.catalog_integration.request import prepare_data as prepare_data_catalog
-      data.update(prepare_data_catalog(request))
+    data = dict(_id=path, _config=current_app.config)
+    data.update(prepare_request(data))
     format = request.args.get('format', 'html')
-    with prepare_storage(data) as data_fs:
-      nbpath = current_app.config['IPYNB']
+    with url_to_chroot_fs(str(prepare_storage(data).join('output', path))) as data_fs:
+      nbpath = data['_config']['IPYNB']
       if data_fs.exists(nbpath):
         with data_fs.open(nbpath, 'rb') as fr:
           nb = nb_from_ipynb_io(fr)

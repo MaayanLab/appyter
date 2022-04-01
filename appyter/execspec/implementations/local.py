@@ -21,7 +21,7 @@ class LocalExecutor(AbstractExecutor):
     from appyter.render.nbexecute import nbexecute_async
     try:
       await nbexecute_async(
-        cwd=job['cwd'],
+        cwd=f"storage://{job['cwd']}",
         ipynb=job['ipynb'],
         emit=emit,
         fuse=job.get('fuse', not job.get('debug', False)),
@@ -35,7 +35,7 @@ class LocalExecutor(AbstractExecutor):
   async def _run(self, **job):
     import asyncio
     from appyter.ext.fsspec.storage import ensure_storage
-    async with ensure_storage(job.get('storage', 'file://')):
+    async with ensure_storage(str(job.get('storage', 'file://'))):
       msg_queue = asyncio.Queue()
       task = asyncio.create_task(self._submit(emit=msg_queue.put, **job))
       while True:

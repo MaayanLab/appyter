@@ -14,7 +14,7 @@ class SubprocessExecutor(AbstractExecutor):
       sys.executable, '-u', '-m',
       'appyter', 'nbexecute',
       '--cwd', job['cwd'],
-      '--data-dir', job['storage'],
+      '--data-dir', str(job['storage']),
       job['ipynb'],
       stdout=asyncio.subprocess.PIPE,
       stderr=sys.stderr,
