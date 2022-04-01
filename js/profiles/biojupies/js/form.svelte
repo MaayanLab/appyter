@@ -35,9 +35,9 @@
         const { error: _error } = await res.json()
         error = _error
       } else {
-        const { session_id } = await res.json()
+        const { _id, _storage } = await res.json()
         error = undefined
-        window.location.href = `${window._config.ORIGIN}/${session_id}/`
+        window.location.href = `${window._config.ORIGIN}/${_id}/${_storage ? `?storage=${_storage}` : ''}`
       }
     } catch (e) {
       error = { cls: 'FrontendException', message: e.toString() }

@@ -31,4 +31,18 @@ def prepare_data(req):
     if storage:
       data['_storage'] = storage
   #
+  if data.get('_executor') == 'cavatica':
+    # CAVATICA executor must be authenticated
+    if not data.get('_auth'): raise PermissionError
+    # CAVATICA executor should use cavatica storage
+    if not data.get('_storage'):
+      from appyter.ext.asyncio.helpers import ensure_sync
+      from appyter.extras.catalog_integration.user_config import get_user_config
+      user_config = ensure_sync(get_user_config(data['_auth']))
+      if not user_config.get('cavatica_api_key'): raise Exception('Missing CAVATICA API Key')
+      if not user_config.get('cavatica_project'): raise Exception('Missing CAVATICA Project')
+      data['_storage'] = f"cavatica://{user_config.get('cavatica_project')}"
+    else:
+      assert data['_storage'].startsWith('cavatica://'), 'CAVATICA executor requires CAVATICA storage'
+  #
   return data

@@ -88,9 +88,18 @@ def render_openapi_from_nbtemplate(env, nb):
                     'properties': {
                       'session_id': {
                         'type': 'string',
+                        'description': 'DEPRECATED: A unique identifier for this appyter invokation',
+                      },
+                      '_id': {
+                        'type': 'string',
                         'description': 'A unique identifier for this appyter invokation',
                       },
+                      '_storage': {
+                        'type': 'string',
+                        'description': 'A URI for the storage backend where this appyter is saved when using integrations',
+                      },
                     },
+                    'required': ['_id']
                   },
                 },
               },
@@ -108,19 +117,19 @@ def render_openapi_from_nbtemplate(env, nb):
           },
         },
       },
-      '/{session_id}/': {
+      '/{_id}/': {
         'get': {
           'description': 'Fetch or interact with an appyter instance',
           'operationId': 'appyter_instance_fetch',
           'parameters': [
             {
               'in': 'path',
-              'name': 'session_id',
+              'name': '_id',
               'schema': {
                 'type': 'string'
               },
               'required': True,
-              'description': 'Session identifier',
+              'description': 'Appyter instance identifier',
             },
           ],
           'responses': {

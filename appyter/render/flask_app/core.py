@@ -77,12 +77,16 @@ def post_index():
   #
   if mimetype in {'text/html'}:
     if error: abort(406)
-    else: return redirect(url_for('__main__.data_files', path=result_hash + '/'), 303)
+    else: return redirect(url_for('__main__.data_files', path=result_hash + '/', storage=data.get('_storage')), 303)
   elif mimetype in {'application/json'}:
     if error is not None:
       return make_response(jsonify(error=error), 406)
     else:
-      return make_response(jsonify(session_id=result_hash), 200)
+      # NOTE: Legacy session_id preserved but deprecated
+      ret = dict(_id=result_hash, session_id=result_hash)
+      if data.get('_storage'):
+        ret.update(_storage=data['_storage'])
+      return make_response(jsonify(ret), 200)
   else:
     abort(404)
 
