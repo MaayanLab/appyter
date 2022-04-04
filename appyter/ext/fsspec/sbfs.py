@@ -8,6 +8,7 @@ from fsspec.asyn import AsyncFileSystem
 from appyter.ext.fsspec.spec.sync_async import SyncAsyncFileSystem
 from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
 from appyter.ext.asyncio.helpers import ensure_sync
+from appyter.ext.urllib import join_slash
 from fsspec.spec import AbstractBufferedFile
 
 class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFileSystem):
@@ -125,30 +126,68 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
       raise NotImplementedError
 
   async def _mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
-    file1_info = await self._info(path1)
-    path2_split = path2.split('/', maxsplit=2)
-    acc2, proj2, *proj_path2 = path2_split
-    project2 = f"{acc2}/{proj2}"
-    if path1.startswith(project2):
-      # moves only allowed within the same project
-      async with self._session.post(f"{self.api_endpoint}/v2/files/{file1_info['_id']}/actions/move", json=dict(
-        project=project2,
-        name='/'.join(proj_path2),
-      )) as res:
-        return await res.json()
+    path1_info = await self._info(path1)
+    path2_split = path2.split('/')
+    if len(path2_split) <= 2: raise PermissionError
+    project2 = '/'.join(path2_split[:2])
+    if path1.startswith(project2): # moves only allowed within the same project
+      try:
+        path2_info = await self._info(path2)
+        # overwrite/merge
+        if path2_info['type'] == 'file':
+          await self._rm_file(path2)
+      except FileNotFoundError:
+        # new file/directory
+        if path1_info['type'] == 'directory':
+          await self._mkdir(path2)
+      #
+      if path1_info['type'] == 'directory':
+        if not recursive: raise IsADirectoryError
+        for subpath1 in (await self._ls(path1, detail=False)):
+          subpath2 = join_slash(path2, subpath1[len(path1):])
+          await self._mv(subpath1, subpath2, recursive=recursive, maxdepth=(maxdepth-1) if maxdepth is not None else maxdepth, **kwargs)
+        await self._rmdir(path1)
+      elif path1_info['type'] == 'file':
+        if await self._exists(path2):
+          await self._rm_file(path2)
+        if len(path2_split) == 3:
+          async with self._session.post(f"{self.api_endpoint}/v2/files/{path1_info['_id']}/actions/move", json=dict(
+            project=project2,
+            name=path2_split[-1],
+          )) as res:
+            return await res.json()
+        else:
+          path2_parent_info = await self._info('/'.join(path2_split[:-1]))
+          if path2_parent_info['type'] != 'directory': raise NotADirectoryError
+          async with self._session.post(f"{self.api_endpoint}/v2/files/{path1_info['_id']}/actions/move", json=dict(
+            parent=path2_parent_info['_id'],
+            name=path2_split[-1],
+          )) as res:
+            return await res.json()
+      else:
+        raise NotImplementedError
     else:
       await self._cp_file(path1, path2, recursive=recursive, maxdepth=maxdepth)
       await self._rm(path1, recursive=recursive)
 
   async def _cp_file(self, path1, path2, **kwargs):
-    file1_info = await self._info(path1)
+    path1_info = await self._info(path1)
     path2_split = path2.split('/', maxsplit=2)
-    acc2, proj2, *proj_path2 = path2_split
-    async with self._session.post(f"{self.api_endpoint}/v2/files/{file1_info['_id']}/actions/copy", json=dict(
-      project=f"{acc2}/{proj2}",
-      name='/'.join(proj_path2),
-    )) as res:
-      return await res.json()
+    project2 = '/'.join(path2_split[:2])
+    if len(path2_split) == 3:
+      async with self._session.post(f"{self.api_endpoint}/v2/files/{path1_info['_id']}/actions/copy", json=dict(
+        project=project2,
+        name=path2_split[-1],
+      )) as res:
+        return await res.json()
+    else:
+      path2_parent_info = await self._info('/'.join(path2_split[:-1]))
+      if path2_parent_info['type'] != 'directory': raise NotADirectoryError
+      async with self._session.post(f"{self.api_endpoint}/v2/files/{path1_info['_id']}/actions/copy", json=dict(
+        parent=path2_parent_info['_id'],
+        name=path2_split[-1],
+      )) as res:
+        return await res.json()
 
   async def _download_info(self, file_info):
     async with self._session.get(f"{self.api_endpoint}/v2/files/{file_info['_id']}/download_info") as req:
@@ -291,7 +330,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
       item = items['items'][0]
       item_name = f"{proj}/{item['name']}"
       if item['type'] == 'file':
-        async with self._session.get(f"{self.api_endpoint}/v2/files/{item['_id']}", params=dict(
+        async with self._session.get(f"{self.api_endpoint}/v2/files/{item['id']}", params=dict(
           fields='size',
         )) as req:
           item_details = await req.json()
