@@ -24,34 +24,50 @@ async def submit(sid, data):
     raise Exception('Unrecognized data type')
   #
   if '_id' in data:
-    result_hash = sanitize_sha1sum(data['_id'])
-    assert result_hash is not None, 'Invalid session id'
+    instance_id = sanitize_sha1sum(data['_id'])
+    assert instance_id is not None, 'Invalid session id'
     data.update(_config=config)
   else:
     data = dict(await _prepare_data(data), _config=config)
-    result_hash = await _prepare_results(data)
+    instance_id = await _prepare_results(data)
   #
-  if await find_room(result_hash):
+  if 'catalog-integration' in data['_config']['EXTRAS']:
+    # if you execute the notebook, it should get registered
+    from appyter.extras.catalog_integration.notebooks import InstanceInfo, add_instance
+    await add_instance(
+      InstanceInfo(
+        instance=instance_id,
+        metadata=dict(
+          ipynb=data.get('_config')['IPYNB'],
+          storage=data.get('_storage'),
+          executor=data.get('_executor'),
+        )
+      ),
+      auth=data.get('_auth'),
+      config=data.get('_config'),
+    )
+  #
+  if await find_room(instance_id):
     await socketio.emit('status', 'Joining existing execution...', to=sid)
-    await enter_room(sid, result_hash)
+    await enter_room(sid, instance_id)
   else:
     storage_uri = await _prepare_storage(data)
     async with _prepare_executor(data, executor) as executor:
-      async with room_lock(result_hash):
-        await enter_room(sid, result_hash)
+      async with room_lock(instance_id):
+        await enter_room(sid, instance_id)
         try:
-          await socketio.emit('status', 'Submitting execution...', to=result_hash)
+          await socketio.emit('status', 'Submitting execution...', to=instance_id)
           job = dict(
-            cwd=f"output/{result_hash}",
+            cwd=f"output/{instance_id}",
             ipynb=os.path.basename(config['IPYNB']),
-            session=result_hash,
+            session=instance_id,
             id=generate_uuid(),
-            url=join_url(request_url, result_hash),
+            url=join_url(request_url, instance_id),
             storage=storage_uri,
             debug=config['DEBUG'],
           )
           async for msg in executor._run(**job):
-            await socketio.forward(None, dict(event=msg['type'], data=msg['data'], to=result_hash))
+            await socketio.forward(None, dict(event=msg['type'], data=msg['data'], to=instance_id))
         except asyncio.CancelledError:
           raise
         except Exception:

@@ -9,7 +9,7 @@ async def prepare_storage(data):
     # cavatica storage provider, obtain CAVATICA API Key and instantiate sbfs
     m = re.match(r'^cavatica://(?P<user>[a-z0-9-]+)/(?P<project>[a-z0-9-]+)$', data['_storage'])
     if m:
-      user_config = await get_user_config(data)
+      user_config = await get_user_config(data.get('_auth'), data.get('_config'))
       if not user_config.get('cavatica_api_key'): raise PermissionError
       assert re.match(r'^[0-9a-f]+$', user_config['cavatica_api_key']) is not None, 'Malformed CAVATICA API Key'
       return f"writecache::chroot::sbfs://{m.group('user')}/{m.group('project')}/appyter/#?sbfs.auth_token={user_config['cavatica_api_key']}"

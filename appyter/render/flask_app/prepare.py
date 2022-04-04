@@ -51,16 +51,17 @@ prepare_storage = ensure_sync(_prepare_storage)
 async def _prepare_results(data):
   ''' Compute instance id & ensure results exist in storage
   '''
-  results_hash = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data={k: v for k, v in data.items() if not k.startswith('_')}))
-  data['_id'] = results_hash
-  cwd = str((await _prepare_storage(data)).join('output', results_hash))
+  instance_id = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data={k: v for k, v in data.items() if not k.startswith('_')}))
+  data['_id'] = instance_id
+  storage = await _prepare_storage(data)
+  cwd = str(storage.join('output', instance_id))
   data_fs = url_to_chroot_fs(cwd)
   data_fs_ctx = ensure_async_contextmanager(data_fs)
   async with data_fs_ctx:
     await ensure_async(data_fs.makedirs)('', exist_ok=True)
     if not await ensure_async(data_fs.exists)(data['_config']['IPYNB']):
       # construct notebook
-      env = get_jinja2_env(config=data['_config'], context=data, session=results_hash)
+      env = get_jinja2_env(config=data['_config'], context=data, session=instance_id)
       nbtemplate = get_nbtemplate()
       # in case of constraint failures, we'll fail here
       nb = render_nb_from_nbtemplate(env, nbtemplate, deep_fields=get_deep_fields(), data=data)
@@ -68,7 +69,22 @@ async def _prepare_results(data):
       async with ensure_async(data_fs.open(data['_config']['IPYNB'], 'w')) as fw:
         nb_to_ipynb_io(nb, fw)
   #
-  return results_hash
+  if 'catalog-integration' in data['_config']['EXTRAS']:
+    # if you create a notebook, it should get registered
+    from appyter.extras.catalog_integration.notebooks import InstanceInfo, add_instance
+    await add_instance(
+      InstanceInfo(
+        instance=instance_id,
+        metadata=dict(
+          storage=data.get('_storage'),
+          executor=data.get('_executor'),
+        )
+      ),
+      auth=data.get('_auth'),
+      config=data.get('_config'),
+    )
+  #
+  return instance_id
 prepare_results = ensure_sync(_prepare_results)
 
 @contextlib.asynccontextmanager
@@ -81,7 +97,6 @@ async def _prepare_executor(data, fallback=None):
     from appyter.extras.catalog_integration.executor import prepare_executor as prepare_executor_catalog
     executor_uri = await prepare_executor_catalog(data)
   #
-  logger.info(f"{data=} {executor_uri=}")
   if executor_uri is not None:
     from appyter.execspec.core import url_to_executor
     async with url_to_executor(executor_uri, config=data['_config']) as executor:

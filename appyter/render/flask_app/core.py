@@ -20,7 +20,7 @@ def post_index():
   #
   try:
     data = dict(prepare_data(request), _config=current_app.config)
-    result_hash = prepare_results(data)
+    instance_id = prepare_results(data)
     error = None
   except KeyboardInterrupt:
     raise
@@ -30,13 +30,13 @@ def post_index():
   #
   if mimetype in {'text/html'}:
     if error: abort(406)
-    else: return redirect(url_for('__main__.data_files', path=result_hash + '/', executor=data.get('_executor'), storage=data.get('_storage')), 303)
+    else: return redirect(url_for('__main__.data_files', path=instance_id + '/', executor=data.get('_executor'), storage=data.get('_storage')), 303)
   elif mimetype in {'application/json'}:
     if error is not None:
       return make_response(jsonify(error=error), 406)
     else:
       # NOTE: Legacy session_id preserved but deprecated
-      ret = dict(_id=result_hash, session_id=result_hash)
+      ret = dict(_id=instance_id, session_id=instance_id)
       if data.get('_executor'): ret.update(_executor=data['_executor'])
       if data.get('_storage'): ret.update(_storage=data['_storage'])
       return make_response(jsonify(ret), 200)
