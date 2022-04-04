@@ -107,4 +107,4 @@ class CavaticaExecutor(WESExecutor):
 
   async def _finalize(self, job, wes_job):
     await super()._finalize(job, wes_job)
-    # TODO: move wes_job['w'] to storage
+    await ensure_async(self.fs.move)(wes_job['workflow_params']['inputs']['w'], f"appyter/output/{job['session']}")
