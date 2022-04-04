@@ -15,7 +15,7 @@ from appyter.ext.asyncio.helpers import ensure_async, ensure_async_contextmanage
 
 class CavaticaExecutor(WESExecutor):
   ''' Run executions in CAVATICA
-  cavatica#?project=myuser/myproject&auth_token=MYKEY&cwl=example.cwl
+  cavatica?project=myuser/myproject&auth_token=MYKEY&cwl=example.cwl
   '''
   protocol = 'cavatica'
 
