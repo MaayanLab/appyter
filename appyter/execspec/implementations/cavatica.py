@@ -103,8 +103,15 @@ class CavaticaExecutor(WESExecutor):
           # use the drs uri
           logger.getChild(k).debug(f"{drs_uri=}")
           v['path'] = drs_uri
+    # use a temporary location since CAVATICA doesn't support subdirectories
+    wes_job['workflow_params']['inputs']['w'] = f"tmp-appyter-output-{job['session']}"
     return wes_job
 
   async def _finalize(self, job, wes_job):
     await super()._finalize(job, wes_job)
-    await ensure_async(self.fs.move)(wes_job['workflow_params']['inputs']['w'], f"appyter/output/{job['session']}")
+    # move appyter output to the correct subdirectory
+    await ensure_async(self.fs.mv)(
+      wes_job['workflow_params']['inputs']['w'],
+      f"appyter/output/{job['session']}",
+      recursive=True,
+    )

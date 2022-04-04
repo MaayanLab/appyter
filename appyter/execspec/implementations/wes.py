@@ -56,7 +56,7 @@ class WESExecutor(AbstractExecutor):
       for field in parse_fields_from_nbtemplate(env, self.nbtemplate, deep=True)
     })
     inputs['s'] = job['url']
-    inputs['w'] = f"appyter-output-{job['session']}"
+    inputs['w'] = f"appyter/output/{job['session']}"
     return dict_merge(
       self.executor_options.get('params', {}),
       workflow_params=dict(inputs=inputs),
