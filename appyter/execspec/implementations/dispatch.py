@@ -33,7 +33,7 @@ class DispatchExecutor(AbstractExecutor):
       self.url,
       json=dict_merge(
         self.executor_options.get('params',{}),
-        **job,
+        **dict(job, storage=str(job['storage'])),
       ),
     ) as resp:
       queue_size = await resp.json()
