@@ -105,8 +105,8 @@ def ensure_sync_generator(asyncgenerator):
 
 class _AsyncSyncContextManager:
   def __init__(self, contextmanager):
-    self._aenter = ensure_async_func(contextmanager.__enter__)
-    self._aexit = ensure_async_func(contextmanager.__exit__)
+    self._aenter = contextmanager.__aenter__ if getattr(contextmanager, '__aenter__', None) is not None else ensure_async_func(contextmanager.__enter__)
+    self._aexit = contextmanager.__aexit__ if getattr(contextmanager, '__aexit__', None) is not None else ensure_async_func(contextmanager.__exit__)
   async def __aenter__(self):
     return await self._aenter()
   async def __aexit__(self, typ, value, traceback):
@@ -118,8 +118,8 @@ def ensure_async_contextmanager(contextmanager):
 
 class _SyncAsyncContextManager:
   def __init__(self, asynccontextmanager):
-    self._enter = ensure_sync_wrapper(asynccontextmanager.__aenter__)
-    self._exit = ensure_sync_wrapper(asynccontextmanager.__aexit__)
+    self._enter = asynccontextmanager.__enter__ if getattr(asynccontextmanager, '__enter__', None) is not None else ensure_sync_wrapper(asynccontextmanager.__aenter__)
+    self._exit = asynccontextmanager.__exit__ if getattr(asynccontextmanager, '__exit__', None) is not None else ensure_sync_wrapper(asynccontextmanager.__aexit__)
   def __enter__(self):
     return self._enter()
   def __exit__(self, typ, value, traceback):
