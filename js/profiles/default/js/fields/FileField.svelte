@@ -1,4 +1,5 @@
 <script>
+  import auth from "@/lib/stores/keycloak_auth_store"
   import { onMount } from "svelte"
 
   export let args
@@ -15,6 +16,7 @@
   async function setup_upload(siofu) {
     siofu.listenOnInput(fileField)
     siofu.addEventListener('start', function (evt) {
+      evt.file.meta.auth = $auth.keycloak.token
       state = {
         striped: true,
         bg: 'primary',

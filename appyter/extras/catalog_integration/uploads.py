@@ -5,7 +5,7 @@ from appyter.ext.urllib import join_url, parent_url
 class FileInfo:
   file: str
   filename: str
-  metadata: dict
+  metadata: dict = None
 
 async def add_file(data: FileInfo, auth=None, config=None):
   if not auth: raise PermissionError
