@@ -1,4 +1,5 @@
 import contextlib
+import traceback
 import logging
 logger = logging.getLogger(__name__)
 
@@ -68,21 +69,40 @@ async def _prepare_results(data):
       # write notebook
       async with ensure_async(data_fs.open(data['_config']['IPYNB'], 'w')) as fw:
         nb_to_ipynb_io(nb, fw)
+      #
+      if 'catalog-integration' in data['_config']['EXTRAS']:
+        # if you create a notebook, it should get registered
+        try:
+          from appyter.extras.catalog_integration.notebooks import InstanceInfo, add_instance
+          await add_instance(
+            InstanceInfo(
+              instance=instance_id,
+              metadata=dict(
+                appyter=nb.metadata.get('appyter'),
+                storage=data.get('_storage'),
+                executor=data.get('_executor'),
+              )
+            ),
+            auth=data.get('_auth'),
+            config=data.get('_config'),
+          )
+        except:
+          logger.warning(traceback.format_exc())
+      return instance_id
   #
   if 'catalog-integration' in data['_config']['EXTRAS']:
-    # if you create a notebook, it should get registered
-    from appyter.extras.catalog_integration.notebooks import InstanceInfo, add_instance
-    await add_instance(
-      InstanceInfo(
-        instance=instance_id,
-        metadata=dict(
-          storage=data.get('_storage'),
-          executor=data.get('_executor'),
-        )
-      ),
-      auth=data.get('_auth'),
-      config=data.get('_config'),
-    )
+    # if you recreate a notebook, it should get registered,
+    #  we'll omit metadata which would already be captured
+    #  when the instance was created
+    try:
+      from appyter.extras.catalog_integration.notebooks import InstanceInfo, add_instance
+      await add_instance(
+        InstanceInfo(instance=instance_id),
+        auth=data.get('_auth'),
+        config=data.get('_config'),
+      )
+    except:
+      logger.warning(traceback.format_exc())
   #
   return instance_id
 prepare_results = ensure_sync(_prepare_results)

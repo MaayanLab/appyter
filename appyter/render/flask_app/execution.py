@@ -33,19 +33,17 @@ async def submit(sid, data):
   #
   if 'catalog-integration' in data['_config']['EXTRAS']:
     # if you execute the notebook, it should get registered
-    from appyter.extras.catalog_integration.notebooks import InstanceInfo, add_instance
-    await add_instance(
-      InstanceInfo(
-        instance=instance_id,
-        metadata=dict(
-          ipynb=data.get('_config')['IPYNB'],
-          storage=data.get('_storage'),
-          executor=data.get('_executor'),
-        )
-      ),
-      auth=data.get('_auth'),
-      config=data.get('_config'),
-    )
+    #  we'll omit metadata which would already be captured
+    #  when the instance was created
+    try:
+      from appyter.extras.catalog_integration.notebooks import InstanceInfo, add_instance
+      await add_instance(
+        InstanceInfo(instance=instance_id),
+        auth=data.get('_auth'),
+        config=data.get('_config'),
+      )
+    except:
+      logger.warning(traceback.format_exc())
   #
   if await find_room(instance_id):
     await socketio.emit('status', 'Joining existing execution...', to=sid)

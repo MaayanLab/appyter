@@ -15,7 +15,6 @@ async def add_instance(data: InstanceInfo, auth=None, config=None):
     headers={
       'Authorization': f"Bearer {auth}",
     },
-    # raise_for_status=True,
   ) as session:
     async with session.post(
       join_url(
