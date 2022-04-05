@@ -67,8 +67,10 @@ async def _prepare_results(data):
       # in case of constraint failures, we'll fail here
       nb = render_nb_from_nbtemplate(env, nbtemplate, deep_fields=get_deep_fields(), data=data)
       # write notebook
-      async with ensure_async(data_fs.open(data['_config']['IPYNB'], 'w')) as fw:
-        nb_to_ipynb_io(nb, fw)
+      async with ensure_async_contextmanager(
+        await ensure_async(data_fs.open)(data['_config']['IPYNB'], 'w')
+      ) as fw:
+        await ensure_async(nb_to_ipynb_io)(nb, fw)
       #
       if 'catalog-integration' in data['_config']['EXTRAS']:
         # if you create a notebook, it should get registered
