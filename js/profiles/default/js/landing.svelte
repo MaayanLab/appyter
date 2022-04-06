@@ -4,7 +4,7 @@
   import hash from '@/lib/stores/url_hash_store'
   import Lazy from '@/components/Lazy.svelte'
   import Loader from '@/components/Loader.svelte'
-  import { setup_chunking } from '@/lib/socketio'
+  import setup_chunking from '@/lib/socketio'
   import pagehit from '@/extras/catalog-integration/pagehit'
   import toc from '@/extras/catalog-integration/toc'
   export let nbdownload
