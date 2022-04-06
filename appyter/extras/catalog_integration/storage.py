@@ -7,7 +7,7 @@ async def prepare_storage(data):
   '''
   if data.get('_storage'):
     # cavatica storage provider, obtain CAVATICA API Key and instantiate sbfs
-    m = re.match(r'^cavatica://(?P<user>[a-z0-9-]+)/(?P<project>[a-z0-9-]+)$', data['_storage'])
+    m = re.match(r'^cavatica://(?P<user>[a-z0-9_-]+)/(?P<project>[a-z0-9_-]+)$', data['_storage'])
     if m:
       user_config = await get_user_config(data.get('_auth'), data.get('_config'))
       if not user_config.get('cavatica_api_key'): raise PermissionError
