@@ -52,7 +52,14 @@ prepare_storage = ensure_sync(_prepare_storage)
 async def _prepare_results(data):
   ''' Compute instance id & ensure results exist in storage
   '''
-  instance_id = sha1sum_dict(dict(ipynb=get_ipynb_hash(), data={k: v for k, v in data.items() if not k.startswith('_')}))
+  instance_id = sha1sum_dict(dict(
+    ipynb=get_ipynb_hash(),
+    data={
+      k: v
+      for k, v in data.items()
+      if not k.startswith('_') and k not in {'_executor', '_storage'}
+    },
+  ))
   data['_id'] = instance_id
   storage = await _prepare_storage(data)
   cwd = str(storage.join('output', instance_id))
