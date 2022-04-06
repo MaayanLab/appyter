@@ -34,7 +34,7 @@
                 name="_executor"
                 class="form-control nodecoration tiny bg-white px-2 py-1 mb-0"
               >
-                <option selected value="default">Execute in appyter catalog</option>
+                <option selected value="">Execute in appyter catalog</option>
                 <option value="cavatica">Execute in CAVATICA</option>
               </select>
             </div>
