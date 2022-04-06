@@ -6,6 +6,7 @@ import asyncio
 import json
 import aiohttp
 import logging
+import traceback
 import functools
 
 from appyter.parse.nb import nb_from_ipynb_io
@@ -135,5 +136,10 @@ class WESExecutor(AbstractExecutor):
         logger.warning(f"Unhandled state received: {state}")
         break
     #
-    await self._finalize(job, wes_job)
-    yield dict(type='status', data=f"Task completed")
+    try:
+      await self._finalize(job, wes_job)
+    except:
+      logger.error(traceback.print_exc())
+      yield dict(type='error', data=f"Task failed to finalize")
+    else:
+      yield dict(type='status', data=f"Task completed")
