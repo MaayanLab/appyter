@@ -19,6 +19,11 @@
     <div class="border-grey mx-2 border-top-0 rounded-bottom tiny collapse show">
       {#if $auth.state === 'auth'}
         <div class="pt-3">
+          <div class="row px-4 px-lg-3 pb-4 justify-content-center">
+            <div class="col col-lg-9 px-lg-3 my-auto px-4 text-center">
+              Logged in as {$auth.keycloak.tokenParsed.email}, <button type="button" class="text-btn" on:click={() => $auth.keycloak.logout()}>click here</button> to logout.
+            </div>
+          </div>
           <div class="row px-3 pb-3">
             <div class="col-lg-3 bold text-lg-right my-auto">
               Execution Profile:
