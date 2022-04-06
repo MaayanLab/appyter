@@ -92,7 +92,6 @@ async def siofu_done(sid, evt):
     if 'catalog-integration' in sess['config']['EXTRAS']:
       # if you upload a file in a request, it should get registered
       try:
-        logger.info(f"{file=}")
         from appyter.extras.catalog_integration.uploads import FileInfo, add_file
         file_uri_parsed = parse_file_uri(file_uri)
         await add_file(
