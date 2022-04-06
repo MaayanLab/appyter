@@ -49,25 +49,32 @@ async def submit(sid, data):
     await socketio.emit('status', 'Joining existing execution...', to=sid)
     await enter_room(sid, instance_id)
   else:
-    storage_uri = await _prepare_storage(data)
-    async with _prepare_executor(data, executor) as executor:
-      async with room_lock(instance_id):
-        await enter_room(sid, instance_id)
-        try:
-          await socketio.emit('status', 'Submitting execution...', to=instance_id)
-          job = dict(
-            cwd=f"output/{instance_id}",
-            ipynb=os.path.basename(config['IPYNB']),
-            session=instance_id,
-            id=generate_uuid(),
-            url=join_url(request_url, instance_id),
-            storage=storage_uri,
-            debug=config['DEBUG'],
-          )
-          async for msg in executor._run(**job):
-            await socketio.forward(None, dict(event=msg['type'], data=msg['data'], to=instance_id))
-        except asyncio.CancelledError:
-          raise
-        except Exception:
-          logger.error(traceback.format_exc())
-          await socketio.emit('error', 'An unhandled executor error occurred, please try again later.', to=sid)
+    try:
+      storage_uri = await _prepare_storage(data)
+      async with _prepare_executor(data, executor) as executor:
+        async with room_lock(instance_id):
+          await enter_room(sid, instance_id)
+          try:
+            await socketio.emit('status', 'Submitting execution...', to=instance_id)
+            job = dict(
+              cwd=f"output/{instance_id}",
+              ipynb=os.path.basename(config['IPYNB']),
+              session=instance_id,
+              id=generate_uuid(),
+              url=join_url(request_url, instance_id),
+              storage=storage_uri,
+              debug=config['DEBUG'],
+            )
+            async for msg in executor._run(**job):
+              await socketio.forward(None, dict(event=msg['type'], data=msg['data'], to=instance_id))
+          except asyncio.CancelledError:
+            raise
+          except Exception:
+            logger.error(traceback.format_exc())
+            await socketio.emit('error', 'An unhandled executor error occurred, please try again later.', to=sid)
+    except asyncio.CancelledError:
+      raise
+    except:
+      logger.error(traceback.format_exc())
+      await socketio.emit('error', 'An unhandled initialization error occurred, please try again later.', to=sid)
+      raise
