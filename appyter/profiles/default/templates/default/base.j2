@@ -27,17 +27,6 @@
         ORIGIN: (window.location.origin + {{ _config.PREFIX|jsonify }}),
         {% if 'catalog-integration' in _config.EXTRAS %}
         CATALOG_ORIGIN: window.location.origin,
-        keycloak: {
-          params: {
-            url: 'https://keycloak.maayanlab.cloud/auth',
-            realm: 'appyters',
-            clientId: 'appyter-library',
-          },
-          init: {
-            onLoad: 'check-sso',
-            silentCheckSsoRedirectUri: window.location.origin + {{ url_for('static', filename='silent-check-sso.html')|jsonify }},
-          },
-        },
         {% endif %}
       }
     </script>
