@@ -60,4 +60,7 @@ async def url_to_emitter(url):
               traceback=traceback.format_exc(),
             ))
   else:
-    raise NotImplementedError
+    logger.error("Emitter not recognized, falling back to stderr")
+    import fsspec
+    with fsspec.open('file:///dev/stderr', 'w') as fw:
+      yield json_emitter_factory(fw)
