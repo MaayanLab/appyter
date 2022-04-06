@@ -16,8 +16,9 @@ async def url_to_emitter(url):
     with fsspec.open(url, 'w') as fw:
       yield json_emitter_factory(fw)
   elif url.startswith('http://') or url.startswith('https://'):
-    from appyter.ext.socketio import AsyncClient
+    import fsspec
     import urllib.parse
+    from appyter.ext.socketio import AsyncClient
     with fsspec.open('file:///dev/stderr', 'w') as fw:
       fallback_emitter = json_emitter_factory(fw)
       async with AsyncClient() as sio:
