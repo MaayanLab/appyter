@@ -1,5 +1,6 @@
 <script>
   import auth from '@/lib/stores/keycloak_auth_store'
+  import human_size from '@/utils/human_size'
   export let args
 
   let value = args.value || args.default || ''
@@ -20,27 +21,6 @@
       .then(res => res.json())
       .then(res => ls[cwd] = res)
       .catch(err => ls[cwd] = [])
-  }
-
-  function human_size(size) {
-    let postfix = 'B'
-    let precision = 0
-    if (size > 1000) {
-      postfix = 'KB'
-      precision += 1
-      size /= 1000
-    }
-    if (size > 1000) {
-      postfix = 'MB'
-      precision += 1
-      size /= 1000
-    }
-    if (size > 1000) {
-      postfix = 'GB'
-      precision += 1
-      size /= 1000
-    }
-    return `${size.toFixed(2)} ${postfix}`
   }
 </script>
 
