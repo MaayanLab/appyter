@@ -1,6 +1,6 @@
+aiohttp-wsgi
 aiohttp<3.8.0
 aiohttp_remotes
-aiohttp-wsgi
 bs4
 click
 click-default-group
@@ -20,3 +20,4 @@ python-dotenv
 python-engineio==4.0.0
 python-socketio==5.0.4
 watchgod
+werkzeug==2.0.3
