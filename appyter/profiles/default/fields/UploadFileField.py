@@ -5,12 +5,12 @@ from appyter.ext.re import re_full
 from appyter.ext.urllib import parse_file_uri
 from appyter.render.flask_app.upload import upload_from_request
 
-class FileField(Field):
+class UploadFileField(Field):
   ''' Represing a uploadable File and facilitating that file upload.
   The field ends up being a string of the file path, for example:
   ```python
   import pandas as pd
-  df = pd.read_csv({{ FileField(name='my-csv', label='My CSV') }})
+  df = pd.read_csv({{ UploadFileField(name='my-csv', label='My CSV') }})
   ```
 
   :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
