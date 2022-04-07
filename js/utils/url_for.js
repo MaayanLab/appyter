@@ -6,7 +6,9 @@ function params_stringify(params) {
     .join('&')
 }
 
-export default function url_for({ path, params }) {
+export default function url_for(props) {
+  let { path, params } = props || {}
+  if (path === undefined || path === null) path = ''
   const params_encoded = params_stringify(params)
   if (params_encoded === '') {
     return path
