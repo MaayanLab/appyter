@@ -35,29 +35,66 @@
     {/if}:
   </div>
   <div class="col-lg-6 pt-2 pt-lg-0">
-    <h4>Browsing <code>{args.storage}</code></h4>
-    <ul style="list-style: none;" class="pl-0">
-      <li> [D] . {cwd}</li>
-      {#if parent !== cwd}
-        <li> [D] <button type="button" class="text-btn" on:click={()=>{ cwd = parent }}>.. {parent}</button></li>
-      {/if}
+    <div style="display: flex; flex-direction: row; max-height: 500px; overflow-x: hidden; overflow-y: auto;" class="pl-0">
+      <div style="display: flex; flex-direction: column; align-items: center; padding-right: 5px">
+        {#if parent !== cwd}
+          <span><i class="far fa-folder"></i> </span>
+        {/if}
+        <span><i class="far fa-folder-open"></i> </span>
       {#each (ls[cwd]||[]) as p}
         {#if p.type === 'directory'}
-          <li> [D] <button type="button" class="text-btn" on:click={()=>{ cwd = p.name }}>{p.name}</button></li>
+          <span><i class="far fa-folder"></i> </span>
         {/if}
       {/each}
       {#each (ls[cwd]||[]) as p}
         {#if p.type === 'file'}
-          <li> [F] <button type="button" class="text-btn" on:click={()=>{ value = p.name }}>
-            {#if value === p.name}
-              <b>{p.name} ({human_size(p.size)})</b>
-            {:else}
-              {p.name} ({human_size(p.size)})
-            {/if}
-          </button></li>
+          <span><i class="far fa-file"></i> </span>
         {/if}
       {/each}
-    </ul>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: start; white-space: nowrap; overflow-x: auto; flex: 1 1 auto;">
+        {#if parent !== cwd}
+          <button type="button" class="text-btn" on:click={()=>{ cwd = parent }}>.. {parent}</button>
+        {/if}
+        <button type="button" class="text-btn">. {cwd}</button>
+        {#each (ls[cwd]||[]) as p}
+          {#if p.type === 'directory'}
+            <button type="button" class="text-btn" on:click={()=>{ cwd = p.name }}>{p.name.slice(cwd.length).replace(/^\//, '')}</button>
+          {/if}
+        {/each}
+        {#each (ls[cwd]||[]) as p}
+          {#if p.type === 'file'}
+            <button type="button" class="text-btn" on:click={()=>{ value = p.name }}>
+              {#if value === p.name}
+                <span style="font-weight: 600">{p.name.slice(cwd.length).replace(/^\//, '')}</span>
+              {:else}
+                {p.name.slice(cwd.length).replace(/^\//, '')}
+              {/if}
+            </button>
+          {/if}
+        {/each}
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: start; padding-left: 5px">
+        {#if parent !== cwd}
+          <span>&nbsp;</span>
+        {/if}
+        <span>&nbsp;</span>
+        {#each (ls[cwd]||[]) as p}
+          {#if p.type === 'directory'}
+            <span>&nbsp;</span>
+          {/if}
+        {/each}
+        {#each (ls[cwd]||[]) as p}
+          {#if p.type === 'file'}
+            {#if value === p.name}
+              <span style="white-space: nowrap; font-weight: 600">{human_size(p.size)}</span>
+            {:else}
+              <span style="white-space: nowrap">{human_size(p.size)}</span>
+            {/if}
+          {/if}
+        {/each}
+      </div>
+    </div>
     <input
       type="text"
       style="display: none"
