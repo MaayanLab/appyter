@@ -34,7 +34,15 @@
       bind:value={value}
     />
     <div class="invalid-feedback">
-      String contains unsupported characters (should match `{args.constraint}`).
+      {#if value}
+        {#if args.feedback}
+          {args.feedback}
+        {:else}
+          String is invalid, should match `{args.constraint}`.
+        {/if}
+      {:else}
+        String should not be empty.
+      {/if}
     </div>
     {#if args.examples && Object.keys(args.examples).length > 0}
       <div class="d-table-row">
