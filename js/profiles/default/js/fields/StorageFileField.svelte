@@ -2,6 +2,7 @@
   import auth from '@/lib/stores/keycloak_auth_store'
   import human_size from '@/utils/human_size'
   export let args
+  export let backend = 'StorageFileField'
 
   let value = args.value || args.default || ''
   $: args.value = `${args.storage}${value}#${value.split('/').slice(-1)[0]}`
@@ -13,7 +14,7 @@
 
   let ls = {}
   $: if (!(cwd in ls)) {
-    fetch(`StorageFileField/ls/${args.storage}${cwd}`, {
+    fetch(`${backend}/ls/${args.storage}${cwd}`, {
       headers: {
         'Authorization': $auth.state === 'auth' ? `Bearer ${$auth.keycloak.token}` : null,
       },

@@ -14,6 +14,7 @@
     </div>
   </DescriptionField>
   <StorageFileField
+    backend="AccountFileField"
     args={{
       ...args,
       label: 'Browse Your Uploads & Integrations',
