@@ -94,7 +94,7 @@ async def serve(app_path, **kwargs):
   ))
   # the underlying appyter library's templates/ipynb/staticfiles/...
   tasks.append(asyncio.create_task(
-    file_watcher(emitter, 'livereload', os.path.join(appyter.__path__[0], 'profiles'),
+    file_watcher(emitter, 'livereload', appyter.__path__[0],
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
         include_dir_glob=['*'],
