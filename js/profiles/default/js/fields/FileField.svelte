@@ -24,29 +24,21 @@
       props={{
         args: {
           ...args,
-          name: `${args.name}-upload`,
           label: 'Upload',
         }
       }}
     />
   {:else if window._config.EXTRAS.includes('catalog-integration') && tab === 'Locate'}
     <Lazy
-      module={() => import('./StorageFileField.svelte')}
-      props={{
-        args: {
-          ...args,
-          name: `${args.name}-locate`,
-          label: 'Browse Your Uploads & Integrations',
-          storage: 'account://',
-        }
-      }}
+      module={() => import('@/extras/catalog-integration/AccountFileField.svelte')}
+      props={{ args }}
     />
   {:else if tab === 'Passthrough'}
     <Lazy
       module={() => import('./URIFileField.svelte')}
       props={{
         args: {
-          name: `${args.name}-uri`,
+          name: args.name,
           label: 'Uniform Resource Identifier',
           description: 'One of several supported identifiers for accessing your file',
           examples: Object.keys(args.examples).reduce((agg, example) => (example.indexOf('://') !== -1) ? { ...agg, [example]: args.examples[example] } : agg, {}),
