@@ -12,9 +12,6 @@ from appyter.ext.itertools import one_and_only
 
 logger = logging.getLogger(__name__)
 
-def slugify(s):
-  return re.sub(r'[^a-zA-Z0-9]+', '_', s)
-
 @cli.command(help='Scaffold an appyter optionally with an existing Jupyter Notebook')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB', required=False, type=click.Path(file_okay=True, path_type=str))
 def init(ipynb, **kwargs):
