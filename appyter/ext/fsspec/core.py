@@ -4,13 +4,11 @@ logger = logging.getLogger(__name__)
 def url_to_fs_ex(url, **kwargs):
   ''' Like url_to_fs but get opts from fragment_qs
   '''
-  from appyter.ext.urllib import parse_file_uri
+  from appyter.ext.yarl import URLEx
   from fsspec.core import url_to_fs
-  uri_parsed = parse_file_uri(url)
-  opts = dict(kwargs, **(uri_parsed.fragment_qs or {}))
-  uri_parsed.fragment = None
-  uri_parsed.fragment_query = None
-  fs, fspath = url_to_fs(str(uri_parsed), **opts)
+  uri_parsed = URLEx(url)
+  opts = dict(kwargs, **uri_parsed.fragment_query_ex)
+  fs, fspath = url_to_fs(str(uri_parsed.with_fragment(None)), **opts)
   return fs, fspath
 
 def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):

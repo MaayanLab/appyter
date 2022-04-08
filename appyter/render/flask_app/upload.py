@@ -7,7 +7,7 @@ from appyter.ext.asyncio.helpers import ensure_async, ensure_sync
 from appyter.ext.contextlib import ContextManagerAsHandle
 
 from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.urllib import parse_file_uri
+from appyter.ext.yarl import URLEx
 from appyter.extras.catalog_integration.storage import prepare_storage
 from appyter.render.flask_app.constants import get_input_fs
 logger = logging.getLogger(__name__)
@@ -93,10 +93,10 @@ async def siofu_done(sid, evt):
       # if you upload a file in a request, it should get registered
       try:
         from appyter.extras.catalog_integration.uploads import FileInfo, add_file
-        file_uri_parsed = parse_file_uri(file_uri)
+        file_uri_parsed = URLEx(file_uri)
         await add_file(
           FileInfo(
-            file=file_uri_parsed.url,
+            file=str(file_uri_parsed.with_fragment(None)),
             filename=file_uri_parsed.fragment,
             metadata=dict(
               size=file['size'],
@@ -122,7 +122,7 @@ def upload_from_request(req, fname):
   filename = secure_filepath(fh.filename)
   if not filename: return None
   data = prepare_request(req)
-  with url_to_chroot_fs(str(prepare_storage(data).join('input'))) as input_fs:
+  with url_to_chroot_fs(str(URLEx(prepare_storage(data)).join('input'))) as input_fs:
     path = generate_uuid()
     with url_to_chroot_fs('memory:///') as tmp_fs:
       with tmp_fs.open(path, 'wb') as fw:
@@ -133,9 +133,9 @@ def upload_from_request(req, fname):
     # if you upload a file in a request, it should get registered
     try:
       from appyter.extras.catalog_integration.uploads import FileInfo, add_file
-      file_uri_parsed = parse_file_uri(file_uri)
+      file_uri_parsed = URLEx(file_uri)
       ensure_sync(add_file(
-        FileInfo(file=file_uri_parsed.url, filename=file_uri_parsed.fragment),
+        FileInfo(file=str(file_uri_parsed.with_fragment(None)), filename=file_uri_parsed.fragment),
         auth=data.get('_auth'),
         config=data.get('_config'),
       ))

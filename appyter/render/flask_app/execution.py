@@ -50,7 +50,7 @@ async def submit(sid, data):
     await enter_room(sid, instance_id)
   else:
     try:
-      storage_uri = await _prepare_storage(data)
+      storage = await _prepare_storage(data)
       async with _prepare_executor(data, executor) as executor:
         async with room_lock(instance_id):
           await enter_room(sid, instance_id)
@@ -62,7 +62,7 @@ async def submit(sid, data):
               session=instance_id,
               id=generate_uuid(),
               url=join_url(request_url, instance_id),
-              storage=storage_uri,
+              storage=storage,
               debug=config['DEBUG'],
             )
             async for msg in executor._run(**job):

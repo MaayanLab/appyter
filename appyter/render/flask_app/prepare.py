@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 from appyter.context import get_env, get_jinja2_env
 from appyter.ext.dict import dict_collision_free_update
 from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.urllib import parse_file_uri
 from appyter.parse.nb import nb_to_ipynb_io
 from appyter.render.flask_app.constants import get_fields, get_deep_fields, get_ipynb_hash, get_nbtemplate
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
@@ -46,7 +45,7 @@ async def _prepare_storage(data):
   if storage_uri is None:
     storage_uri = data['_config']['DATA_DIR']#'storage://'
   #
-  return parse_file_uri(storage_uri)
+  return storage_uri
 prepare_storage = ensure_sync(_prepare_storage)
 
 async def _prepare_results(data):

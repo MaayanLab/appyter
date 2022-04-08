@@ -5,6 +5,7 @@ from flask import request, current_app, send_file, send_from_directory, abort, j
 from werkzeug.exceptions import NotFound
 
 from appyter.ext.urllib import join_url
+from appyter.ext.yarl import URLEx
 from appyter.render.flask_app.constants import get_form, get_ipynb_io, get_nbtemplate_json, get_static_fs, get_j2_env
 from appyter.render.flask_app.core import core
 from appyter.ext.flask import route_join_with_or_without_slash
@@ -65,7 +66,7 @@ def data_files(path):
         _nb=current_app.config['IPYNB'],
       )
     else:
-      output_fs_ctx = ContextManagerAsHandle(url_to_chroot_fs(str(prepare_storage(data).join('output'))))
+      output_fs_ctx = ContextManagerAsHandle(url_to_chroot_fs(str(URLEx(prepare_storage(data)).join('output'))))
       output_fs = output_fs_ctx.open()
       path = join_url(path, current_app.config['IPYNB'])
       if output_fs.exists(path):
@@ -75,7 +76,7 @@ def data_files(path):
       else:
         output_fs_ctx.close()
   else:
-    output_fs_ctx = ContextManagerAsHandle(url_to_chroot_fs(str(prepare_storage(data).join('output'))))
+    output_fs_ctx = ContextManagerAsHandle(url_to_chroot_fs(str(URLEx(prepare_storage(data)).join('output'))))
     output_fs = output_fs_ctx.open()
     if output_fs.exists(path):
       response = send_file(output_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))

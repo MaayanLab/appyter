@@ -1,4 +1,4 @@
-from appyter.ext.urllib import parse_qs
+from appyter.ext.yarl import URLEx
 from appyter.ext.asyncio.helpers import ensure_sync
 
 class AbstractExecutor:
@@ -10,9 +10,8 @@ class AbstractExecutor:
   
   @classmethod
   def parse(cls, url) -> dict:
-    url, _, qs = url.partition('?')
-    opts = parse_qs(qs)
-    return dict(url=url, **opts)
+    url = URLEx(url)
+    return dict(url=str(url.with_fragment(None)), **url.fragment_query_ex)
 
   async def __aenter__(self):
     return self
