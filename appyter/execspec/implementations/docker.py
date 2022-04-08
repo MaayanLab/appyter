@@ -46,7 +46,8 @@ class DockerExecutor(AbstractExecutor):
         f"--{k}={v}" if len(k) > 1 else f"-{k}{v}"
         for k, v in dict_merge(
           {
-            'cwd': job['cwd'],
+            'w': job['cwd'],
+            's': 'file:///dev/stdout',
             'data-dir': str(job['storage']),
           },
           **self.executor_options.get('args', {})

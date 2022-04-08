@@ -1,10 +1,10 @@
-import json
 import logging
 logger = logging.getLogger(__name__)
 
 from appyter.execspec.spec import AbstractExecutor
 from appyter.ext.asyncio.try_n_times import async_try_n_times
 from appyter.ext.asyncio.helpers import ensure_async
+from appyter.ext.dict import dict_merge
 
 def endless_watch(*args, **kwargs):
   from kubernetes import watch
@@ -53,7 +53,21 @@ class KubernetesExecutor(AbstractExecutor):
                 client.V1Container(
                   name=f"appyter-{job['id']}",
                   image=self.url,
-                  command=['appyter', 'orchestration', 'job', json.dumps(job)],
+                  command=[
+                    'appyter', 'nbexecute',
+                    *(
+                      f"--{k}={v}" if len(k) > 1 else f"-{k}{v}"
+                      for k, v in dict_merge(
+                        {
+                          's': job['url'],
+                          'w': job['cwd'],
+                          'data-dir': str(job['storage']),
+                        },
+                        **self.executor_options.get('args', {})
+                      ).items()
+                    ),
+                    job['ipynb'],
+                  ],
                   security_context=client.V1SecurityContext(
                     privileged=True,
                     capabilities=client.V1Capabilities(

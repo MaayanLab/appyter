@@ -6,14 +6,13 @@ import asyncio
 import datetime
 import traceback
 import logging
-
-from appyter.ext.emitter import json_emitter_factory
-from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.asyncio.helpers import ensure_async, ensure_sync
 logger = logging.getLogger(__name__)
 
 from appyter import __version__
 from appyter.cli import cli
+from appyter.ext.emitter import json_emitter_factory
+from appyter.ext.fsspec.core import url_to_chroot_fs
+from appyter.ext.asyncio.helpers import ensure_async, ensure_sync
 from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io, nb_to_json
 from appyter.ext.click import click_option_setenv, click_argument_setenv
@@ -161,14 +160,34 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   #
 
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')
-@click.option('-o', '--output', default='-', type=click.File('w'), help='The output location to write dynamic updates')
+@click.option('-o', type=str, metavar='FILE', default=None, help='Output notebook')
+@click.option('-s', type=str, metavar='URI', default='file:///dev/stderr', help='Status stream')
+@click.option('-w', type=str, metavar='DIR', default=None, help='Working directory')
 @click_option_setenv('--data-dir', envvar='APPYTER_DATA_DIR', default='data', help='The directory that storage:// uris correspond to')
-@click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click_option_setenv('--fuse', envvar='APPYTER_FUSE', default=False, help='Use fuse for execution')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
-def nbexecute(ipynb, output, cwd, fuse, data_dir=None):
+def nbexecute(ipynb, s=None, o=None, w=None, fuse=False, data_dir=None):
+  if s == '-':
+    s = 'file:///dev/stderr'
+  #
+  if o is None:
+    if w is None:
+      o = 'file:///dev/stdout'
+  elif o == '-':
+    o = 'file:///dev/stdout'
+  #
+  from appyter.ext.emitter import url_to_emitter
   from appyter.ext.asyncio.event_loop import with_event_loop
   from appyter.ext.fsspec.storage import ensure_storage
+  from appyter.ext.tempfile import tempdir
   with with_event_loop():
-    with ensure_sync(ensure_storage(data_dir)):
-      ensure_sync(nbexecute_async(ipynb=ipynb, emit=json_emitter_factory(output), cwd=cwd, fuse=fuse))
+    with tempdir(w) as tmp_dir:
+      with ensure_sync(url_to_emitter(s)) as emitter:
+        emitter = ensure_sync(emitter)
+        with ensure_sync(ensure_storage(data_dir)):
+          ensure_sync(nbexecute_async(
+            ipynb=ipynb,
+            emit=emitter,
+            cwd=str(tmp_dir),
+            fuse=fuse,
+          ))
