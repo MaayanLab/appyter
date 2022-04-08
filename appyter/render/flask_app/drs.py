@@ -11,6 +11,27 @@ from flask import current_app, request, send_file, abort
 from appyter.render.flask_app.core import core
 from appyter.render.flask_app.constants import get_input_fs
 from appyter.ext.urllib import url_filename
+from appyter import __version__
+
+@core.route('/ga4gh/drs/v1/service-info', methods=['GET'])
+def drs_service_info():
+  from pathlib import PurePath
+  from appyter.ext.re import slugify
+  name = slugify(PurePath(current_app.config['IPYNB']).stem.lower())
+  return {
+    'id': f"cloud.maayanlab.appyter.{name}",
+    'name': 'Appyter',
+    'type': {
+      'group': 'cloud.maayanlab.appyter',
+      'artifact': 'drs',
+      'version': '1.0.0',
+    },
+    'organization': {
+      'name': 'MaayanLab',
+      'url': 'https://maayanlab.cloud',
+    },
+    'version': __version__,
+  }
 
 @core.route('/ga4gh/drs/v1/objects/<string:file_id>', methods=['GET'])
 def drs_objects(file_id):
