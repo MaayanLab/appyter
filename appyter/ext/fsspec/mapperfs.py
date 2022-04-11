@@ -1,4 +1,6 @@
 import logging
+
+from appyter.ext.urllib import join_slash
 logger = logging.getLogger(__name__)
 
 from fsspec import AbstractFileSystem
@@ -54,8 +56,14 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
     ''' Return (fs, path) depending on whether we hit a mapped paths or not
     '''
     if path in self.pathmap:
-      return url_to_fs_ex(self.pathmap[path])
+      return (*self.pathmap[path], path)
     else:
+      path_split = path.split('/')
+      for i in range(1, len(path_split)):
+        base_path = '/'.join(path_split[:-i])
+        if base_path in self.pathmap:
+          fs, fo = self.pathmap[base_path]
+          return fs, join_slash(fo, *path_split[-i:]), base_path
       raise FileNotFoundError(path)
 
   def __enter__(self):
@@ -85,7 +93,7 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
     raise PermissionError(path)
 
   def cat_file(self, path, start=None, end=None, **kwargs):
-    fs, fs_path = self._pathmap(path)
+    fs, fs_path, _ = self._pathmap(path)
     return fs.cat_file(fs_path, start=start, end=end, **kwargs)
 
   def copy(self, path1, path2, recursive=False, on_error=None, maxdepth=None, **kwargs):
@@ -101,7 +109,7 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
     if path in self.listing:
       raise IsADirectoryError
     else:
-      fs, fs_path = self._pathmap(path)
+      fs, fs_path, _ = self._pathmap(path)
       return fs.get_drs(fs_path, **kwargs)
 
   def info(self, path, **kwargs):
@@ -111,7 +119,7 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
         'type': 'directory',
       }
     else:
-      fs, fs_path = self._pathmap(path)
+      fs, fs_path, _ = self._pathmap(path)
       info = fs.info(fs_path, **kwargs)
       info = dict(info, name=path)
       return info
@@ -127,6 +135,16 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
           results.append(self.info(p))
         else:
           results.append(p)
+    else:
+      try:
+        fs, fo, base_path = self._pathmap(path)
+        for p in fs.ls(fo, detail=detail):
+          if detail:
+            results.append(dict(p, name=join_slash(base_path, p['name'])))
+          else:
+            results.append(join_slash(base_path, p))
+      except FileNotFoundError:
+        pass
     return results
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
