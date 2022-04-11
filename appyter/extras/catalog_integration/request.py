@@ -39,12 +39,15 @@ async def prepare_request(req):
     if not data.get('_auth'): raise PermissionError
     # CAVATICA executor should use cavatica storage
     if not data.get('_storage'):
-      from appyter.extras.catalog_integration.user_config import get_user_config
-      user_config = await get_user_config(data.get('_auth'), data.get('_config'))
-      if not user_config.get('cavatica_api_key'): raise Exception('Missing CAVATICA API Key')
-      if not user_config.get('cavatica_project'): raise Exception('Missing CAVATICA Project')
       # NOTE: this gets sanitized downstream
-      data['_storage'] = f"cavatica://{user_config.get('cavatica_project')}"
+      cavatica_project = request_get(req, '_cavatica_project')
+      if not cavatica_project:
+        from appyter.extras.catalog_integration.user_config import get_user_config
+        user_config = await get_user_config(data.get('_auth'), data.get('_config'))
+        if not user_config.get('cavatica_api_key'): raise Exception('Missing CAVATICA API Key')
+        if not user_config.get('cavatica_project'): raise Exception('Missing CAVATICA Project')
+        cavatica_project = user_config.get('cavatica_project')
+      data['_storage'] = f"cavatica://{cavatica_project}"
     else:
       assert data['_storage'].startsWith('cavatica://'), 'CAVATICA executor requires CAVATICA storage'
   #

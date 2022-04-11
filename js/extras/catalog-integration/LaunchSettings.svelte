@@ -5,6 +5,30 @@
   import DescriptionField from '@/components/fields/DescriptionField.svelte'
   import TabField from '@/components/fields/TabField.svelte'
   import StringField from '@/components/fields/StringField.svelte'
+
+  let config
+  async function get_config() {
+    const res = await fetch(`${window._config.CATALOG_ORIGIN}/postgrest/rpc/user_config`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${await $auth.keycloak.getValidToken()}`,
+      },
+      body: JSON.stringify({ config: null })
+    })
+    if (res.status === 200) {
+      return await res.json()
+    } else {
+      console.error(await res.text())
+    }
+  }
+
+  $: if ($auth.state === 'auth') {
+    get_config()
+      .then(c => config = c)
+      .catch(e => console.error(e))
+  }
 </script>
 
 <SectionField
@@ -18,7 +42,7 @@
   {#if $auth.state === 'auth'}
     <DescriptionField>
       <div class="text-center">
-        Logged in as {$auth.keycloak.tokenParsed.email}, <button type="button" class="text-btn" on:click={() => $auth.keycloak.logout()}>click here</button> to logout.
+        Logged in as {$auth.keycloak.tokenParsed.email}, <a href="{window._config.CATALOG_ORIGIN}/#/account/">click here</a> to manage your account.
       </div>
     </DescriptionField>
     <TabField
@@ -27,24 +51,52 @@
         label: 'Execution Profile',
         description: 'How the appyter should be executed',
         value: 'Catalog',
-        choices: ['Catalog', 'CAVATICA'],
+        choices: [
+          'Catalog',
+          'CAVATICA',
+        ],
       }}
       let:tab={tab}
     >
       {#if tab === 'Catalog'}
+        <input
+          type="text"
+          class="hidden"
+          name="_executor"
+          value=""
+        />
         <DescriptionField>
           <span style="font-weight: 600">Execute using Public Appyter Catalog Resources</span>
         </DescriptionField>
       {:else if tab === 'CAVATICA'}
-        <DescriptionField>
-          <span style="font-weight: 600">Execute in CAVATICA</span>: For more information, or to configure CAVATICA integration, <a href="/#/account/integrations/cavatica">click here</a>.
-        </DescriptionField>
-        <StringField
-          args={{
-            name: 'cavatica_project',
-            label: 'CAVATICA Project',
-          }}
+        <input
+          type="text"
+          class="hidden"
+          name="_executor"
+          value="cavatica"
         />
+        {#if config !== undefined}
+          {#if !config.cavatica_api_key}
+            <DescriptionField>
+              <div class="alert alert-warning">CAVATICA Integration is not configured, please <a href="{window._config.CATALOG_ORIGIN}/#/account/integrations/cavatica">click here to learn more</a>.</div>
+            </DescriptionField>
+          {:else}
+            <DescriptionField>
+              <span style="font-weight: 600">Execute in CAVATICA</span>
+            </DescriptionField>
+            <StringField
+              args={{
+                value: config.cavatica_project || '',
+                name: '_cavatica_project',
+                label: 'CAVATICA Project',
+                constraint: '^[^/]+/[^/]+$',
+                feedback: 'String is invalid, should be of the form: cavatica-username/cavatica-project',
+              }}
+            />
+          {/if}
+        {:else}
+          <Loader />
+        {/if}
       {/if}
     </TabField>
   {:else}
