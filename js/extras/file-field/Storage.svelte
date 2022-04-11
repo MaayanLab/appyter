@@ -1,11 +1,14 @@
 <script>
   import auth from '@/lib/stores/keycloak_auth_store'
+  import Loader from '@/components/Loader.svelte'
   import human_size from '@/utils/human_size'
   export let args
   export let backend = 'StorageFileField'
 
   let value = args.value || args.default || ''
   $: args.value = `${args.storage}${value}#${value.split('/').slice(-1)[0]}`
+
+  let loading = false
 
   let cwd = ''
 
@@ -14,14 +17,21 @@
 
   let ls = {}
   $: if (!(cwd in ls)) {
+    loading = true
     fetch(`${backend}/ls/${args.storage}${cwd}`, {
       headers: {
         'Authorization': $auth.state === 'auth' ? `Bearer ${$auth.keycloak.token}` : null,
       },
     })
       .then(res => res.json())
-      .then(res => ls[cwd] = res)
-      .catch(err => ls[cwd] = [])
+      .then(res => {
+        ls[cwd] = res
+        loading = false
+      })
+      .catch(err => {
+        ls[cwd] = []
+        loading = false
+      })
   }
 </script>
 
@@ -74,6 +84,9 @@
             </button>
           {/if}
         {/each}
+        {#if loading}
+          <Loader />
+        {/if}
       </div>
       <div style="display: flex; flex-direction: column; align-items: start; padding-left: 5px">
         {#if parent !== cwd}

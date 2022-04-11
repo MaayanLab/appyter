@@ -1,6 +1,6 @@
 <script>
   import auth from '@/lib/stores/keycloak_auth_store'
-  import StorageFileField from '@/profiles/default/js/fields/StorageFileField.svelte'
+  import StorageFileField from '@/extras/file-field/Storage.svelte'
   import DescriptionField from '@/components/fields/DescriptionField.svelte'
   import Loader from '@/components/Loader.svelte'
 
@@ -14,11 +14,11 @@
     </div>
   </DescriptionField>
   <StorageFileField
-    backend="AccountFileField"
+    backend="locate"
     args={{
       ...args,
       label: 'Browse Your Uploads & Integrations',
-      storage: 'catalog://',
+      storage: 'user://',
     }}
   />
 {:else}

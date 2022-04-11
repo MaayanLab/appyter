@@ -1,11 +1,10 @@
 <script>
   import re_full from '@/utils/re_full'
 
-  export let args
+  export let args = {}
 
-  let value
-  $: if (args !== undefined && value === undefined) {
-    value = args.default
+  $: if (args.value === undefined) {
+    args.value = args.default
   }
 
   let constraint
@@ -14,8 +13,8 @@
   }
 
   let valid = true
-  $: if (value !== undefined && constraint !== undefined) {
-    valid = constraint.exec(value) !== null
+  $: if (args.value !== undefined && constraint !== undefined) {
+    valid = constraint.exec(args.value) !== null
   }
 </script>
 
@@ -31,10 +30,10 @@
       class:is-valid={valid}
       class:is-invalid={!valid}
       placeholder={args.hint}
-      bind:value={value}
+      bind:value={args.value}
     />
     <div class="invalid-feedback">
-      {#if value}
+      {#if args.value}
         {#if args.feedback}
           {args.feedback}
         {:else}
@@ -53,7 +52,7 @@
           {#each Object.keys(args.examples) as example_name}
             <span class="text-sm m-1 p-1" style="white-space: nowrap;">
               <button type="button" class="text-btn"
-                on:click={() => value = args.examples[example_name]}
+                on:click={() => args.value = args.examples[example_name]}
               >{Array.isArray(args.examples) ? args.examples[example_name] : example_name}</button>
             </span>
           {/each}

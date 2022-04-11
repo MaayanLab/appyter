@@ -261,3 +261,7 @@ class Field(dict):
     ''' (SAFE) The default str(Field) is just safe_value
     '''
     return self.safe_value
+
+  @property
+  def is_file(self):
+    return False

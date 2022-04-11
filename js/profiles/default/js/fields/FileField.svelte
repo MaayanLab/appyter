@@ -20,7 +20,7 @@
 <TabField bind:args={tabArgs} let:tab={tab}>
   {#if tab === 'Upload'}
     <Lazy
-      module={() => import('./UploadFileField.svelte')}
+      module={() => import('@/extras/file-field/Upload.svelte')}
       props={{
         args: {
           ...args,
@@ -30,12 +30,12 @@
     />
   {:else if window._config.EXTRAS.includes('catalog-integration') && tab === 'Locate'}
     <Lazy
-      module={() => import('@/extras/catalog-integration/AccountFileField.svelte')}
+      module={() => import('@/extras/catalog-integration/LocateFileField.svelte')}
       props={{ args }}
     />
   {:else if tab === 'Passthrough'}
     <Lazy
-      module={() => import('./URIFileField.svelte')}
+      module={() => import('@/extras/file-field/URI.svelte')}
       props={{
         args: {
           name: args.name,
