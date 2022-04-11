@@ -9,7 +9,7 @@ from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.render.flask_app.constants import get_base_files, get_html_exporer
 from appyter.render.flask_app.core import core
 from appyter.render.flask_app.prepare import prepare_storage, prepare_request
-from appyter.ext.yarl import URLEx
+from appyter.ext.urllib import URI
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.parse.nb import nb_from_ipynb_io
 
@@ -19,7 +19,7 @@ def export(path):
     data = dict(_id=path, _config=current_app.config)
     data.update(prepare_request(data))
     format = request.args.get('format', 'html')
-    storage = URLEx(prepare_storage(data))
+    storage = URI(prepare_storage(data))
     with url_to_chroot_fs(str(storage.join('output', path))) as data_fs:
       nbpath = data['_config']['IPYNB']
       if data_fs.exists(nbpath):

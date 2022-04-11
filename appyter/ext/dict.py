@@ -31,3 +31,17 @@ def dict_unflatten(f):
 
 def dict_merge(d, **kwargs):
   return dict_unflatten(dict_flatten(d) + dict_flatten(kwargs))
+
+def expand_dotmap(dotmap):
+  ''' Convert dot-notation into deep dict
+  '''
+  params = {}
+  for K, v in dotmap.items():
+    _params_n_2 = None
+    _params_n_1 = params
+    for k in K.split('.'):
+      if k not in _params_n_1: _params_n_1[k] = {}
+      _params_n_2 = _params_n_1
+      _params_n_1 = _params_n_2[k]
+    _params_n_2[k] = v
+  return params

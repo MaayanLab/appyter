@@ -1,4 +1,4 @@
-from appyter.ext.yarl import URLEx
+from appyter.ext.urllib import URI
 from appyter.ext.asyncio.helpers import ensure_sync
 
 class AbstractExecutor:
@@ -10,7 +10,7 @@ class AbstractExecutor:
   
   @classmethod
   def parse(cls, url) -> dict:
-    url = URLEx(url)
+    url = URI(url)
     return dict(url=str(url.with_fragment(None)), **url.fragment_query_ex)
 
   async def __aenter__(self):

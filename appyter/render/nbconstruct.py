@@ -9,11 +9,10 @@ from copy import deepcopy
 from appyter import __version__
 from appyter.cli import cli
 from appyter.context import get_env, get_jinja2_env
-from appyter.ext.urllib import join_url
+from appyter.ext.urllib import URI, join_url
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.parse.nbtemplate import cell_match, parse_fields_from_nbtemplate
 from appyter.ext.click import click_option_setenv, click_argument_setenv
-from appyter.ext.yarl import URLEx
 
 def render_cell(env, cell):
   ''' Render a single cell, calling jinja2 templates when necessary
@@ -64,7 +63,7 @@ def render_nb_from_nbtemplate(env, nbtemplate, data={}, deep_fields=None):
   files = {}
   for field in deep_fields:
     if field.field in {'FileField', 'UploadFileField', 'StorageFileField'} and data.get(field.args['name']):
-      uri_parsed = URLEx(data[field.args['name']])
+      uri_parsed = URI(data[field.args['name']])
       filename = uri_parsed.fragment
       url = str(uri_parsed.with_fragment(None))
       if filename and url:

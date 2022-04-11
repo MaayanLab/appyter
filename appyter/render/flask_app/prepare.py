@@ -1,6 +1,7 @@
 import contextlib
 import traceback
 import logging
+
 logger = logging.getLogger(__name__)
 
 from appyter.context import get_env, get_jinja2_env
@@ -11,6 +12,7 @@ from appyter.render.flask_app.constants import get_fields, get_deep_fields, get_
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.ext.hashlib import sha1sum_dict
 from appyter.ext.asyncio.helpers import ensure_async, ensure_async_contextmanager, ensure_sync
+from appyter.ext.urllib import URI
 
 async def _prepare_request(req):
   ''' Extract internal session variables from request
@@ -61,7 +63,7 @@ async def _prepare_results(data):
   ))
   data['_id'] = instance_id
   storage = await _prepare_storage(data)
-  cwd = str(storage.join('output', instance_id))
+  cwd = str(URI(storage).join('output', instance_id))
   data_fs = url_to_chroot_fs(cwd)
   data_fs_ctx = ensure_async_contextmanager(data_fs)
   async with data_fs_ctx:

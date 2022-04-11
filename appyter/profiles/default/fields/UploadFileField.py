@@ -2,7 +2,7 @@ import re
 from appyter.fields import Field
 from appyter.ext.flask import secure_filepath, join_routes
 from appyter.ext.re import re_full
-from appyter.ext.yarl import URLEx
+from appyter.ext.urllib import URI
 from appyter.render.flask_app.upload import upload_from_request
 
 class UploadFileField(Field):
@@ -34,7 +34,7 @@ class UploadFileField(Field):
   @property
   def raw_value(self):
     if type(self.args['value']) == str and self.args['value']:
-      uri_parsed = URLEx(self.args['value'])
+      uri_parsed = URI(self.args['value'])
       filename = uri_parsed.fragment or self.args['value']
       if self._env.globals['_config']['SAFE_MODE']:
         return secure_filepath(filename)
@@ -64,7 +64,7 @@ class UploadFileField(Field):
   def to_cwl_value(self):
     if not self.args['value']:
       return None
-    uri_parsed = URLEx(self.args['value'])
+    uri_parsed = URI(self.args['value'])
     name = uri_parsed.fragment or self.args['value']
     path = str(uri_parsed.with_fragment(None))
     return {

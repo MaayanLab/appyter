@@ -3,8 +3,7 @@ import aiohttp
 import fsspec
 from fsspec.asyn import AsyncFileSystem
 from appyter.ext.fsspec.spec.sync_async import SyncAsyncFileSystem
-from appyter.ext.yarl import URLEx
-from appyter.ext.urllib import join_url
+from appyter.ext.urllib import URI, join_url
 
 drs_matcher = re.compile(r'^drs://([^/]+)/(.+)$', re.IGNORECASE)
 
@@ -67,7 +66,7 @@ class DRSFileSystem(SyncAsyncFileSystem, AsyncFileSystem):
     else:
       raise RuntimeError('Invalid DRS Implementation')
     # convert access_url into fsspec url
-    url = URLEx(access_url['url']).with_fragment(None)
+    url = URI(access_url['url']).with_fragment(None)
     if access_url.get('headers'):
       url = url.with_fragment_query(access_url.get('headers', {}))
     if access_method.get('region'):
