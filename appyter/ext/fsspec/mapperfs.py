@@ -25,7 +25,15 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
           "pathmap is required"
       )
     
-    self.pathmap = pathmap
+    self.pathmap = {}
+    for path, fs_uri in pathmap.items():
+      if type(fs_uri) == str:
+        self.pathmap[path] = url_to_fs_ex(fs_uri)
+      elif type(fs_uri) == tuple:
+        self.pathmap[path] = fs_uri
+      else:
+        self.pathmap[path] = fs_uri, ''
+
     self.listing = {}
     for mapping in self.pathmap:
       src_split = mapping.split('/')
@@ -51,10 +59,15 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
       raise FileNotFoundError(path)
 
   def __enter__(self):
+    for fs, _fo in self.pathmap.values():
+      if getattr(fs, '__enter__', None) is not None:
+        fs.__enter__()
     return self
-  
+
   def __exit__(self, type, value, traceback):
-    pass
+    for fs, _fo in self.pathmap.values():
+      if getattr(fs, '__exit__', None) is not None:
+        fs.__exit__(type, value, traceback)
 
   def mkdir(self, path, **kwargs):
     raise PermissionError(path)
