@@ -184,7 +184,7 @@ def get_env_from_kwargs(**kwargs):
   if 'prefix' in kwargs or 'PREFIX' not in _config:
     _config['PREFIX'] = try_json_loads(kwargs.get('prefix', os.environ.get('APPYTER_PREFIX', ''))).rstrip('/')
   if 'profile' in kwargs or 'PROFILE' not in _config:
-    _config['PROFILE'] = try_json_loads(kwargs.get('profile', os.environ.get('APPYTER_PROFILE', 'default')))
+    _config['PROFILE'] = try_json_loads(kwargs.get('profile', os.environ.get('APPYTER_PROFILE', 'biojupies')))
   if 'extras' in kwargs or 'EXTRAS' not in _config:
     _config['EXTRAS'] = try_json_loads(kwargs.get('extras', os.environ.get('APPYTER_EXTRAS', '')))
   if 'host' in kwargs or 'HOST' not in _config:
