@@ -110,8 +110,8 @@ class FileField(Field):
   def to_cwl_value(self):
     return {
       'class': 'File',
-      'path': URI(self.raw_value).with_fragment_path(None),
-      'name': self.value,
+      'path': str(self.uri.with_fragment_path(None)),
+      'name': self.uri.fragment_path,
     } if self.raw_value is not None else None
 
   def to_jsonschema(self):
