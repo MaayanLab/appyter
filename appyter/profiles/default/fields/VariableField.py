@@ -73,7 +73,7 @@ class VariableField(Field):
               name=name,
             ).prepare(req)
           )
-          value.append(data[name])
+          value.append(data.pop(name))
           continue
       # prepare with value provided using field
       name = f"{self.args['field']['args']['name']}{i}"
@@ -82,10 +82,11 @@ class VariableField(Field):
           name=name,
         ).prepare({name: v})
       )
-      value.append(data[name])
+      value.append(data.pop(name))
     # return prepared aggregated value
     self.args['value'] = value
-    return { self.args['name']: value }
+    data[self.args['name']] = value
+    return data
   #
   @property
   def raw_value(self):

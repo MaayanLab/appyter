@@ -8,7 +8,7 @@ from appyter.context import get_env, get_jinja2_env
 from appyter.ext.dict import dict_collision_free_update
 from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.parse.nb import nb_to_ipynb_io
-from appyter.render.flask_app.constants import get_fields, get_deep_fields, get_ipynb_hash, get_nbtemplate
+from appyter.render.flask_app.constants import get_fields, get_ipynb_hash, get_nbtemplate
 from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.ext.hashlib import sha1sum_dict
 from appyter.ext.asyncio.helpers import ensure_async, ensure_async_contextmanager, ensure_sync
@@ -73,7 +73,7 @@ async def _prepare_results(data):
       env = get_jinja2_env(config=data['_config'], context=data, session=instance_id)
       nbtemplate = get_nbtemplate()
       # in case of constraint failures, we'll fail here
-      nb = render_nb_from_nbtemplate(env, nbtemplate, deep_fields=get_deep_fields(), data=data)
+      nb = render_nb_from_nbtemplate(env, nbtemplate, data=data)
       # write notebook
       async with ensure_async_contextmanager(
         await ensure_async(data_fs.open)(data['_config']['IPYNB'], 'w')

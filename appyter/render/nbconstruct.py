@@ -9,7 +9,7 @@ from copy import deepcopy
 from appyter import __version__
 from appyter.cli import cli
 from appyter.context import get_env, get_jinja2_env
-from appyter.ext.urllib import URI, join_url
+from appyter.ext.urllib import join_url
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
 from appyter.parse.nbtemplate import cell_match, parse_fields_from_nbtemplate
 from appyter.ext.click import click_option_setenv, click_argument_setenv
@@ -55,19 +55,9 @@ def render_cell(env, cell):
 
   return cell
 
-def render_nb_from_nbtemplate(env, nbtemplate, data={}, deep_fields=None):
+def render_nb_from_nbtemplate(env, nbtemplate, data={}):
   ''' Render the notebook by rendering the jinja2 templates using the context in env.
   '''
-  if deep_fields is None:
-    deep_fields = parse_fields_from_nbtemplate(env, nbtemplate, deep=True)
-  files = {}
-  for field in deep_fields:
-    if field.is_file and data.get(field.args['name']):
-      uri_parsed = URI(data[field.args['name']])
-      filename = uri_parsed.fragment
-      url = str(uri_parsed.with_fragment(None))
-      if filename and url:
-        files[filename] = url
   #
   nb = deepcopy(nbtemplate)
   nb.cells = list(filter(None, [
@@ -83,7 +73,11 @@ def render_nb_from_nbtemplate(env, nbtemplate, data={}, deep_fields=None):
     version=__version__,
     created=datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat(),
     filename=env.globals['_config']['IPYNB'],
-    files=files,
+    files={
+      k[len('_file:'):]: v
+      for k, v in data.items()
+      if k.startswith('_file:')
+    },
     # don't include private fields in nbconstruct
     data={
       k: v

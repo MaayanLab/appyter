@@ -44,12 +44,11 @@ class FileField(Field):
     else:
       return None
 
-  @property
-  def uri(self):
+  def prepare_uri(self, raw_value):
     ''' The fully resolved URI for this file
     '''
-    if self.raw_value is None: return None
-    uri_parsed = URI(self.raw_value)
+    if raw_value is None: return None
+    uri_parsed = URI(raw_value)
     if uri_parsed.scheme is None:
       if self._env.globals['_config']['SAFE_MODE']:
         uri_parsed = (
@@ -60,17 +59,27 @@ class FileField(Field):
             .with_fragment_query_string(uri_parsed.fragment_query_string)
         )
       else:
-        uri_parsed = uri_parsed.with_scheme('file').with_fragment_path(self.raw_value)
+        uri_parsed = uri_parsed.with_scheme('file').with_fragment_path(raw_value)
     return uri_parsed
+
+  @property
+  def uri(self):
+    return self.prepare_uri(self.raw_value)
 
   def prepare(self, req):
     ''' Convert file in request into URI
     '''
+    data_path = None
+    # get data from request upload
     if getattr(req, 'files', None):
       data_path = upload_from_request(req, self.args['name'])
-      if data_path:
-        return {self.args['name']: data_path}
-    return super().prepare(req)
+    # fallback to default
+    if data_path is None: data_path = super().prepare(req)[self.args['name']]
+    data_path = self.prepare_uri(data_path)
+    return {
+      self.args['name']: str(data_path),
+      f"_file:{data_path.fragment_path}": str(data_path.with_fragment_path(None)),
+    }
 
   def constraint(self):
     if self.raw_value is None:
@@ -83,6 +92,8 @@ class FileField(Field):
 
   @property
   def value(self):
+    if self.uri is None:
+      return None
     if not self.constraint():
       raise FieldConstraintException(
         field=self.field,
@@ -111,7 +122,3 @@ class FileField(Field):
   @property
   def public_url(self):
     return str(self.uri.with_fragment_path(None))
-
-  @property
-  def is_file(self):
-    return True
