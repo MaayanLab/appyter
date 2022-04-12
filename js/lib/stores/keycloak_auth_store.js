@@ -2,33 +2,36 @@ import { writable } from 'svelte/store'
 import hash from '@/lib/stores/url_hash_store.js'
 
 function keycloak_auth_store() {
-  const { subscribe, set } = writable({ state: 'init', keycloak: {} })
-  if (window._config.EXTRAS.indexOf('catalog-integration') !== -1 && window._config.keycloak !== undefined) {
+  const { subscribe, set } = writable({
+    state: window._config.EXTRAS.includes('catalog-integration') ? 'init' : 'guest',
+    keycloak: {},
+  })
+  if (window._config.EXTRAS.includes('catalog-integration') && window._config.keycloak !== undefined) {
     import('keycloak-js').then(async ({ default: Keycloak }) => {
       const keycloak = new Keycloak(window._config.keycloak.params)
+      const keycloakLogout = keycloak.logout
+      Object.assign(keycloak, {
+        getValidToken: async () => {
+          try {
+            await keycloak.updateToken(30)
+          } catch (e) {
+            console.error(e)
+            set({ state: 'guest', keycloak })
+          }
+          return keycloak.token
+        },
+        logout: () => {
+          keycloakLogout()
+          set({ state: 'guest', keycloak })
+        },
+      })
       const authenticated = await keycloak.init({
         ...window._config.keycloak.init,
         redirectUri: window.location.href + (window.location.href.includes('#') ? '' : '#') + (window.location.href.includes('?') ? '' : '?'),
       })
-      keycloak.onTokenExpired = () => {
-        console.debug('refreshing expired token...')
-        keycloak.updateToken()
-          .success(() => {
-            set({ state: 'auth', keycloak })
-          })
-          .error(e => {
-            set({ state: 'error', keycloak })
-          })
-      }
       set({
         state: authenticated ? 'auth' : 'guest',
-        keycloak: {
-          ...keycloak,
-          logout: () => {
-            keycloak.logout()
-            set({ state: 'guest', keycloak })
-          }
-        },
+        keycloak,
       })
       // cleanup keycloak auth params
       hash.update($hash => {
