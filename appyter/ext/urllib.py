@@ -23,7 +23,7 @@ def join_url(root, *parts):
   return join_slash(root, str(ChrootPurePosixPath('/').join(*parts)))
 
 url_expr = re.compile(
-  r'^((?P<scheme>.+)://(?P<authority>((?P<username>[^/:@\?#]+?)(:(?P<password>[^/@\?#]+?))?@)?(?P<netloc>(?P<hostname>[^:/\?#]+)(:(?P<port>\d+))?))?)?(?P<path>.*?)(\?(?P<query_string>.*?))?(#(?P<fragment>.*?))?$'
+  r'^((?P<scheme>.+?)://(?P<authority>((?P<username>[^/:@\?#]+?)(:(?P<password>[^/@\?#]+?))?@)?(?P<netloc>(?P<hostname>[^:/\?#]+)(:(?P<port>\d+))?))?)?(?P<path>.*?)(\?(?P<query_string>.*?))?(#(?P<fragment>.*?))?$'
 )
 fragment_expr =  re.compile(
   r'^(?P<path>.*?)(\?(?P<query_string>.*?))?$'
