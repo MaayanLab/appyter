@@ -8,12 +8,11 @@ class FileInfo:
   metadata: dict = None
 
 async def add_file(data: FileInfo, auth=None, config=None):
-  if not auth: raise PermissionError
   import aiohttp
   async with aiohttp.ClientSession(
     headers={
       'Authorization': f"Bearer {auth}",
-    },
+    } if auth else {},
     raise_for_status=True,
   ) as session:
     async with session.post(

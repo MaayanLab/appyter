@@ -9,12 +9,11 @@ class InstanceInfo:
   metadata: dict = None
 
 async def add_instance(data: InstanceInfo, auth=None, config=None):
-  if not auth: raise PermissionError
   import aiohttp
   async with aiohttp.ClientSession(
     headers={
       'Authorization': f"Bearer {auth}",
-    },
+    } if auth else {},
   ) as session:
     async with session.post(
       join_url(
