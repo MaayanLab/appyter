@@ -1,7 +1,7 @@
 import re
 from appyter.fields import Field, FieldConstraintException
 from appyter.render.flask_app.upload import upload_from_request
-from appyter.ext.flask import join_routes, secure_filepath
+from appyter.ext.flask import secure_filepath
 from appyter.ext.urllib import URI
 from appyter.ext.re import re_full
 
@@ -31,8 +31,6 @@ class FileField(Field):
   :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
   def __init__(self, default=None, constraint=r'.*', **kwargs):
-    if default and '://' not in default:
-      default = f"storage://static/{default}"
     super().__init__(
       constraint=constraint,
       default=default,
@@ -42,15 +40,28 @@ class FileField(Field):
   @property
   def raw_value(self):
     if type(self.args['value']) == str and self.args['value']:
-      uri_parsed = URI(self.args['value'])
-      if self._env.globals['_config']['SAFE_MODE']:
-        if uri_parsed.scheme not in {'drs', 's3', 'gs', 'ftp', 'http', 'https', 'storage'}:
-          raise FieldConstraintException(self.field, self.args['name'], self.args['value'], message='Scheme not supported')
-        return secure_filepath(uri_parsed.fragment_path or uri_parsed.name or self.args['value'])
-      else:
-        return uri_parsed.fragment_path or self.args['value']
+      return self.args['value']
     else:
       return None
+
+  @property
+  def uri(self):
+    ''' The fully resolved URI for this file
+    '''
+    if self.raw_value is None: return None
+    uri_parsed = URI(self.raw_value)
+    if uri_parsed.scheme is None:
+      if self._env.globals['_config']['SAFE_MODE']:
+        uri_parsed = (
+          URI(self._env.globals['_config']['PUBLIC_URL'])
+            .join('static', uri_parsed.path)
+            .with_query_string(uri_parsed.query_string)
+            .with_fragment_path(secure_filepath(uri_parsed.fragment_name or uri_parsed.name))
+            .with_fragment_query_string(uri_parsed.fragment_query_string)
+        )
+      else:
+        uri_parsed = uri_parsed.with_scheme('file').with_fragment_path(self.raw_value)
+    return uri_parsed
 
   def prepare(self, req):
     ''' Convert file in request into URI
@@ -65,13 +76,20 @@ class FileField(Field):
     if self.raw_value is None:
       return not self.args.get('required')
     else:
-      return re.match(re_full(self.args['constraint']), self.args['value'])
+      if self._env.globals['_config']['SAFE_MODE']:
+        if self.uri.scheme not in {'drs', 's3', 'gs', 'ftp', 'http', 'https', 'storage', 'user'}:
+          return False
+      return re.match(re_full(self.args['constraint']), self.uri.fragment_path)
 
   @property
   def value(self):
-    ret = super().value
-    if ret is None: return ''
-    else: return ret
+    if not self.constraint():
+      raise FieldConstraintException(
+        field=self.field,
+        field_name=self.args['name'],
+        value=self.raw_value,
+      )
+    return self.uri.fragment_path
 
   def to_cwl(self):
     schema = super().to_cwl()
@@ -79,16 +97,11 @@ class FileField(Field):
     return schema
 
   def to_cwl_value(self):
-    if not self.args['value']:
-      return None
-    uri_parsed = URI(self.args['value'])
-    name = uri_parsed.fragment or self.args['value']
-    path = str(uri_parsed.with_fragment(None))
     return {
       'class': 'File',
-      'path': path,
-      'name': name,
-    }
+      'path': URI(self.raw_value).with_fragment_path(None),
+      'name': self.value,
+    } if self.raw_value is not None else None
 
   def to_jsonschema(self):
     schema = super().to_jsonschema()
@@ -97,13 +110,7 @@ class FileField(Field):
 
   @property
   def public_url(self):
-    try:
-      from flask import request
-      return join_routes(request.base_url, self.value)[1:]
-    except RuntimeError:
-      from appyter.context import get_env
-      config = get_env()
-      return join_routes(config.get('PUBLIC_URL', 'file:///' + config.get('CWD')), self.value)[1:]
+    return str(self.uri.with_fragment_path(None))
 
   @property
   def is_file(self):
