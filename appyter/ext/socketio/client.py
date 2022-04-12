@@ -1,3 +1,4 @@
+import traceback
 import socketio
 import logging
 from appyter.ext.socketio.chunked_emit import ChunkedEmitMixin
@@ -28,3 +29,5 @@ class AsyncClient(
 
   async def __aexit__(self, *args):
     await super().__aexit__(*args)
+    try: await self.eio.http.close()
+    except: logger.warn(traceback.format_exc())
