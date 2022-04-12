@@ -121,7 +121,7 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
         yield Path(self._resolve_path(path))
       elif path:
         # just make another wrapper to deal with subpath mounting
-        with ChrootFileSystem(fs=self, fo=path).mount(path='', mount_dir=mount_dir, fuse=fuse, passthrough=passthrough, **kwargs) as mount_dir:
+        with ChrootFileSystem(fs=self.fs, fo=join_slash(self.storage_options.get('fo', ''), path)).mount(path='', mount_dir=mount_dir, fuse=fuse, passthrough=passthrough, **kwargs) as mount_dir:
           yield mount_dir
       elif fuse:
         # use fuse fs_mount
