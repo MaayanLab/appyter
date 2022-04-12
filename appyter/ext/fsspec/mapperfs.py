@@ -148,7 +148,7 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
     return results
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
-    fs, fs_path = self._pathmap(path)
+    fs, fs_path, _ = self._pathmap(path)
     if 'r' not in mode: raise PermissionError(path)
     return fs._open(
       fs_path,
