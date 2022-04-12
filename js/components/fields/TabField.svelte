@@ -23,7 +23,7 @@
       aria-orientation="vertical"
       role="tablist"
     >
-      {#each args.choices as choice_name}
+      {#each Array.isArray(args.choices) ? args.choices : Object.keys(args.choices) as choice_name}
         <a
           class="nav-link{args.value === choice_name ? ' active' : ''}"
           aria-controls="tab-content-{args.name}-{choice_name}"
