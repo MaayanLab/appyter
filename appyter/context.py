@@ -192,7 +192,7 @@ def get_env_from_kwargs(**kwargs):
   if 'port' in kwargs or 'PORT' not in _config:
     _config['PORT'] = try_json_loads(kwargs.get('port', os.environ.get('APPYTER_PORT', 5000)))
   if 'public_url' in kwargs or 'PUBLIC_URL' not in _config:
-    _config['PUBLIC_URL'] = try_json_loads(kwargs.get('public_url', os.environ.get('APPYTER_PUBLIC_URL', f"http://{_config['HOST']}:{_config['PORT']}"))).rstrip('/')
+    _config['PUBLIC_URL'] = (try_json_loads(kwargs.get('public_url', os.environ.get('APPYTER_PUBLIC_URL'))) or f"http://{_config['HOST']}:{_config['PORT']}").rstrip('/')
   if 'proxy' in kwargs or 'PROXY' not in _config:
     _config['PROXY'] = try_json_loads(kwargs.get('proxy', os.environ.get('APPYTER_PROXY', False)))
   if 'cwd' in kwargs or 'CWD' not in _config:
