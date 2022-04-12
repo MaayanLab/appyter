@@ -7,6 +7,7 @@
   import setup_chunking from '@/lib/socketio'
   import pagehit from '@/extras/catalog-integration/pagehit'
   import toc from '@/extras/catalog-integration/toc'
+  import auth_headers from '@/utils/auth_headers'
   export let nbdownload
 
   const paths = window.location.pathname.split('/').filter(p => p)
@@ -106,9 +107,7 @@
       // no-cache implies a check with the remote server no matter what, it still uses the cache if the resource hasn't changed
       const req = await fetch(`${nbdownload}${window.location.search}`, {
           cache: 'no-cache',
-          headers: {
-            'Authorization': $auth.state === 'auth' ? `Bearer ${$auth.keycloak.token}` : null,
-          },
+          headers: await auth_headers($auth),
         })
       if (req.status === 404) {
         throw new Error('Notebook not found')

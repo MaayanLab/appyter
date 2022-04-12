@@ -4,6 +4,7 @@
   import auth from '@/lib/stores/keycloak_auth_store'
   import Lazy from '@/components/Lazy.svelte'
   import url_for from '@/utils/url_for'
+  import auth_headers from '@/utils/auth_headers'
   export let fields = []
 
   let submitting = false
@@ -28,7 +29,7 @@
         method: 'POST',
         headers: {
           'Accept': 'application/json',
-          'Authorization': $auth.state === 'auth' ? `Bearer ${$auth.keycloak.token}` : null,
+          ...(await auth_headers($auth)),
         },
         body: formData,
       })

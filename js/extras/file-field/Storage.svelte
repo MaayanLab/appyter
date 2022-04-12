@@ -18,19 +18,16 @@
   let ls = {}
   $: if (!(cwd in ls)) {
     loading = true
-    fetch(`${backend}/ls/${args.storage}${cwd}`, {
-      headers: {
-        'Authorization': $auth.state === 'auth' ? `Bearer ${$auth.keycloak.token}` : null,
-      },
-    })
-      .then(res => res.json())
-      .then(res => {
-        ls[cwd] = res
-        loading = false
-      })
-      .catch(err => {
-        ls[cwd] = []
-        loading = false
+    auth_headers($auth)
+      .then(async (headers) => {
+        try {
+          const res = await fetch(`${backend}/ls/${args.storage}${cwd}`, { headers })
+          ls[cwd] = await res.json()
+          loading = false
+        } catch (e) {
+          ls[cwd] = []
+          loading = false
+        }
       })
   }
 </script>

@@ -5,6 +5,7 @@
   import DescriptionField from '@/components/fields/DescriptionField.svelte'
   import TabField from '@/components/fields/TabField.svelte'
   import StringField from '@/components/fields/StringField.svelte'
+  import auth_headers from '@/utils/auth_headers'
 
   let config
   async function get_config() {
@@ -13,7 +14,7 @@
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': `Bearer ${await $auth.keycloak.getValidToken()}`,
+        ...(await auth_headers($auth)),
       },
       body: JSON.stringify({ config: null })
     })
