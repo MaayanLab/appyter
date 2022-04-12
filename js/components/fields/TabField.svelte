@@ -1,13 +1,5 @@
 <script>
-  import hash from '@/lib/stores/url_hash_store'
-  import url_for from '@/utils/url_for'
-
   export let args
-  $: if ($hash.params[args.name] !== undefined) {
-    args.value = $hash.params[args.name]
-  } else {
-    $hash.params[args.name] = args.value
-  }
 </script>
 
 <div class="row px-4 px-lg-3 pb-4">
@@ -28,7 +20,8 @@
           class="nav-link{args.value === choice_name ? ' active' : ''}"
           aria-controls="tab-content-{args.name}-{choice_name}"
           role="tab"
-          href={`${url_for($hash.server)}#${url_for({ path: $hash.path, params: {...$hash.params, [args.name]: choice_name} })}` }
+          href="#"
+          on:click={() => args.value = choice_name}
         >
           {choice_name}
         </a>
