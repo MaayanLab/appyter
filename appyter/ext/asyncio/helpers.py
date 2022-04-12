@@ -12,9 +12,6 @@ import functools
 
 from appyter.ext.asyncio.event_loop import get_event_loop
 
-import logging
-logger = logging.getLogger(__name__)
-
 from inspect import (
   isasyncgen,
   isasyncgenfunction,
@@ -37,15 +34,12 @@ def _call(func, args, kwargs):
   return func(*args, **kwargs)
 
 async def ensure_async_literal(obj):
-  logger.debug(f"ensure_async_literal")
   return obj
 
 async def awaitable_identity(obj):
-  logger.debug(f"awaitable_identity")
   return await obj
 
 def ensure_async_func(func):
-  logger.debug(f"ensure_async_func")
   @functools.wraps(func)
   async def wrapper(*args, **kwargs):
     return await get_event_loop().run_in_executor(
@@ -58,14 +52,12 @@ def ensure_async_func(func):
 
 @ensure_async_func
 def anext(generator):
-  logger.debug(f"anext")
   try:
     return next(generator)
   except StopIteration:
     raise StopAsyncIteration
 
 async def ensure_async_generator(generator):
-  logger.debug(f"ensure_async_generator")
   while True:
     try:
       yield await anext(generator)
@@ -73,7 +65,6 @@ async def ensure_async_generator(generator):
       break
 
 def ensure_sync_coro(coro):
-  logger.debug(f"ensure_sync_coro")
   loop = get_event_loop()
   assert loop._thread_id != threading.current_thread().ident, "Can't run sync coro in async thread!"
   done = threading.Event()
@@ -94,7 +85,6 @@ def ensure_sync_coro(coro):
   return future.result()
 
 def ensure_sync_generator(asyncgenerator):
-  logger.debug(f"ensure_sync_generator")
   __anext__ = ensure_sync_wrapper(asyncgenerator.__anext__)
   while True:
     try:
@@ -113,7 +103,6 @@ class _AsyncSyncContextManager:
     return await self._aexit(typ, value, traceback)
 
 def ensure_async_contextmanager(contextmanager):
-  logger.debug(f"ensure_async_contextmanager")
   return _AsyncSyncContextManager(contextmanager)
 
 class _SyncAsyncContextManager:
@@ -126,11 +115,9 @@ class _SyncAsyncContextManager:
     return self._exit(typ, value, traceback)
 
 def ensure_sync_contextmanager(asynccontextmanager):
-  logger.debug(f"ensure_sync_contextmanager")
   return _SyncAsyncContextManager(asynccontextmanager)
 
 def ensure_async_wrapper(callable):
-  logger.debug(f"ensure_async_wrapper")
   @functools.wraps(callable)
   def wrapper(*args, **kwargs):
     obj = callable(*args, **kwargs)
@@ -165,7 +152,6 @@ def ensure_async(obj):
     return ensure_async_literal(obj)
 
 def ensure_sync_wrapper(callable):
-  logger.debug(f"ensure_sync_wrapper")
   @functools.wraps(callable)
   def wrapper(*args, **kwargs):
     obj = callable(*args, **kwargs)
