@@ -45,6 +45,7 @@
       />
     {/each}
     <button
+      type="button"
       class="btn btn-sm btn-success"
       style="float: right"
       class:disabled={args.max && fields.length > args.max}
