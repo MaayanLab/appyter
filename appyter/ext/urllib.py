@@ -153,8 +153,7 @@ class URI:
   def __str__(self):
     return ''.join(filter(None, (
       f"{self.scheme}://" if self.scheme is not None else None,
-      self.authority,
-      self.path,
+      join_url(self.authority, self.path) if self.authority is not None else self.path,
       f"?{self.query_string}" if self.query_string is not None else None,
       f"#{self.fragment}" if self.fragment is not None else None,
     )))
