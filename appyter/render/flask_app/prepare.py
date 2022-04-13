@@ -53,6 +53,10 @@ prepare_storage = ensure_sync(_prepare_storage)
 async def _prepare_results(data):
   ''' Compute instance id & ensure results exist in storage
   '''
+  storage = await _prepare_storage(data)
+  if 'catalog-integration' in data['_config']['EXTRAS']:
+    from appyter.extras.catalog_integration.userfs import upload_user_to_storage
+    await upload_user_to_storage(storage, data)
   instance_id = sha1sum_dict(dict(
     ipynb=get_ipynb_hash(),
     data={
@@ -61,8 +65,6 @@ async def _prepare_results(data):
       if not k.startswith('_') and k not in {'_executor', '_storage'}
     },
   ))
-  data['_id'] = instance_id
-  storage = await _prepare_storage(data)
   cwd = str(URI(storage).join('output', instance_id))
   data_fs = url_to_chroot_fs(cwd)
   data_fs_ctx = ensure_async_contextmanager(data_fs)

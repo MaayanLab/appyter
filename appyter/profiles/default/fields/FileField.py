@@ -73,7 +73,7 @@ class FileField(Field):
     # get data from request upload
     if getattr(req, 'files', None):
       data_path = upload_from_request(req, self.args['name'])
-    # fallback to default
+    # fallback to default (URI in request)
     if data_path is None: data_path = super().prepare(req)[self.args['name']]
     data_path = self.prepare_uri(data_path)
     return {
