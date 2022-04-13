@@ -12,9 +12,7 @@ import StringField from '@/components/fields/StringField.svelte';
     constraint: '^(drs|s3|gs|ftp|http|https)://.+$',
     feedback: 'Supported protocols include: drs (GA4GH), s3, gs, ftp, http, & https',
   }
-  $: if (stringArgs && stringArgs.value) {
-    args.value = stringArgs.value.replace(/^(.+)\/(.+?)$/g, '$1/$2#$2')
-  }
+  $: args.value = (stringArgs.value || '').replace(/^(.+)\/(.+?)$/g, '$1/$2#$2')
 </script>
 
 <Lazy
