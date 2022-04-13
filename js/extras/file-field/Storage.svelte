@@ -1,5 +1,6 @@
 <script>
   import auth from '@/lib/stores/keycloak_auth_store'
+  import auth_headers from '@/utils/auth_headers'
   import Loader from '@/components/Loader.svelte'
   import human_size from '@/utils/human_size'
   export let args
