@@ -61,7 +61,7 @@ class KubernetesExecutor(AbstractExecutor):
                         {
                           's': job['url'],
                           'w': job['cwd'],
-                          'data-dir': str(job['storage']),
+                          'data-dir': job['storage'],
                         },
                         **self.executor_options.get('args', {})
                       ).items()

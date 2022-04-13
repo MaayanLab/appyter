@@ -16,7 +16,7 @@ from appyter.execspec.spec import AbstractExecutor
 from appyter.ext.fsspec.util import fsspec_read_and_run
 from appyter.ext.asyncio.try_n_times import async_try_n_times
 from appyter.ext.dict import dict_filter_none, dict_merge
-from appyter.ext.urllib import join_slash
+from appyter.ext.urllib import URI, join_slash
 
 class WESExecutor(AbstractExecutor):
   ''' Run executions via a workflow execution service endpoint
@@ -50,7 +50,7 @@ class WESExecutor(AbstractExecutor):
     #       but is necessary if we want to use the standard `cwl-runner`
     from appyter.context import get_jinja2_env
     from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
-    nb = await fsspec_read_and_run(str(job['storage'].join(job['cwd'], job['ipynb'])), nb_from_ipynb_io)
+    nb = await fsspec_read_and_run(str(URI(job['storage']).join(job['cwd'], job['ipynb'])), nb_from_ipynb_io)
     env = get_jinja2_env(config=self.config, context=nb.metadata['appyter']['nbconstruct']['data'], session=job['session'])
     inputs = dict_filter_none({
       field.args['name']: field.to_cwl_value()
