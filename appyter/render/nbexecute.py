@@ -160,34 +160,21 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   #
 
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')
-@click.option('-o', type=str, metavar='FILE', default=None, help='Output notebook')
-@click.option('-s', type=str, metavar='URI', default='file:///dev/stderr', help='Status stream')
+@click.option('-s', type=str, metavar='URI', default='file:///dev/stdout', help='Status stream')
 @click.option('-w', type=str, metavar='DIR', default=None, help='Working directory')
 @click_option_setenv('--data-dir', envvar='APPYTER_DATA_DIR', default='data', help='The directory that storage:// uris correspond to')
 @click_option_setenv('--fuse', envvar='APPYTER_FUSE', default=False, help='Use fuse for execution')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
-def nbexecute(ipynb, s=None, o=None, w=None, fuse=False, data_dir=None):
-  if s == '-':
-    s = 'file:///dev/stderr'
-  #
-  if o is None:
-    if w is None:
-      o = 'file:///dev/stdout'
-  elif o == '-':
-    o = 'file:///dev/stdout'
-  #
+def nbexecute(ipynb, s=None, w=None, fuse=False, data_dir=None):
   from appyter.ext.emitter import url_to_emitter
   from appyter.ext.asyncio.event_loop import with_event_loop
   from appyter.ext.fsspec.storage import ensure_storage
-  from appyter.ext.tempfile import tempdir
   with with_event_loop():
-    with tempdir(w) as tmp_dir:
-      with ensure_sync(url_to_emitter(s)) as emitter:
-        emitter = ensure_sync(emitter)
-        with ensure_sync(ensure_storage(data_dir)):
-          ensure_sync(nbexecute_async(
-            ipynb=ipynb,
-            emit=emitter,
-            cwd=str(tmp_dir),
-            fuse=fuse,
-          ))
+    with ensure_sync(url_to_emitter(s)) as emitter:
+      with ensure_sync(ensure_storage(data_dir)):
+        ensure_sync(nbexecute_async(
+          ipynb=ipynb,
+          emit=emitter,
+          cwd=w,
+          fuse=fuse,
+        ))

@@ -13,8 +13,10 @@ class SubprocessExecutor(AbstractExecutor):
     proc = await asyncio.create_subprocess_exec(
       sys.executable, '-u', '-m',
       'appyter', 'nbexecute',
-      '--cwd', job['cwd'],
-      '--data-dir', str(job['storage']),
+      '-w', f"storage://{job['cwd']}",
+      '-s', 'file:///dev/stdout',
+      '--data-dir', job['storage'],
+      '--fuse=true',
       job['ipynb'],
       stdout=asyncio.subprocess.PIPE,
       stderr=sys.stderr,
