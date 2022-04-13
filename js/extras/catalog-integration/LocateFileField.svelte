@@ -40,4 +40,10 @@
       {/if}
     </div>
   </div>
+  <input
+    type="text"
+    style="display: none"
+    name={args.name}
+    value=""
+  />
 {/if}
