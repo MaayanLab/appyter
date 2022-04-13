@@ -22,11 +22,11 @@ async def _http_serve(directory, port=8888):
   async with with_app_running(app, port=port):
     yield
 
-async def _http_connect(url):
+async def _http_connect(url, ssl_verify=False):
   ''' Successfully connect to and resolve a url
   '''
   import aiohttp
-  async with aiohttp.ClientSession() as session:
+  async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=ssl_verify)) as session:
     async with session.get(url) as response:
       return await response.text()
 

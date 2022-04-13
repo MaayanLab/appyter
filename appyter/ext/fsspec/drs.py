@@ -1,6 +1,7 @@
 import re
 import aiohttp
-import fsspec
+from appyter.ext.fsspec.core import url_to_fs_ex
+from appyter.ext.asyncio.event_loop import get_event_loop
 from fsspec.asyn import AsyncFileSystem
 from appyter.ext.fsspec.spec.sync_async import SyncAsyncFileSystem
 from appyter.ext.urllib import URI, join_url
@@ -10,8 +11,9 @@ drs_matcher = re.compile(r'^drs://([^/]+)/(.+)$', re.IGNORECASE)
 class DRSFileSystem(SyncAsyncFileSystem, AsyncFileSystem):
   protocol = 'drs'
 
-  def __init__(self, *args):
-    super().__init__()
+  def __init__(self, *args, ssl_verify=True, **kwargs):
+    super().__init__(*args, ssl_verify=ssl_verify, **kwargs)
+    self.ssl_verify = ssl_verify
 
   @classmethod
   def _strip_protocol(cls, path):
@@ -27,7 +29,7 @@ class DRSFileSystem(SyncAsyncFileSystem, AsyncFileSystem):
     return ""
 
   async def __aenter__(self):
-    self._session_mgr = aiohttp.ClientSession()
+    self._session_mgr = aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=self.ssl_verify))
     self._session = await self._session_mgr.__aenter__()
     return self
 
@@ -40,7 +42,7 @@ class DRSFileSystem(SyncAsyncFileSystem, AsyncFileSystem):
     _url contains an fsspec compatible url
     '''
     # lookup DRS object
-    async with self._session.get(drs_matcher.sub('https://$1/ga4gh/drs/v1/objects/$2', path)) as req:
+    async with self._session.get(drs_matcher.sub(r'https://\1/ga4gh/drs/v1/objects/\2', path)) as req:
       if req.status != 200:
         raise FileNotFoundError
       info = await req.json()
@@ -57,7 +59,7 @@ class DRSFileSystem(SyncAsyncFileSystem, AsyncFileSystem):
       access_url = access_method['access_url']
     elif access_method.get('access_id'):
       async with self._session.get(join_url(
-        drs_matcher.sub('https://$1/ga4gh/drs/v1/objects/$2/access/', path),
+        drs_matcher.sub(r'https://\1/ga4gh/drs/v1/objects/\2/access/', path),
         access_method['access_id'],
       )) as req:
         if req.status != 200:
@@ -90,4 +92,8 @@ class DRSFileSystem(SyncAsyncFileSystem, AsyncFileSystem):
     '''
     if mode != "rb": raise NotImplementedError
     path_info = self.info(path)
-    return fsspec.open(path_info['_url'], mode=mode, **kwargs)
+    kwargs = dict(loop=get_event_loop())
+    if path_info['_url'].startswith('https://'):
+      kwargs.update(client_kwargs=dict(connector=aiohttp.TCPConnector(ssl=self.ssl_verify)))
+    fs, fo = url_to_fs_ex(path_info['_url'], **kwargs)
+    return fs.open(fo, mode)
