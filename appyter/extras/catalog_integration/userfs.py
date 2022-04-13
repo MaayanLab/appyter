@@ -29,6 +29,8 @@ async def create_userfs(data):
 async def upload_user_to_storage(storage, data):
   ''' Convert all `user://` file_uris into `storage://` uris
   '''
+  # TODO: this is a hack for now,
+  #  the whole thing should probably be part of the file field
   files = {
     k[len('_file:'):]: v
     for k, v in data.items()
@@ -38,9 +40,19 @@ async def upload_user_to_storage(storage, data):
     file_uri.startswith('user://')
     for file_uri in files.values()
   ):
+    from appyter.ext.dict import dict_typed_flatten, dict_typed_unflatten
+    flat_data = dict_typed_flatten(data)
     async with ensure_async_contextmanager(await create_userfs(data)) as userfs:
       async with ensure_async_contextmanager(url_to_chroot_fs(str(URI(storage).join('input')))) as storagefs:
         for filename, file_uri in files.items():
           if file_uri.startswith('user://'):
-            data[f"_file:{filename}"] = await ensure_async(organize_file_content)(storagefs, userfs, file_uri[len('user://'):], filename=filename)
+            new_file_uri = await ensure_async(organize_file_content)(storagefs, userfs, file_uri[len('user://'):], filename=filename)
+            new_file_uri_without_filename = str(URI(new_file_uri).with_fragment_path(None))
+            # replace the uri if it appears in `data`
+            existing_file_uri = str(URI(file_uri).with_fragment_path(filename))
+            flat_data = [
+              (K, new_file_uri_without_filename) if K[-1] == f"_file:{filename}" else (K, new_file_uri if v == existing_file_uri else v)
+              for K, v in flat_data
+            ]
+    return dict_typed_unflatten(flat_data)
   return data

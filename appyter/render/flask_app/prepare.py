@@ -56,7 +56,7 @@ async def _prepare_results(data):
   storage = await _prepare_storage(data)
   if 'catalog-integration' in data['_config']['EXTRAS']:
     from appyter.extras.catalog_integration.userfs import upload_user_to_storage
-    await upload_user_to_storage(storage, data)
+    data = await upload_user_to_storage(storage, data)
   instance_id = sha1sum_dict(dict(
     ipynb=get_ipynb_hash(),
     data={

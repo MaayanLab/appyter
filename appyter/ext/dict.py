@@ -45,3 +45,43 @@ def expand_dotmap(dotmap):
       _params_n_1 = _params_n_2[k]
     _params_n_2[k] = v
   return params
+
+def dict_typed_flatten(d):
+  ''' dict_flatten but preserves lists & ordering
+  '''
+  Q = [(tuple(), d)]
+  F = []
+  while Q:
+    K, V = Q.pop()
+    if type(V) == dict:
+      for k, v in V.items():
+        Q.append(((*K, dict, k), v))
+    elif type(V) == list:
+      for k, v in enumerate(V):
+        Q.append(((*K, list, k), v))
+    else:
+      F.append((K, V))
+  return F
+
+def dict_typed_unflatten(f):
+  ''' opposite of dict_typed_unflatten
+  '''
+  D = {}
+  for K, v in f:
+    o = D
+    for k, typ in zip(K[1:-1:2], K[2:-1:2]):
+      if type(o) == dict and k not in o:
+        o[k] = typ()
+      elif type(o) == list and len(o) < k or o[k] is None:
+        while len(o) <= k: o.append(None)
+        o[k] = typ()
+      #
+      if type(o) == list:
+        while len(o) <= k: o.append(None)
+      print(o, k)
+      o = o[k]
+    if type(o) == list:
+      while len(o) <= K[-1]: o.append(None)
+    print(o, K[-1], v)
+    o[K[-1]] = v
+  return D
