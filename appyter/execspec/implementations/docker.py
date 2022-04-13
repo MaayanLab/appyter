@@ -21,7 +21,11 @@ class DockerExecutor(AbstractExecutor):
       'docker', 'run',
       *(
         f"--{k}={v}" if len(k) > 1 else f"-{k}{v}"
-        for k, v in self.executor_options.get('flags', {}).items()
+        for k, v in dict_merge({
+          'device': '/dev/fuse',
+          'cap-add': 'SYS_ADMIN',
+          'security-opt': 'apparmor:unconfined',
+        }, **self.executor_options.get('flags', {})).items()
       ),
       self.url,
     ]
@@ -46,9 +50,10 @@ class DockerExecutor(AbstractExecutor):
         f"--{k}={v}" if len(k) > 1 else f"-{k}{v}"
         for k, v in dict_merge(
           {
-            'w': job['cwd'],
+            'w': f"storage://{job['cwd']}",
             's': 'file:///dev/stdout',
-            'data-dir': str(job['storage']),
+            'fuse': 'true',
+            'data-dir': job['storage'],
           },
           **self.executor_options.get('args', {})
         ).items()
