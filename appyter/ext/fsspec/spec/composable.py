@@ -34,7 +34,10 @@ class ComposableAbstractFileSystem:
       cls = _import_class(dic.pop("cls"))
     except (ImportError, ValueError, RuntimeError, KeyError, AttributeError):
       cls = get_filesystem_class(protocol)
-    return cls(*dic.pop("args", ()), **{
-      k: ComposableAbstractFileSystem.from_json(json.dumps(v)) if type(v) == dict and 'cls' in v else v
-      for k, v in dic.items()
-    })
+    if cls.from_json == ComposableAbstractFileSystem.from_json:
+      return cls(*dic.pop("args", ()), **{
+        k: ComposableAbstractFileSystem.from_json(json.dumps(v)) if type(v) == dict and 'cls' in v else v
+        for k, v in dic.items()
+      })
+    else:
+      return cls.from_json(blob)
