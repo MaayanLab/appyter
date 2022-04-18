@@ -16,15 +16,15 @@
       role="tablist"
     >
       {#each Array.isArray(args.choices) ? args.choices : Object.keys(args.choices) as choice_name}
-        <a
+        <button
+          type="button"
           class="nav-link{args.value === choice_name ? ' active' : ''}"
           aria-controls="tab-content-{args.name}-{choice_name}"
           role="tab"
-          href="#"
           on:click={() => args.value = choice_name}
         >
           {choice_name}
-        </a>
+        </button>
       {/each}
     </div>
   </div>

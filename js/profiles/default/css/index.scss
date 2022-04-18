@@ -16,6 +16,17 @@ pre code {
   }
 }
 
+button.nav-link {
+  border: none;
+  &:not(.active) {
+    background: transparent;
+    color: #007bff;
+    &:hover {
+      color: #0056b3;
+    }
+  }
+}
+
 /* Credit: https://loading.io/css/ */
 .lds-ellipsis {
   display: inline-block;
