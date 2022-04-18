@@ -27,7 +27,6 @@ class DockerExecutor(AbstractExecutor):
           'security-opt': 'apparmor:unconfined',
         }, **self.executor_options.get('flags', {})).items()
       ),
-      self.url,
     ]
     try:
       proc = await asyncio.create_subprocess_exec(*[
@@ -36,10 +35,11 @@ class DockerExecutor(AbstractExecutor):
       proc_stdout, _ = await proc.communicate()
       conf = json.loads(proc_stdout.decode())
       self._args += [
-        '--network', conf[0]['HostConfig']['NetworkMode']
+        f"--network={conf[0]['HostConfig']['NetworkMode']}"
       ]
     except:
       logger.warn('Not a docker container')
+    self._args.append(self.url)
     return await super().__aenter__()
 
   async def _submit(self, **job):
