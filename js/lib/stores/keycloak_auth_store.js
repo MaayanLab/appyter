@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store'
 import hash from '@/lib/stores/url_hash_store.js'
+import with_timeout from '@/utils/with_timeout'
 
 function keycloak_auth_store() {
   const { subscribe, set } = writable({
@@ -7,7 +8,7 @@ function keycloak_auth_store() {
     keycloak: {},
   })
   if (window._config.EXTRAS.includes('catalog-integration') && window._config.keycloak !== undefined) {
-    import('keycloak-js').then(async ({ default: Keycloak }) => {
+    import('keycloak-js').then(with_timeout(async ({ default: Keycloak }) => {
       const keycloak = new Keycloak(window._config.keycloak.params)
       const keycloakLogout = keycloak.logout
       Object.assign(keycloak, {
@@ -41,9 +42,9 @@ function keycloak_auth_store() {
         if ('state' in params) delete params['state']
         return { ...$hash, params }
       })
-    }).catch(err => {
+    }, 1000)).catch(err => {
       console.error(err)
-      set({ state: 'error', keycloak })
+      set({ state: 'error', keycloak: {} })
     })
   }
   return { subscribe }
