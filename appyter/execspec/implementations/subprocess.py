@@ -1,8 +1,9 @@
 import os
 import sys
 import json
-import asyncio
+
 from appyter.execspec.spec import AbstractExecutor
+from appyter.ext.asyncio.subprocess import sh
 
 class SubprocessExecutor(AbstractExecutor):
   ''' Run executions in a subprocess
@@ -10,7 +11,7 @@ class SubprocessExecutor(AbstractExecutor):
   protocol = 'subprocess'
 
   async def _submit(self, **job):
-    proc = await asyncio.create_subprocess_exec(
+    async for msg, done in sh(
       sys.executable, '-u', '-m',
       'appyter', 'nbexecute',
       '-w', f"storage://{job['cwd']}",
@@ -18,23 +19,18 @@ class SubprocessExecutor(AbstractExecutor):
       '--data-dir', job['storage'],
       '--fuse=true',
       job['ipynb'],
-      stdout=asyncio.subprocess.PIPE,
       stderr=sys.stderr,
       env=dict(
         PYTHONPATH=':'.join(sys.path),
         PATH=os.environ['PATH'],
       ),
-    )
-    while True:
-      line = await proc.stdout.readline()
-      if not line: break
-      yield json.loads(line), False
-    yield await proc.wait(), True
+    ):
+      yield msg, done
 
   async def _run(self, **job):
     yield dict(type='status', data=f"Launching subprocess...")
     async for msg, done in self._submit(**job):
-      if not done: yield msg
+      if not done: yield json.loads(msg)
     if msg == 0:
       yield dict(type='status', data=f"Subprocess exited")
     else:

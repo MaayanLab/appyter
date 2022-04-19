@@ -7,6 +7,7 @@ import asyncio
 logger = logging.getLogger(__name__)
 
 from appyter.execspec.spec import AbstractExecutor
+from appyter.ext.asyncio.subprocess import sh
 from appyter.ext.dict import dict_merge
 
 class DockerExecutor(AbstractExecutor):
@@ -60,22 +61,13 @@ class DockerExecutor(AbstractExecutor):
       ),
       job['ipynb'],
     ]
-    logger.debug(' '.join(map(repr, full_args)))
-    proc = await asyncio.create_subprocess_exec(
-      *full_args,
-      stdout=asyncio.subprocess.PIPE,
-      stderr=sys.stderr,
-    )
-    while True:
-      line = await proc.stdout.readline()
-      if not line: break
-      yield json.loads(line), False
-    yield await proc.wait(), True
+    async for msg, done in sh(*full_args, stderr=sys.stderr):
+      yield msg, done
 
   async def _run(self, **job):
     yield dict(type='status', data=f"Launching container...")
     async for msg, done in self._submit(**job):
-      if not done: yield msg
+      if not done: yield json.loads(msg)
     if msg == 0:
       yield dict(type='status', data=f"Container exited")
     else:
