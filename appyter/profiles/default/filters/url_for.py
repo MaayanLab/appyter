@@ -18,7 +18,7 @@ def url_for(directory, public=False, **kwargs):
     assert filename is not None
     url = join_url(config['PREFIX'], directory, filename)
   #
-  if public:
+  if config['MODE'] == 'default' and public:
     # url_for public modifier -- return the public facing url
     try:
       from flask import request
