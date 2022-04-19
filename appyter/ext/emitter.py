@@ -43,7 +43,7 @@ async def url_to_emitter(url):
             ))
         async def emit(msg):
           try:
-            await sio.emit('forward', dict(event=msg['type'], data=msg['data'], to=room))
+            await sio.emit(msg['type'], msg['data'], to=room)
           except:
             await fallback_emitter(dict(msg,
               traceback=traceback.format_exc(),
