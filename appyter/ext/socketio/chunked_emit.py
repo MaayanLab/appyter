@@ -2,7 +2,7 @@ import json
 import logging
 
 from appyter.ext.asyncio.helpers import ensure_async
-from appyter.ext.hashlib import hashsum_str
+from appyter.ext.hashlib import sha1sum_str
 logger = logging.getLogger(__name__)
 
 class ChunkedEmitMixin:
@@ -19,7 +19,7 @@ class ChunkedEmitMixin:
     #
     if chunkable:
       logger.debug(f"Large packet ({len(serialized)}), chunking...")
-      data_hash = await ensure_async(hashsum_str)(serialized)
+      data_hash = await ensure_async(sha1sum_str)(serialized)
       n_chunks = (len(serialized) // ChunkedEmitMixin.CHUNK_SIZE) + int(len(serialized) % ChunkedEmitMixin.CHUNK_SIZE != 0)
       for n in range(0, n_chunks):
         await super().emit(
