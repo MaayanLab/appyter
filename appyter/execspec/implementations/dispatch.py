@@ -43,4 +43,6 @@ class DispatchExecutor(AbstractExecutor):
     yield dict(type='status', data=f"Submitting appyter for execution..")
     queue_size = await async_try_n_times(3, self._submit, job)
     yield dict(type='status', data=f"Queued successfully, you are at position {queue_size}, your execution will begin when resources are available..")
-    # TODO: track queue position
+    # TODO: room drop hotfix until we have queue tracking
+    import asyncio
+    await asyncio.sleep(60)
