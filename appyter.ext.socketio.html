@@ -40,65 +40,84 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </section>
+<section id="module-appyter.ext.socketio.chunked_emit">
+<span id="appyter-ext-socketio-chunked-emit-module"></span><h2>appyter.ext.socketio.chunked_emit module<a class="headerlink" href="#module-appyter.ext.socketio.chunked_emit" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.ext.socketio.chunked_emit.ChunkedEmitMixin">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.socketio.chunked_emit.</code><code class="sig-name descname">ChunkedEmitMixin</code><a class="reference internal" href="_modules/appyter/ext/socketio/chunked_emit.html#ChunkedEmitMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.chunked_emit.ChunkedEmitMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A mixin for splitting up large <code class="docutils literal notranslate"><span class="pre">emit</span></code> calls into <code class="docutils literal notranslate"><span class="pre">chunked</span></code> calls of lower priority</p>
+<dl class="py attribute">
+<dt id="appyter.ext.socketio.chunked_emit.ChunkedEmitMixin.CHUNK_SIZE">
+<code class="sig-name descname">CHUNK_SIZE</code><em class="property"> = 1048576</em><a class="headerlink" href="#appyter.ext.socketio.chunked_emit.ChunkedEmitMixin.CHUNK_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.socketio.chunked_emit.ChunkedEmitMixin.emit">
+<em class="property">async </em><code class="sig-name descname">emit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">evt</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">priority</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/chunked_emit.html#ChunkedEmitMixin.emit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.chunked_emit.ChunkedEmitMixin.emit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-appyter.ext.socketio.client">
 <span id="appyter-ext-socketio-client-module"></span><h2>appyter.ext.socketio.client module<a class="headerlink" href="#module-appyter.ext.socketio.client" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="appyter.ext.socketio.client.AsyncClient">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.socketio.client.</code><code class="sig-name descname">AsyncClient</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/client.html#AsyncClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin" title="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">socketio.asyncio_client.AsyncClient</span></code></p>
-<p>Client with packet forwarding, emit buffering &amp; chunking</p>
-<dl class="py attribute">
-<dt id="appyter.ext.socketio.client.AsyncClient.CHUNK_SIZE">
-<code class="sig-name descname">CHUNK_SIZE</code><em class="property"> = 1048576</em><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient.CHUNK_SIZE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.socketio.client.</code><code class="sig-name descname">AsyncClient</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reconnection</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">reconnection_attempts</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">reconnection_delay</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">reconnection_delay_max</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">randomization_factor</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">json</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/client.html#AsyncClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#appyter.ext.socketio.forwarding.ForwardingMixin" title="appyter.ext.socketio.forwarding.ForwardingMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.ext.socketio.forwarding.ForwardingMixin</span></code></a>, <a class="reference internal" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin" title="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">socketio.asyncio_client.AsyncClient</span></code></p>
+<p>Client with packet forwarding, emit buffering &amp; chunking
+<code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> is necessary for initialization</p>
 <dl class="py method">
-<dt id="appyter.ext.socketio.client.AsyncClient.connection_tracker">
-<code class="sig-name descname">connection_tracker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/client.html#AsyncClient.connection_tracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient.connection_tracker" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="appyter.ext.socketio.client.AsyncClient.disconnect">
-<em class="property">async </em><code class="sig-name descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/client.html#AsyncClient.disconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient.disconnect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Disconnect from the server.</p>
-<p>Note: this method is a coroutine.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="appyter.ext.socketio.client.AsyncClient.emit">
-<em class="property">async </em><code class="sig-name descname">emit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">evt</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">priority</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/client.html#AsyncClient.emit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient.emit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Emit a custom event to one or more connected clients.</p>
+<dt id="appyter.ext.socketio.client.AsyncClient.connect">
+<em class="property">async </em><code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">headers</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/client.html#AsyncClient.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to a Socket.IO server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>event</strong> – The event name. It can be any string. The event names</p>
+<dd class="field-odd"><p><strong>url</strong> – The URL of the Socket.IO server. It can include custom</p>
 </dd>
 </dl>
-<p><code class="docutils literal notranslate"><span class="pre">'connect'</span></code>, <code class="docutils literal notranslate"><span class="pre">'message'</span></code> and <code class="docutils literal notranslate"><span class="pre">'disconnect'</span></code> are
-reserved and should not be used.
-:param data: The data to send to the server. Data can be of
-type <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">list</span></code> or <code class="docutils literal notranslate"><span class="pre">dict</span></code>. To send
-multiple arguments, use a tuple where each element is of
-one of the types indicated above.
-:param namespace: The Socket.IO namespace for the event. If this
-argument is omitted the event is emitted to the
-default namespace.
-:param callback: If given, this function will be called to acknowledge
-the the server has received the message. The arguments
-that will be passed to the function are those provided
-by the server.</p>
-<p>Note: this method is not designed to be used concurrently. If multiple
-tasks are emitting at the same time on the same client connection, then
-messages composed of multiple packets may end up being sent in an
-incorrect sequence. Use standard concurrency solutions (such as a Lock
-object) to prevent this situation.</p>
-<p>Note 2: this method is a coroutine.</p>
+<p>query string parameters if required by the server.
+:param headers: A dictionary with custom headers to send with the
+connection request.
+:param transports: The list of allowed transports. Valid transports
+are <code class="docutils literal notranslate"><span class="pre">'polling'</span></code> and <code class="docutils literal notranslate"><span class="pre">'websocket'</span></code>. If not
+given, the polling transport is connected first,
+then an upgrade to websocket is attempted.
+:param namespaces: The namespaces to connect as a string or list of
+strings. If not given, the namespaces that have
+registered event handlers are connected.
+:param socketio_path: The endpoint where the Socket.IO server is
+installed. The default value is appropriate for
+most cases.</p>
+<p>Note: this method is a coroutine.</p>
+<p>Note: The connection mechannism occurs in the background and will
+complete at some point after this function returns. The connection
+will be established when the <code class="docutils literal notranslate"><span class="pre">connect</span></code> event is invoked.</p>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">code</span><span class="p">::</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>sio = socketio.AsyncClient()
+sio.connect(’<a class="reference external" href="http://localhost:5000">http://localhost:5000</a>’)</p>
+</div></blockquote>
 </dd></dl>
 
-<dl class="py attribute">
-<dt id="appyter.ext.socketio.client.AsyncClient.klass">
-<code class="sig-name descname">klass</code><a class="headerlink" href="#appyter.ext.socketio.client.AsyncClient.klass" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">socketio.asyncio_client.AsyncClient</span></code></p>
 </dd></dl>
+
+</section>
+<section id="module-appyter.ext.socketio.forwarding">
+<span id="appyter-ext-socketio-forwarding-module"></span><h2>appyter.ext.socketio.forwarding module<a class="headerlink" href="#module-appyter.ext.socketio.forwarding" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.ext.socketio.forwarding.ForwardingMixin">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.socketio.forwarding.</code><code class="sig-name descname">ForwardingMixin</code><a class="reference internal" href="_modules/appyter/ext/socketio/forwarding.html#ForwardingMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.forwarding.ForwardingMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A mixin for converting <code class="docutils literal notranslate"><span class="pre">to=</span></code> messages on the client to <code class="docutils literal notranslate"><span class="pre">forward</span></code> events to be handled by the server</p>
+<dl class="py method">
+<dt id="appyter.ext.socketio.forwarding.ForwardingMixin.emit">
+<em class="property">async </em><code class="sig-name descname">emit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">evt</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">to</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">priority</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/forwarding.html#ForwardingMixin.emit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.forwarding.ForwardingMixin.emit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -107,21 +126,17 @@ object) to prevent this situation.</p>
 <span id="appyter-ext-socketio-priority-queued-emit-module"></span><h2>appyter.ext.socketio.priority_queued_emit module<a class="headerlink" href="#module-appyter.ext.socketio.priority_queued_emit" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.socketio.priority_queued_emit.</code><code class="sig-name descname">PriorityQueuedEmitMixin</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/priority_queued_emit.html#PriorityQueuedEmitMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.socketio.priority_queued_emit.</code><code class="sig-name descname">PriorityQueuedEmitMixin</code><a class="reference internal" href="_modules/appyter/ext/socketio/priority_queued_emit.html#PriorityQueuedEmitMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A mixin for queuing <code class="docutils literal notranslate"><span class="pre">emit</span></code> calls to get triggered sequentially when <code class="docutils literal notranslate"><span class="pre">emit_enabled</span></code> event is set</p>
 <dl class="py method">
-<dt id="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.close">
-<em class="property">async </em><code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/priority_queued_emit.html#PriorityQueuedEmitMixin.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.close" title="Permalink to this definition">¶</a></dt>
+<dt id="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.disconnect">
+<em class="property">async </em><code class="sig-name descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/priority_queued_emit.html#PriorityQueuedEmitMixin.disconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.disconnect" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit">
 <em class="property">async </em><code class="sig-name descname">emit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">evt</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">priority</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/priority_queued_emit.html#PriorityQueuedEmitMixin.emit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit_dispatcher">
-<em class="property">async </em><code class="sig-name descname">emit_dispatcher</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/priority_queued_emit.html#PriorityQueuedEmitMixin.emit_dispatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit_dispatcher" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -133,11 +148,61 @@ object) to prevent this situation.</p>
 <dt id="appyter.ext.socketio.server.AsyncServer">
 <em class="property">class </em><code class="sig-prename descclassname">appyter.ext.socketio.server.</code><code class="sig-name descname">AsyncServer</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/server.html#AsyncServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.server.AsyncServer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin" title="appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">socketio.asyncio_server.AsyncServer</span></code></p>
-<p>Server with packet forwarding</p>
-<dl class="py attribute">
-<dt id="appyter.ext.socketio.server.AsyncServer.klass">
-<code class="sig-name descname">klass</code><a class="headerlink" href="#appyter.ext.socketio.server.AsyncServer.klass" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">socketio.asyncio_server.AsyncServer</span></code></p>
+<p>Server with packet forwarding.
+<code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code> is necessary for initialization</p>
+<dl class="py method">
+<dt id="appyter.ext.socketio.server.AsyncServer.forward">
+<em class="property">async </em><code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sid</span></em>, <em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/server.html#AsyncServer.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.server.AsyncServer.forward" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.socketio.server.AsyncServer.on">
+<code class="sig-name descname">on</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/socketio/server.html#AsyncServer.on"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.socketio.server.AsyncServer.on" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register an event handler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> – The event name. It can be any string. The event names</p>
+</dd>
+</dl>
+<p><code class="docutils literal notranslate"><span class="pre">'connect'</span></code>, <code class="docutils literal notranslate"><span class="pre">'message'</span></code> and <code class="docutils literal notranslate"><span class="pre">'disconnect'</span></code> are
+reserved and should not be used.
+:param handler: The function that should be invoked to handle the
+event. When this parameter is not given, the method
+acts as a decorator for the handler function.
+:param namespace: The Socket.IO namespace for the event. If this
+argument is omitted the handler is associated with
+the default namespace.</p>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">code</span><span class="p">::</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p># as a decorator:
+&#64;socket_io.on(‘connect’, namespace=’/chat’)
+def connect_handler(sid, environ):</p>
+<blockquote>
+<div><p>print(‘Connection request’)
+if environ[‘REMOTE_ADDR’] in blacklisted:</p>
+<blockquote>
+<div><p>return False  # reject</p>
+</div></blockquote>
+</div></blockquote>
+<p># as a method:
+def message_handler(sid, msg):</p>
+<blockquote>
+<div><p>print(‘Received message: ‘, msg)
+eio.send(sid, ‘response’)</p>
+</div></blockquote>
+<p>socket_io.on(‘message’, namespace=’/chat’, handler=message_handler)</p>
+</div></blockquote>
+<p>The handler function receives the <code class="docutils literal notranslate"><span class="pre">sid</span></code> (session ID) for the
+client as first argument. The <code class="docutils literal notranslate"><span class="pre">'connect'</span></code> event handler receives the
+WSGI environment as a second argument, and can return <code class="docutils literal notranslate"><span class="pre">False</span></code> to
+reject the connection. The <code class="docutils literal notranslate"><span class="pre">'message'</span></code> handler and handlers for
+custom event names receive the message payload as a second argument.
+Any values returned from a message handler will be passed to the
+client’s acknowledgement callback function if it exists. The
+<code class="docutils literal notranslate"><span class="pre">'disconnect'</span></code> handler does not take a second argument.</p>
 </dd></dl>
 
 </dd></dl>
@@ -159,7 +224,9 @@ object) to prevent this situation.</p>
   <ul>
 <li><a class="reference internal" href="#">appyter.ext.socketio package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.socketio.chunked_emit">appyter.ext.socketio.chunked_emit module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.socketio.client">appyter.ext.socketio.client module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.socketio.forwarding">appyter.ext.socketio.forwarding module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.socketio.priority_queued_emit">appyter.ext.socketio.priority_queued_emit module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.socketio.server">appyter.ext.socketio.server module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.socketio">Module contents</a></li>

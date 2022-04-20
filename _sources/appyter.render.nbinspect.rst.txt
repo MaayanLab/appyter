@@ -1,0 +1,53 @@
+appyter.render.nbinspect package
+================================
+
+Submodules
+----------
+
+appyter.render.nbinspect.cli module
+-----------------------------------
+
+.. automodule:: appyter.render.nbinspect.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.render.nbinspect.cwl module
+-----------------------------------
+
+.. automodule:: appyter.render.nbinspect.cwl
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.render.nbinspect.jsonschema module
+------------------------------------------
+
+.. automodule:: appyter.render.nbinspect.jsonschema
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.render.nbinspect.nbtemplate\_json module
+------------------------------------------------
+
+.. automodule:: appyter.render.nbinspect.nbtemplate_json
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.render.nbinspect.openapi module
+---------------------------------------
+
+.. automodule:: appyter.render.nbinspect.openapi
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: appyter.render.nbinspect
+   :members:
+   :undoc-members:
+   :show-inheritance:

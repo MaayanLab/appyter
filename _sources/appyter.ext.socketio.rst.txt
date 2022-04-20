@@ -4,10 +4,26 @@ appyter.ext.socketio package
 Submodules
 ----------
 
+appyter.ext.socketio.chunked\_emit module
+-----------------------------------------
+
+.. automodule:: appyter.ext.socketio.chunked_emit
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.ext.socketio.client module
 ----------------------------------
 
 .. automodule:: appyter.ext.socketio.client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.socketio.forwarding module
+--------------------------------------
+
+.. automodule:: appyter.ext.socketio.forwarding
    :members:
    :undoc-members:
    :show-inheritance:

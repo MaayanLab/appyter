@@ -1,0 +1,69 @@
+appyter.execspec.implementations package
+========================================
+
+Submodules
+----------
+
+appyter.execspec.implementations.cavatica module
+------------------------------------------------
+
+.. automodule:: appyter.execspec.implementations.cavatica
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.execspec.implementations.dispatch module
+------------------------------------------------
+
+.. automodule:: appyter.execspec.implementations.dispatch
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.execspec.implementations.docker module
+----------------------------------------------
+
+.. automodule:: appyter.execspec.implementations.docker
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.execspec.implementations.kube module
+--------------------------------------------
+
+.. automodule:: appyter.execspec.implementations.kube
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.execspec.implementations.local module
+---------------------------------------------
+
+.. automodule:: appyter.execspec.implementations.local
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.execspec.implementations.subprocess module
+--------------------------------------------------
+
+.. automodule:: appyter.execspec.implementations.subprocess
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.execspec.implementations.wes module
+-------------------------------------------
+
+.. automodule:: appyter.execspec.implementations.wes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: appyter.execspec.implementations
+   :members:
+   :undoc-members:
+   :show-inheritance:

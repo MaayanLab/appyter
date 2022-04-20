@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.ext.asyncio.subprocess &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.asyncio.subprocess</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.ext.asyncio.subprocess</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="stream_readline_to_queue"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.subprocess.stream_readline_to_queue">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">stream_readline_to_queue</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">queue</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">65536</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Safely yield lines without running into buffer limit</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">linebuf</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+      <span class="n">buf</span> <span class="o">=</span> <span class="k">await</span> <span class="n">stream</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">)</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">buf</span><span class="p">:</span> <span class="k">break</span>
+      <span class="n">linebuf</span> <span class="o">+=</span> <span class="n">buf</span>
+      <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">msg</span><span class="p">,</span> <span class="n">nl</span><span class="p">,</span> <span class="n">rest</span> <span class="o">=</span> <span class="n">linebuf</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nl</span><span class="p">:</span>
+          <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">msg</span> <span class="o">+</span> <span class="n">nl</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+          <span class="n">linebuf</span> <span class="o">=</span> <span class="n">rest</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="k">break</span>
+    <span class="k">if</span> <span class="n">linebuf</span><span class="p">:</span> <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">linebuf</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">e</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="sh"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.subprocess.sh">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">sh</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">65536</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; An opinionated asyncio shell that logs stderr &amp; yields stdout, done</span>
+<span class="sd">  Unlike standard create_subprocess_exec: LimitOverrunError should not be possible.</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">stdout_queue</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39; &#39;</span> <span class="ow">in</span> <span class="n">arg</span> <span class="k">else</span> <span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">))</span>
+  <span class="n">proc</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_subprocess_exec</span><span class="p">(</span>
+    <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+    <span class="n">stdout</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+    <span class="n">limit</span><span class="o">=</span><span class="n">chunk_size</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+  <span class="p">)</span>
+  <span class="n">reader</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">stream_readline_to_queue</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">stdout_queue</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">))</span>
+  <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">msg</span><span class="p">,</span> <span class="n">done</span> <span class="o">=</span> <span class="k">await</span> <span class="n">stdout_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+      <span class="k">yield</span> <span class="n">msg</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
+      <span class="k">raise</span> <span class="n">msg</span>
+    <span class="n">stdout_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">done</span><span class="p">:</span> <span class="k">break</span>
+  <span class="k">await</span> <span class="n">reader</span>
+  <span class="k">yield</span> <span class="k">await</span> <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">(),</span> <span class="kc">True</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.asyncio.subprocess</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

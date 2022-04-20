@@ -38,15 +38,19 @@
   <h1>Source code for appyter.ext.urllib</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">dataclasses</span>
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 <span class="kn">import</span> <span class="nn">urllib.parse</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-
 <span class="kn">from</span> <span class="nn">appyter.ext.pathlib.chroot</span> <span class="kn">import</span> <span class="n">ChrootPurePosixPath</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.json</span> <span class="kn">import</span> <span class="n">try_json_loads</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.dict</span> <span class="kn">import</span> <span class="n">dict_merge</span><span class="p">,</span> <span class="n">expand_dotmap</span>
 
 <div class="viewcode-block" id="parent_url"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.parent_url">[docs]</a><span class="k">def</span> <span class="nf">parent_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
   <span class="n">parent</span><span class="p">,</span> <span class="o">*</span><span class="n">filename</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">parent</span> <span class="k">if</span> <span class="n">filename</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span></div>
+
+<div class="viewcode-block" id="url_filename"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.url_filename">[docs]</a><span class="k">def</span> <span class="nf">url_filename</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+  <span class="n">parent</span><span class="p">,</span> <span class="o">*</span><span class="n">filename</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">filename</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">filename</span> <span class="k">else</span> <span class="n">parent</span></div>
 
 <div class="viewcode-block" id="join_slash"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.join_slash">[docs]</a><span class="k">def</span> <span class="nf">join_slash</span><span class="p">(</span><span class="o">*</span><span class="n">parts</span><span class="p">):</span>
   <span class="k">if</span> <span class="ow">not</span> <span class="n">parts</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>
@@ -56,55 +60,274 @@
 <div class="viewcode-block" id="join_url"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.join_url">[docs]</a><span class="k">def</span> <span class="nf">join_url</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="o">*</span><span class="n">parts</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">join_slash</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ChrootPurePosixPath</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">parts</span><span class="p">)))</span></div>
 
-<div class="viewcode-block" id="parse_qs"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.parse_qs">[docs]</a><span class="k">def</span> <span class="nf">parse_qs</span><span class="p">(</span><span class="n">qs</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Convert dot-notation querystring into option params</span>
+<span class="n">url_expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+  <span class="sa">r</span><span class="s1">&#39;^((?P&lt;scheme&gt;.+?)://(?P&lt;authority&gt;((?P&lt;username&gt;[^/:@\?#]+?)(:(?P&lt;password&gt;[^/@\?#]+?))?@)?(?P&lt;netloc&gt;(?P&lt;hostname&gt;[^:/\?#]+)(:(?P&lt;port&gt;\d+))?))?)?(?P&lt;path&gt;.*?)(\?(?P&lt;query_string&gt;.*?))?(#(?P&lt;fragment&gt;.*?))?$&#39;</span>
+<span class="p">)</span>
+<span class="n">fragment_expr</span> <span class="o">=</span>  <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+  <span class="sa">r</span><span class="s1">&#39;^(?P&lt;path&gt;.*?)(\?(?P&lt;query_string&gt;.*?))?$&#39;</span>
+<span class="p">)</span>
+
+<div class="viewcode-block" id="parse_qs_values"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.parse_qs_values">[docs]</a><span class="k">def</span> <span class="nf">parse_qs_values</span><span class="p">(</span><span class="n">query_map</span><span class="p">):</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.itertools</span> <span class="kn">import</span> <span class="n">collapse</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.json</span> <span class="kn">import</span> <span class="n">try_json_loads</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="n">k</span><span class="p">:</span> <span class="n">collapse</span><span class="p">([</span><span class="n">try_json_loads</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">V</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">V</span> <span class="ow">in</span> <span class="n">query_map</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+  <span class="p">}</span></div>
+
+<div class="viewcode-block" id="URI"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI">[docs]</a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">URI</span><span class="p">:</span>
+  <span class="sd">&#39;&#39;&#39; Not unlike yarl&#39;s URL class but</span>
+<span class="sd">  - support for `::` notation as used in fsspec URIs</span>
+<span class="sd">  - posix_path path operation</span>
+<span class="sd">  - fragment parsing</span>
+<span class="sd">  - dotmap support (query_ex)</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
-  <span class="k">for</span> <span class="n">Kv</span> <span class="ow">in</span> <span class="n">qs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">):</span>
-    <span class="n">K</span><span class="p">,</span> <span class="n">eq</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">Kv</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">eq</span><span class="p">:</span> <span class="n">v</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">_params_n_2</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">_params_n_1</span> <span class="o">=</span> <span class="n">params</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
-      <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_params_n_1</span><span class="p">:</span> <span class="n">_params_n_1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-      <span class="n">_params_n_2</span> <span class="o">=</span> <span class="n">_params_n_1</span>
-      <span class="n">_params_n_1</span> <span class="o">=</span> <span class="n">_params_n_2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-    <span class="n">_params_n_2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">try_json_loads</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">v</span>
-  <span class="k">return</span> <span class="n">params</span></div>
+  <span class="n">scheme</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+  <span class="n">username</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+  <span class="n">password</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+  <span class="n">hostname</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+  <span class="n">port</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+  <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>
+  <span class="n">query_string</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+  <span class="n">fragment</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
-<div class="viewcode-block" id="URIParsed"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URIParsed">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">URIParsed</span><span class="p">:</span>
-  <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
-  <span class="n">query</span><span class="p">:</span> <span class="nb">str</span>
-  <span class="n">fragment</span><span class="p">:</span> <span class="nb">str</span>
-  <span class="n">fragment_query</span><span class="p">:</span> <span class="nb">str</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">query_string</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fragment</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">m</span> <span class="o">=</span> <span class="n">url_expr</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;scheme&#39;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;scheme&#39;</span><span class="p">))</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">))</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">))</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;hostname&#39;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;hostname&#39;</span><span class="p">))</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;port&#39;</span><span class="p">))</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;port&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">))</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;query_string&#39;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;query_string&#39;</span><span class="p">))</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;fragment&#39;</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;fragment&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;scheme&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="p">)</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;hostname&#39;</span><span class="p">,</span> <span class="n">hostname</span><span class="p">)</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">)</span> <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">path</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;query_string&#39;</span><span class="p">,</span> <span class="n">query_string</span><span class="p">)</span>
+      <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;fragment&#39;</span><span class="p">,</span> <span class="n">fragment</span><span class="p">)</span>
 
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">qs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">return</span> <span class="n">parse_qs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">netloc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kc">None</span>
 
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">fragment_qs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">return</span> <span class="n">parse_qs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">auth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="si">}</span><span class="s2">&quot;</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">authority</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">netloc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">auth</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">netloc</span><span class="si">}</span><span class="s2">&quot;</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">netloc</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">posix_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ChrootPurePosixPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">posix_path</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">name</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">posix_path</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">parse_qs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_string</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_string</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">query_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">expand_dotmap</span><span class="p">(</span><span class="n">parse_qs_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">))</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">fragment_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">fragment_expr</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">fragment_posix_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ChrootPurePosixPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment_path</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">fragment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_posix_path</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_posix_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">fragment_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment_posix_path</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_posix_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">fragment_query_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">fragment_expr</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;query_string&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">fragment_query</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">parse_qs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment_query_string</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query_string</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">fragment_query_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">expand_dotmap</span><span class="p">(</span><span class="n">parse_qs_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span><span class="p">))</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
 
   <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">:</span>
-      <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;?&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment</span><span class="p">:</span>
-      <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment</span>
-      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span><span class="p">:</span>
-        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;?&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span>
-    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span><span class="p">:</span>
-      <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;#?&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span>
-    <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">(</span>
+      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s2">://&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+      <span class="n">join_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">authority</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">authority</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot;?</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">query_string</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_string</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot;#</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)))</span>
 
-<span class="n">uri_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(?P&lt;url&gt;[^\?#]+)(\?(?P&lt;query&gt;[^#]*))?(#(?P&lt;fragment&gt;[^\?]*?))?(\?(?P&lt;fragment_query&gt;.*?))?$&#39;</span><span class="p">)</span>
+  <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(&#39;</span><span class="si">{}</span><span class="s2">&#39;)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
-<div class="viewcode-block" id="parse_file_uri"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.parse_file_uri">[docs]</a><span class="k">def</span> <span class="nf">parse_file_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">):</span>
-  <span class="k">return</span> <span class="n">URIParsed</span><span class="p">(</span><span class="o">**</span><span class="n">uri_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span><span class="o">.</span><span class="n">groupdict</span><span class="p">())</span></div>
+<div class="viewcode-block" id="URI.with_scheme"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.with_scheme">[docs]</a>  <span class="k">def</span> <span class="nf">with_scheme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">URI</span><span class="p">(</span>
+      <span class="n">scheme</span><span class="o">=</span><span class="n">scheme</span><span class="p">,</span>
+      <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+      <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+      <span class="n">hostname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+      <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+      <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+      <span class="n">query_string</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_string</span><span class="p">,</span>
+      <span class="n">fragment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="URI.with_username"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.with_username">[docs]</a>  <span class="k">def</span> <span class="nf">with_username</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">URI</span><span class="p">(</span>
+      <span class="n">scheme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span>
+      <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
+      <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+      <span class="n">hostname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+      <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+      <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+      <span class="n">query_string</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_string</span><span class="p">,</span>
+      <span class="n">fragment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="URI.with_password"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.with_password">[docs]</a>  <span class="k">def</span> <span class="nf">with_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">URI</span><span class="p">(</span>
+      <span class="n">scheme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span>
+      <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+      <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span>
+      <span class="n">hostname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+      <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+      <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+      <span class="n">query_string</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_string</span><span class="p">,</span>
+      <span class="n">fragment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="URI.with_hostname"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.with_hostname">[docs]</a>  <span class="k">def</span> <span class="nf">with_hostname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hostname</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">URI</span><span class="p">(</span>
+      <span class="n">scheme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span>
+      <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+      <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+      <span class="n">hostname</span><span class="o">=</span><span class="n">hostname</span><span class="p">,</span>
+      <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+      <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+      <span class="n">query_string</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_string</span><span class="p">,</span>
+      <span class="n">fragment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="URI.with_port"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.with_port">[docs]</a>  <span class="k">def</span> <span class="nf">with_port</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">URI</span><span class="p">(</span>
+      <span class="n">scheme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span>
+      <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+      <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+      <span class="n">hostname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+      <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
+      <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+      <span class="n">query_string</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_string</span><span class="p">,</span>
+      <span class="n">fragment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="URI.with_path"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.with_path">[docs]</a>  <span class="k">def</span> <span class="nf">with_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">URI</span><span class="p">(</span>
+      <span class="n">scheme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span>
+      <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+      <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+      <span class="n">hostname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+      <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+      <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+      <span class="n">query_string</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_string</span><span class="p">,</span>
+      <span class="n">fragment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="URI.with_query_string"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.with_query_string">[docs]</a>  <span class="k">def</span> <span class="nf">with_query_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_string</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">URI</span><span class="p">(</span>
+      <span class="n">scheme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span>
+      <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+      <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+      <span class="n">hostname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+      <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+      <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+      <span class="n">query_string</span><span class="o">=</span><span class="n">query_string</span><span class="p">,</span>
+      <span class="n">fragment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="URI.with_query"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.with_query">[docs]</a>  <span class="k">def</span> <span class="nf">with_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_query_string</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">doseq</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="URI.update_query"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.update_query">[docs]</a>  <span class="k">def</span> <span class="nf">update_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_query</span><span class="p">(</span><span class="n">dict_merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="ow">or</span> <span class="p">{},</span> <span class="o">**</span><span class="n">query</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="URI.with_fragment"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.with_fragment">[docs]</a>  <span class="k">def</span> <span class="nf">with_fragment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fragment</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">URI</span><span class="p">(</span>
+      <span class="n">scheme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span>
+      <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+      <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+      <span class="n">hostname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+      <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+      <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+      <span class="n">query_string</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_string</span><span class="p">,</span>
+      <span class="n">fragment</span><span class="o">=</span><span class="n">fragment</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="URI.with_fragment_path"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.with_fragment_path">[docs]</a>  <span class="k">def</span> <span class="nf">with_fragment_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fragment_path</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">fragment_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_fragment</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_query_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_fragment</span><span class="p">(</span><span class="n">fragment_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_fragment</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fragment_path</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">?</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment_query_string</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="URI.with_fragment_query_string"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.with_fragment_query_string">[docs]</a>  <span class="k">def</span> <span class="nf">with_fragment_query_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fragment_query_string</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fragment_query_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_fragment</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fragment_query_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_fragment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_fragment</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment_path</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">?</span><span class="si">{</span><span class="n">fragment_query_string</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="URI.with_fragment_query"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.with_fragment_query">[docs]</a>  <span class="k">def</span> <span class="nf">with_fragment_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fragment_query</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_fragment_query_string</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">fragment_query</span><span class="p">,</span> <span class="n">doseq</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="URI.update_fragment_query"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.update_fragment_query">[docs]</a>  <span class="k">def</span> <span class="nf">update_fragment_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fragment_query</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_fragment_query</span><span class="p">(</span><span class="n">dict_merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment_query</span> <span class="ow">or</span> <span class="p">{},</span> <span class="o">**</span><span class="n">fragment_query</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="URI.join"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.join">[docs]</a>  <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">parts</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">posix_path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">parts</span><span class="p">)</span><span class="o">.</span><span class="n">realpath</span><span class="p">()))</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">posix_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="URI.fragment_join"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.urllib.URI.fragment_join">[docs]</a>  <span class="k">def</span> <span class="nf">fragment_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">parts</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_fragment_path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment_posix_path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">parts</span><span class="p">)</span><span class="o">.</span><span class="n">realpath</span><span class="p">()))</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fragment_posix_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

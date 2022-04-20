@@ -36,78 +36,46 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.socketio.client</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">hashlib</span>
-<span class="kn">import</span> <span class="nn">asyncio</span>
+<span></span><span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">import</span> <span class="nn">socketio</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
+<span class="kn">from</span> <span class="nn">appyter.ext.socketio.forwarding</span> <span class="kn">import</span> <span class="n">ForwardingMixin</span>
 <span class="kn">from</span> <span class="nn">appyter.ext.socketio.priority_queued_emit</span> <span class="kn">import</span> <span class="n">PriorityQueuedEmitMixin</span>
 
-<div class="viewcode-block" id="AsyncClient"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.client.AsyncClient">[docs]</a><span class="k">class</span> <span class="nc">AsyncClient</span><span class="p">(</span><span class="n">PriorityQueuedEmitMixin</span><span class="p">,</span> <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncClient"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.client.AsyncClient">[docs]</a><span class="k">class</span> <span class="nc">AsyncClient</span><span class="p">(</span>
+  <span class="n">ForwardingMixin</span><span class="p">,</span>
+  <span class="n">PriorityQueuedEmitMixin</span><span class="p">,</span>
+  <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">,</span>
+<span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Client with packet forwarding, emit buffering &amp; chunking</span>
+<span class="sd">   `async with` is necessary for initialization</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="n">klass</span> <span class="o">=</span> <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span>
-  <span class="n">CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">20</span> <span class="c1"># 1 kb</span>
-
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">connection_tracker</span><span class="p">()</span>
-
-<div class="viewcode-block" id="AsyncClient.disconnect"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.client.AsyncClient.disconnect">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Disconnecting...&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_enabled</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
-      <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Ensuring emit queue has been fully processed...&#39;</span><span class="p">)</span>
-      <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Disconnect&#39;</span><span class="p">)</span>
-    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">klass</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">PriorityQueuedEmitMixin</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="AsyncClient.connection_tracker"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.client.AsyncClient.connection_tracker">[docs]</a>  <span class="k">def</span> <span class="nf">connection_tracker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__aenter__</span><span class="p">()</span>
+    <span class="c1">#</span>
     <span class="nd">@self</span><span class="o">.</span><span class="n">event</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">connect</span><span class="p">():</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_emit_enabled</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
     <span class="nd">@self</span><span class="o">.</span><span class="n">event</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">disconnect</span><span class="p">():</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_emit_enabled</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_emit_enabled</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="c1">#</span>
+    <span class="k">return</span> <span class="bp">self</span>
 
-  <span class="k">async</span> <span class="k">def</span> <span class="nf">_emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">room</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">room</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Client forwarding&#39;</span><span class="p">)</span>
-      <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span>
-        <span class="n">priority</span><span class="p">,</span>
-        <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_emit_counter</span><span class="p">),</span> 
-        <span class="p">(</span>
-          <span class="s1">&#39;forward&#39;</span><span class="p">,</span>
-          <span class="nb">dict</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">to</span><span class="p">,</span> <span class="n">room</span><span class="o">=</span><span class="n">room</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">priority</span><span class="p">)</span>
-        <span class="p">),</span>
-        <span class="nb">dict</span><span class="p">()</span>
-      <span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="k">return</span> <span class="k">await</span> <span class="n">PriorityQueuedEmitMixin</span><span class="o">.</span><span class="n">_emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">to</span><span class="p">,</span> <span class="n">room</span><span class="o">=</span><span class="n">room</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">priority</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__aexit__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">eio</span><span class="o">.</span><span class="n">http</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span> <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
 
-<div class="viewcode-block" id="AsyncClient.emit"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.client.AsyncClient.emit">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Client emit&#39;</span><span class="p">)</span>
-    <span class="n">serialized</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">serialized</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">AsyncClient</span><span class="o">.</span><span class="n">CHUNK_SIZE</span><span class="p">:</span>
-      <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Large packet (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">serialized</span><span class="p">)</span><span class="si">}</span><span class="s2">), chunking...&quot;</span><span class="p">)</span>
-      <span class="n">sha1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">()</span>
-      <span class="n">sha1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">serialized</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
-      <span class="n">data_hash</span> <span class="o">=</span> <span class="n">sha1</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-      <span class="n">n_chunks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">serialized</span><span class="p">)</span> <span class="o">//</span> <span class="n">AsyncClient</span><span class="o">.</span><span class="n">CHUNK_SIZE</span> <span class="o">+</span> <span class="mi">1</span>
-      <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_chunks</span><span class="p">):</span>
-        <span class="k">await</span> <span class="n">PriorityQueuedEmitMixin</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-          <span class="s1">&#39;chunked&#39;</span><span class="p">,</span>
-          <span class="nb">dict</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="n">data_hash</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="n">evt</span><span class="p">,</span> <span class="n">chunk</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">n_chunks</span><span class="p">,</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">serialized</span><span class="p">[</span><span class="n">n</span><span class="o">*</span><span class="n">AsyncClient</span><span class="o">.</span><span class="n">CHUNK_SIZE</span><span class="p">:</span><span class="n">n</span><span class="o">*</span><span class="n">AsyncClient</span><span class="o">.</span><span class="n">CHUNK_SIZE</span><span class="o">+</span><span class="n">AsyncClient</span><span class="o">.</span><span class="n">CHUNK_SIZE</span><span class="p">]</span>
-          <span class="p">),</span>
-          <span class="n">priority</span><span class="o">=</span><span class="n">priority</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
-          <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="k">await</span> <span class="n">PriorityQueuedEmitMixin</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">priority</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+<div class="viewcode-block" id="AsyncClient.connect"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.client.AsyncClient.connect">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+      <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+      <span class="n">headers</span><span class="o">=</span><span class="nb">dict</span><span class="p">({</span> <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span> <span class="p">},</span> <span class="o">**</span><span class="n">headers</span><span class="p">),</span>
+      <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

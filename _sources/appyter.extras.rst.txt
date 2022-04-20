@@ -1,6 +1,14 @@
 appyter.extras package
 ======================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   appyter.extras.catalog_integration
+
 Module contents
 ---------------
 

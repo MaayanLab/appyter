@@ -1,16 +1,16 @@
 appyter.ext.fsspec package
 ==========================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   appyter.ext.fsspec.spec
+
 Submodules
 ----------
-
-appyter.ext.fsspec.alias module
--------------------------------
-
-.. automodule:: appyter.ext.fsspec.alias
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 appyter.ext.fsspec.chroot module
 --------------------------------
@@ -24,6 +24,14 @@ appyter.ext.fsspec.core module
 ------------------------------
 
 .. automodule:: appyter.ext.fsspec.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.fsspec.drs module
+-----------------------------
+
+.. automodule:: appyter.ext.fsspec.drs
    :members:
    :undoc-members:
    :show-inheritance:
@@ -52,6 +60,30 @@ appyter.ext.fsspec.overlayfs module
    :undoc-members:
    :show-inheritance:
 
+appyter.ext.fsspec.sbfs module
+------------------------------
+
+.. automodule:: appyter.ext.fsspec.sbfs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.fsspec.singleton module
+-----------------------------------
+
+.. automodule:: appyter.ext.fsspec.singleton
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.fsspec.storage module
+---------------------------------
+
+.. automodule:: appyter.ext.fsspec.storage
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.ext.fsspec.test\_chroot module
 --------------------------------------
 
@@ -60,10 +92,26 @@ appyter.ext.fsspec.test\_chroot module
    :undoc-members:
    :show-inheritance:
 
+appyter.ext.fsspec.test\_drs module
+-----------------------------------
+
+.. automodule:: appyter.ext.fsspec.test_drs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.ext.fsspec.test\_fuse module
 ------------------------------------
 
 .. automodule:: appyter.ext.fsspec.test_fuse
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.fsspec.test\_fuseless\_mount module
+-----------------------------------------------
+
+.. automodule:: appyter.ext.fsspec.test_fuseless_mount
    :members:
    :undoc-members:
    :show-inheritance:
@@ -88,6 +136,14 @@ appyter.ext.fsspec.test\_pathmap module
 ---------------------------------------
 
 .. automodule:: appyter.ext.fsspec.test_pathmap
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.fsspec.test\_sbfs module
+------------------------------------
+
+.. automodule:: appyter.ext.fsspec.test_sbfs
    :members:
    :undoc-members:
    :show-inheritance:

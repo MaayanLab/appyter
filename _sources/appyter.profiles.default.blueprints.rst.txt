@@ -1,0 +1,29 @@
+appyter.profiles.default.blueprints package
+===========================================
+
+Submodules
+----------
+
+appyter.profiles.default.blueprints.StorageFileField module
+-----------------------------------------------------------
+
+.. automodule:: appyter.profiles.default.blueprints.StorageFileField
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.profiles.default.blueprints.locate module
+-------------------------------------------------
+
+.. automodule:: appyter.profiles.default.blueprints.locate
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: appyter.profiles.default.blueprints
+   :members:
+   :undoc-members:
+   :show-inheritance:

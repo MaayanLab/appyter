@@ -38,6 +38,7 @@
   <h1>Source code for appyter.ext.asyncio.event_emitter</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="EventEmitter"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.event_emitter.EventEmitter">[docs]</a><span class="k">class</span> <span class="nc">EventEmitter</span><span class="p">:</span>
@@ -60,16 +61,14 @@
       <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">evt</span> <span class="o">=</span> <span class="k">await</span> <span class="n">event_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calling listeners for </span><span class="si">{</span><span class="n">event</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-          <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
-            <span class="n">listener</span><span class="p">(</span><span class="o">**</span><span class="n">evt</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">listener</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_listeners</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-          <span class="p">])</span>
-        <span class="k">except</span><span class="p">:</span>
-          <span class="kn">import</span> <span class="nn">traceback</span>
-          <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in listener for </span><span class="si">{</span><span class="n">event</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">finally</span><span class="p">:</span>
-          <span class="n">event_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
+          <span class="n">listener</span><span class="p">(</span><span class="o">**</span><span class="n">evt</span><span class="p">)</span>
+          <span class="k">for</span> <span class="n">listener</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_listeners</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="p">],</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+          <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in listener for </span><span class="si">{</span><span class="n">event</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exception</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">event_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">_consumer</span>
   <span class="c1">#</span>
   <span class="k">def</span> <span class="nf">_ensure_consumer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
@@ -112,7 +111,7 @@
     <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
       <span class="n">event_queue</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
       <span class="k">for</span> <span class="n">event_queue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queues</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-    <span class="p">])</span></div>
+    <span class="p">],</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
   
 <div class="viewcode-block" id="EventEmitter.remove"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.event_emitter.EventEmitter.remove">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
@@ -126,7 +125,7 @@
 
 <div class="viewcode-block" id="EventEmitter.clear"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.event_emitter.EventEmitter.clear">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Clearing...&quot;</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consumers</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span></div></div>
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consumers</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

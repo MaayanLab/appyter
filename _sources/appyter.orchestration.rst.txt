@@ -7,9 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   appyter.orchestration.dispatch
    appyter.orchestration.dispatcher
-   appyter.orchestration.job
 
 Submodules
 ----------

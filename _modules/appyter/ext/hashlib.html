@@ -36,21 +36,32 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.hashlib</h1><div class="highlight"><pre>
-<span></span>
-<div class="viewcode-block" id="sha1sum_io"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.hashlib.sha1sum_io">[docs]</a><span class="k">def</span> <span class="nf">sha1sum_io</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">65536</span><span class="p">):</span>
+<span></span><span class="kn">import</span> <span class="nn">functools</span>
+
+<div class="viewcode-block" id="hashsum_io"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.hashlib.hashsum_io">[docs]</a><span class="k">def</span> <span class="nf">hashsum_io</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">65536</span><span class="p">):</span>
   <span class="kn">import</span> <span class="nn">hashlib</span>
-  <span class="n">sha1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">()</span>
+  <span class="n">hashsum</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">algo</span><span class="p">)</span>
   <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
     <span class="n">buf</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">buf</span><span class="p">:</span> <span class="k">break</span>
-    <span class="n">sha1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+    <span class="n">hashsum</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">hashsum</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
+<span class="n">sha1sum_io</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">hashsum_io</span><span class="p">,</span> <span class="s1">&#39;sha1&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="hashsum_str"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.hashlib.hashsum_str">[docs]</a><span class="k">def</span> <span class="nf">hashsum_str</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">hashlib</span>
+  <span class="n">sha1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">algo</span><span class="p">)</span>
+  <span class="n">sha1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
   <span class="k">return</span> <span class="n">sha1</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="sha1sum_dict"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.hashlib.sha1sum_dict">[docs]</a><span class="k">def</span> <span class="nf">sha1sum_dict</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-  <span class="kn">import</span> <span class="nn">json</span><span class="o">,</span> <span class="nn">hashlib</span>
-  <span class="n">sha1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">()</span>
-  <span class="n">sha1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
-  <span class="k">return</span> <span class="n">sha1</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+<span class="n">sha1sum_str</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">hashsum_str</span><span class="p">,</span> <span class="s1">&#39;sha1&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="hashsum_dict"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.hashlib.hashsum_dict">[docs]</a><span class="k">def</span> <span class="nf">hashsum_dict</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">json</span>
+  <span class="k">return</span> <span class="n">hashsum_str</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div>
+
+<span class="n">sha1sum_dict</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">hashsum_dict</span><span class="p">,</span> <span class="s1">&#39;sha1&#39;</span><span class="p">)</span>
 </pre></div>
 
             <div class="clearer"></div>

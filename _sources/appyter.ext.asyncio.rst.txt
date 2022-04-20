@@ -12,26 +12,42 @@ appyter.ext.asyncio.event\_emitter module
    :undoc-members:
    :show-inheritance:
 
-appyter.ext.asyncio.run\_in\_executor module
---------------------------------------------
+appyter.ext.asyncio.event\_loop module
+--------------------------------------
 
-.. automodule:: appyter.ext.asyncio.run_in_executor
+.. automodule:: appyter.ext.asyncio.event_loop
    :members:
    :undoc-members:
    :show-inheritance:
 
-appyter.ext.asyncio.sync\_contextmanager module
------------------------------------------------
+appyter.ext.asyncio.helpers module
+----------------------------------
 
-.. automodule:: appyter.ext.asyncio.sync_contextmanager
+.. automodule:: appyter.ext.asyncio.helpers
    :members:
    :undoc-members:
    :show-inheritance:
 
-appyter.ext.asyncio.sync\_coro module
+appyter.ext.asyncio.subprocess module
 -------------------------------------
 
-.. automodule:: appyter.ext.asyncio.sync_coro
+.. automodule:: appyter.ext.asyncio.subprocess
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.asyncio.test\_helpers module
+----------------------------------------
+
+.. automodule:: appyter.ext.asyncio.test_helpers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.asyncio.test\_subprocess module
+-------------------------------------------
+
+.. automodule:: appyter.ext.asyncio.test_subprocess
    :members:
    :undoc-members:
    :show-inheritance:

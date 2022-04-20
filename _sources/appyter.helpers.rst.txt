@@ -4,6 +4,14 @@ appyter.helpers package
 Submodules
 ----------
 
+appyter.helpers.commandify module
+---------------------------------
+
+.. automodule:: appyter.helpers.commandify
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.helpers.dockerize module
 --------------------------------
 

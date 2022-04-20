@@ -41,6 +41,8 @@
 <span class="kn">import</span> <span class="nn">urllib.parse</span>
 <span class="kn">from</span> <span class="nn">werkzeug.security</span> <span class="kn">import</span> <span class="n">safe_join</span>
 
+<span class="kn">from</span> <span class="nn">appyter.ext.itertools</span> <span class="kn">import</span> <span class="n">collapse</span>
+
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="join_routes"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.join_routes">[docs]</a><span class="k">def</span> <span class="nf">join_routes</span><span class="p">(</span><span class="o">*</span><span class="n">routes</span><span class="p">):</span>
@@ -68,8 +70,21 @@
   <span class="k">try</span><span class="p">:</span>
     <span class="n">secure_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="k">return</span> <span class="kc">True</span>
-  <span class="k">except</span><span class="p">:</span>
+  <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
     <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="request_get"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.request_get">[docs]</a><span class="k">def</span> <span class="nf">request_get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+  <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">request</span> <span class="k">else</span> <span class="n">default</span>
+  <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">collapse</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="n">key</span><span class="p">))</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span> <span class="k">else</span> <span class="n">default</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">is_json</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span> <span class="k">else</span> <span class="n">default</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">collapse</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="n">key</span><span class="p">))</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span> <span class="k">else</span> <span class="n">default</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="route_join_with_or_without_slash"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.route_join_with_or_without_slash">[docs]</a><span class="k">def</span> <span class="nf">route_join_with_or_without_slash</span><span class="p">(</span><span class="n">blueprint</span><span class="p">,</span> <span class="o">*</span><span class="n">routes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Like @app.route but doesn&#39;t care about trailing slash or not</span>
@@ -91,7 +106,7 @@
         <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span>
         <span class="k">if</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">]:</span>
           <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-      <span class="k">except</span><span class="p">:</span>
+      <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
         <span class="k">pass</span>
       <span class="k">return</span> <span class="n">production_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wrapper</span>

@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   appyter.profiles.default.blueprints
    appyter.profiles.default.fields
    appyter.profiles.default.filters
 

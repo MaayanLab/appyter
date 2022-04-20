@@ -28,6 +28,14 @@ appyter.render.flask\_app.development module
    :undoc-members:
    :show-inheritance:
 
+appyter.render.flask\_app.drs module
+------------------------------------
+
+.. automodule:: appyter.render.flask_app.drs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.render.flask\_app.execution module
 ------------------------------------------
 
@@ -52,10 +60,26 @@ appyter.render.flask\_app.livereload module
    :undoc-members:
    :show-inheritance:
 
+appyter.render.flask\_app.prepare module
+----------------------------------------
+
+.. automodule:: appyter.render.flask_app.prepare
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.render.flask\_app.production module
 -------------------------------------------
 
 .. automodule:: appyter.render.flask_app.production
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.render.flask\_app.room\_manager module
+----------------------------------------------
+
+.. automodule:: appyter.render.flask_app.room_manager
    :members:
    :undoc-members:
    :show-inheritance:
@@ -72,14 +96,6 @@ appyter.render.flask\_app.static module
 ---------------------------------------
 
 .. automodule:: appyter.render.flask_app.static
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-appyter.render.flask\_app.storage module
-----------------------------------------
-
-.. automodule:: appyter.render.flask_app.storage
    :members:
    :undoc-members:
    :show-inheritance:

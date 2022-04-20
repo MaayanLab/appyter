@@ -50,7 +50,7 @@
   <span class="kn">import</span> <span class="nn">uuid</span>
   <span class="k">try</span><span class="p">:</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
-  <span class="k">except</span><span class="p">:</span>
+  <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
     <span class="k">return</span> <span class="kc">None</span></div>
 </pre></div>
 

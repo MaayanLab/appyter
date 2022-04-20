@@ -85,35 +85,181 @@
 </dd></dl>
 
 </section>
-<section id="module-appyter.ext.asyncio.run_in_executor">
-<span id="appyter-ext-asyncio-run-in-executor-module"></span><h2>appyter.ext.asyncio.run_in_executor module<a class="headerlink" href="#module-appyter.ext.asyncio.run_in_executor" title="Permalink to this headline">¶</a></h2>
+<section id="module-appyter.ext.asyncio.event_loop">
+<span id="appyter-ext-asyncio-event-loop-module"></span><h2>appyter.ext.asyncio.event_loop module<a class="headerlink" href="#module-appyter.ext.asyncio.event_loop" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.ext.asyncio.event_loop.EventLoopThread">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.asyncio.event_loop.</code><code class="sig-name descname">EventLoopThread</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">loop</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/event_loop.html#EventLoopThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.event_loop.EventLoopThread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code></p>
+<p>Keep the event loop running in this thread until <code class="docutils literal notranslate"><span class="pre">stop</span></code> is called.</p>
+<dl class="py method">
+<dt id="appyter.ext.asyncio.event_loop.EventLoopThread.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/event_loop.html#EventLoopThread.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.event_loop.EventLoopThread.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method representing the thread’s activity.</p>
+<p>You may override this method in a subclass. The standard run() method
+invokes the callable object passed to the object’s constructor as the
+target argument, if any, with sequential and keyword arguments taken
+from the args and kwargs arguments, respectively.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="appyter.ext.asyncio.event_loop.EventLoopThread.stop">
+<code class="sig-name descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/event_loop.html#EventLoopThread.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.event_loop.EventLoopThread.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="appyter.ext.asyncio.event_loop.SharedEventLoopThreadPoolExecutor">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.asyncio.event_loop.</code><code class="sig-name descname">SharedEventLoopThreadPoolExecutor</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">loop</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">initializer</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/event_loop.html#SharedEventLoopThreadPoolExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.event_loop.SharedEventLoopThreadPoolExecutor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.thread.ThreadPoolExecutor</span></code></p>
+<p>This thread pool will initialize each thread with the same event loop.</p>
+</dd></dl>
+
 <dl class="py function">
-<dt id="appyter.ext.asyncio.run_in_executor.run_in_executor">
-<code class="sig-prename descclassname">appyter.ext.asyncio.run_in_executor.</code><code class="sig-name descname">run_in_executor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/run_in_executor.html#run_in_executor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.run_in_executor.run_in_executor" title="Permalink to this definition">¶</a></dt>
+<dt id="appyter.ext.asyncio.event_loop.get_event_loop">
+<code class="sig-prename descclassname">appyter.ext.asyncio.event_loop.</code><code class="sig-name descname">get_event_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/event_loop.html#get_event_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.event_loop.get_event_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the same loop in different threads, create the loop if it doesn’t exist</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.event_loop.new_event_loop">
+<code class="sig-prename descclassname">appyter.ext.asyncio.event_loop.</code><code class="sig-name descname">new_event_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/event_loop.html#new_event_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.event_loop.new_event_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a new event loop with some custom extensions:</p>
+<ul class="simple">
+<li><p>a dedicated thread to run the event loop</p></li>
+<li><p>a thread pool executor that sets the event loop in spawned threads</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.event_loop.with_event_loop">
+<code class="sig-prename descclassname">appyter.ext.asyncio.event_loop.</code><code class="sig-name descname">with_event_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/event_loop.html#with_event_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.event_loop.with_event_loop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
-<section id="module-appyter.ext.asyncio.sync_contextmanager">
-<span id="appyter-ext-asyncio-sync-contextmanager-module"></span><h2>appyter.ext.asyncio.sync_contextmanager module<a class="headerlink" href="#module-appyter.ext.asyncio.sync_contextmanager" title="Permalink to this headline">¶</a></h2>
+<section id="module-appyter.ext.asyncio.helpers">
+<span id="appyter-ext-asyncio-helpers-module"></span><h2>appyter.ext.asyncio.helpers module<a class="headerlink" href="#module-appyter.ext.asyncio.helpers" title="Permalink to this headline">¶</a></h2>
+<p>Async helpers to convert anything sync to and from anything async without deadlocks.
+This requires that you initialize the event loop with the appyter.ext.asyncio.event_loop methods
+which will run the event loop in a dedicated thread and ensure all <code class="docutils literal notranslate"><span class="pre">sync</span></code> methods are executed
+on that dedicated event loop.
+You only need to use <code class="docutils literal notranslate"><span class="pre">ensure_async</span></code> or <code class="docutils literal notranslate"><span class="pre">ensure_sync</span></code> these methods will deal with dispatching to
+the relevant handlers.
+It works with already-sync/async, context managers, generators, &amp; functions of these.</p>
 <dl class="py function">
-<dt id="appyter.ext.asyncio.sync_contextmanager.sync_contextmanager">
-<code class="sig-prename descclassname">appyter.ext.asyncio.sync_contextmanager.</code><code class="sig-name descname">sync_contextmanager</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">async_contextmanager</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/sync_contextmanager.html#sync_contextmanager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.sync_contextmanager.sync_contextmanager" title="Permalink to this definition">¶</a></dt>
+<dt id="appyter.ext.asyncio.helpers.anext">
+<em class="property">async </em><code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">anext</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">generator</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#anext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.anext" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.awaitable_identity">
+<em class="property">async </em><code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">awaitable_identity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#awaitable_identity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.awaitable_identity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.ensure_async">
+<code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">ensure_async</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#ensure_async"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.ensure_async" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.ensure_async_contextmanager">
+<code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">ensure_async_contextmanager</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">contextmanager</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#ensure_async_contextmanager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.ensure_async_contextmanager" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.ensure_async_func">
+<code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">ensure_async_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#ensure_async_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.ensure_async_func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.ensure_async_generator">
+<code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">ensure_async_generator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">generator</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#ensure_async_generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.ensure_async_generator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.ensure_async_literal">
+<em class="property">async </em><code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">ensure_async_literal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#ensure_async_literal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.ensure_async_literal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.ensure_async_wrapper">
+<code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">ensure_async_wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">callable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#ensure_async_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.ensure_async_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.ensure_sync">
+<code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">ensure_sync</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#ensure_sync"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.ensure_sync" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.ensure_sync_contextmanager">
+<code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">ensure_sync_contextmanager</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asynccontextmanager</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#ensure_sync_contextmanager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.ensure_sync_contextmanager" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.ensure_sync_coro">
+<code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">ensure_sync_coro</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">coro</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#ensure_sync_coro"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.ensure_sync_coro" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.ensure_sync_generator">
+<code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">ensure_sync_generator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asyncgenerator</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#ensure_sync_generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.ensure_sync_generator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.ensure_sync_wrapper">
+<code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">ensure_sync_wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">callable</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#ensure_sync_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.ensure_sync_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.isasynccontextmanager">
+<code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">isasynccontextmanager</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#isasynccontextmanager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.isasynccontextmanager" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.helpers.iscontextmanager">
+<code class="sig-prename descclassname">appyter.ext.asyncio.helpers.</code><code class="sig-name descname">iscontextmanager</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/helpers.html#iscontextmanager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.helpers.iscontextmanager" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
-<section id="module-appyter.ext.asyncio.sync_coro">
-<span id="appyter-ext-asyncio-sync-coro-module"></span><h2>appyter.ext.asyncio.sync_coro module<a class="headerlink" href="#module-appyter.ext.asyncio.sync_coro" title="Permalink to this headline">¶</a></h2>
+<section id="module-appyter.ext.asyncio.subprocess">
+<span id="appyter-ext-asyncio-subprocess-module"></span><h2>appyter.ext.asyncio.subprocess module<a class="headerlink" href="#module-appyter.ext.asyncio.subprocess" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.ext.asyncio.sync_coro.sync_coro">
-<code class="sig-prename descclassname">appyter.ext.asyncio.sync_coro.</code><code class="sig-name descname">sync_coro</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">coro</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/sync_coro.html#sync_coro"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.sync_coro.sync_coro" title="Permalink to this definition">¶</a></dt>
+<dt id="appyter.ext.asyncio.subprocess.sh">
+<code class="sig-prename descclassname">appyter.ext.asyncio.subprocess.</code><code class="sig-name descname">sh</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">chunk_size</span><span class="o">=</span><span class="default_value">65536</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/subprocess.html#sh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.subprocess.sh" title="Permalink to this definition">¶</a></dt>
+<dd><p>An opinionated asyncio shell that logs stderr &amp; yields stdout, done
+Unlike standard create_subprocess_exec: LimitOverrunError should not be possible.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="appyter.ext.asyncio.subprocess.stream_readline_to_queue">
+<em class="property">async </em><code class="sig-prename descclassname">appyter.ext.asyncio.subprocess.</code><code class="sig-name descname">stream_readline_to_queue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stream</span></em>, <em class="sig-param"><span class="n">queue</span></em>, <em class="sig-param"><span class="n">chunk_size</span><span class="o">=</span><span class="default_value">65536</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/subprocess.html#stream_readline_to_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.subprocess.stream_readline_to_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Safely yield lines without running into buffer limit</p>
+</dd></dl>
+
+</section>
+<section id="appyter-ext-asyncio-test-helpers-module">
+<h2>appyter.ext.asyncio.test_helpers module<a class="headerlink" href="#appyter-ext-asyncio-test-helpers-module" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-appyter.ext.asyncio.test_subprocess">
+<span id="appyter-ext-asyncio-test-subprocess-module"></span><h2>appyter.ext.asyncio.test_subprocess module<a class="headerlink" href="#module-appyter.ext.asyncio.test_subprocess" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="appyter.ext.asyncio.test_subprocess.test_subprocess">
+<code class="sig-prename descclassname">appyter.ext.asyncio.test_subprocess.</code><code class="sig-name descname">test_subprocess</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/test_subprocess.html#test_subprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.test_subprocess.test_subprocess" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-appyter.ext.asyncio.try_n_times">
 <span id="appyter-ext-asyncio-try-n-times-module"></span><h2>appyter.ext.asyncio.try_n_times module<a class="headerlink" href="#module-appyter.ext.asyncio.try_n_times" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
+<dt id="appyter.ext.asyncio.try_n_times.async_try_n_times">
+<em class="property">async </em><code class="sig-prename descclassname">appyter.ext.asyncio.try_n_times.</code><code class="sig-name descname">async_try_n_times</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">coro</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/try_n_times.html#async_try_n_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.try_n_times.async_try_n_times" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="appyter.ext.asyncio.try_n_times.try_n_times">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.ext.asyncio.try_n_times.</code><code class="sig-name descname">try_n_times</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">coro</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/try_n_times.html#try_n_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.try_n_times.try_n_times" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">appyter.ext.asyncio.try_n_times.</code><code class="sig-name descname">try_n_times</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/asyncio/try_n_times.html#try_n_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.asyncio.try_n_times.try_n_times" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -134,9 +280,11 @@
 <li><a class="reference internal" href="#">appyter.ext.asyncio package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.asyncio.event_emitter">appyter.ext.asyncio.event_emitter module</a></li>
-<li><a class="reference internal" href="#module-appyter.ext.asyncio.run_in_executor">appyter.ext.asyncio.run_in_executor module</a></li>
-<li><a class="reference internal" href="#module-appyter.ext.asyncio.sync_contextmanager">appyter.ext.asyncio.sync_contextmanager module</a></li>
-<li><a class="reference internal" href="#module-appyter.ext.asyncio.sync_coro">appyter.ext.asyncio.sync_coro module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.asyncio.event_loop">appyter.ext.asyncio.event_loop module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.asyncio.helpers">appyter.ext.asyncio.helpers module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.asyncio.subprocess">appyter.ext.asyncio.subprocess module</a></li>
+<li><a class="reference internal" href="#appyter-ext-asyncio-test-helpers-module">appyter.ext.asyncio.test_helpers module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.asyncio.test_subprocess">appyter.ext.asyncio.test_subprocess module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.asyncio.try_n_times">appyter.ext.asyncio.try_n_times module</a></li>
 <li><a class="reference internal" href="#module-appyter.ext.asyncio">Module contents</a></li>
 </ul>

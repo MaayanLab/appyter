@@ -39,17 +39,35 @@
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<div class="viewcode-block" id="try_n_times"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.try_n_times.try_n_times">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">try_n_times</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">coro</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="try_n_times"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.try_n_times.try_n_times">[docs]</a><span class="k">def</span> <span class="nf">try_n_times</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">time</span>
+  <span class="n">backoff</span> <span class="o">=</span> <span class="mi">1</span>
+  <span class="k">while</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+      <span class="k">raise</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+      <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
+      <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">err</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">func</span><span class="si">}</span><span class="s2"> failed, trying again in </span><span class="si">{</span><span class="n">backoff</span><span class="si">}</span><span class="s2">s...&quot;</span><span class="p">)</span>
+      <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">backoff</span><span class="p">)</span>
+      <span class="n">backoff</span> <span class="o">*=</span> <span class="mi">2</span></div>
+
+<div class="viewcode-block" id="async_try_n_times"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.try_n_times.async_try_n_times">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">async_try_n_times</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">coro</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
   <span class="kn">import</span> <span class="nn">asyncio</span>
   <span class="n">backoff</span> <span class="o">=</span> <span class="mi">1</span>
   <span class="k">while</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
       <span class="k">return</span> <span class="k">await</span> <span class="n">coro</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+      <span class="k">raise</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
       <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
       <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">err</span>
-      <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">coro</span><span class="si">}</span><span class="s2"> failed, trying again in </span><span class="si">{</span><span class="n">backoff</span><span class="si">}</span><span class="s2">s...&quot;</span><span class="p">)</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">coro</span><span class="si">}</span><span class="s2"> failed, trying again in </span><span class="si">{</span><span class="n">backoff</span><span class="si">}</span><span class="s2">s...&quot;</span><span class="p">)</span>
       <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">backoff</span><span class="p">)</span>
       <span class="n">backoff</span> <span class="o">*=</span> <span class="mi">2</span></div>
 </pre></div>

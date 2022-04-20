@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.execspec.implementations.wes &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.execspec.implementations.wes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.execspec.implementations.wes</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">aiohttp</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">from</span> <span class="nn">appyter.parse.nb</span> <span class="kn">import</span> <span class="n">nb_from_ipynb_io</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">appyter.execspec.spec</span> <span class="kn">import</span> <span class="n">AbstractExecutor</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.util</span> <span class="kn">import</span> <span class="n">fsspec_read_and_run</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.asyncio.try_n_times</span> <span class="kn">import</span> <span class="n">async_try_n_times</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.dict</span> <span class="kn">import</span> <span class="n">dict_filter_none</span><span class="p">,</span> <span class="n">dict_merge</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">URI</span><span class="p">,</span> <span class="n">join_slash</span>
+
+<div class="viewcode-block" id="WESExecutor"><a class="viewcode-back" href="../../../../appyter.execspec.implementations.html#appyter.execspec.implementations.wes.WESExecutor">[docs]</a><span class="k">class</span> <span class="nc">WESExecutor</span><span class="p">(</span><span class="n">AbstractExecutor</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Run executions via a workflow execution service endpoint</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">protocol</span> <span class="o">=</span> <span class="s1">&#39;wes&#39;</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^wes://&#39;</span><span class="p">,</span> <span class="s1">&#39;https://&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+
+  <span class="k">async</span> <span class="k">def</span> <span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__aenter__</span><span class="p">()</span>
+    <span class="kn">from</span> <span class="nn">appyter.parse.nb</span> <span class="kn">import</span> <span class="n">nb_from_ipynb_io</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cwl</span> <span class="o">=</span> <span class="k">await</span> <span class="n">fsspec_read_and_run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">executor_options</span><span class="p">[</span><span class="s1">&#39;cwl&#39;</span><span class="p">],</span> <span class="k">lambda</span> <span class="n">fr</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fr</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">nbtemplate</span> <span class="o">=</span> <span class="k">await</span> <span class="n">fsspec_read_and_run</span><span class="p">(</span><span class="n">join_slash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;CWD&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">]),</span> <span class="n">nb_from_ipynb_io</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">(</span>
+      <span class="n">headers</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="p">{</span><span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">},</span>
+        <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">executor_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;headers&#39;</span><span class="p">,</span> <span class="p">{}),</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="fm">__aenter__</span><span class="p">()</span>
+    <span class="k">return</span> <span class="bp">self</span>
+  
+  <span class="k">async</span> <span class="k">def</span> <span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="fm">__aexit__</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
+    <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__aexit__</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
+
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job</span><span class="p">):</span>
+    <span class="c1"># NOTE: This is redundant, since the notebook was already created</span>
+    <span class="c1">#       but is necessary if we want to use the standard `cwl-runner`</span>
+    <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_jinja2_env</span>
+    <span class="kn">from</span> <span class="nn">appyter.parse.nbtemplate</span> <span class="kn">import</span> <span class="n">parse_fields_from_nbtemplate</span>
+    <span class="n">nb</span> <span class="o">=</span> <span class="k">await</span> <span class="n">fsspec_read_and_run</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">URI</span><span class="p">(</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;storage&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;cwd&#39;</span><span class="p">],</span> <span class="n">job</span><span class="p">[</span><span class="s1">&#39;ipynb&#39;</span><span class="p">])),</span> <span class="n">nb_from_ipynb_io</span><span class="p">)</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">nb</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;appyter&#39;</span><span class="p">][</span><span class="s1">&#39;nbconstruct&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">session</span><span class="o">=</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">])</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="n">dict_filter_none</span><span class="p">({</span>
+      <span class="n">field</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span> <span class="n">field</span><span class="o">.</span><span class="n">to_cwl_value</span><span class="p">()</span>
+      <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">parse_fields_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbtemplate</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">})</span>
+    <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">job</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
+    <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;appyter/output/</span><span class="si">{</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">dict_merge</span><span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">executor_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;params&#39;</span><span class="p">,</span> <span class="p">{}),</span>
+      <span class="n">workflow_params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">),</span>
+      <span class="n">workflow_url</span><span class="o">=</span><span class="s1">&#39;#/workflow_attachment/0&#39;</span><span class="p">,</span>
+      <span class="n">workflow_attachment</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">[</span>
+          <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">executor_options</span><span class="p">[</span><span class="s1">&#39;cwl&#39;</span><span class="p">]),</span>
+          <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cwl</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">()),</span>
+        <span class="p">],</span>
+      <span class="p">],</span>
+      <span class="n">workflow_type</span><span class="o">=</span><span class="s1">&#39;CWL&#39;</span><span class="p">,</span>
+      <span class="n">workflow_type_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cwl</span><span class="p">[</span><span class="s1">&#39;cwlVersion&#39;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">_submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wes_job</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">FormData</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">wes_job</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+      <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;workflow_attachment&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">bytesio</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+          <span class="n">data</span><span class="o">.</span><span class="n">add_field</span><span class="p">(</span><span class="s1">&#39;workflow_attachment&#39;</span><span class="p">,</span> <span class="n">bytesio</span><span class="p">(),</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="p">{</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">}:</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">add_field</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">add_field</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+      <span class="n">join_slash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;ga4gh/wes/v1&#39;</span><span class="p">,</span> <span class="s1">&#39;runs&#39;</span><span class="p">),</span>
+      <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">req</span><span class="p">:</span>
+      <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="n">req</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">res</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;run_id&#39;</span><span class="p">]</span>
+
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">_watch_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">):</span>
+    <span class="n">current_state</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+      <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">15</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()))</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Checking status of job </span><span class="si">{</span><span class="n">run_id</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">join_slash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;ga4gh/wes/v1&#39;</span><span class="p">,</span> <span class="s1">&#39;runs&#39;</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">req</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="n">req</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">current_state</span> <span class="o">!=</span> <span class="n">state</span><span class="p">:</span>
+        <span class="n">current_state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="k">yield</span> <span class="n">current_state</span>
+
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job</span><span class="p">,</span> <span class="n">wes_job</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">job</span><span class="p">):</span>
+    <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Preparing WES parameters...&quot;</span><span class="p">)</span>
+    <span class="n">wes_job</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_try_n_times</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare</span><span class="p">,</span> <span class="n">job</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Dispatching WES execution...&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wes_job</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">run_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_try_n_times</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_submit</span><span class="p">,</span> <span class="n">wes_job</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Dispatched successfully, your execution will begin soon..&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_watch_state</span><span class="p">(</span><span class="n">run_id</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;QUEUED&#39;</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Queued successfully..&quot;</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;INITIALIZING&#39;</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Computational resources are being initialized..&quot;</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;RUNNING&#39;</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Task is now running..&quot;</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;CANCELING&#39;</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Task is being cancelled!&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+      <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;CANCELED&#39;</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Task was cancelled!&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+      <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;EXECUTOR_ERROR&#39;</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Task had an error and did not complete successfully!&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+      <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;COMPLETE&#39;</span><span class="p">:</span>
+        <span class="k">break</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;An unknown state reported by WES&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unhandled state received: </span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+    <span class="c1">#</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finalize</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">wes_job</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">())</span>
+      <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Task failed to finalize&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Task completed&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.execspec.implementations.wes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

@@ -36,14 +36,93 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.dict</h1><div class="highlight"><pre>
-<span></span>
-<div class="viewcode-block" id="dict_filter_none"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_filter_none">[docs]</a><span class="k">def</span> <span class="nf">dict_filter_none</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+<div class="viewcode-block" id="dict_filter_none"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_filter_none">[docs]</a><span></span><span class="k">def</span> <span class="nf">dict_filter_none</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
   <span class="k">return</span> <span class="p">{</span> <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="p">}</span></div>
 
 <div class="viewcode-block" id="dict_collision_free_update"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_collision_free_update">[docs]</a><span class="k">def</span> <span class="nf">dict_collision_free_update</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
   <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="k">assert</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">,</span> <span class="s1">&#39;Collision in update&#39;</span>
     <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
+
+<div class="viewcode-block" id="dict_flatten"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_flatten">[docs]</a><span class="k">def</span> <span class="nf">dict_flatten</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+  <span class="n">Q</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">tuple</span><span class="p">(),</span> <span class="n">d</span><span class="p">)]</span>
+  <span class="n">F</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">while</span> <span class="n">Q</span><span class="p">:</span>
+    <span class="n">K</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">V</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">V</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">Q</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="o">*</span><span class="n">K</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">v</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">F</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="n">V</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">F</span></div>
+
+<div class="viewcode-block" id="dict_unflatten"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_unflatten">[docs]</a><span class="k">def</span> <span class="nf">dict_unflatten</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+  <span class="n">D</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">for</span> <span class="n">K</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">o</span> <span class="o">=</span> <span class="n">D</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+      <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+        <span class="n">o</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="n">o</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">o</span><span class="p">[</span><span class="n">K</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">v</span>
+  <span class="k">return</span> <span class="n">D</span></div>
+
+<div class="viewcode-block" id="dict_merge"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_merge">[docs]</a><span class="k">def</span> <span class="nf">dict_merge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">dict_unflatten</span><span class="p">(</span><span class="n">dict_flatten</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="n">dict_flatten</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="expand_dotmap"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.expand_dotmap">[docs]</a><span class="k">def</span> <span class="nf">expand_dotmap</span><span class="p">(</span><span class="n">dotmap</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Convert dot-notation into deep dict</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">for</span> <span class="n">K</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dotmap</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">_params_n_2</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_params_n_1</span> <span class="o">=</span> <span class="n">params</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">K</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_params_n_1</span><span class="p">:</span> <span class="n">_params_n_1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+      <span class="n">_params_n_2</span> <span class="o">=</span> <span class="n">_params_n_1</span>
+      <span class="n">_params_n_1</span> <span class="o">=</span> <span class="n">_params_n_2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">_params_n_2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+  <span class="k">return</span> <span class="n">params</span></div>
+
+<div class="viewcode-block" id="dict_typed_flatten"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_typed_flatten">[docs]</a><span class="k">def</span> <span class="nf">dict_typed_flatten</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; dict_flatten but preserves lists &amp; ordering</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">Q</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">tuple</span><span class="p">(),</span> <span class="n">d</span><span class="p">)]</span>
+  <span class="n">F</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">while</span> <span class="n">Q</span><span class="p">:</span>
+    <span class="n">K</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">V</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">V</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">Q</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="o">*</span><span class="n">K</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">v</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">V</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">V</span><span class="p">):</span>
+        <span class="n">Q</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="o">*</span><span class="n">K</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">v</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">F</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="n">V</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">F</span></div>
+
+<div class="viewcode-block" id="dict_typed_unflatten"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_typed_unflatten">[docs]</a><span class="k">def</span> <span class="nf">dict_typed_unflatten</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; opposite of dict_typed_unflatten</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">D</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">for</span> <span class="n">K</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">o</span> <span class="o">=</span> <span class="n">D</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">K</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]):</span>
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+        <span class="n">o</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span><span class="p">()</span>
+      <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">k</span> <span class="ow">or</span> <span class="n">o</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">k</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">o</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">typ</span><span class="p">()</span>
+      <span class="c1">#</span>
+      <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">k</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+      <span class="nb">print</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+      <span class="n">o</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+      <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">K</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> <span class="n">o</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">K</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+    <span class="n">o</span><span class="p">[</span><span class="n">K</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">v</span>
+  <span class="k">return</span> <span class="n">D</span></div>
 </pre></div>
 
             <div class="clearer"></div>

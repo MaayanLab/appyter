@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    appyter.render.flask_app
+   appyter.render.nbinspect
 
 Submodules
 ----------
@@ -32,14 +33,6 @@ appyter.render.nbexecute module
 -------------------------------
 
 .. automodule:: appyter.render.nbexecute
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-appyter.render.nbinspect module
--------------------------------
-
-.. automodule:: appyter.render.nbinspect
    :members:
    :undoc-members:
    :show-inheritance:

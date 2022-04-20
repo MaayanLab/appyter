@@ -18,10 +18,50 @@ Subpackages
 Submodules
 ----------
 
+appyter.ext.aiohttp module
+--------------------------
+
+.. automodule:: appyter.ext.aiohttp
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.contextlib module
+-----------------------------
+
+.. automodule:: appyter.ext.contextlib
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.cryptography module
+-------------------------------
+
+.. automodule:: appyter.ext.cryptography
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.ext.dict module
 -----------------------
 
 .. automodule:: appyter.ext.dict
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.drs module
+----------------------
+
+.. automodule:: appyter.ext.drs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.emitter module
+--------------------------
+
+.. automodule:: appyter.ext.emitter
    :members:
    :undoc-members:
    :show-inheritance:
@@ -66,6 +106,14 @@ appyter.ext.importlib module
    :undoc-members:
    :show-inheritance:
 
+appyter.ext.io module
+---------------------
+
+.. automodule:: appyter.ext.io
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.ext.itertools module
 ----------------------------
 
@@ -82,10 +130,34 @@ appyter.ext.json module
    :undoc-members:
    :show-inheritance:
 
+appyter.ext.multiprocessing module
+----------------------------------
+
+.. automodule:: appyter.ext.multiprocessing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.pytest module
+-------------------------
+
+.. automodule:: appyter.ext.pytest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.ext.re module
 ---------------------
 
 .. automodule:: appyter.ext.re
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.subprocess module
+-----------------------------
+
+.. automodule:: appyter.ext.subprocess
    :members:
    :undoc-members:
    :show-inheritance:

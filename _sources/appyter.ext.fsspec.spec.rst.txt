@@ -1,0 +1,37 @@
+appyter.ext.fsspec.spec package
+===============================
+
+Submodules
+----------
+
+appyter.ext.fsspec.spec.composable module
+-----------------------------------------
+
+.. automodule:: appyter.ext.fsspec.spec.composable
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.fsspec.spec.mountable module
+----------------------------------------
+
+.. automodule:: appyter.ext.fsspec.spec.mountable
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.ext.fsspec.spec.sync\_async module
+------------------------------------------
+
+.. automodule:: appyter.ext.fsspec.spec.sync_async
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: appyter.ext.fsspec.spec
+   :members:
+   :undoc-members:
+   :show-inheritance:

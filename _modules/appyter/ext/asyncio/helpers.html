@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.ext.asyncio.helpers &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.asyncio.helpers</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.ext.asyncio.helpers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39; Async helpers to convert anything sync to and from anything async without deadlocks.</span>
+<span class="sd">This requires that you initialize the event loop with the appyter.ext.asyncio.event_loop methods</span>
+<span class="sd"> which will run the event loop in a dedicated thread and ensure all `sync` methods are executed</span>
+<span class="sd"> on that dedicated event loop.</span>
+<span class="sd">You only need to use `ensure_async` or `ensure_sync` these methods will deal with dispatching to</span>
+<span class="sd"> the relevant handlers.</span>
+<span class="sd">It works with already-sync/async, context managers, generators, &amp; functions of these.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">from</span> <span class="nn">appyter.ext.asyncio.event_loop</span> <span class="kn">import</span> <span class="n">get_event_loop</span>
+
+<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="p">(</span>
+  <span class="n">isasyncgen</span><span class="p">,</span>
+  <span class="n">isasyncgenfunction</span><span class="p">,</span>
+  <span class="n">isawaitable</span><span class="p">,</span>
+  <span class="n">iscoroutine</span><span class="p">,</span>
+  <span class="n">iscoroutinefunction</span><span class="p">,</span>
+  <span class="n">isfunction</span><span class="p">,</span>
+  <span class="n">isgenerator</span><span class="p">,</span>
+  <span class="n">isgeneratorfunction</span><span class="p">,</span>
+  <span class="n">ismethod</span><span class="p">,</span>
+<span class="p">)</span>
+
+<div class="viewcode-block" id="isasynccontextmanager"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.isasynccontextmanager">[docs]</a><span class="k">def</span> <span class="nf">isasynccontextmanager</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+  <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;__aenter__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="iscontextmanager"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.iscontextmanager">[docs]</a><span class="k">def</span> <span class="nf">iscontextmanager</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+  <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;__enter__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+<span class="k">def</span> <span class="nf">_call</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ensure_async_literal"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.ensure_async_literal">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">ensure_async_literal</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">obj</span></div>
+
+<div class="viewcode-block" id="awaitable_identity"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.awaitable_identity">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">awaitable_identity</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+  <span class="k">return</span> <span class="k">await</span> <span class="n">obj</span></div>
+
+<div class="viewcode-block" id="ensure_async_func"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.ensure_async_func">[docs]</a><span class="k">def</span> <span class="nf">ensure_async_func</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+  <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span>
+      <span class="kc">None</span><span class="p">,</span>
+      <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_call</span><span class="p">,</span> <span class="n">func</span><span class="p">),</span>
+      <span class="n">args</span><span class="p">,</span>
+      <span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+  <span class="k">return</span> <span class="n">wrapper</span></div>
+
+<div class="viewcode-block" id="anext"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.anext">[docs]</a><span class="nd">@ensure_async_func</span>
+<span class="k">def</span> <span class="nf">anext</span><span class="p">(</span><span class="n">generator</span><span class="p">):</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
+  <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">StopAsyncIteration</span></div>
+
+<div class="viewcode-block" id="ensure_async_generator"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.ensure_async_generator">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">ensure_async_generator</span><span class="p">(</span><span class="n">generator</span><span class="p">):</span>
+  <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="k">yield</span> <span class="k">await</span> <span class="n">anext</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">StopAsyncIteration</span><span class="p">:</span>
+      <span class="k">break</span></div>
+
+<div class="viewcode-block" id="ensure_sync_coro"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.ensure_sync_coro">[docs]</a><span class="k">def</span> <span class="nf">ensure_sync_coro</span><span class="p">(</span><span class="n">coro</span><span class="p">):</span>
+  <span class="n">loop</span> <span class="o">=</span> <span class="n">get_event_loop</span><span class="p">()</span>
+  <span class="k">assert</span> <span class="n">loop</span><span class="o">.</span><span class="n">_thread_id</span> <span class="o">!=</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">ident</span><span class="p">,</span> <span class="s2">&quot;Can&#39;t run sync coro in async thread!&quot;</span>
+  <span class="n">done</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+  <span class="n">future</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run_coroutine_threadsafe</span><span class="p">(</span><span class="n">coro</span><span class="p">,</span> <span class="n">loop</span><span class="p">)</span>
+  <span class="n">future</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">done</span><span class="o">.</span><span class="n">set</span><span class="p">())</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">done</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+  <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+    <span class="c1"># Cancel the future if this was interrupted and give it time to handle</span>
+    <span class="c1">#  the cancel exception.</span>
+    <span class="n">future</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+    <span class="n">done</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">raise</span> <span class="ne">KeyboardInterrupt</span>
+  <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+    <span class="c1"># Re-raise after cancel without future cancel handling</span>
+    <span class="n">future</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+    <span class="k">raise</span>
+  <span class="k">return</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ensure_sync_generator"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.ensure_sync_generator">[docs]</a><span class="k">def</span> <span class="nf">ensure_sync_generator</span><span class="p">(</span><span class="n">asyncgenerator</span><span class="p">):</span>
+  <span class="fm">__anext__</span> <span class="o">=</span> <span class="n">ensure_sync_wrapper</span><span class="p">(</span><span class="n">asyncgenerator</span><span class="o">.</span><span class="fm">__anext__</span><span class="p">)</span>
+  <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">value</span> <span class="o">=</span> <span class="fm">__anext__</span><span class="p">()</span>
+      <span class="k">yield</span> <span class="n">value</span>
+    <span class="k">except</span> <span class="ne">StopAsyncIteration</span><span class="p">:</span>
+      <span class="k">break</span></div>
+
+<span class="k">class</span> <span class="nc">_AsyncSyncContextManager</span><span class="p">:</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contextmanager</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_aenter</span> <span class="o">=</span> <span class="n">contextmanager</span><span class="o">.</span><span class="fm">__aenter__</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">contextmanager</span><span class="p">,</span> <span class="s1">&#39;__aenter__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ensure_async_func</span><span class="p">(</span><span class="n">contextmanager</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_aexit</span> <span class="o">=</span> <span class="n">contextmanager</span><span class="o">.</span><span class="fm">__aexit__</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">contextmanager</span><span class="p">,</span> <span class="s1">&#39;__aexit__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ensure_async_func</span><span class="p">(</span><span class="n">contextmanager</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">)</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aenter</span><span class="p">()</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aexit</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ensure_async_contextmanager"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.ensure_async_contextmanager">[docs]</a><span class="k">def</span> <span class="nf">ensure_async_contextmanager</span><span class="p">(</span><span class="n">contextmanager</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">_AsyncSyncContextManager</span><span class="p">(</span><span class="n">contextmanager</span><span class="p">)</span></div>
+
+<span class="k">class</span> <span class="nc">_SyncAsyncContextManager</span><span class="p">:</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asynccontextmanager</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_enter</span> <span class="o">=</span> <span class="n">asynccontextmanager</span><span class="o">.</span><span class="fm">__enter__</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">asynccontextmanager</span><span class="p">,</span> <span class="s1">&#39;__enter__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ensure_sync_wrapper</span><span class="p">(</span><span class="n">asynccontextmanager</span><span class="o">.</span><span class="fm">__aenter__</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_exit</span> <span class="o">=</span> <span class="n">asynccontextmanager</span><span class="o">.</span><span class="fm">__exit__</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">asynccontextmanager</span><span class="p">,</span> <span class="s1">&#39;__exit__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ensure_sync_wrapper</span><span class="p">(</span><span class="n">asynccontextmanager</span><span class="o">.</span><span class="fm">__aexit__</span><span class="p">)</span>
+  <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enter</span><span class="p">()</span>
+  <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ensure_sync_contextmanager"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.ensure_sync_contextmanager">[docs]</a><span class="k">def</span> <span class="nf">ensure_sync_contextmanager</span><span class="p">(</span><span class="n">asynccontextmanager</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">_SyncAsyncContextManager</span><span class="p">(</span><span class="n">asynccontextmanager</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ensure_async_wrapper"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.ensure_async_wrapper">[docs]</a><span class="k">def</span> <span class="nf">ensure_async_wrapper</span><span class="p">(</span><span class="n">callable</span><span class="p">):</span>
+  <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">callable</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">callable</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ensure_async</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">wrapper</span></div>
+
+<div class="viewcode-block" id="ensure_async"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.ensure_async">[docs]</a><span class="k">def</span> <span class="nf">ensure_async</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+  <span class="k">if</span> <span class="p">(</span>
+    <span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="ow">or</span> <span class="n">isgeneratorfunction</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="p">):</span>
+    <span class="k">return</span> <span class="n">ensure_async_wrapper</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="p">(</span>
+    <span class="n">isasyncgen</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="ow">or</span> <span class="n">isasyncgenfunction</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="ow">or</span> <span class="n">iscoroutine</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="ow">or</span> <span class="n">isawaitable</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="ow">or</span> <span class="n">isasynccontextmanager</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="p">):</span>
+    <span class="k">return</span> <span class="n">obj</span>
+  <span class="k">elif</span> <span class="n">isgenerator</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ensure_async_generator</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="n">iscontextmanager</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ensure_async_contextmanager</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="p">(</span>
+    <span class="n">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="ow">or</span> <span class="n">ismethod</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="ow">or</span> <span class="n">isfunction</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="p">):</span>
+    <span class="k">return</span> <span class="n">ensure_async_func</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">ensure_async_literal</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ensure_sync_wrapper"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.ensure_sync_wrapper">[docs]</a><span class="k">def</span> <span class="nf">ensure_sync_wrapper</span><span class="p">(</span><span class="n">callable</span><span class="p">):</span>
+  <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">callable</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">callable</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ensure_sync</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">wrapper</span></div>
+
+<div class="viewcode-block" id="ensure_sync"><a class="viewcode-back" href="../../../../appyter.ext.asyncio.html#appyter.ext.asyncio.helpers.ensure_sync">[docs]</a><span class="k">def</span> <span class="nf">ensure_sync</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+  <span class="k">if</span> <span class="p">(</span>
+    <span class="n">isgeneratorfunction</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="ow">or</span> <span class="n">iscontextmanager</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="p">):</span>
+    <span class="k">return</span> <span class="n">obj</span>
+  <span class="k">elif</span> <span class="n">isasynccontextmanager</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ensure_sync_contextmanager</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="n">isasyncgen</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ensure_sync_generator</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="p">(</span>
+    <span class="n">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="ow">or</span> <span class="n">isfunction</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="ow">or</span> <span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="p">):</span>
+    <span class="k">return</span> <span class="n">ensure_sync_wrapper</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="n">iscoroutine</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ensure_sync_coro</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="n">isawaitable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ensure_sync_coro</span><span class="p">(</span><span class="n">awaitable_identity</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">obj</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.ext.asyncio.helpers</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

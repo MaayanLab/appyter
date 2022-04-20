@@ -36,21 +36,25 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.fsspec.util</h1><div class="highlight"><pre>
-<div class="viewcode-block" id="split_protocol_opts"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.util.split_protocol_opts">[docs]</a><span></span><span class="k">def</span> <span class="nf">split_protocol_opts</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">default_protocol</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Like `fsspec.core.split_protocol`</span>
-<span class="sd">  but remove fragments potentially parsing querystrings in the fragment as filesystem opts</span>
+<span></span><span class="kn">from</span> <span class="nn">appyter.ext.contextlib</span> <span class="kn">import</span> <span class="n">ensure_context</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.asyncio.helpers</span> <span class="kn">import</span> <span class="n">ensure_async</span>
 
-<span class="sd">  url of the form: proto://netloc/path?qs=anything#ignored?protocol.options=here</span>
-<span class="sd">  &#39;&#39;&#39;</span>
-  <span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">parse_file_uri</span>
-  <span class="kn">from</span> <span class="nn">fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_fs</span><span class="p">,</span> <span class="n">split_protocol</span>
-  <span class="n">uri_parsed</span> <span class="o">=</span> <span class="n">parse_file_uri</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-  <span class="n">opts</span> <span class="o">=</span> <span class="n">uri_parsed</span><span class="o">.</span><span class="n">fragment_qs</span> <span class="ow">or</span> <span class="p">{}</span>
-  <span class="n">uri_parsed</span><span class="o">.</span><span class="n">fragment</span> <span class="o">=</span> <span class="kc">None</span>
-  <span class="n">uri_parsed</span><span class="o">.</span><span class="n">fragment_query</span> <span class="o">=</span> <span class="kc">None</span>
-  <span class="n">protocol</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">split_protocol</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">uri_parsed</span><span class="p">))</span>
-  <span class="n">protocol</span> <span class="o">=</span> <span class="n">protocol</span> <span class="ow">or</span> <span class="n">default_protocol</span>
-  <span class="k">return</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">opts</span></div>
+<div class="viewcode-block" id="fsspec_read_and_run"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.util.fsspec_read_and_run">[docs]</a><span class="nd">@ensure_async</span>
+<span class="k">def</span> <span class="nf">fsspec_read_and_run</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_fs_ex</span>
+  <span class="n">fs</span><span class="p">,</span> <span class="n">fo</span> <span class="o">=</span> <span class="n">url_to_fs_ex</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+  <span class="k">with</span> <span class="n">ensure_context</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span> <span class="k">as</span> <span class="n">fs</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fo</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fr</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">fr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="fsspec_cp"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.util.fsspec_cp">[docs]</a><span class="nd">@ensure_async</span>
+<span class="k">def</span> <span class="nf">fsspec_cp</span><span class="p">(</span><span class="n">left_fs</span><span class="p">,</span> <span class="n">left_fo</span><span class="p">,</span> <span class="n">right_fs</span><span class="p">,</span> <span class="n">right_fo</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">shutil</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">parent_url</span>
+  <span class="k">with</span> <span class="n">left_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">left_fo</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fr</span><span class="p">:</span>
+    <span class="n">right_fs</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">parent_url</span><span class="p">(</span><span class="n">right_fo</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">right_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">right_fo</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+      <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">fr</span><span class="p">,</span> <span class="n">fw</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

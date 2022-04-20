@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.execspec.implementations.docker &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.execspec.implementations.docker</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.execspec.implementations.docker</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">appyter.execspec.spec</span> <span class="kn">import</span> <span class="n">AbstractExecutor</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.asyncio.subprocess</span> <span class="kn">import</span> <span class="n">sh</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.dict</span> <span class="kn">import</span> <span class="n">dict_merge</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.json</span> <span class="kn">import</span> <span class="n">async_json_loads</span>
+
+<div class="viewcode-block" id="DockerExecutor"><a class="viewcode-back" href="../../../../appyter.execspec.implementations.html#appyter.execspec.implementations.docker.DockerExecutor">[docs]</a><span class="k">class</span> <span class="nc">DockerExecutor</span><span class="p">(</span><span class="n">AbstractExecutor</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Run executions in a docker job</span>
+<span class="sd">  Example uri:</span>
+<span class="sd">  docker::maayanlab/myimage:latest?flags.v=/mydatadir:/data&amp;args.data-dir=/data</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">protocol</span> <span class="o">=</span> <span class="s1">&#39;docker&#39;</span>
+
+  <span class="k">async</span> <span class="k">def</span> <span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_args</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="s1">&#39;docker&#39;</span><span class="p">,</span> <span class="s1">&#39;run&#39;</span><span class="p">,</span>
+      <span class="o">*</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;--</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;-</span><span class="si">{</span><span class="n">k</span><span class="si">}{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dict_merge</span><span class="p">({</span>
+          <span class="s1">&#39;device&#39;</span><span class="p">:</span> <span class="s1">&#39;/dev/fuse&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;cap-add&#39;</span><span class="p">:</span> <span class="s1">&#39;SYS_ADMIN&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;security-opt&#39;</span><span class="p">:</span> <span class="s1">&#39;apparmor:unconfined&#39;</span><span class="p">,</span>
+        <span class="p">},</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">executor_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;flags&#39;</span><span class="p">,</span> <span class="p">{}))</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+      <span class="p">),</span>
+    <span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">proc</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_subprocess_exec</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
+        <span class="s1">&#39;docker&#39;</span><span class="p">,</span> <span class="s1">&#39;inspect&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HOSTNAME&#39;</span><span class="p">],</span>
+      <span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+      <span class="n">proc_stdout</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+      <span class="n">conf</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_json_loads</span><span class="p">(</span><span class="n">proc_stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_args</span> <span class="o">+=</span> <span class="p">[</span>
+        <span class="sa">f</span><span class="s2">&quot;--network=</span><span class="si">{</span><span class="n">conf</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;HostConfig&#39;</span><span class="p">][</span><span class="s1">&#39;NetworkMode&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+      <span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Not a docker container&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__aenter__</span><span class="p">()</span>
+
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">_submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">job</span><span class="p">):</span>
+    <span class="n">full_args</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="p">,</span>
+      <span class="s1">&#39;appyter&#39;</span><span class="p">,</span> <span class="s1">&#39;nbexecute&#39;</span><span class="p">,</span>
+      <span class="o">*</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;--</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;-</span><span class="si">{</span><span class="n">k</span><span class="si">}{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dict_merge</span><span class="p">(</span>
+          <span class="p">{</span>
+            <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;storage://</span><span class="si">{</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;cwd&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="s1">&#39;file:///dev/stdout&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;fuse&#39;</span><span class="p">:</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;data-dir&#39;</span><span class="p">:</span> <span class="n">job</span><span class="p">[</span><span class="s1">&#39;storage&#39;</span><span class="p">],</span>
+          <span class="p">},</span>
+          <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">executor_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+      <span class="p">),</span>
+      <span class="n">job</span><span class="p">[</span><span class="s1">&#39;ipynb&#39;</span><span class="p">],</span>
+    <span class="p">]</span>
+    <span class="k">async</span> <span class="k">for</span> <span class="n">msg</span><span class="p">,</span> <span class="n">done</span> <span class="ow">in</span> <span class="n">sh</span><span class="p">(</span><span class="o">*</span><span class="n">full_args</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">):</span>
+      <span class="k">yield</span> <span class="n">msg</span><span class="p">,</span> <span class="n">done</span>
+
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">job</span><span class="p">):</span>
+    <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Launching container...&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">for</span> <span class="n">msg</span><span class="p">,</span> <span class="n">done</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_submit</span><span class="p">(</span><span class="o">**</span><span class="n">job</span><span class="p">):</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span> <span class="k">yield</span> <span class="k">await</span> <span class="n">async_json_loads</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span> <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">msg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Container exited&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Container exited with error code&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.execspec.implementations.docker</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

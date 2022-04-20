@@ -1,0 +1,45 @@
+appyter.execspec package
+========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   appyter.execspec.implementations
+
+Submodules
+----------
+
+appyter.execspec.core module
+----------------------------
+
+.. automodule:: appyter.execspec.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.execspec.registry module
+--------------------------------
+
+.. automodule:: appyter.execspec.registry
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+appyter.execspec.spec module
+----------------------------
+
+.. automodule:: appyter.execspec.spec
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: appyter.execspec
+   :members:
+   :undoc-members:
+   :show-inheritance:

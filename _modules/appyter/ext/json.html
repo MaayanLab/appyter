@@ -41,7 +41,9 @@
 <div class="viewcode-block" id="try_json_loads"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.json.try_json_loads">[docs]</a><span class="k">def</span> <span class="nf">try_json_loads</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
   <span class="k">try</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-  <span class="k">except</span><span class="p">:</span>
+  <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">v</span>
+  <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">v</span></div>
 
 <div class="viewcode-block" id="try_json_dumps"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.json.try_json_dumps">[docs]</a><span class="k">def</span> <span class="nf">try_json_dumps</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
@@ -49,6 +51,10 @@
     <span class="k">return</span> <span class="n">v</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
+
+<span class="kn">from</span> <span class="nn">appyter.ext.asyncio.helpers</span> <span class="kn">import</span> <span class="n">ensure_async</span>
+<span class="n">async_json_loads</span> <span class="o">=</span> <span class="n">ensure_async</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">)</span>
+<span class="n">async_json_dumps</span> <span class="o">=</span> <span class="n">ensure_async</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">)</span>
 </pre></div>
 
             <div class="clearer"></div>
