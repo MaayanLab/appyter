@@ -12,8 +12,7 @@ from appyter import __version__
 from appyter.cli import cli
 from appyter.ext.emitter import json_emitter_factory
 from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.asyncio.helpers import ensure_async, ensure_sync
-from appyter.ext.contextlib import ensure_context
+from appyter.ext.asyncio.helpers import ensure_async_contextmanager, ensure_sync
 from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io, nb_to_json
 from appyter.ext.click import click_option_setenv, click_argument_setenv
@@ -74,8 +73,8 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   try:
     files = nb.metadata['appyter']['nbconstruct'].get('files')
     logger.debug(f"{cwd=} {files=}")
-    async with ensure_async(ensure_context(url_to_chroot_fs))(cwd, pathmap=files) as fs:
-      async with ensure_async(fs.mount(fuse=fuse)) as mnt:
+    async with ensure_async_contextmanager(url_to_chroot_fs(cwd, pathmap=files)) as fs:
+      async with ensure_async_contextmanager(fs.mount(fuse=fuse)) as mnt:
         # setup execution_info with start time
         nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
         with (mnt/ipynb).open('w') as fw:
