@@ -154,7 +154,10 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   except Exception as e:
     logger.error(traceback.format_exc())
     if state['status'] != 'Success':
-      await emit({ 'type': 'error', 'data': f"Error occured while {state['status']}" })
+      await emit({ 'type': 'error', 'data': f"Error occured while executing" })
+    else:
+      await emit({ 'type': 'error', 'data': f"Error occured while finalizing" })
+    raise
   finally:
     logger.info('complete')
   #

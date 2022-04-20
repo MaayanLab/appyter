@@ -37,7 +37,5 @@ class SubprocessExecutor(AbstractExecutor):
       if not done:
         try: yield await async_json_loads(msg)
         except: logger.warning(traceback.format_exc())
-    if msg == 0:
-      yield dict(type='status', data=f"Subprocess exited")
-    else:
+    if msg != 0:
       yield dict(type='error', data=f"Subprocess exited with error code")
