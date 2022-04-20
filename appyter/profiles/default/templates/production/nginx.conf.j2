@@ -14,8 +14,10 @@
       {%- if ws %}
       proxy_http_version 1.1;
       proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
+      proxy_set_header Connection "Upgrade";
       proxy_read_timeout 900s;
+      proxy_send_timeout 900s;
+      proxy_connect_timeout 900s;
       {%- endif %}
       proxy_pass {{ remote }};
       {%- if cache %}
