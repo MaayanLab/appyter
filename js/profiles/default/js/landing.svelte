@@ -17,6 +17,11 @@
   let notebookRef
   let local_run_url
 
+  // store notebook in config for error reporting
+  $: if (nb) {
+    Object.assign(window._config, { nb })
+  }
+
   // table of contents
   $: if (window._config.EXTRAS.indexOf('toc') !== -1) toc.attach(notebookRef)
 
