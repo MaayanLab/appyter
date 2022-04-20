@@ -75,9 +75,7 @@
       <span class="k">if</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span> <span class="k">yield</span> <span class="k">await</span> <span class="n">async_json_loads</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span> <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
-    <span class="k">if</span> <span class="n">msg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-      <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Subprocess exited&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">msg</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
       <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Subprocess exited with error code&quot;</span><span class="p">)</span></div>
 </pre></div>
 
