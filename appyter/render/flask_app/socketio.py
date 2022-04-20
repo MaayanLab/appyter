@@ -1,3 +1,4 @@
+import uuid
 import logging
 logger = logging.getLogger(__name__)
 
@@ -9,7 +10,8 @@ socketio = AsyncServer(async_mode='aiohttp')
 async def _(sid, environ):
   request = environ['aiohttp.request']
   uid = request.headers.get('Authorization')
-  assert uid is not None
+  if uid is None:
+    uid = str(uuid.uuid4())
   logger.debug(f"connect: {uid} ({sid})")
   async with socketio.session(sid) as sess:
     sess['uid'] = uid
