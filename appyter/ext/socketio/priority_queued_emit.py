@@ -23,9 +23,9 @@ class PriorityQueuedEmitMixin:
 
   async def _emit_dispatcher(self):
     while True:
-      await self._emit_enabled.wait()
       _, _, args, kwargs = await self._emit_queue.get()
       try:
+        await self._emit_enabled.wait()
         await super().emit(*args, **{k:v for k,v in kwargs.items() if v})
       except asyncio.CancelledError:
         raise
