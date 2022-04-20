@@ -1,3 +1,4 @@
+import uuid
 import traceback
 import socketio
 import logging
@@ -31,3 +32,10 @@ class AsyncClient(
     await super().__aexit__(*args)
     try: await self.eio.http.close()
     except: logger.warn(traceback.format_exc())
+
+  async def connect(self, *args, headers={}, **kwargs):
+    return await super().connect(
+      *args,
+      headers=dict({ 'Authorization': str(uuid.uuid4()) }, **headers),
+      **kwargs,
+    )
