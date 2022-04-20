@@ -27,7 +27,7 @@ async def create_userfs(data):
   return MapperFileSystem(pathmap=pathmap)
 
 async def upload_user_to_storage(storage, data):
-  ''' Convert all `user://` file_uris into `storage://` uris
+  ''' Convert all `user://` file_uris into `drs://` or `storage://` uris
   '''
   # TODO: this is a hack for now,
   #  the whole thing should probably be part of the file field
@@ -46,10 +46,16 @@ async def upload_user_to_storage(storage, data):
       async with ensure_async_contextmanager(url_to_chroot_fs(str(URI(storage).join('input')))) as storagefs:
         for filename, file_uri in files.items():
           if file_uri.startswith('user://'):
-            new_file_uri = await ensure_async(organize_file_content)(storagefs, userfs, file_uri[len('user://'):], filename=filename)
-            new_file_uri_without_filename = str(URI(new_file_uri).with_fragment_path(None))
-            # replace the uri if it appears in `data`
             existing_file_uri = str(URI(file_uri).with_fragment_path(filename))
+            try:
+              # Use DRS if it's available
+              new_file_uri_without_filename = await ensure_async(userfs.get_drs)(file_uri[len('user://'):])
+              new_file_uri = str(URI(new_file_uri).with_fragment_path(filename))
+            except:
+              # Otherwise put it into `storage://`
+              new_file_uri = await ensure_async(organize_file_content)(storagefs, userfs, file_uri[len('user://'):], filename=filename)
+              new_file_uri_without_filename = str(URI(new_file_uri).with_fragment_path(None))
+            # replace the uri if it appears in `data`
             flat_data = [
               (K, new_file_uri_without_filename) if K[-1] == f"_file:{filename}" else (K, new_file_uri if v == existing_file_uri else v)
               for K, v in flat_data
