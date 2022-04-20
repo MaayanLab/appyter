@@ -9,7 +9,7 @@ def serve(app_path, **kwargs):
   logger = logging.getLogger(__name__)
   from subprocess import Popen
   from appyter.context import get_env, get_jinja2_env, find_blueprints, get_appyter_directory
-  config = get_env(**kwargs)
+  config = get_env(**kwargs, mode='prerender')
   logger.info(kwargs)
   env = get_jinja2_env(config=config)
   exit_code = 1
