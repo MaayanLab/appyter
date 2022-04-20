@@ -13,6 +13,10 @@ class PriorityQueuedEmitMixin:
     self._emit_dispatcher_task = asyncio.create_task(self._emit_dispatcher())
 
   async def __aexit__(self, *args):
+    if self._emit_enabled.is_set():
+      await super().disconnect()
+    if self._emit_queue.qsize() != 0:
+      logger.warning(f"{self._emit_queue.qsize()} items in queue weren't processed...")
     try:
       self._emit_dispatcher_task.cancel()
       await self._emit_dispatcher_task
@@ -21,8 +25,8 @@ class PriorityQueuedEmitMixin:
 
   async def _emit_dispatcher(self):
     while True:
-      _, _, args, kwargs = await self._emit_queue.get()
       await self._emit_enabled.wait()
+      _, _, args, kwargs = await self._emit_queue.get()
       try:
         await super().emit(*args, **{k:v for k,v in kwargs.items() if v})
       except asyncio.CancelledError:
@@ -41,14 +45,7 @@ class PriorityQueuedEmitMixin:
     ))
 
   async def disconnect(self):
-    logger.debug('Disconnecting...')
     if self._emit_enabled.is_set():
       logger.debug('Ensuring emit queue has been fully processed...')
       await self._emit_queue.join()
-    logger.debug('Disconnect')
-    try:
-      self._emit_dispatcher_task.cancel()
-      await self._emit_dispatcher_task
-    except asyncio.CancelledError:
-      pass
     await super().disconnect()
