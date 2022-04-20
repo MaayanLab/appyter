@@ -50,9 +50,6 @@
       statusBg = 'primary'
       if (status === 'Success') {
         current_code_cell = undefined
-        if (!window._config.DEBUG) {
-          socket.disconnect()
-        }
       }
     })
     socket.on('error', async (value) => {
