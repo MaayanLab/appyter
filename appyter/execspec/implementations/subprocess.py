@@ -1,6 +1,9 @@
 import os
 import sys
 import json
+import traceback
+import logging
+logger = logging.getLogger()
 
 from appyter.execspec.spec import AbstractExecutor
 from appyter.ext.asyncio.subprocess import sh
@@ -30,7 +33,9 @@ class SubprocessExecutor(AbstractExecutor):
   async def _run(self, **job):
     yield dict(type='status', data=f"Launching subprocess...")
     async for msg, done in self._submit(**job):
-      if not done: yield json.loads(msg)
+      if not done:
+        try: yield json.loads(msg)
+        except: logger.warning(traceback.format_exc())
     if msg == 0:
       yield dict(type='status', data=f"Subprocess exited")
     else:
