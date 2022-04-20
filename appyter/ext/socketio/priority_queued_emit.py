@@ -13,8 +13,6 @@ class PriorityQueuedEmitMixin:
     self._emit_dispatcher_task = asyncio.create_task(self._emit_dispatcher())
 
   async def __aexit__(self, *args):
-    if self._emit_enabled.is_set():
-      await super().disconnect()
     if self._emit_queue.qsize() != 0:
       logger.warning(f"{self._emit_queue.qsize()} items in queue weren't processed...")
     try:

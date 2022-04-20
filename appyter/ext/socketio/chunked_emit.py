@@ -15,14 +15,14 @@ class ChunkedEmitMixin:
     if chunkable:
       serialized = json.dumps(data, sort_keys=True, separators=None, ensure_ascii=True)
       chunkable = len(serialized) > self.CHUNK_SIZE
-      await asyncio.sleep()
+      await asyncio.sleep(0)
     #
     if chunkable:
       logger.debug(f"Large packet ({len(serialized)}), chunking...")
       data_hash = str(uuid.uuid4())
       n_chunks = (len(serialized) // ChunkedEmitMixin.CHUNK_SIZE) + int(len(serialized) % ChunkedEmitMixin.CHUNK_SIZE != 0)
       for n in range(0, n_chunks):
-        await asyncio.sleep()
+        await asyncio.sleep(0)
         await super().emit(
           'chunked',
           dict(
