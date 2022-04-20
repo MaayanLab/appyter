@@ -1,18 +1,18 @@
-import multiprocessing as mp
-
-from appyter.ext.fsspec.mapperfs import MapperFileSystem
-mp.set_start_method('spawn', True)
+import appyter.ext.multiprocessing
 
 import tempfile
 import contextlib
 from pathlib import Path
-from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager
 
-import appyter.ext.fsspec
-from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.fsspec.fuse import fs_mount
+from appyter.ext.fsspec.mapperfs import MapperFileSystem
 
-def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
+import pytest
+from appyter.ext.pytest import assert_eq
+from appyter.ext.asyncio.event_loop import with_event_loop
+@pytest.fixture(scope="session", autouse=True)
+def event_loop_fixture():
+  with with_event_loop():
+    yield
 
 @contextlib.contextmanager
 def _test_ctx():

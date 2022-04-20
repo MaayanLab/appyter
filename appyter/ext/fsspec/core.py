@@ -1,6 +1,16 @@
 import logging
 logger = logging.getLogger(__name__)
 
+def url_to_fs_ex(url, **kwargs):
+  ''' Like url_to_fs but get opts from fragment_qs
+  '''
+  from appyter.ext.urllib import URI
+  from fsspec.core import url_to_fs
+  uri_parsed = URI(url)
+  opts = dict(kwargs, **uri_parsed.fragment_query_ex)
+  fs, fspath = url_to_fs(str(uri_parsed.with_fragment(None)), **opts)
+  return fs, fspath
+
 def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):
   ''' Like url_to_fs but supporting our extensions, namely:
   chroot   filesystem path is treated as the root
@@ -8,21 +18,10 @@ def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):
   appyter  create a pathmap from an appyter ipynb
   cached   cache read/writes
   '''
-  from appyter.ext.fsspec.util import split_protocol_opts
   from appyter.ext.fsspec.chroot import ChrootFileSystem
-  protocol, path, opts = split_protocol_opts(url)
-  # add protocol options to inner protocol
-  if protocol not in kwargs: kwargs[protocol] = {}
-  kwargs[protocol].update(opts)
-  # ensure auto_mkdir is enabled
-  if protocol == 'file':
-    if 'auto_mkdir' not in kwargs[protocol]: kwargs[protocol]['auto_mkdir'] = True
+  fs, fs_path = url_to_fs_ex(url, **kwargs)
   # add chroot
-  fs = ChrootFileSystem(
-    target_protocol=protocol,
-    target_options=kwargs[protocol],
-    fo=path,
-  )
+  fs = ChrootFileSystem(fs=fs, fo=fs_path)
   # apply pathmap as needed
   if pathmap:
     from appyter.ext.fsspec.mapperfs import MapperFileSystem

@@ -4,8 +4,6 @@ import logging
 from appyter import __version__
 from appyter.cli import cli
 from appyter.ext.click import click_option_setenv, click_argument_setenv
-from appyter.ext.fsspec.fuse import fs_mount
-from appyter.ext.asyncio.sync_contextmanager import sync_contextmanager
 
 logger = logging.getLogger(__name__)
 
@@ -27,19 +25,16 @@ def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
   import fsspec
   # TODO: can this be less reliant on the `appyter-catalog` storage setup
   uri_parsed = urllib.parse.urlparse(uri)
-  from appyter.ext.fsspec.alias import AliasFileSystemFactory
-  storage_uri = f"{uri_parsed.scheme}://{uri_parsed.netloc}/storage/appyters/"
-  fsspec.register_implementation('storage',
-    AliasFileSystemFactory(
-      'storage',
-      storage_uri,
-    )
-  )
-  # if data_dir doesn't exist, create it
-  if data_dir is None: data_dir = 'tmpfs://'
-  # mount the appyter into the data_dir
-  with sync_contextmanager(fs_mount(data_dir, appyter=uri, cached=True)) as mnt:
-    logging.info(f"Starting `appyter serve`...")
-    # serve the bundle in jupyter notebook
-    from appyter.helpers.serve import serve
-    ctx.invoke(serve, cwd=cwd, data_dir=str(mnt), host=host, port=port, args=args)
+  from appyter.ext.fsspec.storage import ensure_storage
+  from appyter.ext.asyncio.helpers import ensure_sync_contextmanager
+  from appyter.ext.fsspec.core import url_to_chroot_fs
+  with ensure_sync_contextmanager(ensure_storage(f"{uri_parsed.scheme}://{uri_parsed.netloc}/storage/appyters/")):
+    # if data_dir doesn't exist, create it
+    if data_dir is None: data_dir = 'memory://'
+    # mount the appyter into the data_dir
+    fs = url_to_chroot_fs(data_dir, appyter=uri)
+    with fs.mount(fuse=False) as mnt:
+      logging.info(f"Starting `appyter serve`...")
+      # serve the bundle in jupyter notebook
+      from appyter.helpers.serve import serve
+      ctx.invoke(serve, cwd=cwd, data_dir=str(mnt), host=host, port=port, args=args)

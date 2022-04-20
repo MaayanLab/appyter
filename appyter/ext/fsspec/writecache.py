@@ -1,12 +1,15 @@
 import os
+import contextlib
 from pathlib import PurePath
-from fsspec import filesystem, AbstractFileSystem
+from fsspec import AbstractFileSystem, filesystem
+from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
+from appyter.ext.fsspec.spec.composable import ComposableAbstractFileSystem
 from appyter.ext.tempfile import mktemp
 
 import logging
 logger = logging.getLogger(__name__)
 
-class WriteCacheFileSystem(AbstractFileSystem):
+class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem, AbstractFileSystem):
   protocol = 'writecache'
 
   def __init__(self, target_protocol=None, target_options=None, fs=None, **kwargs):
@@ -45,6 +48,12 @@ class WriteCacheFileSystem(AbstractFileSystem):
     if getattr(self.fs, '__exit__', None) is not None:
       self.fs.__exit__(type, value, traceback)
 
+  @contextlib.contextmanager
+  def mount(self, path='', mount_dir=None, fuse=True, **kwargs):
+    mount = self.fs.mount if getattr(self.fs, 'mount', None) is not None else super().mount
+    with mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+      yield mount_dir
+
   def mkdir(self, path, **kwargs):
     path = self.fs.root_marker + path.lstrip('/')
     try:
@@ -68,11 +77,20 @@ class WriteCacheFileSystem(AbstractFileSystem):
   def rmdir(self, path):
     path = self.fs.root_marker + path.lstrip('/')
     try:
-      self.upper_fs.rmdir(path)
+      self.fs.rmdir(path)
     except:
       raise
     else:
       self._dir_cache.discard(path)
+
+  def rm_file(self, path):
+    path = self.fs.root_marker + path.lstrip('/')
+    try:
+      self.fs.rm_file(path)
+    except:
+      raise
+    else:
+      self._local_cache.discard(path)
 
   def rm(self, path, recursive=False, maxdepth=None):
     path = self.fs.root_marker + path.lstrip('/')
@@ -85,6 +103,39 @@ class WriteCacheFileSystem(AbstractFileSystem):
         for d in list(self._dir_cache):
           if d.startswith(path):
             self._dir_cache.remove(d)
+
+  def cat_file(self, path, start=None, end=None, **kwargs):
+    path = self.fs.root_marker + path.lstrip('/')
+    try:
+      return self.fs.cat_file(path, start=start, end=end, **kwargs)
+    except KeyboardInterrupt:
+      raise
+    except:
+      if path in self._local_cache:
+        fh = self._local_cache[path]
+        cur = fh.tell()
+        fh.seek(start or 0)
+        if end is None:
+          contents = fh.read()
+        else:
+          contents = fh.read(end - (start or 0))
+        fh.seek(cur)
+        return contents
+      else:
+        raise
+
+  def put_file(self, lpath, rpath, **kwargs):
+    path = self.fs.root_marker + path.lstrip('/')
+    return self.fs.put_file(lpath, self._resolve_path(rpath), **kwargs)
+
+  def get_file(self, rpath, lpath, **kwargs):
+    path = self.fs.root_marker + path.lstrip('/')
+    return self.fs.get_file(self._resolve_path(rpath), lpath, **kwargs)
+
+  def cp_file(self, path1, path2, **kwargs):
+    path1 = self.fs.root_marker + path1.lstrip('/')
+    path2 = self.fs.root_marker + path2.lstrip('/')
+    return self.fs.cp_file(path1, path2, **kwargs)
 
   def copy(self, path1, path2, recursive=False, on_error=None, **kwargs):
     path1 = self.fs.root_marker + path1.lstrip('/')
@@ -101,7 +152,6 @@ class WriteCacheFileSystem(AbstractFileSystem):
           p = PurePath(d)
           if p.is_relative_to(p1):
             self._dir_cache.add(str(p2 / p.relative_to(path1)))
-
 
   def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
     path1 = self.fs.root_marker + path1.lstrip('/')
@@ -125,6 +175,9 @@ class WriteCacheFileSystem(AbstractFileSystem):
     if path in self._local_cache or path in self._dir_cache:
       return True
     return self.fs.exists(path, **kwargs)
+
+  def get_drs(self, path, **kwargs):
+    return self.fs.get_drs(path, **kwargs)
 
   def info(self, path, **kwargs):
     path = self.fs.root_marker + path.lstrip('/')

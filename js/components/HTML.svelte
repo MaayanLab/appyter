@@ -1,7 +1,5 @@
 <script>
-  import { getContext } from 'svelte'
-  import { report_error as report_error_ctx } from '@/lib/appyter_context.js'
-  const report_error = getContext(report_error_ctx)
+  import report_error from '@/extras/catalog-integration/report_error'
 
   export let classes = ""
   export let data = ""
@@ -24,7 +22,10 @@
     }
   }
 
-  $: if (ref) ref.querySelectorAll('script').forEach(el => try_eval_once(el.innerHTML))
+  $: if (ref) ref.querySelectorAll('script').forEach(el => {
+    if (el.type === 'application/json') return
+    try_eval_once(el.innerHTML)
+  })
 </script>
 
 <div bind:this={ref} class={classes}>

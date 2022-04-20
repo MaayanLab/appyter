@@ -1,4 +1,6 @@
+from appyter.ext.asyncio.helpers import ensure_sync
 import logging
+
 logger = logging.getLogger(__name__)
 
 async def run_app(config):
@@ -15,6 +17,7 @@ async def run_app(config):
 
 async def app_runner(emitter, config):
   import asyncio
+  from appyter.ext.subprocess import interrupt
   state_lock = asyncio.Lock()
   state = dict(proc=await run_app(config))
   #
@@ -24,38 +27,39 @@ async def app_runner(emitter, config):
     async with state_lock:
       if 'proc' in state:
         proc = state.pop('proc')
-        proc.kill()
+        interrupt(proc)
         state['proc'] = await run_app(config)
   #
   @emitter.on('quit')
   async def quit():
     logger.info('Stopping app..')
     async with state_lock:
-      state.pop('proc').kill()
+      proc = state.pop('proc')
+      interrupt(proc)
 
 async def app_messager(emitter, config):
   import asyncio
   from appyter.ext.urllib import join_slash
   from appyter.ext.socketio import AsyncClient
-  from appyter.ext.asyncio.try_n_times import try_n_times
-  sio = AsyncClient()
-  #
-  @emitter.on('livereload')
-  async def livereload(changes):
-    logger.info(f"LiveReload {changes}")
-    await sio.emit('livereload', {})
-  #
-  @emitter.on('quit')
-  async def quit():
-    logger.info('Disconnecting..')
-    await sio.disconnect()
-  #
-  origin = f"http://{config['HOST']}:{config['PORT']}"
-  path = join_slash(config['PREFIX'], "socket.io")
-  logger.info(f"Connecting to appyter server at {origin}{path}...")
-  await asyncio.sleep(1)
-  await try_n_times(3, sio.connect, origin, socketio_path=path)
-  await sio.wait()
+  from appyter.ext.asyncio.try_n_times import async_try_n_times
+  async with AsyncClient() as sio:
+    #
+    @emitter.on('livereload')
+    async def livereload(changes):
+      logger.info(f"LiveReload {changes}")
+      await sio.emit('livereload', {})
+    #
+    @emitter.on('quit')
+    async def quit():
+      logger.info('Disconnecting..')
+      await sio.disconnect()
+    #
+    origin = f"http://{config['HOST']}:{config['PORT']}"
+    path = join_slash(config['PREFIX'], "socket.io")
+    logger.info(f"Connecting to appyter server at {origin}{path}...")
+    await asyncio.sleep(1)
+    await async_try_n_times(3, sio.connect, origin, socketio_path=path)
+    await sio.wait()
 
 async def file_watcher(emitter, evt, path, **kwargs):
   from watchgod import awatch
@@ -63,7 +67,8 @@ async def file_watcher(emitter, evt, path, **kwargs):
   async for changes in awatch(path, **kwargs):
     await emitter.emit(evt, changes=changes)
 
-def serve(app_path, **kwargs):
+@ensure_sync
+async def serve(app_path, **kwargs):
   import os
   import asyncio
   import appyter
@@ -71,12 +76,12 @@ def serve(app_path, **kwargs):
   from appyter.ext.watchgod.watcher import GlobWatcher
   from appyter.context import get_env
   config = get_env(**kwargs)
-  loop = asyncio.get_event_loop()
   emitter = EventEmitter()
+  tasks = []
   # run the app and reload it when necessary
-  loop.create_task(app_runner(emitter, config))
+  tasks.append(asyncio.create_task(app_runner(emitter, config)))
   # the underlying appyter library
-  loop.create_task(
+  tasks.append(asyncio.create_task(
     file_watcher(emitter, 'reload', appyter.__path__[0],
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
@@ -86,10 +91,10 @@ def serve(app_path, **kwargs):
         exclude_file_glob=[],
       ),
     )
-  )
+  ))
   # the underlying appyter library's templates/ipynb/staticfiles/...
-  loop.create_task(
-    file_watcher(emitter, 'livereload', os.path.join(appyter.__path__[0], 'profiles'),
+  tasks.append(asyncio.create_task(
+    file_watcher(emitter, 'livereload', appyter.__path__[0],
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
         include_dir_glob=['*'],
@@ -98,9 +103,9 @@ def serve(app_path, **kwargs):
         exclude_file_glob=['*.py'],
       ),
     )
-  )
+  ))
   # the appyter itself's filters/blueprints
-  loop.create_task(
+  tasks.append(asyncio.create_task(
     file_watcher(emitter, 'reload', config['CWD'],
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
@@ -110,9 +115,9 @@ def serve(app_path, **kwargs):
         exclude_file_glob=[],
       ),
     )
-  )
+  ))
   # the appyter itself's templates/ipynb/staticfiles/...
-  loop.create_task(
+  tasks.append(asyncio.create_task(
     file_watcher(emitter, 'livereload', config['CWD'],
       watcher_cls=GlobWatcher,
       watcher_kwargs=dict(
@@ -122,9 +127,23 @@ def serve(app_path, **kwargs):
         exclude_file_glob=['*.py'],
       ),
     )
-  )
-  loop.create_task(app_messager(emitter, config))
-  loop.run_forever()
-  loop.run_until_complete(emitter.emit('quit'))
-  loop.run_until_complete(emitter.flush())
-  loop.run_until_complete(emitter.clear())
+  ))
+  tasks.append(asyncio.create_task(app_messager(emitter, config)))
+  exit_code = 0
+  try:
+    await asyncio.Event().wait()
+  except asyncio.CancelledError:
+    pass
+  except:
+    exit_code = 1
+  finally:
+    await emitter.emit('quit')
+    await emitter.flush()
+    await emitter.clear()
+    for task in tasks:
+      try:
+        task.cancel()
+        await task
+      except asyncio.CancelledError:
+        pass
+  return exit_code

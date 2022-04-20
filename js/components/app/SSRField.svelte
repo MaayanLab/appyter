@@ -14,7 +14,7 @@
 
   let rendered
   async function render() {
-    const res = await fetch(`${window.location.href.replace(/\/$/, '')}/ssr/`, {
+    const res = await fetch(`${window._config.ORIGIN}/ssr/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

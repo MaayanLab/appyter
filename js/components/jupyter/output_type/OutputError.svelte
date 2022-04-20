@@ -1,9 +1,8 @@
 <script>
-  import { onMount, getContext } from 'svelte'
+  import { onMount } from 'svelte'
   import Ansi from '@/components/Ansi.svelte'
   import collapse from '@/utils/collapse.js'
-  import { report_error as report_error_ctx } from '@/lib/appyter_context.js'
-  const report_error = getContext(report_error_ctx)
+  import report_error from '@/extras/catalog-integration/report_error'
 
   export let data
 

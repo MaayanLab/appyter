@@ -2,8 +2,8 @@ import asyncio
 import typing as t
 from nbclient import NotebookClient
 from nbformat import NotebookNode
-from nbclient.util import ensure_async
 from nbclient.exceptions import CellExecutionComplete, DeadKernelError, CellControlSignal
+from appyter.ext.asyncio.helpers import ensure_async
 
 class NotebookClientIOPubHook(NotebookClient):
   ''' A notebook client with the ability to hook into iopub updates
@@ -33,11 +33,6 @@ class NotebookClientIOPubHook(NotebookClient):
             await self.iopub_hook(cell, cell_index)
 
   def _kc_execute(self, *args, **kwargs):
-    try:
-      loop = asyncio.get_event_loop()
-    except (RuntimeError, AssertionError):
-      loop = asyncio.new_event_loop()
-      asyncio.set_event_loop(loop)
     return self.kc.execute(*args, **kwargs)
 
   async def async_execute_cell(
@@ -88,12 +83,10 @@ class NotebookClientIOPubHook(NotebookClient):
       cell['metadata']['execution'] = {}
 
     self.log.debug("Executing cell:\n%s", cell.source)
-    parent_msg_id = await asyncio.get_running_loop().run_in_executor(None,
-      lambda: self._kc_execute(
-        cell.source,
-        store_history=store_history,
-        stop_on_error=not self.allow_errors
-      )
+    parent_msg_id = await ensure_async(self._kc_execute)(
+      cell.source,
+      store_history=store_history,
+      stop_on_error=not self.allow_errors
     )
     # We launched a code cell to execute
     self.code_cells_executed += 1
@@ -130,6 +123,6 @@ class NotebookClientIOPubHook(NotebookClient):
 
     if execution_count:
       cell['execution_count'] = execution_count
-    self._check_raise_for_error(cell, exec_reply)
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
     self.nb['cells'][cell_index] = cell
     return cell

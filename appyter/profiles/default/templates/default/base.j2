@@ -5,52 +5,30 @@
     <title>Appyter</title>
   {% endblock %}
   {% block style %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" />
   {% endblock %}
   {% block script_head %}
-    <script>
-      window._config = {
-        STATIC_URL: {{ url_for('static', filename='')|jsonify }},
-      }
-    </script>
-    <script src="{{ url_for('static', filename='js/lib/requirejs/require.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lib/require.js') }}"></script>
     <script>
       require.config({
         paths: {
-          'jquery': {{ url_for('static', filename='js/lib/jquery/jquery.min')|jsonify }},
-          'socketio': {{ url_for('static', filename='js/lib/socket.io/socket.io.min')|jsonify }},
-        },
-        shim: {
-          'socketio': {
-            exports: 'io'
-          },
+          'jquery': {{ url_for('static', filename='js/lib/jquery')|jsonify }},
         },
         waitSeconds: 200,
       })
-      define('socket', ['socketio'], function (io) {
-        return io({ path: {{ join_routes(_config.PREFIX, 'socket.io')|jsonify }} })
-      })
-      define('svelte', function () {
-        return {
-          render: function (self, file, props) {
-            require([file], function (Component) {
-              Object.assign(props, { window: window })
-              while (self.children.length > 0) self.children[0].remove()
-              var component = new Component.default({
-                target: self,
-                props: props,
-              })
-              self.classList.remove('loading')
-            }, function (err) {
-              while (self.children.length > 0) self.children[0].remove()
-              var el = document.createElement('div')
-              el.setAttribute('class', 'alert alert-danger')
-              el.textContent = err.toString()
-              self.append(el)
-            })
-          }
-        }
-      })
+    </script>
+    <script>
+      window._config = {
+        DEBUG: {{ _config.DEBUG|jsonify }},
+        PROFILE: {{ _config.PROFILE|jsonify }},
+        EXTRAS: {{ _config.EXTRAS|jsonify }},
+        PREFIX: {{ _config.PREFIX|jsonify }},
+        STATIC: {{ url_for('static', filename='')|jsonify }},
+        ORIGIN: (window.location.origin + {{ _config.PREFIX|jsonify }}),
+        {% if 'catalog-integration' in _config.EXTRAS %}
+        CATALOG_ORIGIN: window.location.origin,
+        {% endif %}
+      }
     </script>
   {% endblock %}
 </head>
@@ -59,25 +37,11 @@
   {% block body %}{% endblock %}
   {% block footer %}{% endblock %}
   {% block script %}
-    {% if _config.DEBUG %}
     <script>
-      require(['socket'], function (socket) {
-        var first_connect = true
-        socket.on('connect', function () {
-          if (first_connect === true) {
-            console.debug('connected')
-            first_connect = false
-          } else {
-            window.location.reload()
-          }
-        })
-        socket.on('livereload', function (data) {
-          console.debug('livereload')
-          window.location.reload()
-        })
+      require([{{ url_for('static', filename='js/index.js')|jsonify }}], function (appyter) {
+        appyter.init(window)
       })
     </script>
-    {% endif %}
   {% endblock %}
 </body>
 </html>

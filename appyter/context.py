@@ -101,7 +101,7 @@ def filter_blueprints(m, k, v):
   if isinstance(v, Blueprint):
     return True
   elif callable(v):
-    if m.__name__.startswith('blueprints') and 'blueprints.' + k == m.__name__:
+    if m.__name__.endswith('blueprints.' + k):
       return True
   return False
 
@@ -171,67 +171,66 @@ def get_jinja2_env(context={}, config=None, session=''):
   env.globals.update(**build_fields(find_fields(config=config), context=context, env=env))
   return env
 
-_mode = None
-def get_env_from_kwargs(mode='default', **kwargs):
-  global _mode
-  if _mode is None:
-    _mode = mode
-  else:
-    mode = _mode
-  #
+_config = {}
+
+def get_env_from_kwargs(**kwargs):
   import os
   import sys
-  import uuid
-  PREFIX = try_json_loads(kwargs.get('prefix', os.environ.get('APPYTER_PREFIX', '/')))
-  PROFILE = try_json_loads(kwargs.get('profile', os.environ.get('APPYTER_PROFILE', 'default')))
-  EXTRAS = try_json_loads(kwargs.get('extras', os.environ.get('APPYTER_EXTRAS', '')))
-  HOST = try_json_loads(kwargs.get('host', os.environ.get('APPYTER_HOST', '127.0.0.1')))
-  PORT = try_json_loads(kwargs.get('port', os.environ.get('APPYTER_PORT', 5000)))
-  PROXY = try_json_loads(kwargs.get('proxy', os.environ.get('APPYTER_PROXY', False)))
-  CWD = try_json_loads(os.path.abspath(kwargs.get('cwd', os.environ.get('APPYTER_CWD', str(os.getcwd())))))
-  DATA_DIR = try_json_loads(kwargs.get('data_dir', os.environ.get('APPYTER_DATA_DIR', 'data')))
-  DISPATCHER = try_json_loads(kwargs.get('dispatcher', os.environ.get('APPYTER_DISPATCHER')))
-  DISPATCHER_URL = try_json_loads(kwargs.get('dispatcher_url', os.environ.get('APPYTER_DISPATCHER_URL')))
-  DISPATCHER_IMAGE = try_json_loads(kwargs.get('dispatcher_image', os.environ.get('APPYTER_DISPATCHER_IMAGE')))
-  SECRET_KEY = try_json_loads(kwargs.get('secret_key', os.environ.get('APPYTER_SECRET_KEY', str(uuid.uuid4()))))
-  DEBUG = try_json_loads(kwargs.get('debug', os.environ.get('APPYTER_DEBUG', 'true')))
-  STATIC_DIR = try_json_loads(kwargs.get('static_dir', os.environ.get('APPYTER_STATIC_DIR', os.path.join(CWD, 'static'))))
-  STATIC_PREFIX = join_slash(PREFIX, 'static')
-  IPYNB = try_json_loads(kwargs.get('ipynb', os.environ.get('APPYTER_IPYNB')))
-  #
-  if mode == 'default' and (IPYNB is None or not os.path.isfile(os.path.join(CWD, IPYNB))):
+  global _config
+  if 'mode' in kwargs or 'MODE' not in _config:
+    _config['MODE'] = kwargs.get('mode', 'default')
+  if 'safe_mode' in kwargs or 'SAFE_MODE' not in _config:
+    _config['SAFE_MODE'] = kwargs.get('safe_mode', True)
+  if 'prefix' in kwargs or 'PREFIX' not in _config:
+    _config['PREFIX'] = try_json_loads(kwargs.get('prefix', os.environ.get('APPYTER_PREFIX', ''))).rstrip('/')
+  if 'profile' in kwargs or 'PROFILE' not in _config:
+    _config['PROFILE'] = try_json_loads(kwargs.get('profile', os.environ.get('APPYTER_PROFILE', 'biojupies')))
+  if 'extras' in kwargs or 'EXTRAS' not in _config:
+    _config['EXTRAS'] = try_json_loads(kwargs.get('extras', os.environ.get('APPYTER_EXTRAS', '')))
+  if 'host' in kwargs or 'HOST' not in _config:
+    _config['HOST'] = try_json_loads(kwargs.get('host', os.environ.get('APPYTER_HOST', '127.0.0.1')))
+  if 'port' in kwargs or 'PORT' not in _config:
+    _config['PORT'] = try_json_loads(kwargs.get('port', os.environ.get('APPYTER_PORT', 5000)))
+  if 'public_url' in kwargs or 'PUBLIC_URL' not in _config:
+    _config['PUBLIC_URL'] = (try_json_loads(kwargs.get('public_url', os.environ.get('APPYTER_PUBLIC_URL'))) or f"http://{_config['HOST']}:{_config['PORT']}").rstrip('/')
+  if 'proxy' in kwargs or 'PROXY' not in _config:
+    _config['PROXY'] = try_json_loads(kwargs.get('proxy', os.environ.get('APPYTER_PROXY', False)))
+  if 'cwd' in kwargs or 'CWD' not in _config:
+    _config['CWD'] = try_json_loads(os.path.abspath(kwargs.get('cwd', os.environ.get('APPYTER_CWD', str(os.getcwd())))))
+  if 'data_dir' in kwargs or 'DATA_DIR' not in _config:
+    _config['DATA_DIR'] = try_json_loads(kwargs.get('data_dir', os.environ.get('APPYTER_DATA_DIR', 'data')))
+  if 'executor' in kwargs or 'EXECUTOR' not in _config:
+    _config['EXECUTOR'] = try_json_loads(kwargs.get('executor', os.environ.get('APPYTER_EXECUTOR')))
+  if 'secret_key' in kwargs or 'SECRET_KEY' not in _config:
+    secret_key = kwargs.get('secret_key', os.environ.get('APPYTER_SECRET_KEY', None))
+    if secret_key is None:
+      import uuid
+      secret_key = str(uuid.uuid4())
+    _config['SECRET_KEY'] = secret_key
+  if 'debug' in kwargs or 'DEBUG' not in _config:
+    _config['DEBUG'] = try_json_loads(kwargs.get('debug', os.environ.get('APPYTER_DEBUG', 'true')))
+  if 'static_dir' in kwargs or 'STATIC_DIR' not in _config:
+    _config['STATIC_DIR'] = try_json_loads(kwargs.get('static_dir', os.environ.get('APPYTER_STATIC_DIR', os.path.join(_config['CWD'], 'static'))))
+  if 'STATIC_PREFIX' not in _config:
+    _config['STATIC_PREFIX'] = join_slash(_config['PREFIX'], 'static')
+  if 'ipynb' in kwargs or 'IPYNB' not in _config:
+    _config['IPYNB'] = try_json_loads(kwargs.get('ipynb', os.environ.get('APPYTER_IPYNB')))
+  #['
+  if _config['MODE'] == 'default' and (_config['IPYNB'] is None or not os.path.isfile(os.path.join(_config['CWD'], _config['IPYNB']))):
     logger.error('ipynb was not found')
   #
-  if '://' not in DATA_DIR and not os.path.isabs(DATA_DIR):
-    DATA_DIR = os.path.join(CWD, DATA_DIR)
+  if '://' not in _config['DATA_DIR'] and not os.path.isabs(_config['DATA_DIR']):
+    _config['DATA_DIR'] = os.path.join(_config['CWD'], _config['DATA_DIR'])
   #
-  if '://' not in STATIC_DIR and not os.path.isabs(STATIC_DIR):
-    STATIC_DIR = os.path.join(CWD, STATIC_DIR)
+  if '://' not in _config['STATIC_DIR'] and not os.path.isabs(_config['STATIC_DIR']):
+    _config['STATIC_DIR'] = os.path.join(_config['CWD'], _config['STATIC_DIR'])
   #
-  if os.path.abspath(CWD) not in sys.path:
-    sys.path.insert(0, CWD)
-  if CWD not in os.environ['PATH'].split(':'):
-    os.environ['PATH'] = CWD + ':' + os.environ['PATH']
+  if os.path.abspath(_config['CWD']) not in sys.path:
+    sys.path.insert(0, _config['CWD'])
+  if _config['CWD'] not in os.environ['PATH'].split(':'):
+    os.environ['PATH'] = _config['CWD'] + ':' + os.environ['PATH']
   #
-  return dict(
-    MODE=mode,
-    PREFIX=PREFIX,
-    PROFILE=PROFILE,
-    EXTRAS=EXTRAS,
-    HOST=HOST,
-    PORT=PORT,
-    PROXY=PROXY,
-    CWD=CWD,
-    DATA_DIR=DATA_DIR,
-    DISPATCHER=DISPATCHER,
-    DISPATCHER_URL=DISPATCHER_URL,
-    DISPATCHER_IMAGE=DISPATCHER_IMAGE,
-    SECRET_KEY=SECRET_KEY,
-    DEBUG=DEBUG,
-    STATIC_DIR=STATIC_DIR,
-    IPYNB=IPYNB,
-    STATIC_PREFIX=STATIC_PREFIX,
-  )
+  return _config
 
 def get_env_from_click():
   ''' Traverse click context and use params for get_env_from_kwargs
@@ -247,7 +246,7 @@ def get_env_from_click():
     }
     click_ctx = click_ctx.parent
   # use aggregated params to get env
-  return get_env_from_kwargs(**params)
+  return params
 
 def get_env_from_flask():
   ''' If we're running in flask, current_app.config should be available
@@ -263,21 +262,15 @@ def get_env(**kwargs):
   '''
   #
   try:
-    global config
-    config = get_env_from_kwargs(**kwargs)
-  except AssertionError:
+    return get_env_from_kwargs(**dict(kwargs, **get_env_from_flask()))
+  except RuntimeError:
     pass
   #
   try:
-    return get_env_from_flask()
-  except Exception:
-    pass
-  #
-  try:
-    return get_env_from_click()
+    return get_env_from_kwargs(**dict(kwargs, **get_env_from_click()))
   except RuntimeError:
     pass
   except AssertionError:
     pass
   #
-  return config
+  return get_env_from_kwargs(**kwargs)

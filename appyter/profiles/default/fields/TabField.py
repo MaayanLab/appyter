@@ -35,6 +35,8 @@ class TabField(Field):
     for section, fields in self.choices.items():
       for field in fields:
         field['args']['parent'] = self.args['name']
+    if not self.args.get('default'):
+      self.args['default'] = next(iter(self.choices))
 
   def prepare(self, req):
     data = super().prepare(req)

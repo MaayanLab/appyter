@@ -1,15 +1,19 @@
-def split_protocol_opts(url, default_protocol='file'):
-  ''' Like `fsspec.core.split_protocol`
-  but remove fragments potentially parsing querystrings in the fragment as filesystem opts
+from appyter.ext.contextlib import ensure_context
+from appyter.ext.asyncio.helpers import ensure_async
 
-  url of the form: proto://netloc/path?qs=anything#ignored?protocol.options=here
-  '''
-  from appyter.ext.urllib import parse_file_uri
-  from fsspec.core import url_to_fs, split_protocol
-  uri_parsed = parse_file_uri(url)
-  opts = uri_parsed.fragment_qs or {}
-  uri_parsed.fragment = None
-  uri_parsed.fragment_query = None
-  protocol, path = split_protocol(str(uri_parsed))
-  protocol = protocol or default_protocol
-  return protocol, path, opts
+@ensure_async
+def fsspec_read_and_run(path, op):
+  from appyter.ext.fsspec.core import url_to_fs_ex
+  fs, fo = url_to_fs_ex(path)
+  with ensure_context(fs) as fs:
+    with fs.open(fo, 'r') as fr:
+      return op(fr)
+
+@ensure_async
+def fsspec_cp(left_fs, left_fo, right_fs, right_fo):
+  import shutil
+  from appyter.ext.urllib import parent_url
+  with left_fs.open(left_fo, 'rb') as fr:
+    right_fs.makedirs(parent_url(right_fo), exist_ok=True)
+    with right_fs.open(right_fo, 'wb') as fw:
+      shutil.copyfileobj(fr, fw)

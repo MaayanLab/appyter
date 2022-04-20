@@ -20,7 +20,7 @@ magic.init(lambda _=globals: _())
 '''
 Setup given globals
 '''
-def init(_globals, verbose=False, ipynb='app.ipynb', mode='magic', **kwargs):
+def init(_globals, verbose=False, ipynb='app.ipynb', mode='magic', safe_mode=False, **kwargs):
   ''' Initialize appyter magic.
 
   Sets up a jinj2 environment and injects %%appyter magic into your environment.
@@ -33,7 +33,7 @@ def init(_globals, verbose=False, ipynb='app.ipynb', mode='magic', **kwargs):
   import jinja2.meta
   import traceback
   from appyter.context import get_env, get_jinja2_env
-  env = get_jinja2_env(config=get_env(verbose=verbose, ipynb=ipynb, mode=mode, **kwargs))
+  env = get_jinja2_env(config=get_env(verbose=verbose, ipynb=ipynb, mode=mode, safe_mode=safe_mode, **kwargs))
   from IPython.core.magic import register_cell_magic
   from IPython.display import display, Markdown, HTML
 

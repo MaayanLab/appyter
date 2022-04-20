@@ -4,7 +4,7 @@ defined in :mod:`appyter.profiles.default.fields`.
 ``` '''
 
 from flask import Markup
-from appyter.ext.itertools import collapse
+from appyter.ext.flask import request_get
 
 class PartialField:
   ''' Partial instantiation of a field
@@ -88,6 +88,8 @@ class Field(dict):
       )
     )
     assert name is not None, "Name should be defined and unique"
+    assert not name.startswith('_'), "Names with _ prefix are reserved"
+    assert len(name) > 1, "Names should use more than 1 character"
     self._env = _env
   
   @property
@@ -99,15 +101,7 @@ class Field(dict):
   def prepare(self, req):
     ''' Given a flask request, capture relevant variables for this field
     '''
-    data = {}
-    if type(req) == dict:
-      value = req.get(self.args['name']) if self.args['name'] in req else self.args.get('default')
-    elif req.json:
-      value = req.json.get(self.args['name']) if self.args['name'] in req.json else self.args.get('default')
-    elif req.form:
-      value = collapse(req.form.getlist(self.args['name'])) if self.args['name'] in req.form else self.args.get('default')
-    else:
-      raise NotImplementedError
+    value = request_get(req, self.args['name'], self.args.get('default'))
     #
     self.args['value'] = value
     return { self.args['name']: value }
@@ -128,6 +122,63 @@ class Field(dict):
         self.template
       ).render(dict(**kwargs, this=self))
     )
+
+  def to_jsonschema(self):
+    schema = {'type': 'string'}
+    if self.args.get('label'): schema['title'] = self.args['label']
+    if self.args.get('description'): schema['description'] = self.args['description']
+    if self.args.get('choices'): schema['enum'] = list(self.args['choices'])
+    if self.args.get('default'): schema['default'] = self.args['default']
+    return schema
+
+  def to_cwl(self):
+    schema = {
+      'id': self.args['name'],
+      'inputBinding': {
+        'prefix': f"--{self.args['name']}=",
+        'separate': False,
+        'shellQuote': True,
+      }
+    }
+    if self.args.get('choices'):
+      if self.args.get('required') == True:
+        schema['type'] = {
+          'type': 'enum', 'symbols': list(self.args['choices'])
+        }
+      else:
+        schema['type'] = ['null', {
+          'type': 'enum', 'symbols': list(self.args['choices'])
+        }]
+    else:
+      schema['type'] = f"string{'' if self.args.get('required') == True else '?'}"
+    #
+    if self.args.get('label'): schema['label'] = self.args['label']
+    if self.args.get('description'): schema['doc'] = self.args['description']
+    if self.args.get('default'): schema['default'] = self.to_cwl_value()
+    return schema
+
+  def to_cwl_value(self):
+    return self.raw_value
+
+  def to_click(self):
+    import click
+    args = (f"--{self.args['name']}",)
+    kwargs = dict()
+    #
+    if self.args.get('required') == True:
+      kwargs['required'] = True
+    #
+    if self.args.get('choices'):
+      kwargs['type'] = click.Choice(list(self.args['choices']))
+    else:
+      kwargs['type'] = click.STRING
+    #
+    if self.args.get('label'): kwargs['help'] = self.args['label']
+    if self.args.get('description'):
+      if 'help' in kwargs: kwargs['help'] += ': ' + self.args['description']
+      else: kwargs['help'] = self.args['description']
+    if self.args.get('default'): kwargs['default'] = self.args['default']
+    return args, kwargs
 
   @property
   def field(self):

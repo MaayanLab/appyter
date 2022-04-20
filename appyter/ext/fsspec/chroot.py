@@ -6,11 +6,13 @@ from appyter.ext.urllib import join_slash
 
 logger = logging.getLogger(__name__)
 
-from pathlib import PurePosixPath
-from fsspec import filesystem, AbstractFileSystem
+from pathlib import Path, PurePosixPath
+from fsspec import AbstractFileSystem, filesystem
+from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
+from appyter.ext.fsspec.spec.composable import ComposableAbstractFileSystem
 from appyter.ext.pathlib.chroot import ChrootPurePosixPath
 
-class ChrootFileSystem(AbstractFileSystem):
+class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem, AbstractFileSystem):
   ''' chroot: update root and disallow access beyond chroot, only works on directories.
   '''
   root_marker = ''
@@ -106,6 +108,52 @@ class ChrootFileSystem(AbstractFileSystem):
       with self.__masquerade_os_error():
         self.fs.__exit__(type, value, traceback)
 
+  @contextlib.contextmanager
+  def mount(self, path='', mount_dir=None, fuse=True, passthrough=True, **kwargs):
+    logger.debug(f"{self=} mount {mount_dir=} {fuse=}")
+    with self.__masquerade_os_error(path=path):
+      if passthrough and getattr(self.fs, 'mount', None) is not None:
+        # try to use underlying fs mount
+        with self.fs.mount(path=self._resolve_path(path), mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+          yield mount_dir
+      elif not fuse and self.fs.protocol == 'file':
+        # shortcut if we're talking about `file://` -- just use the actual directory
+        yield Path(self._resolve_path(path))
+      elif path:
+        # just make another wrapper to deal with subpath mounting
+        with ChrootFileSystem(fs=self.fs, fo=join_slash(self.storage_options.get('fo', ''), path)).mount(path='', mount_dir=mount_dir, fuse=fuse, passthrough=passthrough, **kwargs) as mount_dir:
+          yield mount_dir
+      elif fuse:
+        # use fuse fs_mount
+        from appyter.ext.asyncio.helpers import ensure_sync
+        from appyter.ext.fsspec.fuse import fs_mount
+        with ensure_sync(fs_mount(self, path, mount_dir=mount_dir)) as mount_dir:
+          yield mount_dir
+      else:
+        # no fuse -- resort to copying files
+        import shutil
+        from appyter.ext.tempfile import tempdir
+        # can't use fuse, default is to just copy files into the mount_dir
+        with tempdir(mount_dir) as mount_dir:
+          logger.debug(f"copying files over...")
+          for f1_rel in self.glob('**', detail=True).values():
+            f2_rel = mount_dir / f1_rel['name']
+            f2_rel.parent.mkdir(parents=True, exist_ok=True)
+            if not f2_rel.exists():
+              if f1_rel['type'] == 'file':
+                logger.debug(f"copying {f1_rel['name']} to {str(f2_rel)}")
+                # TODO: if we're backed by a normal filesystem, make a link
+                with self.open(f1_rel['name'], 'rb') as fr:
+                  with f2_rel.open('wb') as fw:
+                    shutil.copyfileobj(fr, fw)
+              elif f1_rel['type'] == 'directory':
+                logger.debug(f"making directory {f1_rel['name']}")
+                f2_rel.mkdir(exist_ok=True)
+              else:
+                raise NotImplementedError
+          logger.debug('Ready')
+          yield mount_dir
+
   def mkdir(self, path, **kwargs):
     with self.__masquerade_os_error(path=path):
       return self.fs.mkdir(self._resolve_path(path), **kwargs)
@@ -116,11 +164,31 @@ class ChrootFileSystem(AbstractFileSystem):
 
   def rmdir(self, path):
     with self.__masquerade_os_error(path=path):
-      return self.upper_fs.rmdir(self._resolve_path(path))
+      return self.fs.rmdir(self._resolve_path(path))
+
+  def rm_file(self, path):
+    with self.__masquerade_os_error(path=path):
+      return self.fs.rm_file(self._resolve_path(path))
 
   def rm(self, path, recursive=False, maxdepth=None):
     with self.__masquerade_os_error(path=path):
       return self.fs.rm(self._resolve_path(path), recursive=recursive, maxdepth=maxdepth)
+
+  def cat_file(self, path, start=None, end=None, **kwargs):
+    with self.__masquerade_os_error():
+      return self.fs.cat_file(self._resolve_path(path), start=start, end=end, **kwargs)
+
+  def put_file(self, lpath, rpath, **kwargs):
+    with self.__masquerade_os_error():
+      return self.fs.put_file(lpath, self._resolve_path(rpath), **kwargs)
+
+  def get_file(self, rpath, lpath, **kwargs):
+    with self.__masquerade_os_error():
+      return self.fs.get_file(self._resolve_path(rpath), lpath, **kwargs)
+
+  def cp_file(self, path1, path2, **kwargs):
+    with self.__masquerade_os_error():
+      return self.fs.cp_file(self._resolve_path(path1), self._resolve_path(path2), **kwargs)
 
   def copy(self, path1, path2, recursive=False, on_error=None, **kwargs):
     with self.__masquerade_os_error():
@@ -133,6 +201,10 @@ class ChrootFileSystem(AbstractFileSystem):
   def exists(self, path, **kwargs):
     with self.__masquerade_os_error(path=path):
       return self.fs.exists(self._resolve_path(path), **kwargs)
+
+  def get_drs(self, path, **kwargs):
+    with self.__masquerade_os_error(path=path):
+      return self.fs.get_drs(self._resolve_path(path), **kwargs)
 
   def info(self, path, **kwargs):
     with self.__masquerade_os_error(path=path):

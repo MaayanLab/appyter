@@ -11,7 +11,8 @@ class StringField(Field):
   :param label: (str) A human readable label for the field for the HTML form
   :param description: (Optional[str]) A long human readable description for the field for the HTML form
   :param constraint: A regular expression for validating the file name.
-  :param hint: A hint to put in the field prior to content.
+  :param hint: (Optional[str]) A hint to put in the field prior to content.
+  :param feedback: (Optional[str]) Text to provide user feedback if the regex fails.
   :param choices: (Union[List[str], Dict[str, str]]) A set of choices that are available for this field or lookup table mapping from choice label to resulting value
   :param required: (Optional[bool]) Whether or not this field is required (defaults to false)
   :param default: (str) A default value as an example and for use during prototyping
@@ -34,3 +35,8 @@ class StringField(Field):
       return not self.args.get('required')
     else:
       return re.match(re_full(self.args['constraint']), self.raw_value)
+
+  def to_jsonschema(self):
+    schema = super().to_jsonschema()
+    if self.args.get('constraint'): schema['pattern'] = re_full(self.args['constraint'])
+    return schema

@@ -1,14 +1,14 @@
 import os
-import aiohttp
 import asyncio
 import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-from appyter.render.flask_app.core import prepare_data, prepare_results
+from appyter.render.flask_app.prepare import _prepare_data, _prepare_results, _prepare_storage, _prepare_executor
 from appyter.render.flask_app.socketio import socketio
+from appyter.render.flask_app.room_manager import enter_room, find_room, room_lock
 from appyter.ext.uuid import sanitize_sha1sum, generate_uuid
-from appyter.ext.urllib import join_slash, join_url
+from appyter.ext.urllib import join_url
 
 # construct/join a notebook
 @socketio.on('submit')
@@ -16,60 +16,65 @@ async def submit(sid, data):
   async with socketio.session(sid) as sess:
     config = sess['config']
     request_url = sess['request_url']
+    executor = sess['executor']
   #
-  if type(data) == dict:
-    data = prepare_data(data)
-    result_hash = prepare_results(data)
-  elif type(data) == str:
-    result_hash = sanitize_sha1sum(data)
-    assert result_hash is not None
-  else:
+  if type(data) == str:
+    data = dict(_id=data)
+  elif type(data) != dict:
     raise Exception('Unrecognized data type')
   #
-  socketio.enter_room(sid, result_hash)
-  await socketio.emit('status', 'Queuing execution', to=sid)
-  job = dict(
-    cwd=join_url('storage://output/', result_hash),
-    ipynb=os.path.basename(config['IPYNB']),
-    session=result_hash,
-    id=generate_uuid(),
-  )
-  #
-  if config['DISPATCHER_URL']:
-    job['url'] = join_slash(config['DISPATCHER_URL'], 'socket.io/')
+  if '_id' in data:
+    instance_id = sanitize_sha1sum(data['_id'])
+    assert instance_id is not None, 'Invalid session id'
+    data.update(_config=config)
   else:
-    job['url'] = request_url
+    data = dict(await _prepare_data(data), _config=config)
+    instance_id = await _prepare_results(data)
   #
-  if config['DISPATCHER_IMAGE']:
-    job['image'] = config['DISPATCHER_IMAGE']
+  if 'catalog-integration' in data['_config']['EXTRAS']:
+    # if you execute the notebook, it should get registered
+    #  we'll omit metadata which would already be captured
+    #  when the instance was created
+    try:
+      from appyter.extras.catalog_integration.notebooks import InstanceInfo, add_instance
+      await add_instance(
+        InstanceInfo(instance=instance_id),
+        auth=data.get('_auth'),
+        config=data.get('_config'),
+      )
+    except:
+      logger.warning(traceback.format_exc())
   #
-  if config['DISPATCHER']:
-    job['storage'] = config['DATA_DIR']
-    queued = False
-    backoff = 1
-    while not queued:
-      try:
-        async with aiohttp.ClientSession(headers={'Content-Type': 'application/json'}) as client:
-          async with client.post(config['DISPATCHER'], json=job) as resp:
-            queue_size = await resp.json()
-            await socketio.emit('status', f"Queued successfully, you are at position {queue_size} in the queue", to=sid)
-            queued = True
-      except asyncio.CancelledError:
-        raise
-      except Exception:
-        logger.error(traceback.format_exc())
-        if backoff < 60:
-          await socketio.emit('status', f"Failed to contact orchestrator, trying again in {backoff}s...", to=sid)
-          asyncio.sleep(backoff)
-          backoff *= 2
-        else:
-          await socketio.emit('error', 'Failed to contact orchestrator, please try again later.', to=sid)
-          break
+  if await find_room(instance_id):
+    await socketio.emit('status', 'Joining existing execution...', to=sid)
+    await enter_room(sid, instance_id)
   else:
-    from appyter.orchestration.job.job import execute_async
-    asyncio.create_task(execute_async(job))
-
-@socketio.on('join')
-async def _(sid, data):
-  socketio.enter_room(sid, data)
-  await socketio.emit('joined', dict(id=sid, session=data), room=data)
+    try:
+      storage = await _prepare_storage(data)
+      async with _prepare_executor(data, executor) as executor:
+        async with room_lock(instance_id):
+          await enter_room(sid, instance_id)
+          try:
+            await socketio.emit('status', 'Submitting execution...', to=instance_id)
+            job = dict(
+              cwd=f"output/{instance_id}",
+              ipynb=os.path.basename(config['IPYNB']),
+              session=instance_id,
+              id=generate_uuid(),
+              url=join_url(request_url, instance_id),
+              storage=storage,
+              debug=config['DEBUG'],
+            )
+            async for msg in executor._run(**job):
+              await socketio.forward(None, dict(event=msg['type'], data=msg['data'], to=instance_id))
+          except asyncio.CancelledError:
+            raise
+          except Exception:
+            logger.error(traceback.format_exc())
+            await socketio.emit('error', 'An unhandled executor error occurred, please try again later.', to=sid)
+    except asyncio.CancelledError:
+      raise
+    except:
+      logger.error(traceback.format_exc())
+      await socketio.emit('error', 'An unhandled initialization error occurred, please try again later.', to=sid)
+      raise

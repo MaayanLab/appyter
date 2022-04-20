@@ -1,4 +1,3 @@
-import click
 import logging
 logger = logging.getLogger(__name__)
 
@@ -13,11 +12,6 @@ def create_app(**kwargs):
   from appyter.orchestration.dispatcher.socketio import socketio
   from appyter.ext.urllib import join_slash
   #
-  logging.basicConfig(
-    level=logging.DEBUG if kwargs.get('debug') else logging.WARNING,
-    format='%(name)s %(message)s',
-  )
-  #
   logger.info('Initializing aiohttp...')
   config = dict(
     HOST=kwargs.get('host'),
@@ -26,11 +20,9 @@ def create_app(**kwargs):
     JOBS=kwargs.get('jobs'),
     JOBS_PER_IMAGE=kwargs.get('jobs_per_image'),
     DEBUG=kwargs.get('debug'),
-    PREFIX=kwargs.get('prefix'),
-    KUBE_NAMESPACE=kwargs.get('kube_namespace'),
-    DISPATCH=kwargs.get('dispatch'),
+    PREFIX=kwargs.get('prefix', '').rstrip('/'),
   )
-  if config['PREFIX'].rstrip('/'):
+  if config['PREFIX']:
     app = web.Application()
     app['config'] = core['config'] = config
     #
@@ -39,7 +31,7 @@ def create_app(**kwargs):
       path = request.match_info['path']
       raise web.HTTPFound(join_slash(app['config']['PREFIX'], path) + '/')
     app.router.add_get('/{path:[^/]*}', redirect_to_prefix)
-    app.add_subapp(config['PREFIX'].rstrip('/'), core)
+    app.add_subapp(config['PREFIX'], core)
   else:
     app = core
     app['config'] = config
@@ -57,9 +49,9 @@ def create_app(**kwargs):
 @click_option_setenv('--jobs', envvar='APPYTER_JOBS', type=int, default=2, help='Number of concurrent jobs to dispatch')
 @click_option_setenv('--jobs-per-image', envvar='APPYTER_JOBS_PER_IMAGE', type=int, default=1, help='Number of concurrent jobs to dispatch for any individual appyter image')
 @click_option_setenv('--debug', envvar='APPYTER_DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
-@click_option_setenv('--kube-namespace', envvar='APPYTER_KUBE_NAMESPACE', type=str, default='default', help='The kubernetes namespace (kubernetes dispatch)')
-@click_option_setenv('--dispatch', envvar='APPYTER_DISPATCH', type=str, default='native', help='The dispatcher mechanism to use (see list-dispatchers)')
 def dispatcher(*args, **kwargs):
-  from aiohttp import web
-  app = create_app(**kwargs)
-  web.run_app(app, host=app['config']['HOST'], port=int(app['config']['PORT']))
+  from appyter.ext.aiohttp import run_app
+  from appyter.ext.asyncio.event_loop import with_event_loop
+  with with_event_loop():
+    app = create_app(**kwargs)
+    run_app(app, host=app['config']['HOST'], port=int(app['config']['PORT']))

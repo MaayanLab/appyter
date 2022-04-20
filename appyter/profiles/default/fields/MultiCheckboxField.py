@@ -54,3 +54,44 @@ class MultiCheckboxField(Field):
       return [self.choices[v] for v in self.raw_value]
     else:
       return self.raw_value
+
+  def to_jsonschema(self):
+    schema = {'type': 'array', 'items': { 'type': 'string' } }
+    if self.args.get('label'): schema['title'] = self.args['label']
+    if self.args.get('description'): schema['description'] = self.args['description']
+    if self.args.get('choices'): schema['items']['enum'] = list(self.args['choices'])
+    if self.args.get('default'): schema['default'] = self.args['default']
+    return schema
+
+  def to_cwl(self):
+    schema = super().to_cwl()
+    # NOTE: CWL's array enum is broken upstream
+    # if self.args.get('required') == True:
+    #   schema['type'] = {
+    #     'type': 'array',
+    #     'items': {
+    #       'type': 'enum',
+    #       'symbols': list(self.args['choices'])
+    #     },
+    #   }
+    # else:
+    #   schema['type'] = ['null', {
+    #     'type': 'array',
+    #     'items': {
+    #       'type': 'enum',
+    #       'symbols': list(self.args['choices'])
+    #     },
+    #   }]
+    schema['type'] = f"string{'' if self.args.get('required') == True else '?'}"
+    return schema
+
+  def to_cwl_value(self):
+    import json
+    return json.dumps(self.raw_value)
+
+  def to_click(self):
+    args, kwargs = super().to_click()
+    # kwargs['multiple'] = True
+    import click
+    kwargs['type'] = click.STRING
+    return args, kwargs

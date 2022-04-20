@@ -3,6 +3,8 @@ import functools
 import urllib.parse
 from werkzeug.security import safe_join
 
+from appyter.ext.itertools import collapse
+
 logger = logging.getLogger(__name__)
 
 def join_routes(*routes):
@@ -30,8 +32,21 @@ def is_remote(url):
   try:
     secure_url(url)
     return True
-  except:
+  except AssertionError:
     return False
+
+def request_get(request, key, default=None):
+  if type(request) == dict:
+    return request.get(key) if key in request else default
+  elif getattr(request, 'method', None) is not None:
+    if request.method == 'GET':
+      return collapse(request.args.getlist(key)) if key in request.args else default
+    elif request.is_json:
+      return request.json.get(key) if key in request.json else default
+    else:
+      return collapse(request.form.getlist(key)) if key in request.form else default
+  else:
+    raise NotImplementedError
 
 def route_join_with_or_without_slash(blueprint, *routes, **kwargs):
   ''' Like @app.route but doesn't care about trailing slash or not
@@ -53,7 +68,7 @@ def decorator_in_production(production_decorator):
         from flask import current_app
         if current_app.config['DEBUG']:
           return func(*args, **kwargs)
-      except:
+      except RuntimeError:
         pass
       return production_func(*args, **kwargs)
     return wrapper

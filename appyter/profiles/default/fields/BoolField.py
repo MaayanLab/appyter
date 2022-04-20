@@ -30,3 +30,18 @@ class BoolField(Field):
   @property
   def choices(self):
     return [True, False]
+
+  def to_jsonschema(self):
+    return dict(super().to_jsonschema(), type='boolean')
+
+  def to_cwl(self):
+    schema = super().to_cwl()
+    schema['type'] = 'boolean'
+    schema['inputBinding']['prefix'] = f"--{self.args['name']}"
+    return schema
+
+  def to_click(self):
+    args, kwargs = super().to_click()
+    kwargs['type'] = bool
+    kwargs['is_flag'] = True
+    return args, kwargs

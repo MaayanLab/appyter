@@ -1,4 +1,4 @@
-export function setup_chunking(socket) {
+export default function setup_chunking(socket) {
   let chunks = {}
   socket.on('chunked', ({ id, event, chunk, total, data }) => {
     console.debug(`${id}: Received chunked packet ${chunk+1} / ${total}`)

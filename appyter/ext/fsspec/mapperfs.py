@@ -1,11 +1,14 @@
 import logging
+from appyter.ext.fsspec.spec.composable import ComposableAbstractFileSystem
+
+from appyter.ext.urllib import join_slash
 logger = logging.getLogger(__name__)
 
 from fsspec import AbstractFileSystem
-from fsspec.core import url_to_fs
-from appyter.ext.fsspec.util import split_protocol_opts
+from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
+from appyter.ext.fsspec.core import url_to_fs_ex
 
-class MapperFileSystem(AbstractFileSystem):
+class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
   ''' MapperFS is the inverse of a fsspec.mapper -- it lets you use a mapping to
   define a virtual filesystem.
   '''
@@ -25,7 +28,15 @@ class MapperFileSystem(AbstractFileSystem):
           "pathmap is required"
       )
     
-    self.pathmap = pathmap
+    self.pathmap = {}
+    for path, fs_uri in pathmap.items():
+      if type(fs_uri) == str:
+        self.pathmap[path] = url_to_fs_ex(fs_uri)
+      elif type(fs_uri) == tuple or type(fs_uri) == list:
+        self.pathmap[path] = fs_uri
+      else:
+        self.pathmap[path] = fs_uri, ''
+
     self.listing = {}
     for mapping in self.pathmap:
       src_split = mapping.split('/')
@@ -46,17 +57,26 @@ class MapperFileSystem(AbstractFileSystem):
     ''' Return (fs, path) depending on whether we hit a mapped paths or not
     '''
     if path in self.pathmap:
-      from fsspec import filesystem
-      protocol, path, opts = split_protocol_opts(self.pathmap[path])
-      return url_to_fs(f"{protocol}://{path}", **opts)
+      return (*self.pathmap[path], path)
     else:
+      path_split = path.split('/')
+      for i in range(1, len(path_split)):
+        base_path = '/'.join(path_split[:-i])
+        if base_path in self.pathmap:
+          fs, fo = self.pathmap[base_path]
+          return fs, join_slash(fo, *path_split[-i:]), base_path
       raise FileNotFoundError(path)
 
   def __enter__(self):
+    for fs, _fo in self.pathmap.values():
+      if getattr(fs, '__enter__', None) is not None:
+        fs.__enter__()
     return self
-  
+
   def __exit__(self, type, value, traceback):
-    pass
+    for fs, _fo in self.pathmap.values():
+      if getattr(fs, '__exit__', None) is not None:
+        fs.__exit__(type, value, traceback)
 
   def mkdir(self, path, **kwargs):
     raise PermissionError(path)
@@ -67,8 +87,15 @@ class MapperFileSystem(AbstractFileSystem):
   def rmdir(self, path):
     raise PermissionError(path)
 
+  def rm_file(self, path):
+    raise PermissionError(path)
+
   def rm(self, path, recursive=False, maxdepth=None):
     raise PermissionError(path)
+
+  def cat_file(self, path, start=None, end=None, **kwargs):
+    fs, fs_path, _ = self._pathmap(path)
+    return fs.cat_file(fs_path, start=start, end=end, **kwargs)
 
   def copy(self, path1, path2, recursive=False, on_error=None, maxdepth=None, **kwargs):
     raise PermissionError(path2)
@@ -79,6 +106,13 @@ class MapperFileSystem(AbstractFileSystem):
   def exists(self, path, **kwargs):
     return path in self.listing or path in self.pathmap
 
+  def get_drs(self, path, **kwargs):
+    if path in self.listing:
+      raise IsADirectoryError
+    else:
+      fs, fs_path, _ = self._pathmap(path)
+      return fs.get_drs(fs_path, **kwargs)
+
   def info(self, path, **kwargs):
     if path in self.listing:
       return {
@@ -86,7 +120,7 @@ class MapperFileSystem(AbstractFileSystem):
         'type': 'directory',
       }
     else:
-      fs, fs_path = self._pathmap(path)
+      fs, fs_path, _ = self._pathmap(path)
       info = fs.info(fs_path, **kwargs)
       info = dict(info, name=path)
       return info
@@ -102,10 +136,20 @@ class MapperFileSystem(AbstractFileSystem):
           results.append(self.info(p))
         else:
           results.append(p)
+    else:
+      try:
+        fs, fo, base_path = self._pathmap(path)
+        for p in fs.ls(fo, detail=detail):
+          if detail:
+            results.append(dict(p, name=join_slash(base_path, p['name'])))
+          else:
+            results.append(join_slash(base_path, p))
+      except FileNotFoundError:
+        pass
     return results
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
-    fs, fs_path = self._pathmap(path)
+    fs, fs_path, _ = self._pathmap(path)
     if 'r' not in mode: raise PermissionError(path)
     return fs._open(
       fs_path,
@@ -115,3 +159,47 @@ class MapperFileSystem(AbstractFileSystem):
       cache_options=cache_options,
       **kwargs,
     )
+
+  def to_json(self):
+    import json
+    cls = type(self)
+    cls = '.'.join((cls.__module__, cls.__name__))
+    proto = (
+      self.protocol[0]
+      if isinstance(self.protocol, (tuple, list))
+      else self.protocol
+    )
+    return json.dumps(
+      dict(
+        **{"cls": cls, "protocol": proto, "args": self.storage_args},
+        **dict(
+          self.storage_options,
+          pathmap={
+            path: [json.loads(fs.to_json()), fo]
+            for path, (fs, fo) in self.pathmap.items()
+          },
+        )
+      )
+    )
+
+  @staticmethod
+  def from_json(blob):
+    import json
+    from fsspec.registry import _import_class, get_filesystem_class
+    dic = json.loads(blob)
+    protocol = dic.pop("protocol")
+    try:
+      cls = _import_class(dic.pop("cls"))
+    except (ImportError, ValueError, RuntimeError, KeyError, AttributeError):
+      cls = get_filesystem_class(protocol)
+    if cls.from_json == MapperFileSystem.from_json:
+      return cls(
+        *dic.pop("args", ()),
+        pathmap={
+          path: (ComposableAbstractFileSystem.from_json(json.dumps(fs)), fo)
+          for path, [fs, fo] in dic.pop('pathmap').items()
+        },
+        **dic,
+      )
+    else:
+      return cls.from_json(blob)

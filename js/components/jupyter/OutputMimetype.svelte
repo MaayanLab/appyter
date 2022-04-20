@@ -1,9 +1,6 @@
 <script>
   import { output_mimetypes, ignored_mimetypes } from './output_mimetype'
-  import { getContext } from 'svelte'
-  import { report_error as report_error_ctx, debug as debug_ctx } from '@/lib/appyter_context.js'
-  const report_error = getContext(report_error_ctx)
-  const debug = getContext(debug_ctx)
+  import report_error from '@/extras/catalog-integration/report_error'
 
   export let data
   let mimetype
@@ -40,7 +37,7 @@
 
 {#if data.data}
   <div class="output_display_data">
-    {#if missing.length > 0 && debug}
+    {#if missing.length > 0 && window._config.DEBUG}
       <div class="alert" class:alert-danger={!mimetype} class:alert-warning={mimetype}>
         <p>Unhandled output_mimetype renderer. This message only appears in development, if there is a rendering issue, please report this on <a href="https://github.com/MaayanLab/appyter/issues">Appyter Issues</a> with this information:</p>
         <code>{error()}</code>

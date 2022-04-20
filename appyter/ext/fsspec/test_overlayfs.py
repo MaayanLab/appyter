@@ -1,5 +1,4 @@
-import multiprocessing as mp
-mp.set_start_method('spawn', True)
+import appyter.ext.multiprocessing
 
 import tempfile
 import contextlib
@@ -9,7 +8,13 @@ from fsspec.core import url_to_fs
 import appyter.ext.fsspec
 from appyter.ext.fsspec.overlayfs import OverlayFileSystem
 
-def assert_eq(a, b): assert a == b, f"{repr(a)} != {repr(b)}"
+import pytest
+from appyter.ext.pytest import assert_eq
+from appyter.ext.asyncio.event_loop import with_event_loop
+@pytest.fixture(scope="session", autouse=True)
+def event_loop_fixture():
+  with with_event_loop():
+    yield
 
 @contextlib.contextmanager
 def _test_ctx():
@@ -38,11 +43,14 @@ def test_file_overlayfs():
         with fs.open('a/d', 'a') as fw:
           fw.write('!')
         assert_eq(fs.cat('a/d'), b'D!')
+        with fs.open('a/d', 'a') as fw:
+          fw.write('!')
+        assert_eq(fs.cat('a/d'), b'D!!')
         assert_eq(fs.cat('e'), b'A')
         assert_eq(fs.cat('E'), b'E')
       assert_eq(frozenset(str(p.relative_to(upper_tmpdir)) for p in upper_tmpdir.rglob('*')), frozenset(['a', 'a/d', 'e', 'E']))
       assert_eq((upper_tmpdir/'e').open('rb').read(), b'A')
       assert_eq((upper_tmpdir/'E').open('rb').read(), b'E')
-      assert_eq((upper_tmpdir/'a/d').open('rb').read(), b'D!')
+      assert_eq((upper_tmpdir/'a/d').open('rb').read(), b'D!!')
       assert_eq((lower_tmpdir/'a/d').open('rb').read(), b'D')
       assert_eq((lower_tmpdir/'e').open('rb').read(), b'E')

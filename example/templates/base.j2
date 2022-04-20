@@ -1,0 +1,20 @@
+{% extends "biojupies/base.j2" %}
+
+{% block script_head %}
+{{ super() }}
+<script>
+Object.assign(window._config, {
+  keycloak: {
+    params: {
+      url: 'https://appyters.maayanlab.cloud/auth',
+      realm: 'appyters',
+      clientId: 'appyter-catalog',
+    },
+    init: {
+      onLoad: 'check-sso',
+      silentCheckSsoRedirectUri: `${window.location.origin}/silent-check-sso.html`,
+    },
+  },
+})
+</script>
+{% endblock %}

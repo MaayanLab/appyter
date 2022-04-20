@@ -1,56 +1,50 @@
 import contextlib
 import logging
-from multiprocessing import Process
+import multiprocessing as mp
 
 logger = logging.getLogger(__name__)
 
-def _fuse_run(url, mount_point, kwargs, alias_dump):
+def _fuse_run(fs_json, fs_path, mount_dir):
   import fsspec.fuse
-  from appyter.ext.fsspec.core import url_to_chroot_fs
-  from appyter.ext.fsspec.alias import register_aliases
-  register_aliases(alias_dump)
-  logger.debug(f'preparing fs from {url} ({kwargs})..')
-  with url_to_chroot_fs(url, **kwargs) as fs:
-    logger.debug('launching fuse..')
-    fsspec.fuse.run(fs, '', mount_point)
-    logger.debug('teardown..')
+  import appyter.ext.fsspec
+  from appyter.ext.asyncio.event_loop import with_event_loop
+  from appyter.ext.fsspec.spec.composable import ComposableAbstractFileSystem
+  with with_event_loop():
+    fs = ComposableAbstractFileSystem.from_json(fs_json)
+    logger.debug(f'preparing {fs}..')
+    with fs as fs:
+      logger.debug('launching fuse..')
+      fsspec.fuse.run(fs, fs_path, mount_dir)
+      logger.debug('teardown..')
 
 @contextlib.asynccontextmanager
-async def fs_mount(url, **kwargs):
+async def fs_mount(fs, fs_path='', mount_dir=None):
   import os
   import signal
-  import asyncio
-  import pathlib
   import traceback
-  from appyter.ext.fsspec.alias import dump_aliases
-  from appyter.ext.asyncio.try_n_times import try_n_times
-  from appyter.ext.asyncio.run_in_executor import run_in_executor
+  from appyter.ext.asyncio.try_n_times import async_try_n_times
+  from appyter.ext.asyncio.helpers import ensure_async
   from appyter.ext.tempfile import tempdir
-  @run_in_executor
-  def _assert_mounted(path):
-    assert path.is_mount()
-  @run_in_executor
-  def _assert_not_mounted(path):
-    assert not path.is_mount()
-  with tempdir() as tmp:
-    logger.debug(f'mounting {url} onto {tmp}')
-    proc = Process(
+  def assert_true(val): assert val
+  with tempdir(mount_dir) as mount_dir:
+    logger.debug(f'mounting {fs} onto {mount_dir}')
+    proc = mp.Process(
       target=_fuse_run,
-      args=(url, str(tmp), kwargs, dump_aliases()),
+      args=(fs.to_json(), str(fs_path), str(mount_dir)),
     )
     proc.start()
     try:
-      await try_n_times(3, _assert_mounted, tmp)
-      logger.debug(f"fs mount ready on {tmp}")
-      yield tmp
+      await async_try_n_times(3, ensure_async(lambda path: assert_true(path.is_mount())), mount_dir)
+      logger.debug(f"fs mount ready on {mount_dir}")
+      yield mount_dir
     except Exception as e:
       logger.error(traceback.format_exc())
       raise
     finally:
       if proc.pid:
-        logger.debug(f"unmounting fs from {tmp}")
+        logger.debug(f"unmounting fs from {mount_dir}")
         os.kill(proc.pid, signal.SIGINT) # SIGINT cleanly stops fsspec.fuse.run
         logger.debug(f"waiting for process to end")
-        await asyncio.get_running_loop().run_in_executor(None, proc.join)
-        await try_n_times(3, _assert_not_mounted, tmp)
+        await ensure_async(proc.join)()
+        await async_try_n_times(3, ensure_async(lambda path: assert_true(not path.is_mount())), mount_dir)
     logger.debug(f"done")

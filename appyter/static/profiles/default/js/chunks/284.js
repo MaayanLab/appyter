@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkappyter_js=self.webpackChunkappyter_js||[]).push([[284],{1284:function(e,t,a){a.r(t);var s=a(4586);const n=(0,a(3213).ZP)({path:`${window._config.PREFIX}/socket.io/`,extraHeaders:{Authorization:(0,s.Z)()}});t.default=n}}]);

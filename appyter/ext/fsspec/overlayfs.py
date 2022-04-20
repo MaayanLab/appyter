@@ -1,12 +1,16 @@
 import shutil
+import contextlib
 import logging
 
 logger = logging.getLogger(__name__)
 
-from fsspec import filesystem, AbstractFileSystem
+from fsspec import filesystem
+from fsspec import AbstractFileSystem
+from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
+from appyter.ext.fsspec.spec.composable import ComposableAbstractFileSystem
 from appyter.ext.urllib import join_slash, parent_url
 
-class OverlayFileSystem(AbstractFileSystem):
+class OverlayFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem, AbstractFileSystem):
   ''' OverlayFS implemented with fsspec
   '''
   root_marker = ''
@@ -46,6 +50,18 @@ class OverlayFileSystem(AbstractFileSystem):
     if getattr(self.lower_fs, '__exit__', None) is not None:
       self.lower_fs.__exit__(type, value, traceback)
 
+  @contextlib.contextmanager
+  def mount(self, path='', mount_dir=None, fuse=True, **kwargs):
+    if not fuse:
+      upper_mount = self.upper_fs.mount if getattr(self.upper_fs, 'mount', None) else super().mount
+      lower_mount = self.lower_fs.mount if getattr(self.lower_fs, 'mount', None) else super().mount
+      with upper_mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+        with lower_mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+          yield mount_dir
+    else:
+      with super().mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+        yield mount_dir
+
   def mkdir(self, path, **kwargs):
     return self.upper_fs.mkdir(path, **kwargs)
   
@@ -55,8 +71,39 @@ class OverlayFileSystem(AbstractFileSystem):
   def rmdir(self, path):
     return self.upper_fs.rmdir(path)
 
+  def rm_file(self, path):
+    return self.upper_fs.rm_file(path)
+
   def rm(self, path, recursive=False, maxdepth=None):
     return self.upper_fs.rm(path, recursive=recursive, maxdepth=maxdepth)
+
+  def cat_file(self, path, start=None, end=None, **kwargs):
+    if self.upper_fs.exists(path):
+      return self.upper_fs.cat_file(path, start=start, end=end, **kwargs)
+    elif self.lower_fs.exists(path):
+      return self.lower_fs.cat_file(path, start=start, end=end, **kwargs)
+    else:
+      raise FileNotFoundError
+
+  def put_file(self, lpath, rpath, **kwargs):
+    return self.upper_fs.put(lpath, rpath, **kwargs)
+
+  def get_file(self, rpath, lpath, **kwargs):
+    if self.upper_fs.exists(rpath):
+      return self.upper_fs.get_file(rpath, lpath, **kwargs)
+    elif self.lower_fs.exists(rpath):
+      return self.lower_fs.get_file(rpath, lpath, **kwargs)
+    else:
+      raise FileNotFoundError
+
+  def cp_file(self, path1, path2, **kwargs):
+    if self.upper_fs.exists(path1) or not self.lower_fs.exists(path1):
+      return self.upper_fs.cp_file(path1, path2, **kwargs)
+    else:
+      with self.lower_fs.open(path1, 'rb') as fr:
+        self.upper_fs.makedirs(parent_url(path2), exist_ok=True)
+        with self.upper_fs.open(path2, 'wb') as fw:
+          shutil.copyfileobj(fr, fw)
 
   def copy(self, path1, path2, recursive=False, on_error=None, maxdepth=None, **kwargs):
     if self.upper_fs.exists(path1) or not self.lower_fs.exists(path1):
@@ -84,6 +131,12 @@ class OverlayFileSystem(AbstractFileSystem):
 
   def exists(self, path, **kwargs):
     return self.upper_fs.exists(path, **kwargs) or self.lower_fs.exists(path, **kwargs)
+
+  def get_drs(self, path, **kwargs):
+    if self.upper_fs.exists(path) or not self.lower_fs.exists(path):
+      return self.upper_fs.get_drs(path, **kwargs)
+    else:
+      return self.lower_fs.get_drs(path, **kwargs)
 
   def info(self, path, **kwargs):
     logger.debug(f"info({path})")
