@@ -41,7 +41,7 @@
           name: args.name,
           label: 'Uniform Resource Identifier',
           description: 'One of several supported identifiers for accessing your file',
-          examples: Object.keys(args.examples).reduce((agg, example) => (example.indexOf('://') !== -1) ? { ...agg, [example]: args.examples[example] } : agg, {}),
+          examples: Object.keys(args.examples || {}).reduce((agg, example) => (example.indexOf('://') !== -1) ? { ...agg, [example]: args.examples[example] } : agg, {}),
         },
       }}
     />
