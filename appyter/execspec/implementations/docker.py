@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 from appyter.execspec.spec import AbstractExecutor
 from appyter.ext.asyncio.subprocess import sh
 from appyter.ext.dict import dict_merge
+from appyter.ext.json import async_json_loads
 
 class DockerExecutor(AbstractExecutor):
   ''' Run executions in a docker job
@@ -35,7 +36,7 @@ class DockerExecutor(AbstractExecutor):
         'docker', 'inspect', os.environ['HOSTNAME'],
       ], stdout=asyncio.subprocess.PIPE)
       proc_stdout, _ = await proc.communicate()
-      conf = json.loads(proc_stdout.decode())
+      conf = await async_json_loads(proc_stdout.decode())
       self._args += [
         f"--network={conf[0]['HostConfig']['NetworkMode']}"
       ]
@@ -69,7 +70,7 @@ class DockerExecutor(AbstractExecutor):
     yield dict(type='status', data=f"Launching container...")
     async for msg, done in self._submit(**job):
       if not done:
-        try: yield json.loads(msg)
+        try: yield await async_json_loads(msg)
         except: logger.warning(traceback.format_exc())
     if msg == 0:
       yield dict(type='status', data=f"Container exited")

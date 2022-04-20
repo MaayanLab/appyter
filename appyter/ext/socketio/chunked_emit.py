@@ -1,9 +1,8 @@
-import json
 import uuid
 import logging
-import asyncio
-
 logger = logging.getLogger(__name__)
+
+from appyter.ext.json import async_json_dumps
 
 class ChunkedEmitMixin:
   ''' A mixin for splitting up large `emit` calls into `chunked` calls of lower priority
@@ -13,16 +12,14 @@ class ChunkedEmitMixin:
   async def emit(self, evt, data, priority=0, **kwargs):
     chunkable = evt not in {'chunked', 'forward'}
     if chunkable:
-      serialized = json.dumps(data, sort_keys=True, separators=None, ensure_ascii=True)
+      serialized = await async_json_dumps(data, sort_keys=True, separators=None, ensure_ascii=True)
       chunkable = len(serialized) > self.CHUNK_SIZE
-      await asyncio.sleep(0)
     #
     if chunkable:
       logger.debug(f"Large packet ({len(serialized)}), chunking...")
       data_hash = str(uuid.uuid4())
       n_chunks = (len(serialized) // ChunkedEmitMixin.CHUNK_SIZE) + int(len(serialized) % ChunkedEmitMixin.CHUNK_SIZE != 0)
       for n in range(0, n_chunks):
-        await asyncio.sleep(0)
         await super().emit(
           'chunked',
           dict(
