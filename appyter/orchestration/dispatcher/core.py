@@ -74,7 +74,7 @@ async def dispatcher(queued=None, tasks=None, jobs_per_image=1):
     job_id = await queued.get()
     async with tasks.lock:
       job = tasks[job_id]
-      image_jobs = Counter(t.get('image') for t in tasks.values() if 'started_ts' in t).get(job.get('image'), 0)
+      image_jobs = Counter(t.get('executor') for t in tasks.values() if 'started_ts' in t).get(job.get('executor'), 0)
       if image_jobs >= jobs_per_image:
         # TODO: push back onto a priority queue such that the next slot that opens uses this one
         #       currently, this appyter execution would end up on the back of the queue
@@ -101,4 +101,5 @@ async def dispatcher(queued=None, tasks=None, jobs_per_image=1):
       logger.error(f"dispatch error: {traceback.format_exc()}")
     #
     async with tasks.lock:
+      queued.task_done()
       del tasks[job_id]
