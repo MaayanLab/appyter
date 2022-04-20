@@ -50,7 +50,7 @@ async def upload_user_to_storage(storage, data):
             try:
               # Use DRS if it's available
               new_file_uri_without_filename = await ensure_async(userfs.get_drs)(file_uri[len('user://'):])
-              new_file_uri = str(URI(new_file_uri).with_fragment_path(filename))
+              new_file_uri = str(URI(new_file_uri_without_filename).with_fragment_path(filename))
             except:
               # Otherwise put it into `storage://`
               new_file_uri = await ensure_async(organize_file_content)(storagefs, userfs, file_uri[len('user://'):], filename=filename)
