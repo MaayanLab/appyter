@@ -42,7 +42,7 @@ function keycloak_auth_store() {
         if ('state' in params) delete params['state']
         return { ...$hash, params }
       })
-    }, 1000)).catch(err => {
+    }, 5000)).catch(err => {
       console.error(err)
       set({ state: 'error', keycloak: {} })
     })

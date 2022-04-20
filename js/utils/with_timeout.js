@@ -4,7 +4,7 @@ export default function with_timeout(promise, timeout) {
     setTimeout(() => {
       if (ctx.done) return
       ctx.done = true
-      reject(new Error('Timeout'))
+      reject('Timeout')
     }, timeout)
     promise(...args)
       .then((value) => {
