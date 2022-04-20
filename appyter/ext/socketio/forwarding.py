@@ -9,4 +9,4 @@ class ForwardingMixin:
       logger.debug(f"Message forwarding {evt} to {to}")
       return await super().emit('forward', dict(event=evt, data=data, to=to, priority=priority))
     else:
-      return await super().emit(evt, data, to=to, priority=priority)
+      return await super().emit(evt, data, priority=priority)
