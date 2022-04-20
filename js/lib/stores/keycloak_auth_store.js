@@ -3,11 +3,12 @@ import hash from '@/lib/stores/url_hash_store.js'
 import with_timeout from '@/utils/with_timeout'
 
 function keycloak_auth_store() {
+  const enabled = window._config.EXTRAS.includes('catalog-integration') && window._config.keycloak !== undefined
   const { subscribe, set } = writable({
-    state: window._config.EXTRAS.includes('catalog-integration') ? 'init' : 'guest',
+    state: enabled ? 'init' : 'error',
     keycloak: {},
   })
-  if (window._config.EXTRAS.includes('catalog-integration') && window._config.keycloak !== undefined) {
+  if (enabled) {
     import('keycloak-js').then(with_timeout(async ({ default: Keycloak }) => {
       const keycloak = new Keycloak(window._config.keycloak.params)
       const keycloakLogout = keycloak.logout
