@@ -2,13 +2,12 @@ import uuid
 import traceback
 import socketio
 import logging
-from appyter.ext.socketio.chunked_emit import ChunkedEmitMixin
-from appyter.ext.socketio.forwarding import ForwardingMixin
-from appyter.ext.socketio.priority_queued_emit import PriorityQueuedEmitMixin
 logger = logging.getLogger(__name__)
 
+from appyter.ext.socketio.forwarding import ForwardingMixin
+from appyter.ext.socketio.priority_queued_emit import PriorityQueuedEmitMixin
+
 class AsyncClient(
-  ChunkedEmitMixin,
   ForwardingMixin,
   PriorityQueuedEmitMixin,
   socketio.AsyncClient,
