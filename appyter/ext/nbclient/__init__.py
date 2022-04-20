@@ -83,12 +83,10 @@ class NotebookClientIOPubHook(NotebookClient):
       cell['metadata']['execution'] = {}
 
     self.log.debug("Executing cell:\n%s", cell.source)
-    parent_msg_id = await asyncio.get_running_loop().run_in_executor(None,
-      lambda: self._kc_execute(
-        cell.source,
-        store_history=store_history,
-        stop_on_error=not self.allow_errors
-      )
+    parent_msg_id = await ensure_async(self._kc_execute)(
+      cell.source,
+      store_history=store_history,
+      stop_on_error=not self.allow_errors
     )
     # We launched a code cell to execute
     self.code_cells_executed += 1
