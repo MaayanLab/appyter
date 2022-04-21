@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.helpers.commandify &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.helpers.commandify</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.helpers.commandify</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+
+<span class="kn">from</span> <span class="nn">appyter.cli</span> <span class="kn">import</span> <span class="n">cli</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.click</span> <span class="kn">import</span> <span class="n">click_argument_setenv</span>
+
+<div class="viewcode-block" id="ipynb_options_from_sys_argv"><a class="viewcode-back" href="../../../appyter.helpers.html#appyter.helpers.commandify.ipynb_options_from_sys_argv">[docs]</a><span class="k">def</span> <span class="nf">ipynb_options_from_sys_argv</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">sys</span>
+  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;commandify&#39;</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">import</span> <span class="nn">fsspec</span>
+    <span class="kn">import</span> <span class="nn">functools</span>
+    <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_env</span><span class="p">,</span> <span class="n">get_jinja2_env</span>
+    <span class="kn">from</span> <span class="nn">appyter.parse.nbtemplate</span> <span class="kn">import</span> <span class="n">parse_fields_from_nbtemplate</span>
+    <span class="kn">from</span> <span class="nn">appyter.ext.dict</span> <span class="kn">import</span> <span class="n">dict_filter_none</span>
+    <span class="kn">from</span> <span class="nn">appyter.parse.nb</span> <span class="kn">import</span> <span class="n">nb_from_ipynb_io</span>
+    <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.event_loop</span> <span class="kn">import</span> <span class="n">with_event_loop</span>
+    <span class="c1">#</span>
+    <span class="n">arg</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="n">arg</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+    <span class="n">ipynb</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">cwd</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
+    <span class="c1">#</span>
+    <span class="k">with</span> <span class="n">with_event_loop</span><span class="p">():</span>
+      <span class="k">with</span> <span class="n">fsspec</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cwd</span> <span class="o">/</span> <span class="n">ipynb</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fr</span><span class="p">:</span>
+        <span class="n">nbtemplate</span> <span class="o">=</span> <span class="n">nb_from_ipynb_io</span><span class="p">(</span><span class="n">fr</span><span class="p">)</span>
+    <span class="c1">#</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">(</span>
+      <span class="n">config</span><span class="o">=</span><span class="n">get_env</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">cwd</span><span class="p">),</span> <span class="n">ipynb</span><span class="o">=</span><span class="n">ipynb</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;inspect&#39;</span><span class="p">,</span> <span class="n">safe_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dict_filter_none</span><span class="p">({</span>
+      <span class="n">field</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span> <span class="n">field</span><span class="o">.</span><span class="n">to_click</span><span class="p">()</span>
+      <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">parse_fields_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nbtemplate</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">})</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+      <span class="n">func</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="o">*</span><span class="n">field</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">**</span><span class="n">field</span><span class="p">[</span><span class="mi">1</span><span class="p">])(</span><span class="n">func</span><span class="p">)</span>
+    <span class="c1">#</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="k">with</span> <span class="n">with_event_loop</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">cwd</span><span class="p">),</span> <span class="n">ipynb</span><span class="o">=</span><span class="n">ipynb</span><span class="p">,</span> <span class="n">nbtemplate</span><span class="o">=</span><span class="n">nbtemplate</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+  <span class="k">return</span> <span class="n">func</span></div>
+
+<span class="nd">@cli</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s1">&#39;Construct an operable command-line from an appyter&#39;</span><span class="p">)</span>
+<span class="nd">@click_argument_setenv</span><span class="p">(</span><span class="s1">&#39;ipynb&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_IPYNB&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">commandify</span><span class="p">(</span><span class="n">ipynb</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+  <span class="k">pass</span>
+
+<span class="nd">@commandify</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s1">&#39;Construct a notebook from an appyter and its arguments&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FILE&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Output notebook&#39;</span><span class="p">)</span>
+<span class="nd">@ipynb_options_from_sys_argv</span>
+<span class="k">def</span> <span class="nf">nbconstruct</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">o</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="k">if</span> <span class="n">o</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span> <span class="n">o</span> <span class="o">=</span> <span class="s1">&#39;/dev/stdout&#39;</span>
+  <span class="kn">import</span> <span class="nn">fsspec</span>
+  <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_env</span><span class="p">,</span> <span class="n">get_jinja2_env</span>
+  <span class="kn">from</span> <span class="nn">appyter.render.nbconstruct</span> <span class="kn">import</span> <span class="n">render_nb_from_nbtemplate</span>
+  <span class="kn">from</span> <span class="nn">appyter.parse.nb</span> <span class="kn">import</span> <span class="n">nb_to_ipynb_io</span>
+  <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">(</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">get_env</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;cwd&#39;</span><span class="p">],</span> <span class="n">ipynb</span><span class="o">=</span><span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;ipynb&#39;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;construct&#39;</span><span class="p">),</span>
+    <span class="n">context</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+  <span class="p">)</span>
+  <span class="n">nb</span> <span class="o">=</span> <span class="n">render_nb_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;nbtemplate&#39;</span><span class="p">],</span> <span class="n">data</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">with</span> <span class="n">fsspec</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+    <span class="n">nb_to_ipynb_io</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="n">fw</span><span class="p">)</span>
+
+<span class="nd">@commandify</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s1">&#39;Construct and execute an appyter&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;URI&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;file:///dev/stderr&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Status stream&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-e&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;URI&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Executor&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FILE&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Output notebook&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-w&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;DIR&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Working directory&#39;</span><span class="p">)</span>
+<span class="nd">@ipynb_options_from_sys_argv</span>
+<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">o</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;file:///dev/stderr&#39;</span>
+  <span class="c1">#</span>
+  <span class="k">if</span> <span class="n">o</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">w</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">o</span> <span class="o">=</span> <span class="s1">&#39;file:///dev/stdout&#39;</span>
+  <span class="k">elif</span> <span class="n">o</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+    <span class="n">o</span> <span class="o">=</span> <span class="s1">&#39;file:///dev/stdout&#39;</span>
+  <span class="c1">#</span>
+  <span class="kn">import</span> <span class="nn">fsspec</span>
+  <span class="kn">import</span> <span class="nn">shutil</span>
+  <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_env</span><span class="p">,</span> <span class="n">get_jinja2_env</span>
+  <span class="kn">from</span> <span class="nn">appyter.parse.nb</span> <span class="kn">import</span> <span class="n">nb_to_ipynb_io</span>
+  <span class="kn">from</span> <span class="nn">appyter.render.nbconstruct</span> <span class="kn">import</span> <span class="n">render_nb_from_nbtemplate</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.emitter</span> <span class="kn">import</span> <span class="n">url_to_emitter</span>
+  <span class="kn">from</span> <span class="nn">appyter.execspec.core</span> <span class="kn">import</span> <span class="n">url_to_executor</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.tempfile</span> <span class="kn">import</span> <span class="n">tempdir</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.helpers</span> <span class="kn">import</span> <span class="n">ensure_sync</span>
+  <span class="c1"># render notebook</span>
+  <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">(</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">get_env</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;cwd&#39;</span><span class="p">],</span> <span class="n">ipynb</span><span class="o">=</span><span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;ipynb&#39;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;construct&#39;</span><span class="p">,</span> <span class="n">safe_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="n">context</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+  <span class="p">)</span>
+  <span class="n">nb</span> <span class="o">=</span> <span class="n">render_nb_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;nbtemplate&#39;</span><span class="p">],</span> <span class="n">data</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="c1"># write into temporary directory</span>
+  <span class="k">with</span> <span class="n">tempdir</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">tmp_dir</span><span class="o">/</span><span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;ipynb&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+      <span class="n">nb_to_ipynb_io</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="n">fw</span><span class="p">)</span>
+    <span class="c1"># execute notebook, sending status updates to `s`</span>
+    <span class="k">with</span> <span class="n">ensure_sync</span><span class="p">(</span><span class="n">url_to_emitter</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">as</span> <span class="n">emitter</span><span class="p">:</span>
+      <span class="n">emitter</span> <span class="o">=</span> <span class="n">ensure_sync</span><span class="p">(</span><span class="n">emitter</span><span class="p">)</span>
+      <span class="k">with</span> <span class="n">url_to_executor</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">executor</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+          <span class="n">cwd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">),</span>
+          <span class="n">ipynb</span><span class="o">=</span><span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;ipynb&#39;</span><span class="p">],</span>
+          <span class="n">fuse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">):</span>
+          <span class="n">emitter</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="c1"># write output notebook, to `o`</span>
+    <span class="k">if</span> <span class="n">o</span><span class="p">:</span>
+      <span class="k">with</span> <span class="p">(</span><span class="n">tmp_dir</span><span class="o">/</span><span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;ipynb&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fr</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">fsspec</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+          <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">fr</span><span class="p">,</span> <span class="n">fw</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.helpers.commandify</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

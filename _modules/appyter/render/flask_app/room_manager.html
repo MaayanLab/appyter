@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.render.flask_app.room_manager &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" accesskey="U">appyter.render.flask_app</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.room_manager</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.render.flask_app.room_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39; Manage rooms</span>
+<span class="sd">NOTE: `rooms` state would need to be distributed if the</span>
+<span class="sd">server was distributed.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.socketio</span> <span class="kn">import</span> <span class="n">socketio</span>
+
+<span class="n">rooms</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="ensure_room"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.room_manager.ensure_room">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">ensure_room</span><span class="p">(</span><span class="n">room</span><span class="p">):</span>
+  <span class="k">global</span> <span class="n">rooms</span>
+  <span class="k">if</span> <span class="n">room</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rooms</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;creating room </span><span class="si">{</span><span class="n">room</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">rooms</span><span class="p">[</span><span class="n">room</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s1">&#39;users&#39;</span><span class="p">:</span> <span class="p">{},</span>
+      <span class="s1">&#39;clients&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span>
+      <span class="s1">&#39;messages&#39;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="p">}</span>
+  <span class="k">return</span> <span class="n">rooms</span><span class="p">[</span><span class="n">room</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="remove_client_from_room"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.room_manager.remove_client_from_room">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">remove_client_from_room</span><span class="p">(</span><span class="n">room_id</span><span class="p">,</span> <span class="n">client_sid</span><span class="p">):</span>
+  <span class="k">global</span> <span class="n">rooms</span>
+  <span class="k">if</span> <span class="n">room_id</span> <span class="ow">in</span> <span class="n">rooms</span><span class="p">:</span>
+    <span class="n">rooms</span><span class="p">[</span><span class="n">room_id</span><span class="p">][</span><span class="s1">&#39;clients&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">client_sid</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rooms</span><span class="p">[</span><span class="n">room_id</span><span class="p">][</span><span class="s1">&#39;clients&#39;</span><span class="p">]:</span>
+      <span class="c1"># no more clients, close room</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;closing room </span><span class="si">{</span><span class="n">room_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="k">del</span> <span class="n">rooms</span><span class="p">[</span><span class="n">room_id</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="enter_room"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.room_manager.enter_room">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">enter_room</span><span class="p">(</span><span class="n">client_sid</span><span class="p">,</span> <span class="n">room_id</span><span class="p">):</span>
+  <span class="n">room</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ensure_room</span><span class="p">(</span><span class="n">room_id</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">client_sid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">room</span><span class="p">[</span><span class="s1">&#39;clients&#39;</span><span class="p">]:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;client </span><span class="si">{</span><span class="n">client_sid</span><span class="si">}</span><span class="s2"> joined room </span><span class="si">{</span><span class="n">room_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># add client to room and relay old messages to the client</span>
+    <span class="n">room</span><span class="p">[</span><span class="s1">&#39;clients&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">client_sid</span><span class="p">)</span>
+    <span class="n">socketio</span><span class="o">.</span><span class="n">enter_room</span><span class="p">(</span><span class="n">client_sid</span><span class="p">,</span> <span class="n">room_id</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">socketio</span><span class="o">.</span><span class="n">session</span><span class="p">(</span><span class="n">client_sid</span><span class="p">)</span> <span class="k">as</span> <span class="n">client_sess</span><span class="p">:</span>
+      <span class="n">client_uid</span> <span class="o">=</span> <span class="n">client_sess</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">room</span><span class="p">[</span><span class="s1">&#39;messages&#39;</span><span class="p">][</span><span class="n">room</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client_uid</span><span class="p">,</span> <span class="mi">0</span><span class="p">):]:</span>
+      <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="s1">&#39;event&#39;</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">to</span><span class="o">=</span><span class="n">client_sid</span><span class="p">)</span>
+    <span class="n">room</span><span class="p">[</span><span class="s1">&#39;users&#39;</span><span class="p">][</span><span class="n">client_uid</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">room</span><span class="p">[</span><span class="s1">&#39;messages&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ensure_joined"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.room_manager.ensure_joined">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">ensure_joined</span><span class="p">(</span><span class="n">client_sid</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">with</span> <span class="n">socketio</span><span class="o">.</span><span class="n">session</span><span class="p">(</span><span class="n">client_sid</span><span class="p">)</span> <span class="k">as</span> <span class="n">client_sess</span><span class="p">:</span>
+    <span class="n">client_uid</span> <span class="o">=</span> <span class="n">client_sess</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span>
+  <span class="c1">#</span>
+  <span class="k">for</span> <span class="n">room_id</span> <span class="ow">in</span> <span class="n">rooms</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">client_uid</span> <span class="ow">in</span> <span class="n">rooms</span><span class="p">[</span><span class="n">room_id</span><span class="p">][</span><span class="s1">&#39;users&#39;</span><span class="p">]:</span>
+      <span class="k">await</span> <span class="n">enter_room</span><span class="p">(</span><span class="n">client_sid</span><span class="p">,</span> <span class="n">room_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="find_room"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.room_manager.find_room">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">find_room</span><span class="p">(</span><span class="n">room_id</span><span class="p">):</span>
+  <span class="k">global</span> <span class="n">rooms</span>
+  <span class="k">return</span> <span class="n">room_id</span> <span class="ow">in</span> <span class="n">rooms</span></div>
+
+<div class="viewcode-block" id="room_lock"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.room_manager.room_lock">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">asynccontextmanager</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">room_lock</span><span class="p">(</span><span class="n">room_id</span><span class="p">):</span>
+  <span class="n">lock_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+  <span class="n">room</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ensure_room</span><span class="p">(</span><span class="n">room_id</span><span class="p">)</span>
+  <span class="n">room</span><span class="p">[</span><span class="s1">&#39;clients&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">lock_id</span><span class="p">)</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="k">yield</span>
+  <span class="k">finally</span><span class="p">:</span>
+    <span class="k">await</span> <span class="n">remove_client_from_room</span><span class="p">(</span><span class="n">room_id</span><span class="p">,</span> <span class="n">lock_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="on_join"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.room_manager.on_join">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_join</span><span class="p">(</span><span class="n">client_sid</span><span class="p">,</span> <span class="n">room_data</span><span class="p">):</span>
+  <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">room_data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span> <span class="n">room_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="n">room_data</span><span class="p">}</span>
+  <span class="k">await</span> <span class="n">enter_room</span><span class="p">(</span><span class="n">client_sid</span><span class="p">,</span> <span class="n">room_data</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">])</span></div>
+
+<span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;forward&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">client_sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+  <span class="k">global</span> <span class="n">rooms</span>
+  <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">rooms</span><span class="p">:</span>
+    <span class="n">rooms</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">]][</span><span class="s1">&#39;messages&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">client_sid</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">room</span> <span class="ow">in</span> <span class="n">socketio</span><span class="o">.</span><span class="n">rooms</span><span class="p">(</span><span class="n">client_sid</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">remove_client_from_room</span><span class="p">(</span><span class="n">room</span><span class="p">,</span> <span class="n">client_sid</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" >appyter.render.flask_app</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.room_manager</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

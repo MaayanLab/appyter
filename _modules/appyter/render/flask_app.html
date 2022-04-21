@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.render.flask_app &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.render.flask_app</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">appyter.cli</span> <span class="kn">import</span> <span class="n">cli</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.click</span> <span class="kn">import</span> <span class="n">Json</span><span class="p">,</span> <span class="n">click_option_setenv</span><span class="p">,</span> <span class="n">click_argument_setenv</span>
+
+<div class="viewcode-block" id="create_app"><a class="viewcode-back" href="../../../appyter.render.flask_app.html#appyter.render.flask_app.create_app">[docs]</a><span class="k">def</span> <span class="nf">create_app</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Completely initialize the flask application</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="kn">import</span> <span class="nn">asyncio</span>
+  <span class="kn">from</span> <span class="nn">aiohttp</span> <span class="kn">import</span> <span class="n">web</span>
+  <span class="kn">from</span> <span class="nn">aiohttp_wsgi</span> <span class="kn">import</span> <span class="n">WSGIHandler</span>
+  <span class="kn">from</span> <span class="nn">aiohttp_remotes</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">XForwardedRelaxed</span>
+  <span class="kn">from</span> <span class="nn">aiohttp.web_exceptions</span> <span class="kn">import</span> <span class="n">HTTPException</span>
+  <span class="kn">from</span> <span class="nn">aiohttp.web_middlewares</span> <span class="kn">import</span> <span class="n">middleware</span>
+  <span class="c1">#</span>
+  <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">Blueprint</span>
+  <span class="kn">from</span> <span class="nn">flask_cors</span> <span class="kn">import</span> <span class="n">CORS</span>
+  <span class="c1">#</span>
+  <span class="kn">from</span> <span class="nn">appyter.render.flask_app.socketio</span> <span class="kn">import</span> <span class="n">socketio</span>
+  <span class="kn">from</span> <span class="nn">appyter.render.flask_app.core</span> <span class="kn">import</span> <span class="n">core</span>
+  <span class="kn">import</span> <span class="nn">appyter.render.flask_app.static</span>
+  <span class="kn">import</span> <span class="nn">appyter.render.flask_app.export</span>
+  <span class="kn">import</span> <span class="nn">appyter.render.flask_app.upload</span>
+  <span class="kn">import</span> <span class="nn">appyter.render.flask_app.execution</span>
+  <span class="kn">import</span> <span class="nn">appyter.render.flask_app.room_manager</span>
+  <span class="kn">import</span> <span class="nn">appyter.render.flask_app.drs</span>
+  <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;debug&#39;</span><span class="p">]:</span>
+    <span class="kn">import</span> <span class="nn">appyter.render.flask_app.livereload</span>
+  <span class="c1">#</span>
+  <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_env</span><span class="p">,</span> <span class="n">find_blueprints</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">join_slash</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.flask</span> <span class="kn">import</span> <span class="n">join_routes</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.helpers</span> <span class="kn">import</span> <span class="n">ensure_async</span><span class="p">,</span> <span class="n">ensure_sync</span>
+  <span class="n">config</span> <span class="o">=</span> <span class="n">get_env</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="c1">#</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Initializing aiohttp...&#39;</span><span class="p">)</span>
+  <span class="n">app</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">()</span>
+  <span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span>
+  <span class="c1">#</span>
+  <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">]:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Initializing error handler middleware...&#39;</span><span class="p">)</span>
+    <span class="nd">@middleware</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">error_handler</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">handler</span><span class="p">):</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">handler</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+      <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+        <span class="k">raise</span>
+      <span class="k">except</span> <span class="n">HTTPException</span><span class="p">:</span>
+        <span class="k">raise</span>
+      <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">web</span><span class="o">.</span><span class="n">HTTPFound</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_handler</span><span class="p">)</span>
+  <span class="c1">#</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Initializing socketio...&#39;</span><span class="p">)</span>
+  <span class="n">socketio</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">join_slash</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span> <span class="s1">&#39;socket.io&#39;</span><span class="p">))</span>
+  <span class="nd">@app</span><span class="o">.</span><span class="n">cleanup_ctx</span><span class="o">.</span><span class="n">append</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">initialize_socketio</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">socketio</span><span class="p">:</span>
+      <span class="k">yield</span>
+  <span class="c1">#</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Initializing flask...&#39;</span><span class="p">)</span>
+  <span class="n">flask_app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">static_url_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">static_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+  <span class="n">CORS</span><span class="p">(</span><span class="n">flask_app</span><span class="p">)</span>
+  <span class="n">flask_app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+  <span class="n">flask_app</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">]</span>
+  <span class="c1">#</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Registering blueprints...&#39;</span><span class="p">)</span>
+  <span class="n">flask_app</span><span class="o">.</span><span class="n">register_blueprint</span><span class="p">(</span><span class="n">core</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">blueprint_name</span><span class="p">,</span> <span class="n">blueprint</span> <span class="ow">in</span> <span class="n">find_blueprints</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">flask_app</span><span class="o">.</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blueprint</span><span class="p">,</span> <span class="n">Blueprint</span><span class="p">):</span>
+      <span class="n">flask_app</span><span class="o">.</span><span class="n">register_blueprint</span><span class="p">(</span><span class="n">blueprint</span><span class="p">,</span> <span class="n">url_prefix</span><span class="o">=</span><span class="n">join_routes</span><span class="p">(</span><span class="n">blueprint_name</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">blueprint</span><span class="p">):</span>
+      <span class="n">blueprint</span><span class="p">(</span><span class="n">flask_app</span><span class="p">,</span> <span class="n">url_prefix</span><span class="o">=</span><span class="n">join_routes</span><span class="p">(</span><span class="n">blueprint_name</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Unrecognized blueprint type: &#39;</span> <span class="o">+</span> <span class="n">blueprint_name</span><span class="p">)</span>
+  <span class="c1">#</span>
+  <span class="k">if</span> <span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Registering prefix redirect&#39;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">redirect_to_prefix</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+      <span class="n">path</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">match_info</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span>
+      <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span> <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+      <span class="k">raise</span> <span class="n">web</span><span class="o">.</span><span class="n">HTTPFound</span><span class="p">(</span><span class="n">join_routes</span><span class="p">(</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_get</span><span class="p">(</span><span class="s1">&#39;/{path:[^/]*}&#39;</span><span class="p">,</span> <span class="n">redirect_to_prefix</span><span class="p">)</span>
+  <span class="c1">#</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Registering flask with aiohttp...&#39;</span><span class="p">)</span>
+  <span class="n">wsgi_handler</span> <span class="o">=</span> <span class="n">WSGIHandler</span><span class="p">(</span><span class="n">flask_app</span><span class="p">)</span>
+  <span class="n">app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">join_slash</span><span class="p">(</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span> <span class="s1">&#39;{path_info:.*}&#39;</span><span class="p">),</span> <span class="n">wsgi_handler</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">flask_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PROXY&#39;</span><span class="p">]:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Applying proxy fix middleware...&#39;</span><span class="p">)</span>
+    <span class="n">ensure_sync</span><span class="p">(</span><span class="n">setup</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">XForwardedRelaxed</span><span class="p">()))</span>
+  <span class="c1">#</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">storage_ctx</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Registering application storage handler&#39;</span><span class="p">)</span>
+    <span class="n">data_dir</span> <span class="o">=</span> <span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;DATA_DIR&#39;</span><span class="p">]</span>
+    <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.storage</span> <span class="kn">import</span> <span class="n">ensure_storage</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">ensure_storage</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span> <span class="k">as</span> <span class="n">fs</span><span class="p">:</span>
+      <span class="k">await</span> <span class="n">ensure_async</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">makedirs</span><span class="p">)(</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+      <span class="k">await</span> <span class="n">ensure_async</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">makedirs</span><span class="p">)(</span><span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Storage ready&#39;</span><span class="p">)</span>
+      <span class="k">yield</span>
+  <span class="n">app</span><span class="o">.</span><span class="n">cleanup_ctx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">storage_ctx</span><span class="p">)</span>
+  <span class="c1">#</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">executor_ctx</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Registering application executor handler&#39;</span><span class="p">)</span>
+    <span class="n">executor_uri</span> <span class="o">=</span> <span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;EXECUTOR&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;local&#39;</span>
+    <span class="kn">from</span> <span class="nn">appyter.execspec.core</span> <span class="kn">import</span> <span class="n">url_to_executor</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">url_to_executor</span><span class="p">(</span><span class="n">executor_uri</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">])</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+      <span class="n">app</span><span class="p">[</span><span class="s1">&#39;executor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">executor</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Executor ready&#39;</span><span class="p">)</span>
+      <span class="k">yield</span>
+  <span class="n">app</span><span class="o">.</span><span class="n">cleanup_ctx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">executor_ctx</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">app</span></div>
+
+<span class="c1"># register flask_app with CLI</span>
+<span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s1">&#39;Run a flask web application based on an appyter-enabled jupyter notebook&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--cwd&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_CWD&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The directory to treat as the current working directory for templates and execution&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--prefix&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_PREFIX&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Specify the prefix for which to mount the webserver onto&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--profile&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_PROFILE&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;biojupies&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Specify the profile to use for rendering&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--extras&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_EXTRAS&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="nb">type</span><span class="o">=</span><span class="n">Json</span><span class="p">(),</span> <span class="n">multiple</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Specify extras flags&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--host&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_HOST&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The host the flask server should run on&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--socket&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_SOCKET&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The socket to mount to (when running in production)&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_PORT&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The port this flask server should run on&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--public-url&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_PUBLIC_URL&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The public url users use to access the appyter (like when behind a load balancer)&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--proxy&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_PROXY&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Whether this is running behind a proxy and the IP should be fixed for CORS&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--data-dir&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_DATA_DIR&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The directory to store data of executions&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--executor&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_EXECUTOR&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The executor URI which controls how executions are performed&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--secret-key&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_SECRET_KEY&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;A secret key for flask&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--debug&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_DEBUG&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Whether or not we should be in debugging mode, not for use in multi-tenant situations&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--static-dir&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_STATIC_DIR&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;static&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The folder whether staticfiles are located&#39;</span><span class="p">)</span>
+<span class="nd">@click_argument_setenv</span><span class="p">(</span><span class="s1">&#39;ipynb&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_IPYNB&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">flask_app</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">sys</span>
+  <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.event_loop</span> <span class="kn">import</span> <span class="n">with_event_loop</span>
+  <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">with_event_loop</span><span class="p">():</span>
+      <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;socket&#39;</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">appyter.ext.aiohttp</span> <span class="kn">import</span> <span class="n">run_app</span>
+        <span class="n">socket</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;socket&#39;</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Launching aiohttp server on </span><span class="si">{</span><span class="n">socket</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;:&#39;</span> <span class="ow">in</span> <span class="n">socket</span><span class="p">:</span>
+          <span class="n">host</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+          <span class="n">run_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">run_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">socket</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">appyter.render.flask_app.development</span> <span class="kn">import</span> <span class="n">serve</span>
+        <span class="n">exit_code</span> <span class="o">=</span> <span class="n">serve</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">appyter.render.flask_app.production</span> <span class="kn">import</span> <span class="n">serve</span>
+        <span class="n">exit_code</span> <span class="o">=</span> <span class="n">serve</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+    <span class="k">pass</span>
+  <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

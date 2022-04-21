@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.render.flask_app.core &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" accesskey="U">appyter.render.flask_app</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.core</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.render.flask_app.core</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Blueprint</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">abort</span><span class="p">,</span> <span class="n">url_for</span><span class="p">,</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">make_response</span>
+
+<span class="kn">from</span> <span class="nn">appyter.ext.exceptions</span> <span class="kn">import</span> <span class="n">exception_as_dict</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.flask</span> <span class="kn">import</span> <span class="n">route_join_with_or_without_slash</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.constants</span> <span class="kn">import</span> <span class="n">get_j2_env</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.prepare</span> <span class="kn">import</span> <span class="n">prepare_data</span><span class="p">,</span> <span class="n">prepare_results</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">core</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;__main__&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="post_index"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.post_index">[docs]</a><span class="nd">@route_join_with_or_without_slash</span><span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">post_index</span><span class="p">():</span>
+  <span class="n">mimetype</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">accept_mimetypes</span><span class="o">.</span><span class="n">best_match</span><span class="p">([</span>
+    <span class="s1">&#39;text/html&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+  <span class="p">],</span> <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+  <span class="c1">#</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">prepare_data</span><span class="p">(</span><span class="n">request</span><span class="p">),</span> <span class="n">_config</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">instance_id</span> <span class="o">=</span> <span class="n">prepare_results</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
+  <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+    <span class="k">raise</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">exception_as_dict</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+  <span class="c1">#</span>
+  <span class="k">if</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;text/html&#39;</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="n">error</span><span class="p">:</span> <span class="n">abort</span><span class="p">(</span><span class="mi">406</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;__main__.data_files&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">instance_id</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_executor&#39;</span><span class="p">),</span> <span class="n">storage</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_storage&#39;</span><span class="p">)),</span> <span class="mi">303</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;application/json&#39;</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">),</span> <span class="mi">406</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="c1"># NOTE: Legacy session_id preserved but deprecated</span>
+      <span class="n">ret</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_id</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span> <span class="n">session_id</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_executor&#39;</span><span class="p">):</span> <span class="n">ret</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_executor</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;_executor&#39;</span><span class="p">])</span>
+      <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_storage&#39;</span><span class="p">):</span> <span class="n">ret</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_storage</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;_storage&#39;</span><span class="p">])</span>
+      <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">(</span><span class="n">ret</span><span class="p">),</span> <span class="mi">200</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="post_ssr"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.core.post_ssr">[docs]</a><span class="nd">@route_join_with_or_without_slash</span><span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="s1">&#39;ssr&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">post_ssr</span><span class="p">():</span>
+  <span class="n">env</span> <span class="o">=</span> <span class="n">get_j2_env</span><span class="p">()</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">ctx</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;field&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Field&#39;</span><span class="p">),</span> <span class="s1">&#39;Invalid field&#39;</span>
+    <span class="k">return</span> <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="p">[</span><span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;field&#39;</span><span class="p">]](</span><span class="o">**</span><span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+  <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+    <span class="k">raise</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">jsonify</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="n">exception_as_dict</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span> <span class="mi">406</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" >appyter.render.flask_app</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.core</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

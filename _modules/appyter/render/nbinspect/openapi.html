@@ -1,0 +1,430 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.render.nbinspect.openapi &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.nbinspect.openapi</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.render.nbinspect.openapi</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">import</span> <span class="nn">fsspec</span>
+
+<span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_env</span><span class="p">,</span> <span class="n">get_jinja2_env</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.click</span> <span class="kn">import</span> <span class="n">click_option_setenv</span><span class="p">,</span> <span class="n">click_argument_setenv</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">join_slash</span>
+<span class="kn">from</span> <span class="nn">appyter.parse.nb</span> <span class="kn">import</span> <span class="n">nb_from_ipynb_io</span>
+<span class="kn">from</span> <span class="nn">appyter.render.nbinspect.cli</span> <span class="kn">import</span> <span class="n">nbinspect</span>
+<span class="kn">from</span> <span class="nn">appyter.render.nbinspect.jsonschema</span> <span class="kn">import</span> <span class="n">render_jsonschema_from_nbtemplate</span>
+
+<div class="viewcode-block" id="render_openapi_from_nbtemplate"><a class="viewcode-back" href="../../../../appyter.render.nbinspect.html#appyter.render.nbinspect.openapi.render_openapi_from_nbtemplate">[docs]</a><span class="k">def</span> <span class="nf">render_openapi_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nb</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39; Render a openapi representing the relevant Fields throughout the notebook.</span>
+<span class="sd">  TODO: outputs</span>
+<span class="sd">  TODO: appyter.json metadata</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;openapi&#39;</span><span class="p">:</span> <span class="s1">&#39;3.1.0&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="c1"># TODO</span>
+      <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Appyter API&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;An API for interfacing with the Appyter.&#39;</span><span class="p">,</span>
+      <span class="c1"># termsOfService:</span>
+      <span class="s1">&#39;contact&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s2">&quot;Ma&#39;ayan Lab&quot;</span><span class="p">,</span>
+        <span class="c1"># &#39;email&#39;: &#39;&#39;,</span>
+        <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="s1">&#39;https://maayanlab.cloud/&#39;</span><span class="p">,</span>
+      <span class="p">},</span>
+      <span class="s1">&#39;license&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;CC-BY-NC-SA&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="s1">&#39;https://github.com/MaayanLab/appyter/blob/main/LICENSE&#39;</span><span class="p">,</span>
+      <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;servers&#39;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="s1">&#39;/&#39;</span> <span class="p">},</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;paths&#39;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s1">&#39;/&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;get&#39;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Get information about this appyter&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;operationId&#39;</span><span class="p">:</span> <span class="s1">&#39;appyter_inspect&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;responses&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;200&#39;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Appyter instance&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;application/vnd.jupyter&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="c1"># &#39;description&#39;: &#39;Appyter notebook&#39;,</span>
+                  <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/components/schemas/AppyterIPYNB&#39;</span><span class="p">,</span>
+                  <span class="p">},</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;application/json&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="c1"># &#39;description&#39;: &#39;Appyter nbinspect&#39;,</span>
+                  <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/components/schemas/AppyterNBInspect&#39;</span><span class="p">,</span>
+                  <span class="p">},</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;text/html&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="c1"># &#39;description&#39;: &#39;Appyter form&#39;,</span>
+                  <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                  <span class="p">},</span>
+                <span class="p">},</span>
+              <span class="p">},</span>
+            <span class="p">},</span>
+          <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;post&#39;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Executes the appyter&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;operationId&#39;</span><span class="p">:</span> <span class="s1">&#39;appyter_execute&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;requestBody&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s1">&#39;multipart/form-data&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="n">render_jsonschema_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nb</span><span class="p">),</span>
+              <span class="p">},</span>
+            <span class="p">},</span>
+          <span class="p">},</span>
+          <span class="s1">&#39;responses&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;200&#39;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Appyter results&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;application/json&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                      <span class="s1">&#39;session_id&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;DEPRECATED: A unique identifier for this appyter invokation&#39;</span><span class="p">,</span>
+                      <span class="p">},</span>
+                      <span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;A unique identifier for this appyter invokation&#39;</span><span class="p">,</span>
+                      <span class="p">},</span>
+                      <span class="s1">&#39;_storage&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;A URI for the storage backend where this appyter is saved when using integrations&#39;</span><span class="p">,</span>
+                      <span class="p">},</span>
+                    <span class="p">},</span>
+                    <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span>
+                  <span class="p">},</span>
+                <span class="p">},</span>
+              <span class="p">},</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;406&#39;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Not acceptable error, field(s) did not satisfy constraint(s)&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;application/json&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/components/schemas/Error&#39;</span><span class="p">,</span>
+                  <span class="p">},</span>
+                <span class="p">},</span>
+              <span class="p">},</span>
+            <span class="p">},</span>
+          <span class="p">},</span>
+        <span class="p">},</span>
+      <span class="p">},</span>
+      <span class="s1">&#39;/</span><span class="si">{_id}</span><span class="s1">/&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;get&#39;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Fetch or interact with an appyter instance&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;operationId&#39;</span><span class="p">:</span> <span class="s1">&#39;appyter_instance_fetch&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;parameters&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="s1">&#39;in&#39;</span><span class="p">:</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;_id&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span>
+              <span class="p">},</span>
+              <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Appyter instance identifier&#39;</span><span class="p">,</span>
+            <span class="p">},</span>
+          <span class="p">],</span>
+          <span class="s1">&#39;responses&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;200&#39;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Appyter instance&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;application/vnd.jupyter&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="c1"># &#39;description&#39;: &#39;Appyter instance&#39;,</span>
+                  <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/AppyterInstanceIPYNB&quot;</span><span class="p">,</span>
+                  <span class="p">},</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;application/json&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="c1"># &#39;description&#39;: &#39;Appyter instance&#39;,</span>
+                  <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/AppyterInstanceIPYNB&quot;</span><span class="p">,</span>
+                  <span class="p">},</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;text/html&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="c1"># &#39;description&#39;: &#39;Interactive appyter instance viewer&#39;,</span>
+                  <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                  <span class="p">},</span>
+                <span class="p">},</span>
+              <span class="p">},</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;404&#39;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Appyter instance not found&#39;</span><span class="p">,</span>
+            <span class="p">},</span>
+          <span class="p">},</span>
+        <span class="p">},</span>
+      <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;components&#39;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s1">&#39;schemas&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;AppyterNBInspect&#39;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Appyter field extracts&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s1">&#39;field&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+              <span class="p">},</span>
+              <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Field-specific arguments&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The unique name of this field&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                  <span class="p">},</span>
+                  <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;A human readable label for the field&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                  <span class="p">},</span>
+                  <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;A human readable description for the field&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                  <span class="p">},</span>
+                  <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;A list or lookup dictionary of possible choices&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;oneOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+                      <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/components/schemas/Any&#39;</span> <span class="p">}},</span>
+                      <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/components/schemas/Any&#39;</span> <span class="p">}},</span>
+                    <span class="p">]</span>
+                  <span class="p">},</span>
+                  <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Whether or not this field is required&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                  <span class="p">},</span>
+                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The value used if not provided&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/components/schemas/Any&#39;</span><span class="p">,</span>
+                  <span class="p">},</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+              <span class="p">},</span>
+            <span class="p">},</span>
+          <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;AppyterIPYNB&#39;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Appyter IPython Notebook format&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;metadata&#39;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Jupyter notebook metadata&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;appyter&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Appyter specific metadata&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="p">{</span>
+                      <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                  <span class="p">},</span>
+                <span class="p">},</span>
+              <span class="p">},</span>
+            <span class="p">},</span>
+          <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;AppyterInstanceIPYNB&#39;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Appyter Instance IPython Notebook format&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;metadata&#39;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Jupyter notebook metadata&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;appyter&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Appyter specific metadata&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="p">{</span>
+                      <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;https://raw.githubusercontent.com/MaayanLab/appyter-catalog/master/schema/appyter-validator.json&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="s1">&#39;nbconstruct&#39;</span><span class="p">:</span> <span class="p">{</span>
+                      <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="p">{</span>
+                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="s1">&#39;files&#39;</span><span class="p">:</span> <span class="p">{</span>
+                          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;File name to source mapping used during nbconstruct&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                          <span class="p">},</span>
+                        <span class="p">},</span>
+                        <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="p">{</span>
+                          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Version of appyter used for nbconstruct&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                      <span class="p">},</span>
+                    <span class="p">},</span>
+                    <span class="s1">&#39;nbexecute&#39;</span><span class="p">:</span> <span class="p">{</span>
+                      <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;started&#39;</span><span class="p">:</span> <span class="p">{</span>
+                          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Server time when nbexecute was started&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;date-time&#39;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="s1">&#39;completed&#39;</span><span class="p">:</span> <span class="p">{</span>
+                          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Server time when nbexecute completed&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;date-time&#39;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                        <span class="s1">&#39;files&#39;</span><span class="p">:</span> <span class="p">{</span>
+                          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;File name to source mapping present after nbexecute&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                          <span class="p">},</span>
+                        <span class="p">},</span>
+                        <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="p">{</span>
+                          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Version of appyter used for nbexecute&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                      <span class="p">},</span>
+                    <span class="p">},</span>
+                  <span class="p">},</span>
+                <span class="p">},</span>
+              <span class="p">},</span>
+              <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="p">},</span>
+          <span class="p">},</span>
+          <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;Error&#39;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;cls&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Specific type of error&#39;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Human readable indication of what went wrong&#39;</span><span class="p">,</span>
+                <span class="p">},</span>
+              <span class="p">},</span>
+            <span class="p">},</span>
+          <span class="p">},</span>
+          <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+          <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;cls&#39;</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;Any&#39;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s1">&#39;oneOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;null&#39;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;number&#39;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;integer&#39;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/components/schemas/Any&#39;</span> <span class="p">}</span> <span class="p">},</span>
+            <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/components/schemas/Any&#39;</span> <span class="p">}</span> <span class="p">},</span>
+          <span class="p">],</span>
+        <span class="p">},</span>
+      <span class="p">},</span>
+    <span class="p">},</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">schema</span></div>
+
+<span class="nd">@nbinspect</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s1">&#39;Create OpenAPI spec for appyter&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--output&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">),</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The output location of the inspection json&#39;</span><span class="p">)</span>
+<span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--cwd&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_CWD&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The directory to treat as the current working directory for templates and execution&#39;</span><span class="p">)</span>
+<span class="nd">@click_argument_setenv</span><span class="p">(</span><span class="s1">&#39;ipynb&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_IPYNB&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">openapi</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="n">ipynb</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span>
+  <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">get_env</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">ipynb</span><span class="o">=</span><span class="n">ipynb</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;inspect&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+  <span class="k">with</span> <span class="n">fsspec</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">join_slash</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="n">ipynb</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fr</span><span class="p">:</span>
+    <span class="n">nbtemplate</span> <span class="o">=</span> <span class="n">nb_from_ipynb_io</span><span class="p">(</span><span class="n">fr</span><span class="p">)</span>
+  <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">render_openapi_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nbtemplate</span><span class="p">),</span> <span class="n">output</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.nbinspect.openapi</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

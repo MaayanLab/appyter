@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.render.flask_app.production &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" accesskey="U">appyter.render.flask_app</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.production</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.render.flask_app.production</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">fsspec</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">join_url</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.tempfile</span> <span class="kn">import</span> <span class="n">tempdir</span>
+
+<div class="viewcode-block" id="serve"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.production.serve">[docs]</a><span class="k">def</span> <span class="nf">serve</span><span class="p">(</span><span class="n">app_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="kn">import</span> <span class="nn">os</span>
+  <span class="kn">import</span> <span class="nn">sys</span>
+  <span class="kn">import</span> <span class="nn">logging</span>
+  <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+  <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span>
+  <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_env</span><span class="p">,</span> <span class="n">get_jinja2_env</span><span class="p">,</span> <span class="n">find_blueprints</span><span class="p">,</span> <span class="n">get_appyter_directory</span>
+  <span class="n">config</span> <span class="o">=</span> <span class="n">get_env</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;prerender&#39;</span><span class="p">)</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+  <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">1</span>
+  <span class="k">with</span> <span class="n">tempdir</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Working directory </span><span class="si">{</span><span class="n">tmp_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1">#</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pre-rendering pages...&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">fsspec</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">join_url</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;CWD&#39;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">]),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fr</span><span class="p">:</span>
+      <span class="kn">from</span> <span class="nn">appyter.parse.nb</span> <span class="kn">import</span> <span class="n">nb_from_ipynb_io</span>
+      <span class="n">nbtemplate</span> <span class="o">=</span> <span class="n">nb_from_ipynb_io</span><span class="p">(</span><span class="n">fr</span><span class="p">)</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">tmp_dir</span><span class="o">/</span><span class="s1">&#39;index.html&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+      <span class="kn">from</span> <span class="nn">appyter.render.form</span> <span class="kn">import</span> <span class="n">render_form_from_nbtemplate</span>
+      <span class="n">fw</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">render_form_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nbtemplate</span><span class="p">))</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">tmp_dir</span><span class="o">/</span><span class="s1">&#39;index.json&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+      <span class="kn">import</span> <span class="nn">json</span>
+      <span class="kn">from</span> <span class="nn">appyter.render.nbinspect.nbtemplate_json</span> <span class="kn">import</span> <span class="n">render_nbtemplate_json_from_nbtemplate</span>
+      <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">render_nbtemplate_json_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nbtemplate</span><span class="p">),</span> <span class="n">fw</span><span class="p">)</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">tmp_dir</span><span class="o">/</span><span class="s1">&#39;landing.html&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+      <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s1">&#39;landing.j2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+        <span class="n">_nb</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">]),</span>
+      <span class="p">)</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">fw</span><span class="p">)</span>
+    <span class="c1">#</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating production config...&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">tmp_dir</span><span class="o">/</span><span class="s1">&#39;supervisord.conf&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+      <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s1">&#39;production/supervisord.conf.j2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span><span class="n">_tmp_dir</span><span class="o">=</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">sys</span><span class="o">=</span><span class="n">sys</span><span class="p">,</span> <span class="nb">str</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">fw</span><span class="p">)</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">tmp_dir</span><span class="o">/</span><span class="s1">&#39;nginx.conf&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+      <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s1">&#39;production/nginx.conf.j2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+        <span class="n">_tmp_dir</span><span class="o">=</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">=</span><span class="n">os</span><span class="p">,</span> <span class="nb">str</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">get_appyter_directory</span><span class="o">=</span><span class="n">get_appyter_directory</span><span class="p">,</span>
+        <span class="n">find_blueprints</span><span class="o">=</span><span class="n">find_blueprints</span><span class="p">,</span>
+      <span class="p">)</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">fw</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting production instance at http://</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;HOST&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PORT&#39;</span><span class="p">]</span><span class="si">}{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/ ...&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">Popen</span><span class="p">([</span><span class="s1">&#39;supervisord&#39;</span><span class="p">,</span> <span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp_dir</span><span class="o">/</span><span class="s1">&#39;supervisord.conf&#39;</span><span class="p">)])</span> <span class="k">as</span> <span class="n">proc</span><span class="p">:</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="n">exit_code</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+      <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+        <span class="n">proc</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+        <span class="n">exit_code</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+  <span class="c1">#</span>
+  <span class="k">return</span> <span class="n">exit_code</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" >appyter.render.flask_app</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.production</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>

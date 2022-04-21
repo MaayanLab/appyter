@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.render.flask_app.execution &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" accesskey="U">appyter.render.flask_app</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.execution</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.render.flask_app.execution</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.prepare</span> <span class="kn">import</span> <span class="n">_prepare_data</span><span class="p">,</span> <span class="n">_prepare_results</span><span class="p">,</span> <span class="n">_prepare_storage</span><span class="p">,</span> <span class="n">_prepare_executor</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.socketio</span> <span class="kn">import</span> <span class="n">socketio</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.room_manager</span> <span class="kn">import</span> <span class="n">enter_room</span><span class="p">,</span> <span class="n">find_room</span><span class="p">,</span> <span class="n">room_lock</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.uuid</span> <span class="kn">import</span> <span class="n">sanitize_sha1sum</span><span class="p">,</span> <span class="n">generate_uuid</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">join_url</span>
+
+<span class="c1"># construct/join a notebook</span>
+<div class="viewcode-block" id="submit"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.execution.submit">[docs]</a><span class="nd">@socketio</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">with</span> <span class="n">socketio</span><span class="o">.</span><span class="n">session</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
+    <span class="n">request_url</span> <span class="o">=</span> <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;request_url&#39;</span><span class="p">]</span>
+    <span class="n">executor</span> <span class="o">=</span> <span class="n">sess</span><span class="p">[</span><span class="s1">&#39;executor&#39;</span><span class="p">]</span>
+  <span class="c1">#</span>
+  <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_id</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Unrecognized data type&#39;</span><span class="p">)</span>
+  <span class="c1">#</span>
+  <span class="k">if</span> <span class="s1">&#39;_id&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+    <span class="n">instance_id</span> <span class="o">=</span> <span class="n">sanitize_sha1sum</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="n">instance_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Invalid session id&#39;</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="k">await</span> <span class="n">_prepare_data</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">_config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">instance_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_prepare_results</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+  <span class="c1">#</span>
+  <span class="k">if</span> <span class="s1">&#39;catalog-integration&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;_config&#39;</span><span class="p">][</span><span class="s1">&#39;EXTRAS&#39;</span><span class="p">]:</span>
+    <span class="c1"># if you execute the notebook, it should get registered</span>
+    <span class="c1">#  we&#39;ll omit metadata which would already be captured</span>
+    <span class="c1">#  when the instance was created</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="kn">from</span> <span class="nn">appyter.extras.catalog_integration.notebooks</span> <span class="kn">import</span> <span class="n">InstanceInfo</span><span class="p">,</span> <span class="n">add_instance</span>
+      <span class="k">await</span> <span class="n">add_instance</span><span class="p">(</span>
+        <span class="n">InstanceInfo</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">instance_id</span><span class="p">),</span>
+        <span class="n">auth</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_auth&#39;</span><span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_config&#39;</span><span class="p">),</span>
+      <span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+  <span class="c1">#</span>
+  <span class="k">if</span> <span class="k">await</span> <span class="n">find_room</span><span class="p">(</span><span class="n">instance_id</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;Joining existing execution...&#39;</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">sid</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">enter_room</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">instance_id</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">storage</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_prepare_storage</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+      <span class="k">async</span> <span class="k">with</span> <span class="n">_prepare_executor</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">executor</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">room_lock</span><span class="p">(</span><span class="n">instance_id</span><span class="p">):</span>
+          <span class="k">await</span> <span class="n">enter_room</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">instance_id</span><span class="p">)</span>
+          <span class="k">try</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;Submitting execution...&#39;</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+              <span class="n">cwd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;output/</span><span class="si">{</span><span class="n">instance_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+              <span class="n">ipynb</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">]),</span>
+              <span class="n">session</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+              <span class="nb">id</span><span class="o">=</span><span class="n">generate_uuid</span><span class="p">(),</span>
+              <span class="n">url</span><span class="o">=</span><span class="n">join_url</span><span class="p">(</span><span class="n">request_url</span><span class="p">,</span> <span class="n">instance_id</span><span class="p">),</span>
+              <span class="n">storage</span><span class="o">=</span><span class="n">storage</span><span class="p">,</span>
+              <span class="n">debug</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="k">async</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">executor</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span><span class="o">**</span><span class="n">job</span><span class="p">):</span>
+              <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">msg</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span> <span class="n">data</span><span class="o">=</span><span class="n">msg</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="n">to</span><span class="o">=</span><span class="n">instance_id</span><span class="p">))</span>
+          <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+            <span class="k">raise</span>
+          <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;An unhandled executor error occurred, please try again later.&#39;</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">sid</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+      <span class="k">raise</span>
+    <span class="k">except</span><span class="p">:</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+      <span class="k">await</span> <span class="n">socketio</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;An unhandled initialization error occurred, please try again later.&#39;</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">sid</span><span class="p">)</span>
+      <span class="k">raise</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../flask_app.html" >appyter.render.flask_app</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.render.flask_app.execution</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    </div>
+  </body>
+</html>
