@@ -1,4 +1,5 @@
 def main():
+  import appyter.ext.asyncio
   import appyter.ext.multiprocessing
   # load dotenv if present
   from dotenv import load_dotenv
