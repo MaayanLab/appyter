@@ -3,6 +3,7 @@ import sys
 import click
 import fsspec
 import asyncio
+import pathlib
 import datetime
 import traceback
 import logging
@@ -16,7 +17,7 @@ from appyter.ext.asyncio.helpers import ensure_async_contextmanager, ensure_sync
 from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io, nb_to_json
 from appyter.ext.click import click_option_setenv, click_argument_setenv
-from appyter.ext.urllib import join_url
+from appyter.ext.urllib import URI
 
 def cell_is_code(cell):
     return cell.get('cell_type') == 'code'
@@ -35,7 +36,7 @@ def iopub_hook_factory(nb, emit):
 async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='', subscribe=None, fuse=False):
   logger.info('starting')
   assert callable(emit), 'Emit must be callable'
-  with fsspec.open(join_url(cwd, ipynb), 'r') as fr:
+  with fsspec.open(str(URI(cwd).join(ipynb)), 'r') as fr:
     nb = nb_from_ipynb_io(fr)
   #
   if 'appyter' not in nb.metadata:
@@ -164,14 +165,18 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
 
 @cli.command(help='Execute a jupyter notebook on the command line asynchronously')
 @click.option('-s', type=str, metavar='URI', default='file:///dev/stdout', help='Status stream')
-@click.option('-w', type=str, metavar='DIR', default=None, help='Working directory')
-@click_option_setenv('--data-dir', envvar='APPYTER_DATA_DIR', default='data', help='The directory that storage:// uris correspond to')
+@click.option('-w', type=str, metavar='DIR', default='storage://', help='Working directory')
+@click_option_setenv('--data-dir', envvar='APPYTER_DATA_DIR', default=None, help='The directory that storage:// uris correspond to')
 @click_option_setenv('--fuse', envvar='APPYTER_FUSE', default=False, help='Use fuse for execution')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def nbexecute(ipynb, s=None, w=None, fuse=False, data_dir=None):
   from appyter.ext.emitter import url_to_emitter
   from appyter.ext.asyncio.event_loop import with_event_loop
   from appyter.ext.fsspec.storage import ensure_storage
+  if data_dir is None:
+    p = pathlib.Path(ipynb)
+    data_dir = str(p.parent)
+    ipynb = p.name
   with with_event_loop():
     with ensure_sync(url_to_emitter(s)) as emitter:
       with ensure_sync(ensure_storage(data_dir)):
