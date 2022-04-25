@@ -32,6 +32,9 @@ def test_fuse_mount():
           }),
           frozenset({('test', b'Hello World!')}),
         )
+        (mnt_dir/'hi').mkdir(exist_ok=True)
+        (mnt_dir/'hi/world').open('w').write('test')
+        assert_eq((mnt_dir/'hi/world').open('r').read(), 'test')
     finally:
       fs.rm('', recursive=True)
 
