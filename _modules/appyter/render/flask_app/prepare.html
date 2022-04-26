@@ -63,16 +63,14 @@
   <span class="k">return</span> <span class="n">data</span>
 <span class="n">prepare_request</span> <span class="o">=</span> <span class="n">ensure_sync</span><span class="p">(</span><span class="n">_prepare_request</span><span class="p">)</span>
 
-<span class="k">async</span> <span class="k">def</span> <span class="nf">_prepare_data</span><span class="p">(</span><span class="n">req</span><span class="p">):</span>
+<div class="viewcode-block" id="prepare_data"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.prepare.prepare_data">[docs]</a><span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="n">req</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Extract fields from submission</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
   <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">get_fields</span><span class="p">():</span>
     <span class="n">dict_collision_free_update</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">field</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">req</span><span class="p">))</span>
-  <span class="c1">#</span>
-  <span class="n">dict_collision_free_update</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="k">await</span> <span class="n">_prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)))</span>
-  <span class="k">return</span> <span class="n">data</span>
-<span class="n">prepare_data</span> <span class="o">=</span> <span class="n">ensure_sync</span><span class="p">(</span><span class="n">_prepare_data</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">data</span></div>
+<span class="n">_prepare_data</span> <span class="o">=</span> <span class="n">ensure_async</span><span class="p">(</span><span class="n">prepare_data</span><span class="p">)</span>
 
 <span class="k">async</span> <span class="k">def</span> <span class="nf">_prepare_storage</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Figure out the storage fsspec URI to use for this request</span>

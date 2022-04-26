@@ -98,6 +98,8 @@
         <span class="p">)</span>
       <span class="k">else</span><span class="p">:</span>
         <span class="n">uri_parsed</span> <span class="o">=</span> <span class="n">uri_parsed</span><span class="o">.</span><span class="n">with_scheme</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">with_fragment_path</span><span class="p">(</span><span class="n">raw_value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">uri_parsed</span><span class="o">.</span><span class="n">fragment_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">uri_parsed</span> <span class="o">=</span> <span class="n">uri_parsed</span><span class="o">.</span><span class="n">with_fragment_path</span><span class="p">(</span><span class="n">uri_parsed</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">uri_parsed</span></div>
 
   <span class="nd">@property</span>

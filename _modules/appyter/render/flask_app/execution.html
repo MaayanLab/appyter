@@ -43,7 +43,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">appyter.render.flask_app.prepare</span> <span class="kn">import</span> <span class="n">_prepare_data</span><span class="p">,</span> <span class="n">_prepare_results</span><span class="p">,</span> <span class="n">_prepare_storage</span><span class="p">,</span> <span class="n">_prepare_executor</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.prepare</span> <span class="kn">import</span> <span class="n">_prepare_data</span><span class="p">,</span> <span class="n">_prepare_request</span><span class="p">,</span> <span class="n">_prepare_results</span><span class="p">,</span> <span class="n">_prepare_storage</span><span class="p">,</span> <span class="n">_prepare_executor</span>
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app.socketio</span> <span class="kn">import</span> <span class="n">socketio</span>
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app.room_manager</span> <span class="kn">import</span> <span class="n">enter_room</span><span class="p">,</span> <span class="n">find_room</span><span class="p">,</span> <span class="n">room_lock</span>
 <span class="kn">from</span> <span class="nn">appyter.ext.uuid</span> <span class="kn">import</span> <span class="n">sanitize_sha1sum</span><span class="p">,</span> <span class="n">generate_uuid</span>
@@ -67,7 +67,9 @@
     <span class="k">assert</span> <span class="n">instance_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Invalid session id&#39;</span>
     <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
   <span class="k">else</span><span class="p">:</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="k">await</span> <span class="n">_prepare_data</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">_config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="k">await</span> <span class="n">_prepare_data</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="k">await</span> <span class="n">_prepare_request</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
     <span class="n">instance_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_prepare_results</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
   <span class="c1">#</span>
   <span class="k">if</span> <span class="s1">&#39;catalog-integration&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;_config&#39;</span><span class="p">][</span><span class="s1">&#39;EXTRAS&#39;</span><span class="p">]:</span>

@@ -47,13 +47,12 @@
 
 <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_chroot_fs</span>
 <span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">URI</span>
-<span class="kn">from</span> <span class="nn">appyter.extras.catalog_integration.storage</span> <span class="kn">import</span> <span class="n">prepare_storage</span>
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app.constants</span> <span class="kn">import</span> <span class="n">get_input_fs</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app.core</span> <span class="kn">import</span> <span class="n">core</span>
 <span class="kn">from</span> <span class="nn">appyter.render.flask_app.socketio</span> <span class="kn">import</span> <span class="n">socketio</span>
-<span class="kn">from</span> <span class="nn">appyter.render.flask_app.prepare</span> <span class="kn">import</span> <span class="n">prepare_request</span>
+<span class="kn">from</span> <span class="nn">appyter.render.flask_app.prepare</span> <span class="kn">import</span> <span class="n">prepare_storage</span><span class="p">,</span> <span class="n">prepare_request</span>
 <span class="kn">from</span> <span class="nn">appyter.ext.flask</span> <span class="kn">import</span> <span class="n">secure_filepath</span><span class="p">,</span> <span class="n">route_join_with_or_without_slash</span>
 <span class="kn">from</span> <span class="nn">appyter.ext.hashlib</span> <span class="kn">import</span> <span class="n">sha1sum_io</span>
 <span class="kn">from</span> <span class="nn">appyter.ext.uuid</span> <span class="kn">import</span> <span class="n">generate_uuid</span>

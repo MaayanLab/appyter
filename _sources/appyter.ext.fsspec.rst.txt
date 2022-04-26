@@ -60,6 +60,14 @@ appyter.ext.fsspec.overlayfs module
    :undoc-members:
    :show-inheritance:
 
+appyter.ext.fsspec.s3fs module
+------------------------------
+
+.. automodule:: appyter.ext.fsspec.s3fs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.ext.fsspec.sbfs module
 ------------------------------
 
