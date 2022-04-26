@@ -24,14 +24,14 @@ async def _prepare_request(req):
   return data
 prepare_request = ensure_sync(_prepare_request)
 
-async def _prepare_data(req):
+def prepare_data(req):
   ''' Extract fields from submission
   '''
   data = {}
   for field in get_fields():
     dict_collision_free_update(data, **field.prepare(req))
   return data
-prepare_data = ensure_sync(_prepare_data)
+_prepare_data = ensure_async(prepare_data)
 
 async def _prepare_storage(data):
   ''' Figure out the storage fsspec URI to use for this request
