@@ -30,8 +30,6 @@ async def _prepare_data(req):
   data = {}
   for field in get_fields():
     dict_collision_free_update(data, **field.prepare(req))
-  #
-  dict_collision_free_update(data, **(await _prepare_request(req)))
   return data
 prepare_data = ensure_sync(_prepare_data)
 

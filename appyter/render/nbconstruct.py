@@ -9,9 +9,10 @@ from copy import deepcopy
 from appyter import __version__
 from appyter.cli import cli
 from appyter.context import get_env, get_jinja2_env
-from appyter.ext.urllib import join_url
+from appyter.ext.asyncio.event_loop import with_event_loop
+from appyter.ext.urllib import URI
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io
-from appyter.parse.nbtemplate import cell_match, parse_fields_from_nbtemplate
+from appyter.parse.nbtemplate import cell_match
 from appyter.ext.click import click_option_setenv, click_argument_setenv
 
 def render_cell(env, cell):
@@ -93,12 +94,15 @@ def render_nb_from_nbtemplate(env, nbtemplate, data={}):
 @click_option_setenv('--cwd', envvar='APPYTER_CWD', default=os.getcwd(), help='The directory to treat as the current working directory for templates and execution')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def nbconstruct(cwd, ipynb, context, output, **kwargs):
+  from appyter.render.flask_app.prepare import prepare_data
   context = json.load(context)
   env = get_jinja2_env(
     config=get_env(cwd=cwd, ipynb=ipynb, mode='construct', **kwargs),
     context=context,
   )
-  with fsspec.open(join_url(cwd, ipynb), 'r') as fr:
-    nbtemplate = nb_from_ipynb_io(fr)
-  nb = render_nb_from_nbtemplate(env, nbtemplate, data=context)
-  nb_to_ipynb_io(nb, output)
+  with with_event_loop():
+    with fsspec.open(str(URI(cwd).join(ipynb)), 'r') as fr:
+      nbtemplate = nb_from_ipynb_io(fr)
+    data = prepare_data(context)
+    nb = render_nb_from_nbtemplate(env, nbtemplate, data=data)
+    nb_to_ipynb_io(nb, output)

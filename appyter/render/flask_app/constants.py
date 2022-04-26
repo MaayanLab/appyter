@@ -6,20 +6,27 @@ from appyter.ext.functools import memcached
 from appyter.ext.flask import decorator_in_production
 
 @decorator_in_production(memcached)
+def get_env():
+  try:
+    from flask import current_app
+    return current_app.config
+  except RuntimeError:
+    from appyter.context import get_env
+    return get_env()
+
+@decorator_in_production(memcached)
 def get_cwd_fs():
   ''' Return fsspec compatible chroot to the current directory
   '''
-  from flask import current_app
   from appyter.ext.fsspec.core import url_to_chroot_fs
-  return url_to_chroot_fs(current_app.config['CWD'])
+  return url_to_chroot_fs(get_env()['CWD'])
 
 @decorator_in_production(memcached)
 def get_static_fs():
   ''' Return fsspec compatible chroot to the static directory
   '''
-  from flask import current_app
   from appyter.ext.fsspec.core import url_to_chroot_fs
-  return url_to_chroot_fs(current_app.config['STATIC_DIR'])
+  return url_to_chroot_fs(get_env()['STATIC_DIR'])
 
 @decorator_in_production(memcached)
 def get_input_fs():
@@ -40,9 +47,8 @@ def _get_ipynb_io():
   ''' Return byte stream for original ipynb
   '''
   import io, shutil
-  from flask import current_app
   ipynb_io = io.BytesIO()
-  with get_cwd_fs().open(current_app.config['IPYNB'], 'rb') as fr:
+  with get_cwd_fs().open(get_env()['IPYNB'], 'rb') as fr:
     shutil.copyfileobj(fr, ipynb_io)
   return ipynb_io
 
@@ -64,9 +70,8 @@ def get_nbtemplate():
 def get_j2_env():
   ''' Get an initialized bare jinja2 environment (no context)
   '''
-  from flask import current_app
   from appyter.context import get_jinja2_env
-  return get_jinja2_env(config=current_app.config)
+  return get_jinja2_env(config=get_env())
 
 @decorator_in_production(memcached)
 def get_form():
@@ -116,12 +121,12 @@ def get_html_exporer():
 def get_base_files():
   ''' Include all (non-hidden) files in cwd (include requirements.txt, utils, etc..)
   '''
-  from flask import current_app
   fs = get_cwd_fs()
+  ipynb = get_env()['IPYNB']
   base_files = {}
   for f in fs.glob('*'):
     if f.startswith('.'): continue
-    if f == current_app.config['IPYNB']: continue
+    if f == ipynb: continue
     if not fs.isfile(f): continue
     base_files[f] = fs.open(f, 'rb').read()
   return base_files

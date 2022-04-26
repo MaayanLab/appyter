@@ -60,6 +60,8 @@ class FileField(Field):
         )
       else:
         uri_parsed = uri_parsed.with_scheme('file').with_fragment_path(raw_value)
+    if uri_parsed.fragment_path is None:
+      uri_parsed = uri_parsed.with_fragment_path(uri_parsed.name)
     return uri_parsed
 
   @property

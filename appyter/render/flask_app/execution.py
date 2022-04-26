@@ -4,7 +4,7 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-from appyter.render.flask_app.prepare import _prepare_data, _prepare_results, _prepare_storage, _prepare_executor
+from appyter.render.flask_app.prepare import _prepare_data, _prepare_request, _prepare_results, _prepare_storage, _prepare_executor
 from appyter.render.flask_app.socketio import socketio
 from appyter.render.flask_app.room_manager import enter_room, find_room, room_lock
 from appyter.ext.uuid import sanitize_sha1sum, generate_uuid
@@ -28,7 +28,9 @@ async def submit(sid, data):
     assert instance_id is not None, 'Invalid session id'
     data.update(_config=config)
   else:
-    data = dict(await _prepare_data(data), _config=config)
+    data = dict(_config=config)
+    data.update(await _prepare_data(data))
+    data.update(await _prepare_request(data))
     instance_id = await _prepare_results(data)
   #
   if 'catalog-integration' in data['_config']['EXTRAS']:

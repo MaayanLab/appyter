@@ -5,7 +5,7 @@ from flask import Blueprint, request, redirect, abort, url_for, current_app, jso
 from appyter.ext.exceptions import exception_as_dict
 from appyter.ext.flask import route_join_with_or_without_slash
 from appyter.render.flask_app.constants import get_j2_env
-from appyter.render.flask_app.prepare import prepare_data, prepare_results
+from appyter.render.flask_app.prepare import prepare_data, prepare_request, prepare_results
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,9 @@ def post_index():
   ], 'text/html')
   #
   try:
-    data = dict(prepare_data(request), _config=current_app.config)
+    data = dict(_config=current_app.config)
+    data.update(prepare_data(request))
+    data.update(prepare_request(request))
     instance_id = prepare_results(data)
     error = None
   except KeyboardInterrupt:
