@@ -181,6 +181,11 @@
     show_code = JSON.parse($hash.params.show_code)
   }
 
+  let dashboard = undefined
+  $: if ($hash.params.dashboard) {
+    dashboard = JSON.parse($hash.params.dashboard)
+  }
+
   let path = $hash.path // defer scroll handling for init
   $: if ($hash.path && $hash.path !== path) { // debounce scroll handling
     path = $hash.path+''
@@ -321,6 +326,18 @@
         Toggle Code
       </button>
     {/if}
+    {#if window._config.EXTRAS.indexOf('dashboard') !== -1}
+      <button
+        type="button"  
+        class="btn btn-secondary white"
+        on:click={() => {
+          $hash.params.dashboard = JSON.stringify(!dashboard)
+          $hash.path = ''
+        }}
+      >
+        Toggle Dashboard
+      </button>
+    {/if}
     {#if window._config.EXTRAS.indexOf('catalog-integration') !== -1}
     <a
       id="run-notebook-locally"
@@ -340,7 +357,7 @@
     </div>
   {/if}
   <div class="w-100"></div>
-  {#if $toc !== undefined}
+  {#if $toc !== undefined && !dashboard}
     <Lazy
       module={() => import('@/extras/catalog-integration/TableOfContents.svelte')}
       props={{ toc: $toc }}
@@ -354,16 +371,25 @@
   <div
     bind:this={notebookRef}
     class="col-sm-12"
-    class:col-md-9={$toc !== undefined}
-    class:col-xl-10={$toc !== undefined}
+    class:col-md-9={$toc !== undefined && !dashboard}
+    class:col-xl-10={$toc !== undefined && !dashboard}
   >
     {#if nb}
-      <Lazy
-        module={() => import('@/components/jupyter/Notebook.svelte')}
-        props={{
-          nb, show_code, current_code_cell
-        }}
-      />
+      {#if !dashboard}
+        <Lazy
+          module={() => import('@/components/jupyter/Notebook.svelte')}
+          props={{
+            nb, show_code, current_code_cell
+          }}
+        />
+      {:else}
+        <Lazy
+          module={() => import('@/extras/dashboard/Dashboard.svelte')}
+          props={{
+            nb, show_code, current_code_cell
+          }}
+        />
+      {/if}
     {/if}
   </div>
 </div>

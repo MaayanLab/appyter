@@ -11,3 +11,4 @@ def list_extras():
   print('storage-file-field  Enable StorageFileField, WARNING: security risk, not for use in public environment')
   print('toc                 Add a sticky table of contents to the rendered notebook')
   print('toggle-code         Add a button for toggling code visibility')
+  print('dashboard           Enable dashboard toggle (alpha)')
