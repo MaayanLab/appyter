@@ -8,13 +8,12 @@ from appyter.ext.contextlib import ContextManagerAsHandle
 
 from appyter.ext.fsspec.core import url_to_chroot_fs
 from appyter.ext.urllib import URI
-from appyter.extras.catalog_integration.storage import prepare_storage
 from appyter.render.flask_app.constants import get_input_fs
 logger = logging.getLogger(__name__)
 
 from appyter.render.flask_app.core import core
 from appyter.render.flask_app.socketio import socketio
-from appyter.render.flask_app.prepare import prepare_request
+from appyter.render.flask_app.prepare import prepare_storage, prepare_request
 from appyter.ext.flask import secure_filepath, route_join_with_or_without_slash
 from appyter.ext.hashlib import sha1sum_io
 from appyter.ext.uuid import generate_uuid
