@@ -78,10 +78,10 @@ class FileField(Field):
     # fallback to default (URI in request)
     if data_path is None: data_path = super().prepare(req)[self.args['name']]
     data_path = self.prepare_uri(data_path)
-    return {
-      self.args['name']: str(data_path),
-      f"_file:{data_path.fragment_path}": str(data_path.with_fragment_path(None)),
-    }
+    data = {self.args['name']: str(data_path)}
+    if data_path.fragment_path:
+      data.update({ f"_file:{data_path.fragment_path}": str(data_path.with_fragment_path(None))})
+    return data
 
   def constraint(self):
     if self.raw_value is None:
