@@ -27,6 +27,7 @@
         ORIGIN: (window.location.origin + {{ _config.PREFIX|jsonify }}),
         {% if 'catalog-integration' in _config.EXTRAS %}
         CATALOG_ORIGIN: window.location.origin,
+        HINTS: {{ _config.HINTS|jsonify }},
         {% endif %}
       }
     </script>
