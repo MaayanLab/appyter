@@ -8,7 +8,7 @@
   import auth_headers from '@/utils/auth_headers'
 
   const executor_map = {
-    'default': 'Catalog',
+    'default': 'Our Cloud',
     'cavatica': 'CAVATICA',
   }
 
