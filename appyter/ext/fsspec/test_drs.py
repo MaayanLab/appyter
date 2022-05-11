@@ -24,7 +24,6 @@ async def _drs_serve(port=8888):
   routes = aiohttp.web.RouteTableDef()
   @routes.get('/ga4gh/drs/v1/service-info')
   async def drs_service_info(request: aiohttp.web.Request):
-    print('!!')
     return aiohttp.web.json_response({
       'id': f"cloud.maayanlab.appyter",
       'name': 'Appyter',

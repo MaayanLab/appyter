@@ -78,10 +78,8 @@ def dict_typed_unflatten(f):
       #
       if type(o) == list:
         while len(o) <= k: o.append(None)
-      print(o, k)
       o = o[k]
     if type(o) == list:
       while len(o) <= K[-1]: o.append(None)
-    print(o, K[-1], v)
     o[K[-1]] = v
   return D
