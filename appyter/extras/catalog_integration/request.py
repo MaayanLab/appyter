@@ -16,16 +16,6 @@ async def prepare_request(req):
       '_storage',
     ]
   }))
-  # if executor hints are provided (e.g. ['executor:default'])
-  #  we'll verify that the chosen executor is supported
-  executor_hints = {
-    hint_value
-    for hint in data.get('_config').get('HINTS', set())
-    for hint_prefix, sep, hint_value in (hint.partition(':'),)
-    if hint_prefix == 'executor' and sep == ':'
-  }
-  if executor_hints and data.get('_executor', 'default') not in executor_hints:
-    raise Exception('Executor not supported for this appyter')
   #
   if not data.get('_auth') and getattr(req, 'cookies', None) is not None:
     authorization = req.cookies.get('authorization')
