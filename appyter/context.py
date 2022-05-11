@@ -215,7 +215,10 @@ def get_env_from_kwargs(**kwargs):
     _config['STATIC_PREFIX'] = join_slash(_config['PREFIX'], 'static')
   if 'ipynb' in kwargs or 'IPYNB' not in _config:
     _config['IPYNB'] = try_json_loads(kwargs.get('ipynb', os.environ.get('APPYTER_IPYNB')))
-  #['
+  if 'catalog-integration' in config['EXTRAS']:
+    if 'hints' in kwargs or 'HINTS' not in _config:
+      _config['HINTS'] = try_json_loads(kwargs.get('hints', os.environ.get('APPYTER_HINTS', '')))
+  #
   if _config['MODE'] == 'default' and (_config['IPYNB'] is None or not os.path.isfile(os.path.join(_config['CWD'], _config['IPYNB']))):
     logger.error('ipynb was not found')
   #
