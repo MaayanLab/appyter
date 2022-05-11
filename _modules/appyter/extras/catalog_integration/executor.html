@@ -42,6 +42,17 @@
 <div class="viewcode-block" id="prepare_executor"><a class="viewcode-back" href="../../../../appyter.extras.catalog_integration.html#appyter.extras.catalog_integration.executor.prepare_executor">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">prepare_executor</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39; Safely translate public facing executor URI into internally operable execspec URIs</span>
 <span class="sd">  &#39;&#39;&#39;</span>
+  <span class="c1"># if executor hints are provided (e.g. [&#39;executor:default&#39;])</span>
+  <span class="c1">#  we&#39;ll verify that the chosen executor is supported</span>
+  <span class="n">executor_hints</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">hint_value</span>
+    <span class="k">for</span> <span class="n">hint</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_config&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HINTS&#39;</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">hint_prefix</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">hint_value</span> <span class="ow">in</span> <span class="p">(</span><span class="n">hint</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">),)</span>
+    <span class="k">if</span> <span class="n">hint_prefix</span> <span class="o">==</span> <span class="s1">&#39;executor&#39;</span> <span class="ow">and</span> <span class="n">sep</span> <span class="o">==</span> <span class="s1">&#39;:&#39;</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="n">executor_hints</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_executor&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">executor_hints</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Executor not supported for this appyter&#39;</span><span class="p">)</span>
+  <span class="c1">#</span>
   <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_executor&#39;</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;_executor&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;cavatica&#39;</span><span class="p">:</span>
       <span class="n">user_config</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_user_config</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_auth&#39;</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_config&#39;</span><span class="p">))</span>
