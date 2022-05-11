@@ -7,6 +7,28 @@
   import StringField from '@/components/fields/StringField.svelte'
   import auth_headers from '@/utils/auth_headers'
 
+  const executor_map = {
+    'default': 'Catalog',
+    'cavatica': 'CAVATICA',
+  }
+
+  const executor_hints = (window._config.HINTS || [])
+    .reduce((executor_hints, hint) => {
+      const m = /^executor:(.+)$/.exec(hint)
+      if (m !== null) return [...executor_hints, m[1]]
+      else return executor_hints
+    }, [])
+
+  const choices = executor_hints.length > 0 ?
+    executor_hints.reduce(
+      (executors, executor) =>
+        executor in executor_map ?
+          [...executors, executor_map[executor]]
+          : executors,
+      [],
+    )
+    : Object.values(executor_map)
+
   let config
   async function get_config() {
     const res = await fetch(`${window._config.CATALOG_ORIGIN}/postgrest/rpc/user_config`, {
@@ -51,15 +73,12 @@
         name: '_executor',
         label: 'Execution Profile',
         description: 'How the appyter should be executed',
-        value: 'Catalog',
-        choices: [
-          'Catalog',
-          'CAVATICA',
-        ],
+        value: choices[0],
+        choices,
       }}
       let:tab={tab}
     >
-      {#if tab === 'Catalog'}
+      {#if tab === executor_map['default']}
         <input
           type="text"
           class="hidden"
@@ -69,7 +88,7 @@
         <DescriptionField>
           <span style="font-weight: 600">Execute using Public Appyter Catalog Resources</span>
         </DescriptionField>
-      {:else if tab === 'CAVATICA'}
+      {:else if tab === executor_map['cavatica']}
         <input
           type="text"
           class="hidden"
