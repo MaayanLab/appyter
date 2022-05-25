@@ -1,4 +1,3 @@
-import json
 from appyter.fields import Field
 
 class BoolField(Field):
@@ -10,6 +9,8 @@ class BoolField(Field):
   :param required: (Optional[bool]) Whether or not this field is required (defaults to false)
   :param default: (bool) A default value as an example and for use during prototyping
   :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
+  :param yes_label: (Optional[str]) The text instead of "Yes"
+  :param no_label: (Optional[str]) The text instead of "No"
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
   :param \**kwargs: Additional keyword arguments used by other fields
   '''
