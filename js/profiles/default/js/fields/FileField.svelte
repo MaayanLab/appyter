@@ -24,7 +24,7 @@
       props={{
         args: {
           ...args,
-          label: 'Upload',
+          label: 'Choose file',
         }
       }}
     />
