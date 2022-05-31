@@ -73,7 +73,12 @@ def new_event_loop():
     logger.warning('Event loop already exists')
     return _LOOP
   logger.debug(f"New event loop")
-  loop = asyncio.new_event_loop()
+  try:
+    import uvloop
+    loop = uvloop.new_event_loop()
+  except ImportError:
+    logger.warning('Install uvloop for better performance')
+    loop = asyncio.new_event_loop()
   asyncio.set_event_loop(loop)
   loop_executor = SharedEventLoopThreadPoolExecutor(loop=loop)
   loop.set_default_executor(loop_executor)

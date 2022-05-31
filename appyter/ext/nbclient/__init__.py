@@ -1,8 +1,11 @@
 import asyncio
 import typing as t
+from contextlib import asynccontextmanager
 from nbclient import NotebookClient
 from nbformat import NotebookNode
 from nbclient.exceptions import CellExecutionComplete, DeadKernelError, CellControlSignal
+from nbclient.util import run_hook
+from appyter.ext.asyncio.event_loop import get_event_loop
 from appyter.ext.asyncio.helpers import ensure_async
 
 class NotebookClientIOPubHook(NotebookClient):
@@ -126,3 +129,34 @@ class NotebookClientIOPubHook(NotebookClient):
     await self._check_raise_for_error(cell, cell_index, exec_reply)
     self.nb['cells'][cell_index] = cell
     return cell
+
+  @asynccontextmanager
+  async def async_setup_kernel(self, **kwargs) -> t.AsyncGenerator:
+      """
+      Context manager for setting up the kernel to execute a notebook.
+
+      This assigns the Kernel Manager (``self.km``) if missing and Kernel Client(``self.kc``).
+
+      When control returns from the yield it stops the client's zmq channels, and shuts
+      down the kernel.
+      """
+      # by default, cleanup the kernel client if we own the kernel manager
+      # and keep it alive if we don't
+      cleanup_kc = kwargs.pop('cleanup_kc', self.owns_km)
+      if self.km is None:
+          self.km = self.create_kernel_manager()
+
+      loop = get_event_loop()
+
+      if not self.km.has_kernel:
+          await self.async_start_new_kernel(**kwargs)
+          await self.async_start_new_kernel_client()
+      try:
+          yield
+      except RuntimeError as e:
+          await run_hook(self.on_notebook_error, notebook=self.nb)
+          raise e
+      finally:
+          if cleanup_kc:
+              await self._async_cleanup_kernel()
+          await run_hook(self.on_notebook_complete, notebook=self.nb)
