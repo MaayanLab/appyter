@@ -3,8 +3,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 from appyter.ext.socketio.priority_queued_emit import PriorityQueuedEmitMixin
+from appyter.ext.socketio.chunked_emit import ChunkedEmitMixin
 
 class AsyncServer(
+  ChunkedEmitMixin,
   PriorityQueuedEmitMixin,
   socketio.AsyncServer,
 ):

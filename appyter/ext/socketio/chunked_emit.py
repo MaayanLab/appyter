@@ -10,7 +10,7 @@ class ChunkedEmitMixin:
   CHUNK_SIZE = 1<<20 # 1kb
 
   async def emit(self, evt, data, priority=0, **kwargs):
-    chunkable = evt not in {'chunked', 'forward'}
+    chunkable = evt != 'chunked'
     if chunkable:
       serialized = await async_json_dumps(data, sort_keys=True, separators=None, ensure_ascii=True)
       chunkable = len(serialized) > self.CHUNK_SIZE
