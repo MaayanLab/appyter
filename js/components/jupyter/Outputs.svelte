@@ -36,17 +36,6 @@
 
 <div class="output_wrapper">
   <div class="output">
-    {#if index === loading}
-      <div class="output_area">
-        <Prompt
-          index="{index}-loader"
-          prompt_type="output"
-        />
-        <div class="output_subarea">
-          <Loader />
-        </div>
-      </div>
-    {/if}
     {#each [...reduce_output_streams(data)] as output (output.index)}
       <div class="output_area">
         <Prompt
@@ -58,5 +47,16 @@
         </div>
       </div>
     {/each}
+    {#if index === loading}
+      <div class="output_area">
+        <Prompt
+          index="{index}-loader"
+          prompt_type="output"
+        />
+        <div class="output_subarea">
+          <Loader />
+        </div>
+      </div>
+    {/if}
   </div>
 </div>
