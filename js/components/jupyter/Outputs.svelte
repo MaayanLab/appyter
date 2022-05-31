@@ -28,7 +28,7 @@
     for (const stream in streams) {
       streams[stream].text = streams[stream].text.replace(/^\r/, '').replace(/(\r?\n)+$/, '')
       if (streams[stream].text) {
-        yield {...streams[stream], index: i++}
+        yield streams[stream]
       }
     }
   }
