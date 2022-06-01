@@ -22,6 +22,10 @@ def render_cwl_from_nbtemplate(env, nb, ipynb=None, cwd=None, info=None):
   schema = {
     'cwlVersion': 'v1.2',
     'class': 'CommandLineTool',
+    'requirements': [
+        {'class': 'InlineJavascriptRequirement'},
+        {'class': 'LoadListingRequirement'},
+    ],
   }
   # potentially extract info from appyter embedded metadata if not provided
   if info is None and 'appyter' in nb.metadata and 'info' in nb.metadata['appyter']:
