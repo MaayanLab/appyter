@@ -4,6 +4,7 @@ from pathlib import PurePath
 from fsspec import AbstractFileSystem, filesystem
 from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
 from appyter.ext.fsspec.spec.composable import ComposableAbstractFileSystem
+from appyter.ext.pathlib import is_relative_to
 from appyter.ext.tempfile import mktemp
 
 import logging
@@ -150,7 +151,7 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSy
         p2 = PurePath(path2)
         for d in list(self._dir_cache):
           p = PurePath(d)
-          if p.is_relative_to(p1):
+          if is_relative_to(p, p1):
             self._dir_cache.add(str(p2 / p.relative_to(path1)))
 
   def mv(self, path1, path2, recursive=False, maxdepth=None, **kwargs):
@@ -166,7 +167,7 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSy
         p2 = PurePath(path2)
         for d in list(self._dir_cache):
           p = PurePath(d)
-          if p.is_relative_to(p1):
+          if is_relative_to(p, p1):
             self._dir_cache.remove(d)
             self._dir_cache.add(str(p2 / p.relative_to(path1)))
 
