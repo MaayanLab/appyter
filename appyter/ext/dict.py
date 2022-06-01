@@ -1,5 +1,5 @@
 def dict_filter_none(d):
-  return { k: v for k, v in d.items() if v }
+  return { k: v for k, v in d.items() if v is not None }
 
 def dict_collision_free_update(d, **kwargs):
   for k, v in kwargs.items():
