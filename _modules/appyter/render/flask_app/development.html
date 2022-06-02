@@ -51,7 +51,7 @@
     <span class="sa">f</span><span class="s2">&quot;--socket=</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;HOST&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PORT&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
     <span class="n">stdout</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span>
     <span class="n">stderr</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
-    <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span>
+    <span class="n">env</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">),</span>
   <span class="p">)</span></div>
 
 <div class="viewcode-block" id="app_runner"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.development.app_runner">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">app_runner</span><span class="p">(</span><span class="n">emitter</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>

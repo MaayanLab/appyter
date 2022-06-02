@@ -44,8 +44,10 @@
 
 <span class="kn">from</span> <span class="nn">appyter.ext.socketio.forwarding</span> <span class="kn">import</span> <span class="n">ForwardingMixin</span>
 <span class="kn">from</span> <span class="nn">appyter.ext.socketio.priority_queued_emit</span> <span class="kn">import</span> <span class="n">PriorityQueuedEmitMixin</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.socketio.chunked_emit</span> <span class="kn">import</span> <span class="n">ChunkedEmitMixin</span>
 
 <div class="viewcode-block" id="AsyncClient"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.client.AsyncClient">[docs]</a><span class="k">class</span> <span class="nc">AsyncClient</span><span class="p">(</span>
+  <span class="n">ChunkedEmitMixin</span><span class="p">,</span>
   <span class="n">ForwardingMixin</span><span class="p">,</span>
   <span class="n">PriorityQueuedEmitMixin</span><span class="p">,</span>
   <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">,</span>

@@ -67,6 +67,15 @@ with defaults about the failure.</p>
 The cell which was just processed.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt id="appyter.ext.nbclient.NotebookClientIOPubHook.async_setup_kernel">
+<code class="sig-name descname">async_setup_kernel</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; AsyncGenerator<a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook.async_setup_kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook.async_setup_kernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Context manager for setting up the kernel to execute a notebook.</p>
+<p>This assigns the Kernel Manager (<code class="docutils literal notranslate"><span class="pre">self.km</span></code>) if missing and Kernel Client(<code class="docutils literal notranslate"><span class="pre">self.kc</span></code>).</p>
+<p>When control returns from the yield it stops the client’s zmq channels, and shuts
+down the kernel.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>

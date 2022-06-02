@@ -38,9 +38,12 @@
   <h1>Source code for appyter.ext.nbclient</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">asynccontextmanager</span>
 <span class="kn">from</span> <span class="nn">nbclient</span> <span class="kn">import</span> <span class="n">NotebookClient</span>
 <span class="kn">from</span> <span class="nn">nbformat</span> <span class="kn">import</span> <span class="n">NotebookNode</span>
 <span class="kn">from</span> <span class="nn">nbclient.exceptions</span> <span class="kn">import</span> <span class="n">CellExecutionComplete</span><span class="p">,</span> <span class="n">DeadKernelError</span><span class="p">,</span> <span class="n">CellControlSignal</span>
+<span class="kn">from</span> <span class="nn">nbclient.util</span> <span class="kn">import</span> <span class="n">run_hook</span>
+<span class="kn">from</span> <span class="nn">appyter.ext.asyncio.event_loop</span> <span class="kn">import</span> <span class="n">get_event_loop</span>
 <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.helpers</span> <span class="kn">import</span> <span class="n">ensure_async</span>
 
 <div class="viewcode-block" id="NotebookClientIOPubHook"><a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook">[docs]</a><span class="k">class</span> <span class="nc">NotebookClientIOPubHook</span><span class="p">(</span><span class="n">NotebookClient</span><span class="p">):</span>
@@ -163,7 +166,38 @@
       <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;execution_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">execution_count</span>
     <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_raise_for_error</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">,</span> <span class="n">exec_reply</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">nb</span><span class="p">[</span><span class="s1">&#39;cells&#39;</span><span class="p">][</span><span class="n">cell_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span>
-    <span class="k">return</span> <span class="n">cell</span></div></div>
+    <span class="k">return</span> <span class="n">cell</span></div>
+
+<div class="viewcode-block" id="NotebookClientIOPubHook.async_setup_kernel"><a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook.async_setup_kernel">[docs]</a>  <span class="nd">@asynccontextmanager</span>
+  <span class="k">async</span> <span class="k">def</span> <span class="nf">async_setup_kernel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">AsyncGenerator</span><span class="p">:</span>
+      <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Context manager for setting up the kernel to execute a notebook.</span>
+
+<span class="sd">      This assigns the Kernel Manager (``self.km``) if missing and Kernel Client(``self.kc``).</span>
+
+<span class="sd">      When control returns from the yield it stops the client&#39;s zmq channels, and shuts</span>
+<span class="sd">      down the kernel.</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="c1"># by default, cleanup the kernel client if we own the kernel manager</span>
+      <span class="c1"># and keep it alive if we don&#39;t</span>
+      <span class="n">cleanup_kc</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;cleanup_kc&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">owns_km</span><span class="p">)</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">km</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">km</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_kernel_manager</span><span class="p">()</span>
+
+      <span class="n">loop</span> <span class="o">=</span> <span class="n">get_event_loop</span><span class="p">()</span>
+
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">km</span><span class="o">.</span><span class="n">has_kernel</span><span class="p">:</span>
+          <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_start_new_kernel</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+          <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_start_new_kernel_client</span><span class="p">()</span>
+      <span class="k">try</span><span class="p">:</span>
+          <span class="k">yield</span>
+      <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+          <span class="k">await</span> <span class="n">run_hook</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_notebook_error</span><span class="p">,</span> <span class="n">notebook</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nb</span><span class="p">)</span>
+          <span class="k">raise</span> <span class="n">e</span>
+      <span class="k">finally</span><span class="p">:</span>
+          <span class="k">if</span> <span class="n">cleanup_kc</span><span class="p">:</span>
+              <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_cleanup_kernel</span><span class="p">()</span>
+          <span class="k">await</span> <span class="n">run_hook</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_notebook_complete</span><span class="p">,</span> <span class="n">notebook</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nb</span><span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

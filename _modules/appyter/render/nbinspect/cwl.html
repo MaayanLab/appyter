@@ -60,6 +60,10 @@
   <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;cwlVersion&#39;</span><span class="p">:</span> <span class="s1">&#39;v1.2&#39;</span><span class="p">,</span>
     <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;CommandLineTool&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;requirements&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;InlineJavascriptRequirement&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;LoadListingRequirement&#39;</span><span class="p">},</span>
+    <span class="p">],</span>
   <span class="p">}</span>
   <span class="c1"># potentially extract info from appyter embedded metadata if not provided</span>
   <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;appyter&#39;</span> <span class="ow">in</span> <span class="n">nb</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">and</span> <span class="s1">&#39;info&#39;</span> <span class="ow">in</span> <span class="n">nb</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;appyter&#39;</span><span class="p">]:</span>
