@@ -5,6 +5,8 @@
   import Lazy from '@/components/Lazy.svelte'
   import url_for from '@/utils/url_for'
   import auth_headers from '@/utils/auth_headers'
+  import hash from '@/lib/stores/url_hash_store'
+
   export let fields = []
 
   let submitting = false
@@ -21,10 +23,9 @@
     return field
   }
 
-  async function onSubmit(evt) {
+  async function onSubmit(formData) {
     try {
       submitting = true
-      const formData = new FormData(evt.target)
       const res = await fetch(window.location.href, {
         method: 'POST',
         headers: {
@@ -50,13 +51,27 @@
   $: if (error) {
     console.error(error)
   }
+
+  // Given the following url structure:
+  //  `...#?args.field1=val1&args.field2=val2&submit`
+  // trigger onSubmit with the provided arguments.
+  $: if ($hash.params.submit === true) {
+    const params = {...$hash.params}
+    const formData = new FormData()
+    for (const param in params) {
+      const m = /^args\.(.+)$/.exec(param)
+      if (m === null) continue
+      formData.append(m[1], params[param])
+    }
+    onSubmit(formData)
+  }
 </script>
 
 <form
   method="POST"
   enctype="multipart/form-data"
   action="#"
-  on:submit|preventDefault={onSubmit}
+  on:submit|preventDefault={evt => onSubmit(new FormData(evt.target))}
 >
   {#if orphaned_fields.length > 0}
     <SectionField
