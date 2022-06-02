@@ -6,8 +6,19 @@
   export let args
   export let backend = 'StorageFileField'
 
+  let selection = {}
   let value = args.value || args.default || ''
-  $: args.value = `${args.storage}${value}#${value.split('/').slice(-1)[0]}`
+  $: if (args.multiple) {
+    args.value = JSON.stringify(
+      Object.keys(selection)
+        .filter(p => selection[p])
+        .map(p => `${args.storage}${p}#${p.split('/').slice(-1)[0]}`)
+    )
+  } else if (value) {
+    args.value = `${args.storage}${value}#${value.split('/').slice(-1)[0]}`
+  } else {
+    args.value = ''
+  }
 
   let loading = false
 
@@ -61,6 +72,31 @@
         {/if}
       {/each}
       </div>
+      {#if args.multiple}
+        <div style="display: flex; flex-direction: column; align-items: center; padding-right: 5px">
+          {#if parent !== cwd}
+            <span>&nbsp; </span>
+          {/if}
+          <span>&nbsp;</span>
+        {#each (ls[cwd]||[]) as p}
+          {#if p.type === 'directory'}
+            <span>&nbsp;</span>
+          {/if}
+        {/each}
+        {#each (ls[cwd]||[]) as p}
+          {#if p.type === 'file'}
+            <span>
+              <input
+                type="checkbox"
+                checked={selection[p.name]}
+                on:change={evt => {
+                  selection = {...selection, [p.name]: evt.target.checked}
+                }} />
+            </span>
+          {/if}
+        {/each}
+        </div>
+      {/if}
       <div style="display: flex; flex-direction: column; align-items: start; white-space: nowrap; overflow-x: auto; flex: 1 1 auto;">
         {#if parent !== cwd}
           <button type="button" class="text-btn" on:click={()=>{ cwd = parent }}>.. {parent}</button>
@@ -73,8 +109,14 @@
         {/each}
         {#each (ls[cwd]||[]) as p}
           {#if p.type === 'file'}
-            <button type="button" class="text-btn" on:click={()=>{ value = p.name }}>
-              {#if value === p.name}
+            <button
+              type="button"
+              class="text-btn"
+              on:click={() => {
+                selection = {...(args.multiple ? selection : {}), [p.name]: !selection[p.name]}
+                if (!args.multiple) value = p.name
+              }}>
+              {#if selection[p.name]}
                 <span style="font-weight: 600">{p.name.slice(cwd.length).replace(/^\//, '')}</span>
               {:else}
                 {p.name.slice(cwd.length).replace(/^\//, '')}
