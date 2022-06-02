@@ -5,11 +5,15 @@
   export let args
   let focused
   let error
-  let value = args.default
+  let value
   let items
   let current_focus = -1
   let relevant_items
-  
+
+  $: if (args !== undefined && value === undefined) {
+    value = args.default
+  }
+
   $: if (items !== undefined) {
     relevant_items = Object.keys(items)
       .filter(item => item.toLowerCase().substr(0, value.length) === value.toLowerCase() && item !== value)
