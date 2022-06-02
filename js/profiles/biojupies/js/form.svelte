@@ -52,18 +52,36 @@
     console.error(error)
   }
 
-  // Given the following url structure:
-  //  `...#?args.field1=val1&args.field2=val2&submit`
-  // trigger onSubmit with the provided arguments.
-  $: if ($hash.params.submit === true) {
-    const params = {...$hash.params}
-    const formData = new FormData()
+  // Parse {["args.${name}"]: value} as {[name]: value}
+  function parse_args(params) {
+    const args = {}
     for (const param in params) {
       const m = /^args\.(.+)$/.exec(param)
       if (m === null) continue
-      formData.append(m[1], params[param])
+      args[m[1]] = params[param]
     }
-    onSubmit(formData)
+    return args
+  }
+
+  // Given the following url structure:
+  //  `...#?args.field1=val1&args.field2=val2`
+  $: if (fields && $hash.params) {
+    const params = {...$hash.params}
+    const args = parse_args(params)
+    // We can augment field defaults in the form
+    for (const field of fields) {
+      if (field.args.name in args) {
+        field.args.default = args[field.args.name]
+      }
+    }
+    // We can submit the appyter right away based on the args
+    if (params.submit === true) {
+      const formData = new FormData()
+      for (const arg in args) {
+        formData.append(arg, args[arg])
+      }
+      onSubmit(formData)
+    }
   }
 </script>
 
