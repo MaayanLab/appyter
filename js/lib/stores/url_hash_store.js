@@ -5,13 +5,13 @@ function params_parse(params_encoded) {
   return params_encoded
     .split('&')
     .map(param_pair => param_pair.split('=').map(decodeURIComponent))
-    .reduce((params, [key, value]) => ({ ...params, [key]: value }), {})
+    .reduce((params, [key, value]) => ({ ...params, [key]: value !== undefined ? value : true }), {})
 }
 
 function params_stringify(params) {
   return Object.keys(params)
     .filter(param => params[param] !== undefined && params[param] !== '')
-    .map((param) => [param, params[param]].map(encodeURIComponent).join('='))
+    .map((param) => params[param] === true ? encodeURIComponent(param) : [param, params[param]].map(encodeURIComponent).join('='))
     .join('&')
 }
 
