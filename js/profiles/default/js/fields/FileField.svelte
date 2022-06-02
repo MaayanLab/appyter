@@ -24,7 +24,7 @@
       props={{
         args: {
           ...args,
-          label: 'Choose file',
+          label: `Choose file${args.multiple ? 's' : ''}`,
         }
       }}
     />
@@ -42,6 +42,7 @@
           label: 'Uniform Resource Identifier',
           description: 'One of several supported identifiers for accessing your file',
           examples: Object.keys(args.examples || {}).reduce((agg, example) => (example.indexOf('://') !== -1) ? { ...agg, [example]: args.examples[example] } : agg, {}),
+          multiple: args.multiple,
         },
       }}
     />
