@@ -115,30 +115,37 @@ async def siofu_done(sid, evt):
   ), to=sid)
 
 # upload from client with POST
-def upload_from_request(req, fname):
-  fh = req.files.get(fname)
-  if not fh: return None
-  filename = secure_filepath(fh.filename)
-  if not filename: return None
-  data = prepare_request(req)
-  with url_to_chroot_fs(str(URI(prepare_storage(data)).join('input'))) as input_fs:
-    path = generate_uuid()
-    with url_to_chroot_fs('memory:///') as tmp_fs:
-      with tmp_fs.open(path, 'wb') as fw:
-        fh.save(fw)
-      file_uri = organize_file_content(input_fs, tmp_fs, path, filename)
+def upload_from_request(req, fname, multiple=False):
+  ret = []
+  for fh in (req.files.getlist(fname) if multiple else [req.files.get(fname)]):
+    if not fh:
+      ret.append(None)
+      continue
+    filename = secure_filepath(fh.filename)
+    if not filename:
+      ret.append(None)
+      continue
+    data = prepare_request(req)
+    with url_to_chroot_fs(str(URI(prepare_storage(data)).join('input'))) as input_fs:
+      path = generate_uuid()
+      with url_to_chroot_fs('memory:///') as tmp_fs:
+        with tmp_fs.open(path, 'wb') as fw:
+          fh.save(fw)
+        file_uri = organize_file_content(input_fs, tmp_fs, path, filename)
+    #
+    if 'catalog-integration' in data['_config']['EXTRAS']:
+      # if you upload a file in a request, it should get registered
+      try:
+        from appyter.extras.catalog_integration.uploads import FileInfo, add_file
+        file_uri_parsed = URI(file_uri)
+        ensure_sync(add_file(
+          FileInfo(file=str(file_uri_parsed.with_fragment(None)), filename=file_uri_parsed.fragment),
+          auth=data.get('_auth'),
+          config=data.get('_config'),
+        ))
+      except:
+        logger.warning(traceback.format_exc())
+    #
+    ret.append(file_uri)
   #
-  if 'catalog-integration' in data['_config']['EXTRAS']:
-    # if you upload a file in a request, it should get registered
-    try:
-      from appyter.extras.catalog_integration.uploads import FileInfo, add_file
-      file_uri_parsed = URI(file_uri)
-      ensure_sync(add_file(
-        FileInfo(file=str(file_uri_parsed.with_fragment(None)), filename=file_uri_parsed.fragment),
-        auth=data.get('_auth'),
-        config=data.get('_config'),
-      ))
-    except:
-      logger.warning(traceback.format_exc())
-  #
-  return file_uri
+  return ret if multiple else ret[0]
