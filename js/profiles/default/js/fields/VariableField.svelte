@@ -58,11 +58,9 @@
   </div>
 </div>
 
-<div style="display: none">
-  <input
-    type="text"
-    class="hidden"
-    name={args.name}
-    value={args.value}
-  />
-</div>
+<input
+  type="text"
+  class="hidden"
+  name={args.name}
+  value={args.value}
+/>

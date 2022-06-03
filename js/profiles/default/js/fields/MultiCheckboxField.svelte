@@ -53,7 +53,7 @@ $: args.value = JSON.stringify(Object.keys(value).filter(k => value[k]))
     <input
       id={args.name}
       name={args.name}
-      style="display: none;"
+      class="hidden"
       type="text"
       value={args.value}
     />
