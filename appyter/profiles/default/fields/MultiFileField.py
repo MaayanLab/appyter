@@ -75,23 +75,7 @@ class MultiFileField(FileField):
 
   def to_cwl(self):
     schema = super().to_cwl()
-    if self.args.get('required') == True:
-      schema['type'] = {
-        'type': 'array',
-        'items': {
-          'type': 'File',
-        }
-      }
-    else:
-      schema['type'] = [
-        None,
-        {
-          'type': 'array',
-          'items': {
-            'type': 'File',
-          }
-        }
-      ]
+    schema['type'] = f"File[]{'' if self.args.get('required') == True else '?'}"
     return schema
 
   def to_cwl_value(self):
