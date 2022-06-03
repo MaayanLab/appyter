@@ -20,8 +20,8 @@
   $: full_filenames = Object.keys(state)
     .reduce((files, file) =>
       state[file].full_filename !== undefined ? [...files, state[file].full_filename] : files, [])
-        .join(',')
-  
+    .join('\n')
+
   let ctx
 
   // setup uploading event handlers
@@ -167,8 +167,7 @@
         id={args.name}
         multiple={args.multiple}
       />
-      <input
-        type="text"
+      <textarea
         class="hidden"
         name={args.name}
         value={full_filenames}

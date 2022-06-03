@@ -38,11 +38,11 @@
       module={() => import('@/extras/file-field/URI.svelte')}
       props={{
         args: {
-          name: args.name,
+          ...args,
+          value: undefined, default: undefined,
           label: 'Uniform Resource Identifier',
           description: 'One of several supported identifiers for accessing your file',
           examples: Object.keys(args.examples || {}).reduce((agg, example) => (example.indexOf('://') !== -1) ? { ...agg, [example]: args.examples[example] } : agg, {}),
-          multiple: args.multiple,
         },
       }}
     />

@@ -40,9 +40,8 @@
       {/if}
     </div>
   </div>
-  <input
-    type="text"
-    style="display: none"
+  <textarea
+    class="hidden"
     name={args.name}
     value=""
   />

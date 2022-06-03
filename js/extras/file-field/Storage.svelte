@@ -7,18 +7,10 @@
   export let backend = 'StorageFileField'
 
   let selection = {}
-  let value = args.value || args.default || ''
-  $: if (args.multiple) {
-    args.value = JSON.stringify(
-      Object.keys(selection)
-        .filter(p => selection[p])
-        .map(p => `${args.storage}${p}#${p.split('/').slice(-1)[0]}`)
-    )
-  } else if (value) {
-    args.value = `${args.storage}${value}#${value.split('/').slice(-1)[0]}`
-  } else {
-    args.value = ''
-  }
+  $: args.value = Object.keys(selection)
+      .filter(p => selection[p])
+      .map(p => `${args.storage}${p}#${p.split('/').slice(-1)[0]}`)
+      .join('\n')
 
   let loading = false
 
@@ -114,7 +106,6 @@
               class="text-btn"
               on:click={() => {
                 selection = {...(args.multiple ? selection : {}), [p.name]: !selection[p.name]}
-                if (!args.multiple) value = p.name
               }}>
               {#if selection[p.name]}
                 <span style="font-weight: 600">{p.name.slice(cwd.length).replace(/^\//, '')}</span>
@@ -140,7 +131,7 @@
         {/each}
         {#each (ls[cwd]||[]) as p}
           {#if p.type === 'file'}
-            {#if value === p.name}
+            {#if selection[p.name]}
               <span style="white-space: nowrap; font-weight: 600">{human_size(p.size)}</span>
             {:else}
               <span style="white-space: nowrap">{human_size(p.size)}</span>
@@ -149,11 +140,11 @@
         {/each}
       </div>
     </div>
-    <input
+    <textarea
       type="text"
-      style="display: none"
+      class="hidden"
       name={args.name}
-      bind:value={args.value}
+      value={args.value}
     />
   </div>
 </div>
