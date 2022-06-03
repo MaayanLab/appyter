@@ -12,7 +12,7 @@
     constraint: '^(drs|s3|gs|ftp|http|https)://.+$',
     feedback: 'Supported protocols include: drs (GA4GH), s3, gs, ftp, http, & https',
   }
-  $: args.value = ensure_string_list(stringArgs.value).map(value => value.replace(/^(.+)\/(.+?)$/g, '$1/$2#$2')).join('\n')
+  $: args.value = ensure_string_list(stringArgs.value).map(value => value.replace(/^(.+)\/([#\?]+)(.*)$/g, '$1/$2#$2')).join('\n')
 </script>
 
 <Lazy
