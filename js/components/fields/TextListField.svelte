@@ -1,12 +1,11 @@
 <script>
-  import ensure_list from '@/utils/ensure_list'
+  import ensure_string_list from '@/utils/ensure_string_list'
   import re_full from '@/utils/re_full'
 
   export let args = {}
 
-  let value
   $: if (args !== undefined && args.value === undefined) {
-    value = ensure_list(args.default).join('\n')
+    args.value = args.default
   }
 
   let constraint
@@ -16,9 +15,7 @@
 
   let invalid = []
   $: if (args.value !== undefined && constraint !== undefined) {
-    invalid = args.value
-      .replace(/\n+$/g, '')
-      .split('\n')
+    invalid = ensure_string_list(args.value)
       .filter(v => constraint.exec(v) === null)
       .map((value, index) => ({ value, index }))
   }
@@ -37,8 +34,7 @@
       class="form-control nodecoration tiny"
       class:is-valid={invalid.length === 0}
       class:is-invalid={invalid.length !== 0}
-      bind:value={value}
-      on:change={evt => args.value = evt.target.value.split('\n').filter(v => v.replace(/\s+/, '') !== '')}
+      bind:value={args.value}
     ></textarea>
     <div class="invalid-feedback">
       {#each invalid as el}
@@ -55,7 +51,7 @@
           {#each Object.keys(args.examples) as example_name}
             <span class="text-sm m-1 p-1" style="white-space: nowrap;">
               <button type="button" class="text-btn"
-                on:click={() => value = args.examples[example_name].join('\n')}
+                on:click={() => args.value = ensure_string_list(args.examples[example_name]).join('\n')}
               >{example_name}</button>
             </span>
           {/each}
