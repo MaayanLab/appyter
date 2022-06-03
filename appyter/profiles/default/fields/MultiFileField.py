@@ -75,7 +75,28 @@ class MultiFileField(FileField):
 
   def to_cwl(self):
     schema = super().to_cwl()
-    schema['type'] = f"File[]{'' if self.args.get('required') == True else '?'}"
+    schema['inputBinding'].pop('prefix', None)
+    if self.args.get('required') == True:
+      schema['type'] = {
+        'type': 'array',
+        'items': 'File',
+        'inputBinding': {
+          'separate': False,
+          'prefix': f"--{self.args['name']}="
+        },
+      }
+    else:
+      schema['type'] = [
+        'null',
+        {
+          'type': 'array',
+          'items': 'File',
+          'inputBinding': {
+            'separate': False,
+            'prefix': f"--{self.args['name']}="
+          },
+        },
+      ]
     return schema
 
   def to_cwl_value(self):
@@ -86,6 +107,11 @@ class MultiFileField(FileField):
         'name': uri.fragment_path,
       } for uri in self.uris
     ] if self.raw_value is not None else None
+
+  def to_click(self):
+    args, kwargs = super().to_click()
+    kwargs['multiple'] = True
+    return args, kwargs
 
   def to_jsonschema(self):
     schema = super().to_jsonschema()
