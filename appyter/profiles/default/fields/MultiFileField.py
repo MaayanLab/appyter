@@ -13,8 +13,8 @@ class MultiFileField(FileField):
   def raw_value(self):
     if type(self.args['value']) == str and self.args['value']:
       raw_value = self.args['value'].splitlines()
-    elif type(self.args['value']) == list:
-      raw_value = self.args['value']
+    elif type(self.args['value']) == list or type(self.args['value']) == tuple:
+      raw_value = list(self.args['value'])
     else:
       raw_value = []
     return [v for v in raw_value if re.sub('\s+', '', v)]

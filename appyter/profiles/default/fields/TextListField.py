@@ -43,8 +43,8 @@ class TextListField(Field):
           )
         )
       )
-    elif type(self.args['value']) == list:
-      return self.args['value']
+    elif type(self.args['value']) == list or type(self.args['value']) == tuple:
+      return list(self.args['value'])
     elif self.args['value'] is None:
       return []
     else:
