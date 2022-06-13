@@ -12,5 +12,8 @@ fsspec.register_implementation('sbfs', SBFSFileSystem)
 from appyter.ext.fsspec.drs import DRSFileSystem
 fsspec.register_implementation('drs', DRSFileSystem)
 
-from appyter.ext.fsspec.s3fs import S3FileSystemEx
-fsspec.register_implementation('s3', S3FileSystemEx)
+try:
+  from appyter.ext.fsspec.s3fs import S3FileSystemEx
+  fsspec.register_implementation('s3', S3FileSystemEx)
+except ImportError:
+  pass
