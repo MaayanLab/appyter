@@ -40,8 +40,21 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </section>
-<section id="appyter-execspec-implementations-cavatica-module">
-<h2>appyter.execspec.implementations.cavatica module<a class="headerlink" href="#appyter-execspec-implementations-cavatica-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-appyter.execspec.implementations.cavatica">
+<span id="appyter-execspec-implementations-cavatica-module"></span><h2>appyter.execspec.implementations.cavatica module<a class="headerlink" href="#module-appyter.execspec.implementations.cavatica" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.execspec.implementations.cavatica.CavaticaExecutor">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.execspec.implementations.cavatica.</code><code class="sig-name descname">CavaticaExecutor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">project</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">auth_token</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">api_endpoint</span><span class="o">=</span><span class="default_value">'https://cavatica-api.sbgenomics.com'</span></em>, <em class="sig-param"><span class="n">wes_endpoint</span><span class="o">=</span><span class="default_value">'wes://cavatica-ga4gh-api.sbgenomics.com'</span></em>, <em class="sig-param"><span class="n">drs_endpoint</span><span class="o">=</span><span class="default_value">'drs://cavatica-ga4gh-api.sbgenomics.com'</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">headers</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/cavatica.html#CavaticaExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.execspec.implementations.cavatica.CavaticaExecutor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#appyter.execspec.implementations.wes.WESExecutor" title="appyter.execspec.implementations.wes.WESExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.execspec.implementations.wes.WESExecutor</span></code></a></p>
+<p>Run executions in CAVATICA
+cavatica?project=myuser/myproject&amp;auth_token=MYKEY&amp;cwl=example.cwl</p>
+<dl class="py attribute">
+<dt id="appyter.execspec.implementations.cavatica.CavaticaExecutor.protocol">
+<code class="sig-name descname">protocol</code><em class="property"> = 'cavatica'</em><a class="headerlink" href="#appyter.execspec.implementations.cavatica.CavaticaExecutor.protocol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-appyter.execspec.implementations.dispatch">
 <span id="appyter-execspec-implementations-dispatch-module"></span><h2>appyter.execspec.implementations.dispatch module<a class="headerlink" href="#module-appyter.execspec.implementations.dispatch" title="Permalink to this headline">¶</a></h2>
@@ -146,8 +159,20 @@ kube::maayanlab/myimage:latest?namespace=default</p>
 </dd></dl>
 
 </section>
-<section id="appyter-execspec-implementations-wes-module">
-<h2>appyter.execspec.implementations.wes module<a class="headerlink" href="#appyter-execspec-implementations-wes-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-appyter.execspec.implementations.wes">
+<span id="appyter-execspec-implementations-wes-module"></span><h2>appyter.execspec.implementations.wes module<a class="headerlink" href="#module-appyter.execspec.implementations.wes" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="appyter.execspec.implementations.wes.WESExecutor">
+<em class="property">class </em><code class="sig-prename descclassname">appyter.execspec.implementations.wes.</code><code class="sig-name descname">WESExecutor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/wes.html#WESExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.execspec.implementations.wes.WESExecutor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.execspec.spec.AbstractExecutor</span></code></a></p>
+<p>Run executions via a workflow execution service endpoint</p>
+<dl class="py attribute">
+<dt id="appyter.execspec.implementations.wes.WESExecutor.protocol">
+<code class="sig-name descname">protocol</code><em class="property"> = 'wes'</em><a class="headerlink" href="#appyter.execspec.implementations.wes.WESExecutor.protocol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-appyter.execspec.implementations">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.execspec.implementations" title="Permalink to this headline">¶</a></h2>
@@ -165,13 +190,13 @@ kube::maayanlab/myimage:latest?namespace=default</p>
   <ul>
 <li><a class="reference internal" href="#">appyter.execspec.implementations package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#appyter-execspec-implementations-cavatica-module">appyter.execspec.implementations.cavatica module</a></li>
+<li><a class="reference internal" href="#module-appyter.execspec.implementations.cavatica">appyter.execspec.implementations.cavatica module</a></li>
 <li><a class="reference internal" href="#module-appyter.execspec.implementations.dispatch">appyter.execspec.implementations.dispatch module</a></li>
 <li><a class="reference internal" href="#module-appyter.execspec.implementations.docker">appyter.execspec.implementations.docker module</a></li>
 <li><a class="reference internal" href="#module-appyter.execspec.implementations.kube">appyter.execspec.implementations.kube module</a></li>
 <li><a class="reference internal" href="#module-appyter.execspec.implementations.local">appyter.execspec.implementations.local module</a></li>
 <li><a class="reference internal" href="#module-appyter.execspec.implementations.subprocess">appyter.execspec.implementations.subprocess module</a></li>
-<li><a class="reference internal" href="#appyter-execspec-implementations-wes-module">appyter.execspec.implementations.wes module</a></li>
+<li><a class="reference internal" href="#module-appyter.execspec.implementations.wes">appyter.execspec.implementations.wes module</a></li>
 <li><a class="reference internal" href="#module-appyter.execspec.implementations">Module contents</a></li>
 </ul>
 </li>
