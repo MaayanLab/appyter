@@ -154,33 +154,40 @@
   <span class="p">),</span> <span class="n">to</span><span class="o">=</span><span class="n">sid</span><span class="p">)</span></div>
 
 <span class="c1"># upload from client with POST</span>
-<div class="viewcode-block" id="upload_from_request"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.upload.upload_from_request">[docs]</a><span class="k">def</span> <span class="nf">upload_from_request</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-  <span class="n">fh</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-  <span class="k">if</span> <span class="ow">not</span> <span class="n">fh</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
-  <span class="n">filename</span> <span class="o">=</span> <span class="n">secure_filepath</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
-  <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
-  <span class="n">data</span> <span class="o">=</span> <span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
-  <span class="k">with</span> <span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">URI</span><span class="p">(</span><span class="n">prepare_storage</span><span class="p">(</span><span class="n">data</span><span class="p">))</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">)))</span> <span class="k">as</span> <span class="n">input_fs</span><span class="p">:</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">generate_uuid</span><span class="p">()</span>
-    <span class="k">with</span> <span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="s1">&#39;memory:///&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_fs</span><span class="p">:</span>
-      <span class="k">with</span> <span class="n">tmp_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
-        <span class="n">fh</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fw</span><span class="p">)</span>
-      <span class="n">file_uri</span> <span class="o">=</span> <span class="n">organize_file_content</span><span class="p">(</span><span class="n">input_fs</span><span class="p">,</span> <span class="n">tmp_fs</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+<div class="viewcode-block" id="upload_from_request"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.upload.upload_from_request">[docs]</a><span class="k">def</span> <span class="nf">upload_from_request</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">multiple</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">fh</span> <span class="ow">in</span> <span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">if</span> <span class="n">multiple</span> <span class="k">else</span> <span class="p">[</span><span class="n">req</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">fname</span><span class="p">)]):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">fh</span><span class="p">:</span>
+      <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+      <span class="k">continue</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">secure_filepath</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
+      <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+      <span class="k">continue</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">prepare_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">URI</span><span class="p">(</span><span class="n">prepare_storage</span><span class="p">(</span><span class="n">data</span><span class="p">))</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">)))</span> <span class="k">as</span> <span class="n">input_fs</span><span class="p">:</span>
+      <span class="n">path</span> <span class="o">=</span> <span class="n">generate_uuid</span><span class="p">()</span>
+      <span class="k">with</span> <span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="s1">&#39;memory:///&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_fs</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">tmp_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fw</span><span class="p">:</span>
+          <span class="n">fh</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fw</span><span class="p">)</span>
+        <span class="n">file_uri</span> <span class="o">=</span> <span class="n">organize_file_content</span><span class="p">(</span><span class="n">input_fs</span><span class="p">,</span> <span class="n">tmp_fs</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="c1">#</span>
+    <span class="k">if</span> <span class="s1">&#39;catalog-integration&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;_config&#39;</span><span class="p">][</span><span class="s1">&#39;EXTRAS&#39;</span><span class="p">]:</span>
+      <span class="c1"># if you upload a file in a request, it should get registered</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">appyter.extras.catalog_integration.uploads</span> <span class="kn">import</span> <span class="n">FileInfo</span><span class="p">,</span> <span class="n">add_file</span>
+        <span class="n">file_uri_parsed</span> <span class="o">=</span> <span class="n">URI</span><span class="p">(</span><span class="n">file_uri</span><span class="p">)</span>
+        <span class="n">ensure_sync</span><span class="p">(</span><span class="n">add_file</span><span class="p">(</span>
+          <span class="n">FileInfo</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">file_uri_parsed</span><span class="o">.</span><span class="n">with_fragment</span><span class="p">(</span><span class="kc">None</span><span class="p">)),</span> <span class="n">filename</span><span class="o">=</span><span class="n">file_uri_parsed</span><span class="o">.</span><span class="n">fragment</span><span class="p">),</span>
+          <span class="n">auth</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_auth&#39;</span><span class="p">),</span>
+          <span class="n">config</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_config&#39;</span><span class="p">),</span>
+        <span class="p">))</span>
+      <span class="k">except</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+    <span class="c1">#</span>
+    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_uri</span><span class="p">)</span>
   <span class="c1">#</span>
-  <span class="k">if</span> <span class="s1">&#39;catalog-integration&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;_config&#39;</span><span class="p">][</span><span class="s1">&#39;EXTRAS&#39;</span><span class="p">]:</span>
-    <span class="c1"># if you upload a file in a request, it should get registered</span>
-    <span class="k">try</span><span class="p">:</span>
-      <span class="kn">from</span> <span class="nn">appyter.extras.catalog_integration.uploads</span> <span class="kn">import</span> <span class="n">FileInfo</span><span class="p">,</span> <span class="n">add_file</span>
-      <span class="n">file_uri_parsed</span> <span class="o">=</span> <span class="n">URI</span><span class="p">(</span><span class="n">file_uri</span><span class="p">)</span>
-      <span class="n">ensure_sync</span><span class="p">(</span><span class="n">add_file</span><span class="p">(</span>
-        <span class="n">FileInfo</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">file_uri_parsed</span><span class="o">.</span><span class="n">with_fragment</span><span class="p">(</span><span class="kc">None</span><span class="p">)),</span> <span class="n">filename</span><span class="o">=</span><span class="n">file_uri_parsed</span><span class="o">.</span><span class="n">fragment</span><span class="p">),</span>
-        <span class="n">auth</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_auth&#39;</span><span class="p">),</span>
-        <span class="n">config</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_config&#39;</span><span class="p">),</span>
-      <span class="p">))</span>
-    <span class="k">except</span><span class="p">:</span>
-      <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
-  <span class="c1">#</span>
-  <span class="k">return</span> <span class="n">file_uri</span></div>
+  <span class="k">return</span> <span class="n">ret</span> <span class="k">if</span> <span class="n">multiple</span> <span class="k">else</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 </pre></div>
 
             <div class="clearer"></div>

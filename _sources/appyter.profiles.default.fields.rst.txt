@@ -76,6 +76,14 @@ appyter.profiles.default.fields.MultiChoiceField module
    :undoc-members:
    :show-inheritance:
 
+appyter.profiles.default.fields.MultiFileField module
+-----------------------------------------------------
+
+.. automodule:: appyter.profiles.default.fields.MultiFileField
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 appyter.profiles.default.fields.SectionField module
 ---------------------------------------------------
 
