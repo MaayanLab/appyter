@@ -56,7 +56,7 @@ class DRSFileSystem(SyncAsyncFileSystem, AsyncFileSystem):
     elif access_method['type'] not in acceptible_types: raise NotImplementedError
     # obtain access url
     if access_method.get('access_url'):
-      access_url = access_method['access_url']
+      access_url = dict(url=access_method['access_url'])
     elif access_method.get('access_id'):
       async with self._session.get(join_url(
         drs_matcher.sub(r'https://\1/ga4gh/drs/v1/objects/\2/access/', path),
