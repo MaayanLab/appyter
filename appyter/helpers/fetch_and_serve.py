@@ -22,19 +22,20 @@ logger = logging.getLogger(__name__)
 @click.pass_context
 def fetch_and_serve(ctx, data_dir, cwd, host, port, args, uri):
   import urllib.parse, urllib.request
-  import fsspec
   # TODO: can this be less reliant on the `appyter-catalog` storage setup
   uri_parsed = urllib.parse.urlparse(uri)
   from appyter.ext.fsspec.storage import ensure_storage
   from appyter.ext.asyncio.helpers import ensure_sync_contextmanager
   from appyter.ext.fsspec.core import url_to_chroot_fs
-  with ensure_sync_contextmanager(ensure_storage(f"{uri_parsed.scheme}://{uri_parsed.netloc}/storage/appyters/")):
-    # if data_dir doesn't exist, create it
-    if data_dir is None: data_dir = 'memory://'
-    # mount the appyter into the data_dir
-    fs = url_to_chroot_fs(data_dir, appyter=uri)
-    with fs.mount(fuse=False) as mnt:
-      logging.info(f"Starting `appyter serve`...")
-      # serve the bundle in jupyter notebook
-      from appyter.helpers.serve import serve
-      ctx.invoke(serve, cwd=cwd, data_dir=str(mnt), host=host, port=port, args=args)
+  from appyter.ext.asyncio.event_loop import with_event_loop
+  with with_event_loop():
+    with ensure_sync_contextmanager(ensure_storage(f"{uri_parsed.scheme}://{uri_parsed.netloc}/storage/appyters/")):
+      # if data_dir doesn't exist, create it
+      if data_dir is None: data_dir = 'memory://'
+      # mount the appyter into the data_dir
+      fs = url_to_chroot_fs(data_dir, appyter=uri)
+      with fs.mount(fuse=False) as mnt:
+        logging.info(f"Starting `appyter serve`...")
+        # serve the bundle in jupyter notebook
+        from appyter.helpers.serve import serve
+        ctx.invoke(serve, cwd=cwd, data_dir=str(mnt), host=host, port=port, args=args)
