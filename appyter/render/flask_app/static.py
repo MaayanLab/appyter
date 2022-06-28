@@ -25,7 +25,7 @@ def get_index():
   elif mimetype in {'application/json'}:
     return jsonify(get_nbtemplate_json())
   elif mimetype in {'application/vnd.jupyter'}:
-    return send_file(get_ipynb_io(), attachment_filename=current_app.config['IPYNB'], mimetype=mimetype)
+    return send_file(get_ipynb_io(), attachment_filename=current_app.config['IPYNB'], mimetype=mimetype, conditional=True)
   else:
     abort(404)
 
@@ -33,14 +33,14 @@ def get_index():
 def favicon():
   static = get_static_fs()
   if static.exists('favicon.ico'):
-    return send_file(static.open('favicon.ico', 'rb'), attachment_filename='favicon.ico')
+    return send_file(static.open('favicon.ico', 'rb'), attachment_filename='favicon.ico', conditional=True)
   abort(404)
 
 @core.route('/static/<path:filename>', methods=['GET'])
 def static(filename):
   static = get_static_fs()
   if static.exists(filename):
-    return send_file(static.open(filename, 'rb'), attachment_filename=filename)
+    return send_file(static.open(filename, 'rb'), attachment_filename=filename, conditional=True)
     #
   try:
     return send_from_directory(get_appyter_directory('static'), path=filename)
@@ -69,7 +69,7 @@ def data_files(path):
       output_fs = output_fs_ctx.open()
       path = join_url(path, current_app.config['IPYNB'])
       if output_fs.exists(path):
-        response = send_file(output_fs.open(path, 'rb'), attachment_filename=current_app.config['IPYNB'])
+        response = send_file(output_fs.open(path, 'rb'), attachment_filename=current_app.config['IPYNB'], conditional=True)
         response.call_on_close(output_fs_ctx.close)
         return response
       else:
@@ -78,7 +78,7 @@ def data_files(path):
     output_fs_ctx = ContextManagerAsHandle(url_to_chroot_fs(str(URI(prepare_storage(data)).join('output'))))
     output_fs = output_fs_ctx.open()
     if output_fs.exists(path):
-      response = send_file(output_fs.open(path, 'rb'), attachment_filename=os.path.basename(path))
+      response = send_file(output_fs.open(path, 'rb'), attachment_filename=os.path.basename(path), conditional=True)
       response.call_on_close(output_fs_ctx.close)
       return response
     else:
