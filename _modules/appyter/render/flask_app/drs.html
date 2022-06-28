@@ -130,7 +130,7 @@
   <span class="k">except</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
   <span class="c1">#</span>
-  <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">file_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;rb&#39;</span><span class="p">),</span> <span class="n">attachment_filename</span><span class="o">=</span><span class="n">url_filename</span><span class="p">(</span><span class="n">file_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span></div>
+  <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">file_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;rb&#39;</span><span class="p">),</span> <span class="n">attachment_filename</span><span class="o">=</span><span class="n">url_filename</span><span class="p">(</span><span class="n">file_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]),</span> <span class="n">conditional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>
