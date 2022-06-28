@@ -20,6 +20,7 @@
       proxy_connect_timeout 900s;
       {%- endif %}
       proxy_pass {{ remote }};
+      proxy_force_ranges on;
       {%- if cache %}
       proxy_cache {{ cache }};
       proxy_cache_revalidate on;
