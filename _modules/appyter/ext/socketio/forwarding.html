@@ -40,7 +40,7 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ForwardingMixin"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.forwarding.ForwardingMixin">[docs]</a><span class="k">class</span> <span class="nc">ForwardingMixin</span><span class="p">:</span>
-  <span class="sd">&#39;&#39;&#39; A mixin for converting `to=` messages on the client to `forward` events to be handled by the server</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; A mixin for converting `to=` messages on the client to `forward` events to be handled by the server</span>
 <span class="sd">  &#39;&#39;&#39;</span>
 <div class="viewcode-block" id="ForwardingMixin.emit"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.forwarding.ForwardingMixin.emit">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

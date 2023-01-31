@@ -513,7 +513,7 @@
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
   <span class="k">def</span> <span class="nf">_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Implements certain write ops, to use `open` with mode=&#39;w&#39; or mode=&#39;a&#39; use writecache,</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Implements certain write ops, to use `open` with mode=&#39;w&#39; or mode=&#39;a&#39; use writecache,</span>
 <span class="sd">    i.e. writecache::chroot::sbfs://*</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;rb&quot;</span><span class="p">:</span>

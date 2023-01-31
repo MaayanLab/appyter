@@ -46,12 +46,12 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="join_routes"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.join_routes">[docs]</a><span class="k">def</span> <span class="nf">join_routes</span><span class="p">(</span><span class="o">*</span><span class="n">routes</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Utility function for joining routes while striping extraneous slashes</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Utility function for joining routes while striping extraneous slashes</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">return</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">route</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">routes</span> <span class="k">if</span> <span class="n">route</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)])</span></div>
 
 <div class="viewcode-block" id="secure_filepath"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.secure_filepath">[docs]</a><span class="k">def</span> <span class="nf">secure_filepath</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Ensures this will be a sanitized relative path</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Ensures this will be a sanitized relative path</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">secured_filepath</span> <span class="o">=</span> <span class="n">safe_join</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">filepath</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span>
   <span class="k">assert</span> <span class="n">secured_filepath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Filepath wasn&#39;t secure&quot;</span>
@@ -87,7 +87,7 @@
     <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="route_join_with_or_without_slash"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.route_join_with_or_without_slash">[docs]</a><span class="k">def</span> <span class="nf">route_join_with_or_without_slash</span><span class="p">(</span><span class="n">blueprint</span><span class="p">,</span> <span class="o">*</span><span class="n">routes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Like @app.route but doesn&#39;t care about trailing slash or not</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Like @app.route but doesn&#39;t care about trailing slash or not</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="n">routes_stripped</span> <span class="o">=</span> <span class="n">join_routes</span><span class="p">(</span><span class="o">*</span><span class="n">routes</span><span class="p">)</span>

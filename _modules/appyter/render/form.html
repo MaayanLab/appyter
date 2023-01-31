@@ -39,7 +39,7 @@
 <span></span><span class="kn">from</span> <span class="nn">appyter.parse.nbtemplate</span> <span class="kn">import</span> <span class="n">parse_fields_from_nbtemplate</span>
 
 <div class="viewcode-block" id="render_form_from_nbtemplate"><a class="viewcode-back" href="../../../appyter.render.html#appyter.render.form.render_form_from_nbtemplate">[docs]</a><span class="k">def</span> <span class="nf">render_form_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nb</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Render a form with the Fields requested throughout the notebook.</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Render a form with the Fields requested throughout the notebook.</span>
 <span class="sd">  `form.j2` is responsible for calling render on each relevant field.</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">return</span> <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s1">&#39;form.j2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>

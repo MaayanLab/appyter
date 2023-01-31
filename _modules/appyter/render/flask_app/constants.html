@@ -55,35 +55,35 @@
 
 <div class="viewcode-block" id="get_cwd_fs"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_cwd_fs">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_cwd_fs</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Return fsspec compatible chroot to the current directory</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Return fsspec compatible chroot to the current directory</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_chroot_fs</span>
   <span class="k">return</span> <span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="n">get_env</span><span class="p">()[</span><span class="s1">&#39;CWD&#39;</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="get_static_fs"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_static_fs">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_static_fs</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Return fsspec compatible chroot to the static directory</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Return fsspec compatible chroot to the static directory</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_chroot_fs</span>
   <span class="k">return</span> <span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="n">get_env</span><span class="p">()[</span><span class="s1">&#39;STATIC_DIR&#39;</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="get_input_fs"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_input_fs">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_input_fs</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Return fsspec compatible chroot to the static directory</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Return fsspec compatible chroot to the static directory</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_chroot_fs</span>
   <span class="k">return</span> <span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="s1">&#39;storage://input/&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="get_output_fs"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_output_fs">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_output_fs</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Return fsspec compatible chroot to the static directory</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Return fsspec compatible chroot to the static directory</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_chroot_fs</span>
   <span class="k">return</span> <span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="s1">&#39;storage://output/&#39;</span><span class="p">)</span></div>
 
 <span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">_get_ipynb_io</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Return byte stream for original ipynb</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Return byte stream for original ipynb</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">import</span> <span class="nn">io</span><span class="o">,</span> <span class="nn">shutil</span>
   <span class="n">ipynb_io</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
@@ -92,7 +92,7 @@
   <span class="k">return</span> <span class="n">ipynb_io</span>
 
 <div class="viewcode-block" id="get_ipynb_io"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_ipynb_io">[docs]</a><span class="k">def</span> <span class="nf">get_ipynb_io</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Reuse the BytesIO stream</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Reuse the BytesIO stream</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">ipynb_io</span> <span class="o">=</span> <span class="n">_get_ipynb_io</span><span class="p">()</span>
   <span class="n">ipynb_io</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -100,56 +100,56 @@
 
 <div class="viewcode-block" id="get_nbtemplate"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_nbtemplate">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_nbtemplate</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Parse the ipynb</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Parse the ipynb</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.parse.nb</span> <span class="kn">import</span> <span class="n">nb_from_ipynb_io</span>
   <span class="k">return</span> <span class="n">nb_from_ipynb_io</span><span class="p">(</span><span class="n">get_ipynb_io</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="get_j2_env"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_j2_env">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_j2_env</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Get an initialized bare jinja2 environment (no context)</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Get an initialized bare jinja2 environment (no context)</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_jinja2_env</span>
   <span class="k">return</span> <span class="n">get_jinja2_env</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">get_env</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="get_form"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_form">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_form</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Render a form for the nbtemplate</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Render a form for the nbtemplate</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.render.form</span> <span class="kn">import</span> <span class="n">render_form_from_nbtemplate</span>
   <span class="k">return</span> <span class="n">render_form_from_nbtemplate</span><span class="p">(</span><span class="n">get_j2_env</span><span class="p">(),</span> <span class="n">get_nbtemplate</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="get_nbtemplate_json"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_nbtemplate_json">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_nbtemplate_json</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Render the nbtemplate as nbtemplate_json</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Render the nbtemplate as nbtemplate_json</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.render.nbinspect</span> <span class="kn">import</span> <span class="n">render_nbtemplate_json_from_nbtemplate</span>
   <span class="k">return</span> <span class="n">render_nbtemplate_json_from_nbtemplate</span><span class="p">(</span><span class="n">get_j2_env</span><span class="p">(),</span> <span class="n">get_nbtemplate</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="get_fields"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_fields">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_fields</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Parse the nbtemplate fields</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Parse the nbtemplate fields</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.parse.nbtemplate</span> <span class="kn">import</span> <span class="n">parse_fields_from_nbtemplate</span>
   <span class="k">return</span> <span class="n">parse_fields_from_nbtemplate</span><span class="p">(</span><span class="n">get_j2_env</span><span class="p">(),</span> <span class="n">get_nbtemplate</span><span class="p">(),</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="get_deep_fields"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_deep_fields">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_deep_fields</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Parse the nbtemplate fields</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Parse the nbtemplate fields</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.parse.nbtemplate</span> <span class="kn">import</span> <span class="n">parse_fields_from_nbtemplate</span>
   <span class="k">return</span> <span class="n">parse_fields_from_nbtemplate</span><span class="p">(</span><span class="n">get_j2_env</span><span class="p">(),</span> <span class="n">get_nbtemplate</span><span class="p">(),</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="get_ipynb_hash"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_ipynb_hash">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_ipynb_hash</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; A hash for the ipynb</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; A hash for the ipynb</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.ext.hashlib</span> <span class="kn">import</span> <span class="n">sha1sum_io</span>
   <span class="k">return</span> <span class="n">sha1sum_io</span><span class="p">(</span><span class="n">get_ipynb_io</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="get_html_exporer"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_html_exporer">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_html_exporer</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; nbconvert html export</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; nbconvert html export</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">nbconvert</span> <span class="kn">import</span> <span class="n">HTMLExporter</span>
   <span class="n">html_exporter</span> <span class="o">=</span> <span class="n">HTMLExporter</span><span class="p">()</span>
@@ -158,7 +158,7 @@
 
 <div class="viewcode-block" id="get_base_files"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.constants.get_base_files">[docs]</a><span class="nd">@decorator_in_production</span><span class="p">(</span><span class="n">memcached</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">get_base_files</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Include all (non-hidden) files in cwd (include requirements.txt, utils, etc..)</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Include all (non-hidden) files in cwd (include requirements.txt, utils, etc..)</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">fs</span> <span class="o">=</span> <span class="n">get_cwd_fs</span><span class="p">()</span>
   <span class="n">ipynb</span> <span class="o">=</span> <span class="n">get_env</span><span class="p">()[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">]</span>

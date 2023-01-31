@@ -274,7 +274,7 @@
   <span class="k">return</span> <span class="n">_config</span></div>
 
 <div class="viewcode-block" id="get_env_from_click"><a class="viewcode-back" href="../../appyter.html#appyter.context.get_env_from_click">[docs]</a><span class="k">def</span> <span class="nf">get_env_from_click</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; Traverse click context and use params for get_env_from_kwargs</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Traverse click context and use params for get_env_from_kwargs</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">click_ctx</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">get_current_context</span><span class="p">()</span>
   <span class="c1"># aggregate all params from all parents</span>
@@ -290,7 +290,7 @@
   <span class="k">return</span> <span class="n">params</span></div>
 
 <div class="viewcode-block" id="get_env_from_flask"><a class="viewcode-back" href="../../appyter.html#appyter.context.get_env_from_flask">[docs]</a><span class="k">def</span> <span class="nf">get_env_from_flask</span><span class="p">():</span>
-  <span class="sd">&#39;&#39;&#39; If we&#39;re running in flask, current_app.config should be available</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; If we&#39;re running in flask, current_app.config should be available</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span>
   <span class="k">return</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span></div>
@@ -298,7 +298,7 @@
 <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="get_env"><a class="viewcode-back" href="../../appyter.html#appyter.context.get_env">[docs]</a><span class="k">def</span> <span class="nf">get_env</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Try various methods to grab the application config</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Try various methods to grab the application config</span>
 <span class="sd">  (different based on whether we&#39;re in a flask thread/somewhere else)</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="c1">#</span>

@@ -51,7 +51,7 @@
 
 <span class="nd">@contextlib</span><span class="o">.</span><span class="n">asynccontextmanager</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">_http_serve</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8888</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Serve a simple static listing of the given directory on the specified port</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Serve a simple static listing of the given directory on the specified port</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">aiohttp</span> <span class="kn">import</span> <span class="n">web</span>
   <span class="kn">from</span> <span class="nn">appyter.ext.aiohttp</span> <span class="kn">import</span> <span class="n">with_app_running</span>
@@ -61,7 +61,7 @@
     <span class="k">yield</span>
 
 <span class="k">async</span> <span class="k">def</span> <span class="nf">_http_connect</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">ssl_verify</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Successfully connect to and resolve a url</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Successfully connect to and resolve a url</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">import</span> <span class="nn">aiohttp</span>
   <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">(</span><span class="n">connector</span><span class="o">=</span><span class="n">aiohttp</span><span class="o">.</span><span class="n">TCPConnector</span><span class="p">(</span><span class="n">ssl</span><span class="o">=</span><span class="n">ssl_verify</span><span class="p">))</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
@@ -71,7 +71,7 @@
 <div class="viewcode-block" id="http_serve_ctx"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.pytest.http_serve_ctx">[docs]</a><span class="nd">@ensure_sync</span>
 <span class="nd">@contextlib</span><span class="o">.</span><span class="n">asynccontextmanager</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">http_serve_ctx</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8888</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Context for _http_serve, ensuring server is ready before proceeding</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Context for _http_serve, ensuring server is ready before proceeding</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.try_n_times</span> <span class="kn">import</span> <span class="n">async_try_n_times</span>
   <span class="k">async</span> <span class="k">with</span> <span class="n">_http_serve</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>

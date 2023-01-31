@@ -49,13 +49,13 @@
 <span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">join_slash</span><span class="p">,</span> <span class="n">parent_url</span>
 
 <div class="viewcode-block" id="OverlayFileSystem"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.overlayfs.OverlayFileSystem">[docs]</a><span class="k">class</span> <span class="nc">OverlayFileSystem</span><span class="p">(</span><span class="n">MountableAbstractFileSystem</span><span class="p">,</span> <span class="n">ComposableAbstractFileSystem</span><span class="p">,</span> <span class="n">AbstractFileSystem</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; OverlayFS implemented with fsspec</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; OverlayFS implemented with fsspec</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">root_marker</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
   <span class="n">protocol</span> <span class="o">=</span> <span class="s1">&#39;overlayfs&#39;</span>
 
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_fs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lower_protocol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lower_options</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span> <span class="n">upper_fs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper_protocol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper_options</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    lower: str | fs | (protocol, options) initial</span>

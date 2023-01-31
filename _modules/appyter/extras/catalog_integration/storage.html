@@ -41,7 +41,7 @@
 <span class="kn">from</span> <span class="nn">appyter.extras.catalog_integration.user_config</span> <span class="kn">import</span> <span class="n">get_user_config</span>
 
 <div class="viewcode-block" id="prepare_storage"><a class="viewcode-back" href="../../../../appyter.extras.catalog_integration.html#appyter.extras.catalog_integration.storage.prepare_storage">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">prepare_storage</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Safely translate public facing storage URIs into internally operable fsspec URIs</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Safely translate public facing storage URIs into internally operable fsspec URIs</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_storage&#39;</span><span class="p">):</span>
     <span class="c1"># cavatica storage provider, obtain CAVATICA API Key and instantiate sbfs</span>

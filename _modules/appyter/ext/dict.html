@@ -71,7 +71,7 @@
   <span class="k">return</span> <span class="n">dict_unflatten</span><span class="p">(</span><span class="n">dict_flatten</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="n">dict_flatten</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="expand_dotmap"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.expand_dotmap">[docs]</a><span class="k">def</span> <span class="nf">expand_dotmap</span><span class="p">(</span><span class="n">dotmap</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; Convert dot-notation into deep dict</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Convert dot-notation into deep dict</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
   <span class="k">for</span> <span class="n">K</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dotmap</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -85,7 +85,7 @@
   <span class="k">return</span> <span class="n">params</span></div>
 
 <div class="viewcode-block" id="dict_typed_flatten"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_typed_flatten">[docs]</a><span class="k">def</span> <span class="nf">dict_typed_flatten</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; dict_flatten but preserves lists &amp; ordering</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; dict_flatten but preserves lists &amp; ordering</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">Q</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">tuple</span><span class="p">(),</span> <span class="n">d</span><span class="p">)]</span>
   <span class="n">F</span> <span class="o">=</span> <span class="p">[]</span>
@@ -102,7 +102,7 @@
   <span class="k">return</span> <span class="n">F</span></div>
 
 <div class="viewcode-block" id="dict_typed_unflatten"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_typed_unflatten">[docs]</a><span class="k">def</span> <span class="nf">dict_typed_unflatten</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; opposite of dict_typed_unflatten</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; opposite of dict_typed_unflatten</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">D</span> <span class="o">=</span> <span class="p">{}</span>
   <span class="k">for</span> <span class="n">K</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>

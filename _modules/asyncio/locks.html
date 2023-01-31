@@ -38,14 +38,15 @@
   <h1>Source code for asyncio.locks</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Synchronization primitives.&quot;&quot;&quot;</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Lock&#39;</span><span class="p">,</span> <span class="s1">&#39;Event&#39;</span><span class="p">,</span> <span class="s1">&#39;Condition&#39;</span><span class="p">,</span> <span class="s1">&#39;Semaphore&#39;</span><span class="p">,</span> <span class="s1">&#39;BoundedSemaphore&#39;</span><span class="p">)</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Lock&#39;</span><span class="p">,</span> <span class="s1">&#39;Event&#39;</span><span class="p">,</span> <span class="s1">&#39;Condition&#39;</span><span class="p">,</span> <span class="s1">&#39;Semaphore&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;BoundedSemaphore&#39;</span><span class="p">,</span> <span class="s1">&#39;Barrier&#39;</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">enum</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">exceptions</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">mixins</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">tasks</span>
-
 
 <span class="k">class</span> <span class="nc">_ContextManagerMixin</span><span class="p">:</span>
     <span class="k">async</span> <span class="k">def</span> <span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -59,7 +60,7 @@
 
 
 <span class="k">class</span> <span class="nc">Lock</span><span class="p">(</span><span class="n">_ContextManagerMixin</span><span class="p">,</span> <span class="n">mixins</span><span class="o">.</span><span class="n">_LoopBoundMixin</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Primitive lock objects.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Primitive lock objects.</span>
 
 <span class="sd">    A primitive lock is a synchronization primitive that is not owned</span>
 <span class="sd">    by a particular coroutine when locked.  A primitive lock is in one</span>
@@ -112,8 +113,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="n">mixins</span><span class="o">.</span><span class="n">_marker</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_locked</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -125,11 +125,11 @@
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> [</span><span class="si">{</span><span class="n">extra</span><span class="si">}</span><span class="s1">]&gt;&#39;</span>
 
     <span class="k">def</span> <span class="nf">locked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return True if lock is acquired.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if lock is acquired.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locked</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">acquire</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Acquire a lock.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Acquire a lock.</span>
 
 <span class="sd">        This method blocks until the lock is unlocked, then sets it to</span>
 <span class="sd">        locked and returns True.</span>
@@ -161,7 +161,7 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Release a lock.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Release a lock.</span>
 
 <span class="sd">        When the lock is locked, reset it to unlocked, and return.</span>
 <span class="sd">        If any other coroutines are blocked waiting for the lock to become</span>
@@ -178,7 +178,7 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Lock is not acquired.&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_wake_up_first</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Wake up the first waiter if it isn&#39;t done.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wake up the first waiter if it isn&#39;t done.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="k">try</span><span class="p">:</span>
@@ -194,7 +194,7 @@
 
 
 <span class="k">class</span> <span class="nc">Event</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">_LoopBoundMixin</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Asynchronous equivalent to threading.Event.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Asynchronous equivalent to threading.Event.</span>
 
 <span class="sd">    Class implementing event objects. An event manages a flag that can be set</span>
 <span class="sd">    to true with the set() method and reset to false with the clear() method.</span>
@@ -202,8 +202,7 @@
 <span class="sd">    false.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="n">mixins</span><span class="o">.</span><span class="n">_marker</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -215,11 +214,11 @@
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> [</span><span class="si">{</span><span class="n">extra</span><span class="si">}</span><span class="s1">]&gt;&#39;</span>
 
     <span class="k">def</span> <span class="nf">is_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return True if and only if the internal flag is true.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if and only if the internal flag is true.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>
 
     <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Set the internal flag to true. All coroutines waiting for it to</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the internal flag to true. All coroutines waiting for it to</span>
 <span class="sd">        become true are awakened. Coroutine that call wait() once the flag is</span>
 <span class="sd">        true will not block at all.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -231,13 +230,13 @@
                     <span class="n">fut</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Reset the internal flag to false. Subsequently, coroutines calling</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset the internal flag to false. Subsequently, coroutines calling</span>
 <span class="sd">        wait() will block until set() is called to set the internal flag</span>
 <span class="sd">        to true again.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Block until the internal flag is true.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Block until the internal flag is true.</span>
 
 <span class="sd">        If the internal flag is true on entry, return True</span>
 <span class="sd">        immediately.  Otherwise, block until another coroutine calls</span>
@@ -256,7 +255,7 @@
 
 
 <span class="k">class</span> <span class="nc">Condition</span><span class="p">(</span><span class="n">_ContextManagerMixin</span><span class="p">,</span> <span class="n">mixins</span><span class="o">.</span><span class="n">_LoopBoundMixin</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Asynchronous equivalent to threading.Condition.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Asynchronous equivalent to threading.Condition.</span>
 
 <span class="sd">    This class implements condition variable objects. A condition variable</span>
 <span class="sd">    allows one or more coroutines to wait until they are notified by another</span>
@@ -265,8 +264,7 @@
 <span class="sd">    A new Lock object is created and used as the underlying lock.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="n">mixins</span><span class="o">.</span><span class="n">_marker</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">lock</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
 
@@ -286,7 +284,7 @@
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> [</span><span class="si">{</span><span class="n">extra</span><span class="si">}</span><span class="s1">]&gt;&#39;</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Wait until notified.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wait until notified.</span>
 
 <span class="sd">        If the calling coroutine has not acquired the lock when this</span>
 <span class="sd">        method is called, a RuntimeError is raised.</span>
@@ -323,7 +321,7 @@
                 <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">CancelledError</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">wait_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Wait until a predicate becomes true.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wait until a predicate becomes true.</span>
 
 <span class="sd">        The predicate should be a callable which result will be</span>
 <span class="sd">        interpreted as a boolean value.  The final predicate value is</span>
@@ -336,7 +334,7 @@
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;By default, wake up one coroutine waiting on this condition, if any.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;By default, wake up one coroutine waiting on this condition, if any.</span>
 <span class="sd">        If the calling coroutine has not acquired the lock when this method</span>
 <span class="sd">        is called, a RuntimeError is raised.</span>
 
@@ -360,7 +358,7 @@
                 <span class="n">fut</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">notify_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Wake up all threads waiting on this condition. This method acts</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wake up all threads waiting on this condition. This method acts</span>
 <span class="sd">        like notify(), but wakes up all waiting threads instead of one. If the</span>
 <span class="sd">        calling thread has not acquired the lock when this method is called,</span>
 <span class="sd">        a RuntimeError is raised.</span>
@@ -369,7 +367,7 @@
 
 
 <span class="k">class</span> <span class="nc">Semaphore</span><span class="p">(</span><span class="n">_ContextManagerMixin</span><span class="p">,</span> <span class="n">mixins</span><span class="o">.</span><span class="n">_LoopBoundMixin</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A Semaphore implementation.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A Semaphore implementation.</span>
 
 <span class="sd">    A semaphore manages an internal counter which is decremented by each</span>
 <span class="sd">    acquire() call and incremented by each release() call. The counter</span>
@@ -383,13 +381,11 @@
 <span class="sd">    ValueError is raised.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="n">mixins</span><span class="o">.</span><span class="n">_marker</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Semaphore initial value must be &gt;= 0&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_wakeup_scheduled</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">res</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
@@ -398,20 +394,13 @@
             <span class="n">extra</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">extra</span><span class="si">}</span><span class="s1">, waiters:</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> [</span><span class="si">{</span><span class="n">extra</span><span class="si">}</span><span class="s1">]&gt;&#39;</span>
 
-    <span class="k">def</span> <span class="nf">_wake_up_next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span><span class="p">:</span>
-            <span class="n">waiter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">waiter</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
-                <span class="n">waiter</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_wakeup_scheduled</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">return</span>
-
     <span class="k">def</span> <span class="nf">locked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns True if semaphore can not be acquired immediately.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if semaphore cannot be acquired immediately.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span>
+            <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="n">w</span><span class="o">.</span><span class="n">cancelled</span><span class="p">()</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span> <span class="ow">or</span> <span class="p">())))</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">acquire</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Acquire a semaphore.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Acquire a semaphore.</span>
 
 <span class="sd">        If the internal counter is larger than zero on entry,</span>
 <span class="sd">        decrement it by one and return True immediately.  If it is</span>
@@ -419,45 +408,221 @@
 <span class="sd">        called release() to make it larger than 0, and then return</span>
 <span class="sd">        True.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># _wakeup_scheduled is set if *another* task is scheduled to wakeup</span>
-        <span class="c1"># but its acquire() is not resumed yet</span>
-        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wakeup_scheduled</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">fut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_loop</span><span class="p">()</span><span class="o">.</span><span class="n">create_future</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fut</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">locked</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">()</span>
+        <span class="n">fut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_loop</span><span class="p">()</span><span class="o">.</span><span class="n">create_future</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fut</span><span class="p">)</span>
+
+        <span class="c1"># Finally block should be called before the CancelledError</span>
+        <span class="c1"># handling as we don&#39;t want CancelledError to call</span>
+        <span class="c1"># _wake_up_first() and attempt to wake up itself.</span>
+        <span class="k">try</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">fut</span>
-                <span class="c1"># reset _wakeup_scheduled *after* waiting for a future</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_wakeup_scheduled</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fut</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fut</span><span class="o">.</span><span class="n">cancelled</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_wake_up_next</span><span class="p">()</span>
-                <span class="k">raise</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">raise</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wake_up_next</span><span class="p">()</span>
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Release a semaphore, incrementing the internal counter by one.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Release a semaphore, incrementing the internal counter by one.</span>
+
 <span class="sd">        When it was zero on entry and another coroutine is waiting for it to</span>
 <span class="sd">        become larger than zero again, wake up that coroutine.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wake_up_next</span><span class="p">()</span>
 
+    <span class="k">def</span> <span class="nf">_wake_up_next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wake up the first waiter that isn&#39;t done.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">fut</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_waiters</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fut</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">fut</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span>
+
 
 <span class="k">class</span> <span class="nc">BoundedSemaphore</span><span class="p">(</span><span class="n">Semaphore</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A bounded semaphore implementation.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A bounded semaphore implementation.</span>
 
 <span class="sd">    This raises ValueError in release() if it would increase the value</span>
 <span class="sd">    above the initial value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="n">mixins</span><span class="o">.</span><span class="n">_marker</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bound_value</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound_value</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;BoundedSemaphore released too many times&#39;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+
+
+<span class="k">class</span> <span class="nc">_BarrierState</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">FILLING</span> <span class="o">=</span> <span class="s1">&#39;filling&#39;</span>
+    <span class="n">DRAINING</span> <span class="o">=</span> <span class="s1">&#39;draining&#39;</span>
+    <span class="n">RESETTING</span> <span class="o">=</span> <span class="s1">&#39;resetting&#39;</span>
+    <span class="n">BROKEN</span> <span class="o">=</span> <span class="s1">&#39;broken&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">Barrier</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">_LoopBoundMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Asyncio equivalent to threading.Barrier</span>
+
+<span class="sd">    Implements a Barrier primitive.</span>
+<span class="sd">    Useful for synchronizing a fixed number of tasks at known synchronization</span>
+<span class="sd">    points. Tasks block on &#39;wait()&#39; and are simultaneously awoken once they</span>
+<span class="sd">    have all made their call.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parties</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a barrier, initialised to &#39;parties&#39; tasks.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">parties</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;parties must be &gt; 0&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span> <span class="o">=</span> <span class="n">Condition</span><span class="p">()</span> <span class="c1"># notify all tasks when state changes</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parties</span> <span class="o">=</span> <span class="n">parties</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">FILLING</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="mi">0</span>       <span class="c1"># count tasks in Barrier</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+        <span class="n">extra</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">broken</span><span class="p">:</span>
+            <span class="n">extra</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;, waiters:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_waiting</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parties</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> [</span><span class="si">{</span><span class="n">extra</span><span class="si">}</span><span class="s1">]&gt;&#39;</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># wait for the barrier reaches the parties number</span>
+        <span class="c1"># when start draining release and return index of waited task</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wait for the barrier.</span>
+
+<span class="sd">        When the specified number of tasks have started waiting, they are all</span>
+<span class="sd">        simultaneously awoken.</span>
+<span class="sd">        Returns an unique and individual index number from 0 to &#39;parties-1&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_block</span><span class="p">()</span> <span class="c1"># Block while the barrier drains or resets.</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parties</span><span class="p">:</span>
+                    <span class="c1"># We release the barrier</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_release</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wait</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">index</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="c1"># Wake up any tasks waiting for barrier to drain.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_exit</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_block</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Block until the barrier is ready for us,</span>
+        <span class="c1"># or raise an exception if it is broken.</span>
+        <span class="c1">#</span>
+        <span class="c1"># It is draining or resetting, wait until done</span>
+        <span class="c1"># unless a CancelledError occurs</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">_BarrierState</span><span class="o">.</span><span class="n">DRAINING</span><span class="p">,</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">RESETTING</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># see if the barrier is in a broken state</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="ow">is</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">BROKEN</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">BrokenBarrierError</span><span class="p">(</span><span class="s2">&quot;Barrier aborted&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Release the tasks waiting in the barrier.</span>
+
+        <span class="c1"># Enter draining state.</span>
+        <span class="c1"># Next waiting tasks will be blocked until the end of draining.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">DRAINING</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="o">.</span><span class="n">notify_all</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_wait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Wait in the barrier until we are released. Raise an exception</span>
+        <span class="c1"># if the barrier is reset or broken.</span>
+
+        <span class="c1"># wait for end of filling</span>
+        <span class="c1"># unless a CancelledError occurs</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">FILLING</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="ow">in</span> <span class="p">(</span><span class="n">_BarrierState</span><span class="o">.</span><span class="n">BROKEN</span><span class="p">,</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">RESETTING</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">BrokenBarrierError</span><span class="p">(</span><span class="s2">&quot;Abort or reset of barrier&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># If we are the last tasks to exit the barrier, signal any tasks</span>
+        <span class="c1"># waiting for the barrier to drain.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="ow">in</span> <span class="p">(</span><span class="n">_BarrierState</span><span class="o">.</span><span class="n">RESETTING</span><span class="p">,</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">DRAINING</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">FILLING</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="o">.</span><span class="n">notify_all</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset the barrier to the initial state.</span>
+
+<span class="sd">        Any tasks currently waiting will get the BrokenBarrier exception</span>
+<span class="sd">        raised.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">RESETTING</span><span class="p">:</span>
+                    <span class="c1">#reset the barrier, waking up tasks</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">RESETTING</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">FILLING</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="o">.</span><span class="n">notify_all</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Place the barrier into a &#39;broken&#39; state.</span>
+
+<span class="sd">        Useful in case of error.  Any currently waiting tasks and tasks</span>
+<span class="sd">        attempting to &#39;wait()&#39; will have BrokenBarrierError raised.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">BROKEN</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="o">.</span><span class="n">notify_all</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">parties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the number of tasks required to trip the barrier.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_waiting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the number of tasks currently waiting at the barrier.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="ow">is</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">FILLING</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">broken</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if the barrier is in a broken state.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="ow">is</span> <span class="n">_BarrierState</span><span class="o">.</span><span class="n">BROKEN</span>
 </pre></div>
 
             <div class="clearer"></div>

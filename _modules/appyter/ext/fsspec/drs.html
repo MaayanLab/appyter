@@ -55,7 +55,7 @@
 
   <span class="nd">@classmethod</span>
   <span class="k">def</span> <span class="nf">_strip_protocol</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;For DRS, we always want to keep the full URL&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;For DRS, we always want to keep the full URL&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">path</span>
 
   <span class="nd">@classmethod</span>
@@ -75,7 +75,7 @@
     <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_mgr</span><span class="o">.</span><span class="fm">__aexit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
 
   <span class="k">async</span> <span class="k">def</span> <span class="nf">_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Use DRS To find info about the object</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Use DRS To find info about the object</span>
 <span class="sd">    _id contains the DRS ID</span>
 <span class="sd">    _url contains an fsspec compatible url</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -126,7 +126,7 @@
     <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
   <span class="k">def</span> <span class="nf">_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Open the path with the url prepared during `_info`</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Open the path with the url prepared during `_info`</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;rb&quot;</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span>
     <span class="n">path_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>

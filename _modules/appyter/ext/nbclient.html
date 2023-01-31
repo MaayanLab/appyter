@@ -47,7 +47,7 @@
 <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.helpers</span> <span class="kn">import</span> <span class="n">ensure_async</span>
 
 <div class="viewcode-block" id="NotebookClientIOPubHook"><a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook">[docs]</a><span class="k">class</span> <span class="nc">NotebookClientIOPubHook</span><span class="p">(</span><span class="n">NotebookClient</span><span class="p">):</span>
-  <span class="sd">&#39;&#39;&#39; A notebook client with the ability to hook into iopub updates</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; A notebook client with the ability to hook into iopub updates</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">iopub_hook</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -82,7 +82,7 @@
       <span class="n">cell_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
       <span class="n">execution_count</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
       <span class="n">store_history</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NotebookNode</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Executes a single code cell.</span>
 
 <span class="sd">    To execute all cells see :meth:`execute`.</span>
@@ -170,7 +170,7 @@
 
 <div class="viewcode-block" id="NotebookClientIOPubHook.async_setup_kernel"><a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook.async_setup_kernel">[docs]</a>  <span class="nd">@asynccontextmanager</span>
   <span class="k">async</span> <span class="k">def</span> <span class="nf">async_setup_kernel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">AsyncGenerator</span><span class="p">:</span>
-      <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">      Context manager for setting up the kernel to execute a notebook.</span>
 
 <span class="sd">      This assigns the Kernel Manager (``self.km``) if missing and Kernel Client(``self.kc``).</span>
