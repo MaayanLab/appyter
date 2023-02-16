@@ -4,7 +4,7 @@ import contextlib
 async def ensure_storage(storage_uri):
   import fsspec
   from appyter.ext.fsspec.core import url_to_fs_ex
-  if 'storage' not in fsspec.registry.target:
+  if 'storage' not in fsspec.registry:
     from appyter.ext.fsspec.singleton import SingletonFileSystem
     from appyter.ext.asyncio.helpers import ensure_async_contextmanager
     fs, fo = url_to_fs_ex(storage_uri)
