@@ -203,14 +203,14 @@
         {#if state[id].bg === 'error'}
           <div class="alert alert-danger">
             Error loading file{#if state[id].error}: {state[id].error}{/if}
-            {#if state[id].url}from <a href={state[id].url} target=_blank>{state[id].url}</a>{/if}
+            {#if state[id].url}from <a href={state[id].url} target=_blank rel=noreferrer>{state[id].url}</a>{/if}
           </div>
         {/if}
         {#if state[id].bg === 'warning'}
           <div class="alert alert-warning">
             Error loading file{#if state[id].error}: {state[id].error}{/if}<br />
             <b>It may require user engagement</b>, please visit
-              <a href={state[id].url} target=_blank>{state[id].url}</a>
+              <a href={state[id].url} target=_blank rel=noreferrer>{state[id].url}</a>
             to download the example file for upload.
           </div>
         {/if}
@@ -243,7 +243,8 @@
               <span class="text-sm m-1 p-1" style="white-space: nowrap;">
                 <a
                   href={args.examples[example_name]}
-                  target="_blank"
+                  target=_blank
+                  rel=noreferrer
                 >{example_name}</a>
               </span>
             {/each}

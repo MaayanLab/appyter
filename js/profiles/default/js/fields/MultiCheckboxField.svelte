@@ -32,6 +32,7 @@ $: args.value = JSON.stringify(Object.keys(value).filter(k => value[k]))
         <li
           class="list-group-item cursor-pointer"
           on:click={() => value[choice] = !value[choice]}
+          on:keypress={() => value[choice] = !value[choice]}
         >
           <div class="form-check">
             <input

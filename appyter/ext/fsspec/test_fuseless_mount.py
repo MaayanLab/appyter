@@ -35,6 +35,12 @@ def test_fuse_mount():
         (mnt_dir/'hi').mkdir(exist_ok=True)
         (mnt_dir/'hi/world').open('w').write('test')
         assert_eq((mnt_dir/'hi/world').open('r').read(), 'test')
+        # seek works
+        with (mnt_dir/'bye').open('w+') as fw:
+          fw.write('hi!')
+          fw.seek(0)
+          fw.write('H')
+        assert_eq((mnt_dir/'bye').open('r').read(), 'Hi!')
     finally:
       fs.rm('', recursive=True)
 
