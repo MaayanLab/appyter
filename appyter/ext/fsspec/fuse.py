@@ -45,6 +45,9 @@ async def fs_mount(fs, fs_path='', mount_dir=None):
         logger.debug(f"unmounting fs from {mount_dir}")
         os.kill(proc.pid, signal.SIGINT) # SIGINT cleanly stops fsspec.fuse.run
         logger.debug(f"waiting for process to end")
-        await ensure_async(proc.join)()
+        try:
+          await ensure_async(proc.join)(30)
+        except TimeoutError:
+          os.kill(proc.pid, signal.SIGTERM) # SIGTERM unclean stop
         await async_try_n_times(3, ensure_async(lambda path: assert_true(not path.is_mount())), mount_dir)
     logger.debug(f"done")
