@@ -25,6 +25,7 @@ class SubprocessExecutor(AbstractExecutor):
       job['ipynb'],
       stderr=sys.stderr,
       env=dict(
+        SYSTEMROOT=os.environ.get('SYSTEMROOT', ''),
         PYTHONPATH=':'.join(sys.path),
         PATH=os.environ['PATH'],
       ),
