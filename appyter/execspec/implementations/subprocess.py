@@ -26,6 +26,7 @@ class SubprocessExecutor(AbstractExecutor):
       stderr=sys.stderr,
       env=dict(
         SYSTEMROOT=os.environ.get('SYSTEMROOT', ''),
+        HOME=os.environ.get('HOME', ''),
         PYTHONPATH=':'.join(sys.path),
         PATH=os.environ['PATH'],
       ),

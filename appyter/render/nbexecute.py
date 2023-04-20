@@ -99,6 +99,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
           async with client.async_setup_kernel(
             env=dict(
               SYSTEMROOT=os.environ.get('SYSTEMROOT', ''),
+              HOME=str(mnt),
               PYTHONPATH=':'.join(sys.path),
               PATH=os.environ['PATH'],
             ),
