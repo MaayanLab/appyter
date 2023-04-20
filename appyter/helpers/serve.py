@@ -51,7 +51,7 @@ def serve(data_dir, cwd, host, port, args):
       ],
       stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr,
       cwd=tmp.resolve(),
-      env=dict(
+      env=dict(os.environ,
         PYTHONPATH=':'.join(sys.path),
         PATH=os.environ['PATH']
       ),

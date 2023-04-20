@@ -42,7 +42,7 @@ def serve(app_path, **kwargs):
         find_blueprints=find_blueprints,
       ).dump(fw)
     logger.info(f"Starting production instance at http://{config['HOST']}:{config['PORT']}{config['PREFIX']}/ ...")
-    with Popen(['supervisord', '-n', '-c', str(tmp_dir/'supervisord.conf')]) as proc:
+    with Popen(['supervisord', '-n', '-c', str(tmp_dir/'supervisord.conf')], env=os.environ) as proc:
       try:
         exit_code = proc.wait()
       except KeyboardInterrupt:
