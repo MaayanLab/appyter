@@ -162,6 +162,11 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
     with self.__masquerade_os_error(path=path):
       return self.fs.makedirs(self._resolve_path(path), exist_ok=exist_ok)
 
+  def chmod(self, path, mode):
+    with self.__masquerade_os_error(path=path):
+      if hasattr(self.fs, 'chmod'):
+        return self.fs.chmod(self._resolve_path(path), mode)
+
   def rmdir(self, path):
     with self.__masquerade_os_error(path=path):
       return self.fs.rmdir(self._resolve_path(path))
