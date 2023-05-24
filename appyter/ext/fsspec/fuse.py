@@ -37,6 +37,9 @@ class FUSErEx(FUSEr):
       data["st_mtime"] = time.time()
       return data
 
+  def chmod(self, path, mode): pass
+  def chown(self, path, mode): pass
+
 def _fuse_run(fs_json, fs_path, mount_dir):
   import fsspec.fuse
   import appyter.ext.fsspec
