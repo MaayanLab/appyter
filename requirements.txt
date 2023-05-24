@@ -6,7 +6,7 @@ click
 click-default-group
 flask_cors
 flask>=2.0,<2.1
-fsspec==2022.1.0
+fsspec==2023.5.0
 fusepy
 ipython
 jinja2
@@ -17,8 +17,8 @@ nbconvert
 nbformat>=5.0,<6.0
 notebook
 python-dotenv
-python-engineio==4.0.0
-python-socketio==5.0.4
+python-engineio==4.4.1
+python-socketio==5.8.0
 pyyaml
 watchgod
 werkzeug==2.0.3
