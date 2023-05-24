@@ -22,12 +22,9 @@ def _test_ctx():
   with tempfile.TemporaryDirectory() as tmpdir:
     tmpdir = Path(tmpdir)
     (tmpdir/'a'/'b').mkdir(parents=True)
-    with (tmpdir/'a'/'b'/'c').open('w') as fw:
-      fw.write('C')
-    with (tmpdir/'a'/'d').open('w') as fw:
-      fw.write('D')
-    with (tmpdir/'e').open('w') as fw:
-      fw.write('E')
+    with (tmpdir/'a'/'b'/'c').open('w') as fw: fw.write('C')
+    with (tmpdir/'a'/'d').open('w') as fw: fw.write('D')
+    with (tmpdir/'e').open('w') as fw: fw.write('E')
     yield tmpdir
 
 def test_file_chroot_fuse():
@@ -36,18 +33,16 @@ def test_file_chroot_fuse():
     with ensure_sync(fs_mount(fs)) as fs:
       # reads work
       assert_eq(frozenset(str(p.relative_to(fs)) for p in fs.rglob('*')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e', 'g']))
-      assert_eq((fs/'a'/'b'/'c').open('rb').read(), b'C')
-      assert_eq((fs/'a'/'d').open('rb').read(), b'D')
-      assert_eq((fs/'e').open('rb').read(), b'E')
+      with (fs/'a'/'b'/'c').open('rb') as fr: assert_eq(fr.read(), b'C')
+      with (fs/'a'/'d').open('rb') as fr: assert_eq(fr.read(), b'D')
+      with (fs/'e').open('rb') as fr: assert_eq(fr.read(), b'E')
       # pathmap works
-      assert_eq((fs/'g').open('rb').read(), b'E')
+      with (fs/'g').open('rb') as fr: assert_eq(fr.read(), b'E')
       # writes work
-      with (fs / 'f').open('wb') as fw:
-        fw.write(b'f')
-      assert_eq((fs/'f').open('rb').read(), b'f')
+      with (fs/'f').open('wb') as fw: fw.write(b'f')
+      with (fs/'f').open('rb') as fr: assert_eq(fr.read(), b'f')
       # overwrites work
-      with (fs / 'f').open('wb') as fw:
-        fw.write(b'F')
-      assert_eq((fs/'f').open('rb').read(), b'F')
+      with (fs/'f').open('wb') as fw: fw.write(b'F')
+      with (fs/'f').open('rb') as fr: assert_eq(fr.read(), b'F')
       # and make it to the underlying store
-      assert_eq((tmpdir/'f').open('rb').read(), b'F')
+      with (tmpdir/'f').open('rb') as fr: assert_eq(fr.read(), b'F')

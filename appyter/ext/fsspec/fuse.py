@@ -14,7 +14,7 @@ def _fuse_run(fs_json, fs_path, mount_dir):
     logger.debug(f'preparing {fs}..')
     with fs as fs:
       logger.debug('launching fuse..')
-      fsspec.fuse.run(fs, fs_path, mount_dir)
+      fsspec.fuse.run(fs, fs_path, mount_dir, threads=True)
       logger.debug('teardown..')
 
 @contextlib.asynccontextmanager

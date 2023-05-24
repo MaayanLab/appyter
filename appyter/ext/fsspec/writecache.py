@@ -1,5 +1,6 @@
 import os
 import contextlib
+from threading import Event
 from pathlib import PurePath
 from fsspec import AbstractFileSystem, filesystem
 from appyter.ext.fsspec.spec.mountable import MountableAbstractFileSystem
@@ -91,7 +92,7 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSy
     except:
       raise
     else:
-      self._local_cache.discard(path)
+      self._local_cache.pop(path, None)
 
   def rm(self, path, recursive=False, maxdepth=None):
     path = self.fs.root_marker + path.lstrip('/')
@@ -107,31 +108,15 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSy
 
   def cat_file(self, path, start=None, end=None, **kwargs):
     path = self.fs.root_marker + path.lstrip('/')
-    try:
-      return self.fs.cat_file(path, start=start, end=end, **kwargs)
-    except KeyboardInterrupt:
-      raise
-    except:
-      if path in self._local_cache:
-        fh = self._local_cache[path]
-        cur = fh.tell()
-        fh.seek(start or 0)
-        if end is None:
-          contents = fh.read()
-        else:
-          contents = fh.read(end - (start or 0))
-        fh.seek(cur)
-        return contents
-      else:
-        raise
+    return self.fs.cat_file(path, start=start, end=end, **kwargs)
 
   def put_file(self, lpath, rpath, **kwargs):
-    path = self.fs.root_marker + path.lstrip('/')
-    return self.fs.put_file(lpath, self._resolve_path(rpath), **kwargs)
+    rpath = self.fs.root_marker + rpath.lstrip('/')
+    return self.fs.put_file(lpath, rpath, **kwargs)
 
   def get_file(self, rpath, lpath, **kwargs):
-    path = self.fs.root_marker + path.lstrip('/')
-    return self.fs.get_file(self._resolve_path(rpath), lpath, **kwargs)
+    rpath = self.fs.root_marker + rpath.lstrip('/')
+    return self.fs.get_file(rpath, lpath, **kwargs)
 
   def cp_file(self, path1, path2, **kwargs):
     path1 = self.fs.root_marker + path1.lstrip('/')
@@ -183,7 +168,7 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSy
   def info(self, path, **kwargs):
     path = self.fs.root_marker + path.lstrip('/')
     if path in self._local_cache:
-      return self._local_cache[path]
+      return self._local_cache[path]['details']
     elif path in self._dir_cache:
       return {'type': 'directory', 'name': path}
     return self.fs.info(path, **kwargs)
@@ -197,7 +182,7 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSy
     for local_file_path, f in self._local_cache.items():
       if tuple(local_file_path.split('/'))[:len(path_split)] == path_split:
         if detail:
-          results[local_file_path] = f
+          results[local_file_path] = f['details']
         else:
           results[local_file_path] = local_file_path
     for f in self.fs.ls(path, detail=detail, **kwargs):
@@ -211,7 +196,7 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSy
     path = self.fs.root_marker + path.lstrip('/')
     if 'r' not in mode or '+' in mode:
       if path in self._local_cache:
-        details = self._local_cache[path]
+        details = self._local_cache[path]['details']
       else:
         try:
           details = self.fs.info(path)
@@ -220,26 +205,36 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSy
         except FileNotFoundError:
           details = None
       return LocalTempFile(self, path, mode=mode, details=details)
+    if path in self._local_cache:
+      # wait for pending writes before allowing reads
+      #  helps prevent a particular race condition caused by FUSE mounts
+      self._local_cache[path]['commit'].wait(timeout=5)
     return self.fs._open(path, mode=mode, **kwargs)
 
 class LocalTempFile:
   """A temporary local file, which will be uploaded on commit"""
 
   def __init__(self, fs, path, fn=None, mode="wb", autocommit=True, seek=0, details=None):
-    fs._local_cache[path] = details if details else {'type': 'file', 'size': 0}
-    fn = fn or mktemp()
-    self.mode = mode
-    self.fn = fn
-    # if the file exists on the remote and we need the contents, get them first
-    if details and 'a' in mode or ('r' in mode and '+' in mode):
-      fs.fs.get(path, fn)
-    self.fh = open(fn, mode)
-    if seek:
-      self.fh.seek(seek)
-    self.path = path
     self.fs = fs
-    self.closed = False
+    self.path = path
+    self.mode = mode
     self.autocommit = autocommit
+    if self.path not in self.fs._local_cache:
+      self.fn = fn or mktemp()
+      self.fs._local_cache[self.path] = {
+        'fn': self.fn,
+        'details': details if details else {'type': 'file', 'size': 0},
+        'commit': Event(),
+        'rc': 0,
+      }
+      # if the file exists on the remote and we need the contents, get them first
+      if details and 'a' in self.mode or ('r' in self.mode and '+' in self.mode):
+        self.fs.get_file(self.path, self.fn)
+    else:
+      self.fn = fn or self.fs._local_cache[self.path]['fn']
+    self.fh = open(self.fn, self.mode)
+    if seek: self.fh.seek(seek)
+    self.fs._local_cache[self.path]['rc'] += 1
 
   def __reduce__(self):
     # always open in rb+ to allow continuing writing at a location
@@ -256,7 +251,6 @@ class LocalTempFile:
 
   def close(self):
     self.fh.close()
-    self.closed = True
     if self.autocommit:
       self.commit()
 
@@ -265,13 +259,14 @@ class LocalTempFile:
     self.cleanup()
 
   def commit(self):
-    self.fs.fs.put(self.fn, self.path)
+    self.fs.put_file(self.fn, self.path)
     self.cleanup()
 
   def cleanup(self):
-    os.remove(self.fn)
-    if self.path in self.fs._local_cache:
-      del self.fs._local_cache[self.path]
+    self.fs._local_cache[self.path]['rc'] -= 1
+    if self.fs._local_cache[self.path]['rc'] == 0:
+      self.fs._local_cache.pop(self.path)['commit'].set()
+      os.remove(self.fn)
 
   def __getattr__(self, item):
     return getattr(self.fh, item)
