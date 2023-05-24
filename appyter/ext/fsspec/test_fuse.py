@@ -46,3 +46,4 @@ def test_file_chroot_fuse():
       with (fs/'f').open('rb') as fr: assert_eq(fr.read(), b'F')
       # and make it to the underlying store
       with (tmpdir/'f').open('rb') as fr: assert_eq(fr.read(), b'F')
+      assert_eq(frozenset(str(p.relative_to(tmpdir)) for p in tmpdir.rglob('*')), frozenset(['a', 'a/b', 'a/b/c', 'a/d', 'e', 'f']))

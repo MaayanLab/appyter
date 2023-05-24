@@ -33,8 +33,8 @@ def test_fuse_mount():
           frozenset({('test', b'Hello World!')}),
         )
         (mnt_dir/'hi').mkdir(exist_ok=True)
-        (mnt_dir/'hi/world').open('w').write('test')
-        assert_eq((mnt_dir/'hi/world').open('r').read(), 'test')
+        with (mnt_dir/'hi/world').open('w') as fw: fw.write('test')
+        with (mnt_dir/'hi/world').open('r') as fr: assert_eq(fr.read(), 'test')
     finally:
       fs.rm('', recursive=True)
 
@@ -50,7 +50,7 @@ def test_fuseless_mount():
         logging.debug(f"{mnt_dir=}")
         assert_eq(
           frozenset({
-            (p.name, p.open('rb').read())
+            (p.name, p.read_bytes())
             for p in mnt_dir.rglob('*') if p.is_file()
           }),
           frozenset({('test', b'Hello World!')}),
