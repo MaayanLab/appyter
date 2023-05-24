@@ -4,6 +4,39 @@ import multiprocessing as mp
 
 logger = logging.getLogger(__name__)
 
+import time, stat, fuse, errno, traceback
+from fsspec.fuse import FUSEr
+class FUSErEx(FUSEr):
+  def getattr(self, path, fh=None):
+      if self._ready_file and path in ["/.fuse_ready", ".fuse_ready"]:
+          return {"type": "file", "st_size": 5}
+
+      path = "".join([self.root, path.lstrip("/")]).rstrip("/")
+      try:
+          if len(path) > 255:
+             raise fuse.FuseOSError(errno.ENAMETOOLONG)
+          info = self.fs.info(path)
+      except:
+          logger.warning(traceback.format_exc())
+          raise fuse.FuseOSError(errno.ENOENT)
+
+      data = {"st_uid": info.get("uid", 1000), "st_gid": info.get("gid", 1000)}
+      perm = info.get("mode", 0o777)
+
+      if info["type"] != "file":
+          data["st_mode"] = stat.S_IFDIR | perm
+          data["st_size"] = 0
+          data["st_blksize"] = 0
+      else:
+          data["st_mode"] = stat.S_IFREG | perm
+          data["st_size"] = info["size"]
+          data["st_blksize"] = 5 * 2 ** 20
+          data["st_nlink"] = 1
+      data["st_atime"] = time.time()
+      data["st_ctime"] = time.time()
+      data["st_mtime"] = time.time()
+      return data
+
 def _fuse_run(fs_json, fs_path, mount_dir):
   import fsspec.fuse
   import appyter.ext.fsspec
@@ -14,7 +47,7 @@ def _fuse_run(fs_json, fs_path, mount_dir):
     logger.debug(f'preparing {fs}..')
     with fs as fs:
       logger.debug('launching fuse..')
-      fsspec.fuse.run(fs, fs_path, mount_dir, threads=True)
+      fsspec.fuse.run(fs, fs_path, mount_dir, threads=True, ops_class=FUSErEx)
       logger.debug('teardown..')
 
 @contextlib.asynccontextmanager
