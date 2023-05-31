@@ -1,3 +1,5 @@
+import os
+import errno
 import contextlib
 import traceback
 import logging
@@ -79,14 +81,15 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
       yield
     except FileNotFoundError:
       if path:
-        raise FileNotFoundError(path)
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
+
       else:
         raise FileNotFoundError
     except PermissionError:
       if path:
-        raise PermissionError(path)
+        raise PermissionError(errno.EPERM, os.strerror(errno.EPERM), path)
       else:
-        raise PermissionError
+        raise PermissionError(errno.EPERM, os.strerror(errno.EPERM))
     except OSError as e:
       logger.error(traceback.format_exc())
       if e.errno:
