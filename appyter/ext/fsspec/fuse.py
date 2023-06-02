@@ -1,8 +1,18 @@
 import contextlib
 import logging
 import multiprocessing as mp
+from fsspec.fuse import FUSEr
 
 logger = logging.getLogger(__name__)
+
+class FUSErEx(FUSEr):
+  def flush(self, path, fh):
+    try: self.cache[fh].flush()
+    except: pass
+
+  def fsync(self, path, datasync, fh):
+    try: self.cache[fh].flush()
+    except: pass
 
 def _fuse_run(fs_json, fs_path, mount_dir):
   import fsspec.fuse
@@ -14,7 +24,7 @@ def _fuse_run(fs_json, fs_path, mount_dir):
     logger.debug(f'preparing {fs}..')
     with fs as fs:
       logger.debug('launching fuse..')
-      fsspec.fuse.run(fs, fs_path, mount_dir)
+      fsspec.fuse.run(fs, fs_path, mount_dir, ops_class=FUSErEx)
       logger.debug('teardown..')
 
 @contextlib.asynccontextmanager
