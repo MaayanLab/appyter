@@ -6,6 +6,12 @@ from fsspec.fuse import FUSEr
 logger = logging.getLogger(__name__)
 
 class FUSErEx(FUSEr):
+  def chmod(self, path, mode):
+    pass
+
+  def chown(self, path, uid, gid):
+    pass
+
   def flush(self, path, fh):
     try: self.cache[fh].flush()
     except: pass
