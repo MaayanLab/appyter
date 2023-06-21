@@ -60,7 +60,8 @@ class KubernetesExecutor(AbstractExecutor):
                       for k, v in dict_merge(
                         {
                           's': job['url'],
-                          'w': job['cwd'],
+                          'w': f"storage://{job['cwd']}",
+                          'fuse': 'true',
                           'data-dir': job['storage'],
                         },
                         **self.executor_options.get('args', {})
