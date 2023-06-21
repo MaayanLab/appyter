@@ -39,6 +39,7 @@ class KubernetesExecutor(AbstractExecutor):
       body=client.V1Job(
         api_version='batch/v1',
         kind='Job',
+        namespace=namespace,
         metadata=client.V1ObjectMeta(
           name=job['id'],
           annotations={
