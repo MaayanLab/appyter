@@ -31,7 +31,7 @@ class KubernetesExecutor(AbstractExecutor):
     from kubernetes import config
     config.load_incluster_config()
 
-  def _submit(self, job, namespace='default'):
+  def submit(self, job, namespace='default'):
     from kubernetes import client
     batchV1 = client.BatchV1Api()
     batchV1.create_namespaced_job(
@@ -98,9 +98,9 @@ class KubernetesExecutor(AbstractExecutor):
         ),
       ),
     )
-  submit = ensure_async(_submit)
+  _submit = ensure_async(submit)
 
-  def _wait_for(self, run_id, namespace='default', debug=False):
+  def wait_for(self, run_id, namespace='default', debug=False):
     from kubernetes import client
     coreV1 = client.CoreV1Api()
     batchV1 = client.BatchV1Api()
@@ -115,7 +115,7 @@ class KubernetesExecutor(AbstractExecutor):
           break
     logger.info(f"{run_id} completed")
     return 0
-  wait_for = ensure_async(_wait_for)
+  _wait_for = ensure_async(wait_for)
 
   async def _run(self, **job):
     yield dict(type='status', data=f"Submitting appyter for execution..")
