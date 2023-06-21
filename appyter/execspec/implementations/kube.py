@@ -92,7 +92,7 @@ class KubernetesExecutor(AbstractExecutor):
               ],
             ),
           ),
-          ttlSecondsAfterFinished=120,
+          ttl_seconds_after_finished=120,
           backoff_limit=1,
         ),
       ),
