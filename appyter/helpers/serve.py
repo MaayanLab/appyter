@@ -54,7 +54,6 @@ def serve(data_dir, cwd, host, port, args):
       env=dict(os.environ,
         PYTHONUTF8='1',
         PYTHONPATH=':'.join(sys.path),
-        PATH=os.environ['PATH']
       ),
     )
     exit_code = None

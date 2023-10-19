@@ -98,12 +98,9 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
           await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
           async with client.async_setup_kernel(
             env=dict(
-              SYSTEMROOT=os.environ.get('SYSTEMROOT', ''),
-              HOME=str(mnt),
-              USERPROFILE=str(mnt),
+              { k: v for k, v in os.environ.items() if not k.startswith('APPYTER_') },
               PYTHONUTF8='1',
               PYTHONPATH=':'.join(sys.path),
-              PATH=os.environ['PATH'],
             ),
           ):
             logger.info('executing')
