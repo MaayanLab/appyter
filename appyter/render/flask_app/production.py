@@ -12,7 +12,6 @@ def serve(app_path, **kwargs):
   config = get_env(**kwargs, mode='prerender')
   logger.info(kwargs)
   env = get_jinja2_env(config=config)
-  os_env = { k: v for k, v in os.environ.items() if not k.startswith('APPYTER_') }
   exit_code = 1
   with tempdir() as tmp_dir:
     logger.info(f"Working directory {tmp_dir}")
@@ -35,15 +34,22 @@ def serve(app_path, **kwargs):
     #
     logger.info(f"Generating production config...")
     with (tmp_dir/'supervisord.conf').open('w') as fw:
-      env.get_template('production/supervisord.conf.j2').stream(_tmp_dir=tmp_dir, env=os_env, sys=sys, str=str).dump(fw)
+      env.get_template('production/supervisord.conf.j2').stream(
+        _tmp_dir=tmp_dir,
+        list=list,
+        str=str,
+        sys=sys,
+      ).dump(fw)
     with (tmp_dir/'nginx.conf').open('w') as fw:
       env.get_template('production/nginx.conf.j2').stream(
-        _tmp_dir=tmp_dir, os=os, str=str,
-        get_appyter_directory=get_appyter_directory,
+        _tmp_dir=tmp_dir,
         find_blueprints=find_blueprints,
+        get_appyter_directory=get_appyter_directory,
+        os=os,
+        str=str,
       ).dump(fw)
     logger.info(f"Starting production instance at http://{config['HOST']}:{config['PORT']}{config['PREFIX']}/ ...")
-    with Popen(['supervisord', '-n', '-c', str(tmp_dir/'supervisord.conf')], env=os_env) as proc:
+    with Popen(['supervisord', '-n', '-c', str(tmp_dir/'supervisord.conf')], env=os.environ) as proc:
       try:
         exit_code = proc.wait()
       except KeyboardInterrupt:
