@@ -34,12 +34,19 @@ def serve(app_path, **kwargs):
     #
     logger.info(f"Generating production config...")
     with (tmp_dir/'supervisord.conf').open('w') as fw:
-      env.get_template('production/supervisord.conf.j2').stream(_tmp_dir=tmp_dir, sys=sys, str=str).dump(fw)
+      env.get_template('production/supervisord.conf.j2').stream(
+        _tmp_dir=tmp_dir,
+        list=list,
+        str=str,
+        sys=sys,
+      ).dump(fw)
     with (tmp_dir/'nginx.conf').open('w') as fw:
       env.get_template('production/nginx.conf.j2').stream(
-        _tmp_dir=tmp_dir, os=os, str=str,
-        get_appyter_directory=get_appyter_directory,
+        _tmp_dir=tmp_dir,
         find_blueprints=find_blueprints,
+        get_appyter_directory=get_appyter_directory,
+        os=os,
+        str=str,
       ).dump(fw)
     logger.info(f"Starting production instance at http://{config['HOST']}:{config['PORT']}{config['PREFIX']}/ ...")
     with Popen(['supervisord', '-n', '-c', str(tmp_dir/'supervisord.conf')], env=os.environ) as proc:

@@ -25,12 +25,9 @@ class SubprocessExecutor(AbstractExecutor):
       job['ipynb'],
       stderr=sys.stderr,
       env=dict(
-        SYSTEMROOT=os.environ.get('SYSTEMROOT', ''),
-        HOME=os.environ.get('HOME', ''),
-        USERPROFILE=os.environ.get('USERPROFILE', ''),
-        PYTHONUTF8='1',
+        os.environ,
+        { k: v for k, v in os.environ.items() if not k.startswith('APPYTER_') },
         PYTHONPATH=':'.join(sys.path),
-        PATH=os.environ['PATH'],
       ),
     ):
       yield msg, done

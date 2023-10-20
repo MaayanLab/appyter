@@ -51,11 +51,7 @@ def serve(data_dir, cwd, host, port, args):
       ],
       stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr,
       cwd=tmp.resolve(),
-      env=dict(os.environ,
-        PYTHONUTF8='1',
-        PYTHONPATH=':'.join(sys.path),
-        PATH=os.environ['PATH']
-      ),
+      env=dict(os.environ, PYTHONPATH=':'.join(sys.path)),
     )
     exit_code = None
     while exit_code is None:

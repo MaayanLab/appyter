@@ -12,7 +12,7 @@ async def run_app(config):
     f"--socket={config['HOST']}:{config['PORT']}",
     stdout=sys.stdout,
     stderr=sys.stderr,
-    env=dict(os.environ),
+    env=os.environ,
   )
 
 async def app_runner(emitter, config):
