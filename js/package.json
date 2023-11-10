@@ -47,7 +47,7 @@
     "markdown-it-anchor": "^8.4.1",
     "requirejs": "^2.3.6",
     "select2": "^4.0.13",
-    "socket.io-client": "^4.4.1",
+    "socket.io-client": "^4.5.4",
     "socketio-file-upload": "^0.7.3",
     "uuid": "^8.3.2"
   }
