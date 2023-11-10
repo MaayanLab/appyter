@@ -21,5 +21,5 @@ python-engineio==4.0.0
 python-socketio==5.0.4
 pyyaml
 watchgod
-werkzeug==2.0.3
+werkzeug==2.2.3
 yarl==1.8.2
