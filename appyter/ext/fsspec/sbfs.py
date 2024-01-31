@@ -284,6 +284,7 @@ class SBFSFileSystem(MountableAbstractFileSystem, SyncAsyncFileSystem, AsyncFile
     return ensure_sync(self._get_drs(path, **kwargs))
 
   async def _info(self, path, **kwargs):
+    if len(path) > 1024: raise FileNotFoundError
     path_split = [] if path in {'', '.', '/', './'} else path.split('/')
     if len(path_split) == 0:
       return {'name': path, 'type': 'directory'}

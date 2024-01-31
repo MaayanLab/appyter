@@ -1,6 +1,13 @@
 from s3fs.core import S3FileSystem, buck_acls, ClientError, translate_boto_error, ParamValidationError, sync_wrapper
 
 class S3FileSystemEx(S3FileSystem):
+
+    async def _info(self, path, bucket=None, key=None, refresh=False, version_id=None):
+        if len(path) > 1024: raise FileNotFoundError
+        return await super()._info(path, bucket=bucket, key=key, refresh=refresh, version_id=version_id)
+
+    info = sync_wrapper(_info)
+
     async def _mkdir(self, path, acl="", create_parents=True, **kwargs):
         '''
         If we create an empty directory, we'll add it to `dircache`
