@@ -132,7 +132,7 @@ def create_app(**kwargs):
 @click_option_setenv('--secret-key', envvar='APPYTER_SECRET_KEY', default=None, help='A secret key for flask')
 @click_option_setenv('--debug', envvar='APPYTER_DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
 @click_option_setenv('--static-dir', envvar='APPYTER_STATIC_DIR', default='static', help='The folder whether staticfiles are located')
-@click_option_setenv('--watch', envvar='APPYTER_WATCH', type=bool, default=False, help='Whether to watch files or not (when running in development)')
+@click_option_setenv('--watch', envvar='APPYTER_WATCH', type=bool, default=True, help='Whether to watch files or not (when running in development)')
 @click_argument_setenv('ipynb', envvar='APPYTER_IPYNB')
 def flask_app(**kwargs):
   import sys
