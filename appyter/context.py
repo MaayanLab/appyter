@@ -219,6 +219,9 @@ def get_env_from_kwargs(**kwargs):
     if 'hints' in kwargs or 'HINTS' not in _config:
       _config['HINTS'] = try_json_loads(kwargs.get('hints', os.environ.get('APPYTER_HINTS', '')))
   #
+  if 'watch' in kwargs or 'WATCH' not in _config:
+    _config['WATCH'] = False if not _config.get('DEBUG', False) else try_json_loads(kwargs.get('watch', True))
+  #
   if _config['MODE'] == 'default' and (_config['IPYNB'] is None or not os.path.isfile(os.path.join(_config['CWD'], _config['IPYNB']))):
     logger.error('ipynb was not found')
   #
