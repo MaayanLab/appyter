@@ -75,17 +75,14 @@ async def serve(app_path, **kwargs):
   from appyter.ext.asyncio.event_emitter import EventEmitter
   from appyter.ext.watchgod.watcher import GlobWatcher
   from appyter.context import get_env
-  logger.info(kwargs)
   config = get_env(**kwargs)
-  logger.info(config)
   emitter = EventEmitter()
   tasks = []
   # run the app and reload it when necessary
   tasks.append(asyncio.create_task(app_runner(emitter, config)))
   # the underlying appyter library
-  logger.info(config.get('WATCH'))
-  logger.info(config['WATCH'])
   if config['WATCH']:
+    logger.info('in here')
     tasks.append(asyncio.create_task(
       file_watcher(emitter, 'reload', appyter.__path__[0],
         watcher_cls=GlobWatcher,
