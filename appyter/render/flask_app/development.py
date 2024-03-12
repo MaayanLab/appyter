@@ -75,7 +75,9 @@ async def serve(app_path, **kwargs):
   from appyter.ext.asyncio.event_emitter import EventEmitter
   from appyter.ext.watchgod.watcher import GlobWatcher
   from appyter.context import get_env
+  logger.info(kwargs)
   config = get_env(**kwargs)
+  logger.info(config)
   emitter = EventEmitter()
   tasks = []
   # run the app and reload it when necessary
