@@ -83,7 +83,9 @@ async def serve(app_path, **kwargs):
   # run the app and reload it when necessary
   tasks.append(asyncio.create_task(app_runner(emitter, config)))
   # the underlying appyter library
-  if config.get('WATCH'):
+  logger.info(config.get('WATCH'))
+  logger.info(config['WATCH'])
+  if config['WATCH']:
     tasks.append(asyncio.create_task(
       file_watcher(emitter, 'reload', appyter.__path__[0],
         watcher_cls=GlobWatcher,
