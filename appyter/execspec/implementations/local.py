@@ -1,6 +1,7 @@
-import contextlib
+import os
 import traceback
 import logging
+from appyter.ext.json import try_json_loads
 logger = logging.getLogger(__name__)
 
 from appyter.execspec.spec import AbstractExecutor
@@ -20,11 +21,14 @@ class LocalExecutor(AbstractExecutor):
   async def _submit(self, emit=None, **job):
     from appyter.render.nbexecute import nbexecute_async
     try:
+      fuse = job.get('fuse')
+      if fuse is None: fuse = try_json_loads(os.environ.get('APPYTER_FUSE'))
+      if fuse is None: fuse = not job.get('debug', False)
       await nbexecute_async(
         cwd=f"storage://{job['cwd']}",
         ipynb=job['ipynb'],
         emit=emit,
-        fuse=job.get('fuse', not job.get('debug', False)),
+        fuse=fuse,
       )
     except:
       logger.error(traceback.format_exc())
