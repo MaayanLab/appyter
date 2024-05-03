@@ -306,6 +306,11 @@
             href={`../export/${instance_id}/${window.location.search ? `${window.location.search}&` : '?'}format=zip`}
             title="An archive with the notebook and dependent files for running it"
           >Notebook Bundle (.zip)</a>
+          <a
+            class="dropdown-item"
+            href={`../export/${instance_id}/${window.location.search ? `${window.location.search}&` : '?'}format=pdf`}
+            title="An archive with the notebook and dependent files for running it"
+          >PDF Export (.pdf)</a>
         </div>
       </div>
     </div>
