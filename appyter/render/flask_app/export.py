@@ -32,7 +32,7 @@ def export(path):
         elif format == 'pdf':
           exporter = get_pdf_exporter()
           body, _rcs = exporter.from_notebook_node(nb)
-          return send_file(body, mimetype='application/pdf', as_attachment=True, attachment_filename='output.pdf')
+          return send_file(io.BytesIO(body), mimetype='application/pdf', as_attachment=True, attachment_filename='output.pdf')
         elif format == 'zip':
           metadata = nb.get('metadata', {}).get('appyter', {})
           files = metadata.get('nbexecute', {}).get('files', metadata.get('nbconstruct', {}).get('files', {}))
