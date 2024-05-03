@@ -109,13 +109,23 @@ def get_ipynb_hash():
   return sha1sum_io(get_ipynb_io())
 
 @decorator_in_production(memcached)
-def get_html_exporer():
+def get_html_exporter():
   ''' nbconvert html export
   '''
   from nbconvert import HTMLExporter
   html_exporter = HTMLExporter()
   html_exporter.template_name = 'classic'
   return html_exporter
+
+
+@decorator_in_production(memcached)
+def get_pdf_exporter():
+  ''' nbconvert pdf export
+  '''
+  from nbconvert import WebPDFExporter
+  pdf_exporter = WebPDFExporter()
+  pdf_exporter.template_name = 'classic'
+  return pdf_exporter
 
 @decorator_in_production(memcached)
 def get_base_files():

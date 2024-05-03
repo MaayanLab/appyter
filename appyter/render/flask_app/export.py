@@ -6,7 +6,7 @@ import zipfile
 from flask import request, current_app, send_file, abort
 
 from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.render.flask_app.constants import get_base_files, get_html_exporer
+from appyter.render.flask_app.constants import get_base_files, get_html_exporter, get_pdf_exporter
 from appyter.render.flask_app.core import core
 from appyter.render.flask_app.prepare import prepare_storage, prepare_request
 from appyter.ext.urllib import URI
@@ -26,9 +26,13 @@ def export(path):
         with data_fs.open(nbpath, 'rb') as fr:
           nb = nb_from_ipynb_io(fr)
         if format == 'html':
-          exporter = get_html_exporer()
+          exporter = get_html_exporter()
           body, _rcs = exporter.from_notebook_node(nb)
           return send_file(io.BytesIO(body.encode()), mimetype='text/html', as_attachment=True, attachment_filename='output.html')
+        elif format == 'pdf':
+          exporter = get_pdf_exporter()
+          body, _rcs = exporter.from_notebook_node(nb)
+          return send_file(body, mimetype='application/pdf', as_attachment=True, attachment_filename='output.pdf')
         elif format == 'zip':
           metadata = nb.get('metadata', {}).get('appyter', {})
           files = metadata.get('nbexecute', {}).get('files', metadata.get('nbconstruct', {}).get('files', {}))
