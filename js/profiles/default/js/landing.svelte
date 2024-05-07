@@ -281,42 +281,45 @@
     <button
       type="button"
       class="btn btn-dark white"
+      style="color: white !important;"
       onclick="downloadCitation()"
     >
       Export Citation
     </button>
-  </div>
-  <div class="d-inline-block">
-    <div class="dropdown">
-      <button
-        type="button"
-        class="btn btn-dark dropdown-toggle"
-        data-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >
-        Share
-      </button>
-      <div class="dropdown-menu">
-        <div
-          class="dropdown-item"
-          title="Copy the link to this report"
-          on:click={() => {
-            navigator.clipboard.writeText(window.location.href);
-          }}
+
+    <div class="d-inline-block">
+      <div class="dropdown">
+        <button
+          type="button"
+          class="btn btn-dark dropdown-toggle"
+          style="color: white !important;"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
         >
-          Copy Link
+          Share
+        </button>
+        <div class="dropdown-menu">
+          <div
+            class="dropdown-item"
+            title="Copy the link to this report"
+            on:click={() => {
+              navigator.clipboard.writeText(window.location.href);
+            }}
+          >
+            Copy Link
+          </div>
+          <a
+            class="dropdown-item"
+            href={`https://www.linkedin.com/shareArticle?mini=true&url=https%3A//multiomics2paper.maayanlab.cloud/${instance_id}`}
+            title="Share a link to the report on LinkedIn">LinkedIn</a
+          >
+          <a
+            class="dropdown-item"
+            href={`https://twitter.com/intent/tweet?text=https%3A//multiomics2paper.maayanlab.cloud/${instance_id}`}
+            title="Share a link to the report on X">X</a
+          >
         </div>
-        <a
-          class="dropdown-item"
-          href={`https://www.linkedin.com/shareArticle?mini=true&url=https%3A//multiomics2paper.maayanlab.cloud/${instance_id}`}
-          title="Share a link to the report on LinkedIn">LinkedIn</a
-        >
-        <a
-          class="dropdown-item"
-          href={`https://twitter.com/intent/tweet?text=https%3A//multiomics2paper.maayanlab.cloud/${instance_id}`}
-          title="Share a link to the report on X">X</a
-        >
       </div>
     </div>
   </div>
