@@ -217,7 +217,6 @@
 </script>
 
 <div class="row">
-  <div class="w-100"></div>
   <div class="col-sm-12 text-center">
     <div class="d-inline-block">
       <div class="dropdown">
@@ -336,6 +335,7 @@
       </div>
     </div>
   {/if}
+  <div class="w-100"></div>
   {#if $toc !== undefined}
     <Lazy
       module={() =>
