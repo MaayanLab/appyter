@@ -225,30 +225,6 @@
       props={{ toc: $toc }}
     />
   {/if}
-  <div class="col-sm-12 col-md-9 col-lg-8 col-xl-6 p-5" style="font-family: 'Open Sans';">
-    <p class="pb-3" style="font-weight: bold; font-size: 22px; color: black;">
-      Multiomics2Paper: Computational Workflow to Identify Driver Pathways and Novel Targets for Cohorts of Patients
-      Profiled with Transcriptomics, Proteomics, and Phosphoproteomics
-    </p>
-    <div class="p-2" style="border: 2px solid lightgray;">
-      <p id="abstract" class="pb-2" style="font-weight: bold; font-size: 22px; color: black;">
-        Abstract
-      </p>
-      <p class="" style="font-size: 14px; color: black;">
-        In its third phase, the Clinical Proteomic Tumor Analysis Consortium (CPTAC) program collected pan-cancer data
-        from 1,020 patients profiling the transcriptome, proteome, and phospho-proteome of tumors and adjacent tissues
-        from ten cancer types. To identify driver cell signaling pathways and potential immunotherapeutic candidates
-        from this CPTAC cohort, we applied the eXpression to Kinases (X2K) [1] and TargetRanger [2] algorithms. For each
-        cancer type, tumor samples were first clustered into subtypes based on cell signaling profiles inferred from
-        RNA-seq data with X2K, and then cell surface targets were prioritized for each cluster. These targets were
-        subsequently confirmed for high protein expression in the tumor subtypes. For each cancer type, the
-        computational pipeline identified key protein kinases and cell surface proteins that may serve as personalized
-        targets. Many of these targets are also robustly differentially expressed at the proteome level. Altogether,
-        this rational approach to identify key cell signaling pathways and potential targets demonstrates a pipeline
-        that can be applied for personalized cancer diagnosis and therapeutic development.
-      </p>
-    </div>
-  </div>
   <div class="col-sm-12 text-center">
     <div class="d-inline-block">
       <div class="dropdown">
