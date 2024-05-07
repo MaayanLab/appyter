@@ -218,13 +218,6 @@
 
 <div class="row">
   <div class="w-100"></div>
-  {#if $toc !== undefined}
-    <Lazy
-      module={() =>
-        import("@/extras/catalog-integration/TableOfContents.svelte")}
-      props={{ toc: $toc }}
-    />
-  {/if}
   <div class="col-sm-12 text-center">
     <div class="d-inline-block">
       <div class="dropdown">
@@ -342,6 +335,13 @@
         {status}
       </div>
     </div>
+  {/if}
+  {#if $toc !== undefined}
+    <Lazy
+      module={() =>
+        import("@/extras/catalog-integration/TableOfContents.svelte")}
+      props={{ toc: $toc }}
+    />
   {/if}
   {#if status === "Loading..."}
     <div class="col-sm-12 text-center">
