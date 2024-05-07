@@ -311,13 +311,17 @@
           </div>
           <a
             class="dropdown-item"
-            href={`https://www.linkedin.com/shareArticle?mini=true&url=https%3A//multiomics2paper.maayanlab.cloud/${instance_id}`}
-            title="Share a link to the report on LinkedIn">LinkedIn</a
+            href={`https://www.linkedin.com/shareArticle?mini=true&url=https%3A//${window.location.host + window.location.pathname}`}
+            title="Share a link to the report on LinkedIn"
+            target="_blank"
+            >LinkedIn</a
           >
           <a
             class="dropdown-item"
-            href={`https://twitter.com/intent/tweet?text=https%3A//multiomics2paper.maayanlab.cloud/${instance_id}`}
-            title="Share a link to the report on X">X</a
+            href={`https://twitter.com/intent/tweet?text=https%3A//${window.location.host + window.location.pathname}`}
+            title="Share a link to the report on X"
+            target="_blank"
+            >X</a
           >
         </div>
       </div>
