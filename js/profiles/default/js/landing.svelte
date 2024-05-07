@@ -217,6 +217,14 @@
 </script>
 
 <div class="row">
+  <div class="w-100"></div>
+  {#if $toc !== undefined}
+    <Lazy
+      module={() =>
+        import("@/extras/catalog-integration/TableOfContents.svelte")}
+      props={{ toc: $toc }}
+    />
+  {/if}
   <div class="col-sm-12 col-md-9 col-lg-8 col-xl-6 p-5" style="font-family: 'Open Sans';">
     <p class="pb-3" style="font-weight: bold; font-size: 22px; color: black;">
       Multiomics2Paper: Computational Workflow to Identify Driver Pathways and Novel Targets for Cohorts of Patients
@@ -358,14 +366,6 @@
         {status}
       </div>
     </div>
-  {/if}
-  <div class="w-100"></div>
-  {#if $toc !== undefined}
-    <Lazy
-      module={() =>
-        import("@/extras/catalog-integration/TableOfContents.svelte")}
-      props={{ toc: $toc }}
-    />
   {/if}
   {#if status === "Loading..."}
     <div class="col-sm-12 text-center">
