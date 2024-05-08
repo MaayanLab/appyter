@@ -125,7 +125,7 @@ def get_pdf_exporter():
   from nbconvert import WebPDFExporter
   pdf_exporter = WebPDFExporter()
   pdf_exporter.template_name = 'classic'
-  pdf_exporter.exclude_input_prompt = True
+  pdf_exporter.exclude_input = True
   return pdf_exporter
 
 @decorator_in_production(memcached)
