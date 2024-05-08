@@ -45,11 +45,11 @@
           <a href="#abstract" class="toc h2">
             Abstract
           </a>
-          <a href="#summary" class="toc h2">
-            Summary
+          <a href="#introduction" class="toc h2">
+            Introduction
           </a>
-          <a href="#motivation" class="toc h2">
-            Motivation
+          <a href="#methods" class="toc h2">
+            Methods
           </a>
           <a href="#results" class="toc h2">
             Results
