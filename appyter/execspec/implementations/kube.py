@@ -69,6 +69,13 @@ class KubernetesExecutor(AbstractExecutor):
                     ),
                     job['ipynb'],
                   ],
+                  env=[
+                    client.V1EnvVar(
+                      name=key,
+                      value=value,
+                    )
+                    for key, value in self.executor_options.get('env', {}).items()
+                  ],
                   security_context=client.V1SecurityContext(
                     privileged=True,
                     capabilities=client.V1Capabilities(
