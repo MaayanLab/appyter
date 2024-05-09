@@ -88,6 +88,9 @@ class KubernetesExecutor(AbstractExecutor):
                       mount_path='/dev/fuse',
                     )
                   ],
+                  resources=client.V1ResourceRequirements(
+                    **self.executor_options.get('resources', {})
+                  ),
                 ),
               ],
               volumes=[
