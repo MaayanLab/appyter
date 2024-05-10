@@ -60,13 +60,21 @@ class KubernetesExecutor(AbstractExecutor):
                       for k, v in dict_merge(
                         {
                           's': job['url'],
-                          'w': job['cwd'],
+                          'w': f"storage://{job['cwd']}",
                           'data-dir': job['storage'],
+                          'fuse': 'true',
                         },
                         **self.executor_options.get('args', {})
                       ).items()
                     ),
                     job['ipynb'],
+                  ],
+                  env=[
+                    client.V1EnvVar(
+                      name=key,
+                      value=value,
+                    )
+                    for key, value in self.executor_options.get('env', {}).items()
                   ],
                   security_context=client.V1SecurityContext(
                     privileged=True,
@@ -80,6 +88,9 @@ class KubernetesExecutor(AbstractExecutor):
                       mount_path='/dev/fuse',
                     )
                   ],
+                  resources=client.V1ResourceRequirements(
+                    **self.executor_options.get('resources', {})
+                  ),
                 ),
               ],
               volumes=[
@@ -92,7 +103,7 @@ class KubernetesExecutor(AbstractExecutor):
               ],
             ),
           ),
-          ttlSecondsAfterFinished=120,
+          ttl_seconds_after_finished=120,
           backoff_limit=1,
         ),
       ),
