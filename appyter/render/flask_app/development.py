@@ -82,29 +82,30 @@ async def serve(app_path, **kwargs):
   tasks.append(asyncio.create_task(app_runner(emitter, config)))
   # the underlying appyter library
   if config['WATCH']:
-    tasks.append(asyncio.create_task(
-      file_watcher(emitter, 'reload', appyter.__path__[0],
-        watcher_cls=GlobWatcher,
-        watcher_kwargs=dict(
-          include_dir_glob=['*'],
-          include_file_glob=['*.py'],
-          exclude_dir_glob=[],
-          exclude_file_glob=[],
-        ),
-      )
-    ))
-    # the underlying appyter library's templates/ipynb/staticfiles/...
-    tasks.append(asyncio.create_task(
-      file_watcher(emitter, 'livereload', appyter.__path__[0],
-        watcher_cls=GlobWatcher,
-        watcher_kwargs=dict(
-          include_dir_glob=['*'],
-          include_file_glob=['*'],
-          exclude_dir_glob=[],
-          exclude_file_glob=['*.py'],
-        ),
-      )
-    ))
+    if os.environ.get('APPYTER_DEVELOPMENT'):
+      tasks.append(asyncio.create_task(
+        file_watcher(emitter, 'reload', appyter.__path__[0],
+          watcher_cls=GlobWatcher,
+          watcher_kwargs=dict(
+            include_dir_glob=['*'],
+            include_file_glob=['*.py'],
+            exclude_dir_glob=[],
+            exclude_file_glob=[],
+          ),
+        )
+      ))
+      # the underlying appyter library's templates/ipynb/staticfiles/...
+      tasks.append(asyncio.create_task(
+        file_watcher(emitter, 'livereload', appyter.__path__[0],
+          watcher_cls=GlobWatcher,
+          watcher_kwargs=dict(
+            include_dir_glob=['*'],
+            include_file_glob=['*'],
+            exclude_dir_glob=[],
+            exclude_file_glob=['*.py'],
+          ),
+        )
+      ))
     # the appyter itself's filters/blueprints
     tasks.append(asyncio.create_task(
       file_watcher(emitter, 'reload', config['CWD'],
