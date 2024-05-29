@@ -49,24 +49,7 @@
             loading={current_code_cell}
           />
         </Cell>
-      {:else if cell.cell_type === 'markdown'}
-        <Cell type="text">
-          <Input>
-            <Prompt
-              prompt_type="input"
-              index={cell.index}
-            />
-            <div class="inner_cell">
-              <div class="text_cell_render border-box-sizing rendered_html">
-                <Lazy
-                  module={() => import('@/components/Markdown.svelte')}
-                  props={{data: collapse(cell.source)}}
-                />
-              </div>
-            </div>
-          </Input>
-        </Cell>
-      {:else if cell.cell_type === 'raw'}
+        {#if "buttons" in cell.metadata}
         <div class="col-sm-12 text-center">
           <div class="d-inline-block">
             <div class="dropdown">
@@ -166,6 +149,24 @@
             </div>
           </div>
         </div>
+        {/if}
+      {:else if cell.cell_type === 'markdown'}
+        <Cell type="text">
+          <Input>
+            <Prompt
+              prompt_type="input"
+              index={cell.index}
+            />
+            <div class="inner_cell">
+              <div class="text_cell_render border-box-sizing rendered_html">
+                <Lazy
+                  module={() => import('@/components/Markdown.svelte')}
+                  props={{data: collapse(cell.source)}}
+                />
+              </div>
+            </div>
+          </Input>
+        </Cell>
       {/if}
     {/if}
   {/each}
