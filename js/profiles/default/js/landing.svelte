@@ -217,7 +217,6 @@
 </script>
 
 <div class="row">
-  <div class="w-100">&nbsp;</div>
   {#if status}
     <div class="col-sm-8 offset-sm-2">
       <div class="alert alert-{statusBg}" role="alert">
