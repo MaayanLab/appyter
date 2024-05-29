@@ -50,7 +50,23 @@
           />
         </Cell>
       {:else if cell.cell_type === 'markdown'}
-        {#if cell.metadata.buttons}
+        <Cell type="text">
+          <Input>
+            <Prompt
+              prompt_type="input"
+              index={cell.index}
+            />
+            <div class="inner_cell">
+              <div class="text_cell_render border-box-sizing rendered_html">
+                <Lazy
+                  module={() => import('@/components/Markdown.svelte')}
+                  props={{data: collapse(cell.source)}}
+                />
+              </div>
+            </div>
+          </Input>
+        </Cell>
+      {:else if cell.cell.type === 'raw'}
         <div class="col-sm-12 text-center">
           <div class="d-inline-block">
             <div class="dropdown">
@@ -91,18 +107,16 @@
               </div>
             </div>
           </div>
-          {#if window._config.EXTRAS.indexOf("toggle-code") !== -1}
-            <button
-              type="button"
-              class="btn btn-secondary white"
-              on:click={() => {
-                $hash.params.show_code = JSON.stringify(!show_code);
-                $hash.path = "";
-              }}
-            >
-              Toggle Code
-            </button>
-          {/if}
+          <button
+            type="button"
+            class="btn btn-secondary white"
+            on:click={() => {
+              $hash.params.show_code = JSON.stringify(!show_code);
+              $hash.path = "";
+            }}
+          >
+            Toggle Code
+          </button>
           <button
             type="button"
             class="btn btn-dark white"
@@ -152,26 +166,6 @@
             </div>
           </div>
         </div>
-        {:else}
-        <Cell type="text">
-          <Input>
-            <Prompt
-              prompt_type="input"
-              index={cell.index}
-            />
-            <div class="inner_cell">
-              <div class="text_cell_render border-box-sizing rendered_html">
-                <Lazy
-                  module={() => import('@/components/Markdown.svelte')}
-                  props={{data: collapse(cell.source)}}
-                />
-              </div>
-            </div>
-          </Input>
-        </Cell>
-      
-      {/if}
-      
       {/if}
     {/if}
   {/each}
