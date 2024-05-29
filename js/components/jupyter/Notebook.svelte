@@ -66,7 +66,7 @@
             </div>
           </Input>
         </Cell>
-      {:else if cell.cell.type === 'raw'}
+      {:else if cell.cell_type === 'raw'}
         <div class="col-sm-12 text-center">
           <div class="d-inline-block">
             <div class="dropdown">
