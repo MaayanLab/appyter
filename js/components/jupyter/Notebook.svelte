@@ -106,28 +106,29 @@
             >
               Export Citation
             </button>
-            <button
+            <a
               class="share-item"
               title="Copy the link to this report"
+              href="#top"
               on:click={() => {
                 navigator.clipboard.writeText(window.location.href);
               }}
             >
-              <img src="static/share.png" alt="Share" width="30px" />
-            </button>
+              <img src="/static/share.png" alt="Share" width="30px" />
+            </a>
             <a
               class="share-item"
               href={`https://www.linkedin.com/shareArticle?mini=true&url=https%3A//${window.location.host + window.location.pathname}`}
               title="Share a link to the report on LinkedIn"
               target="_blank"
-              ><img src="static/linkedin.png" alt="LinkedIn" width="30px" />
+              ><img src="/static/linkedin.png" alt="LinkedIn" width="30px" />
             </a>
             <a
               class="share-item"
               href={`https://twitter.com/intent/tweet?text=https%3A//${window.location.host + window.location.pathname}`}
               title="Share a link to the report on X"
               target="_blank"
-              ><img src="static/X.png" alt="X" width="30px" />
+              ><img src="/static/X.png" alt="X" width="30px" />
             </a>
           </div>
         {/if}
