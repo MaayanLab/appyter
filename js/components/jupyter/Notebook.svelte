@@ -48,7 +48,7 @@
           />
         </Cell>
         {#if "buttons" in cell.metadata}
-          <div class="col-sm-12 text-center">
+          <div class="col-sm-12 text-center p-3">
             <div class="d-inline-block">
               <div class="dropdown">
                 <button
