@@ -1,8 +1,8 @@
 <script>
   export let type
-  export let outputs
+  export let styles
 </script>
 
-<div class="cell border-box-sizing {type}_cell rendered {outputs}">
+<div class="cell border-box-sizing {type}_cell rendered" style="{styles}">
   <slot></slot>
 </div>

@@ -23,7 +23,7 @@
   {#each nb.cells as cell (cell.index)}
     {#if collapse(cell.source) !== ""}
       {#if cell.cell_type === "code"}
-        <Cell type="code" outputs="{cell.outputs.length}">
+        <Cell type="code" styles="{cell.metadata.styles || ""}">
           {#if show_code}
             <Input>
               <Prompt
