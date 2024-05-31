@@ -7,6 +7,7 @@
   export let data = []
   export let index
   export let loading
+  export let styles
 
   function *reduce_output_streams(outputs) {
     let i = 0
@@ -42,7 +43,7 @@
           index="{index}-{output.index}"
           prompt_type="output"
         />
-        <div class="output_subarea">
+        <div class="output_subarea" style="{styles}">
           <Output data={output} />
         </div>
       </div>

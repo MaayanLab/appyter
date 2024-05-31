@@ -13,7 +13,6 @@
   export let nb;
   export let show_code;
   export let current_code_cell;
-  export let nbdownload;
 
   const paths = window.location.pathname.split("/").filter((p) => p);
   const instance_id = paths[paths.length - 1];
@@ -23,7 +22,7 @@
   {#each nb.cells as cell (cell.index)}
     {#if collapse(cell.source) !== ""}
       {#if cell.cell_type === "code"}
-        <Cell type="code" styles="{cell.metadata.styles || ""}">
+        <Cell type="code">
           {#if show_code}
             <Input>
               <Prompt
@@ -45,6 +44,7 @@
             index={cell.index}
             data={cell.outputs || []}
             loading={current_code_cell}
+            styles="{cell.metadata.styles || ""}"
           />
         </Cell>
         {#if "buttons" in cell.metadata}
@@ -63,7 +63,7 @@
                 <div class="dropdown-menu">
                   <a
                     class="dropdown-item"
-                    href={`${nbdownload}${window.location.search}`}
+                    href={`main.ipynb${window.location.search}`}
                     title="The standalone jupyter notebook as shown"
                     >Jupyter Notebook (.ipynb)</a
                   >
