@@ -40,7 +40,8 @@ async def dispatcher_ctx(app):
   #
   app['dispatch_queue'] = asyncio.Queue()
   app['tasks'] = LockedOrderedDict()
-  timeout = app['config']['TIMEOUT']
+  timeout = app['config'].get('JOB_TIMEOUT')
+  if timeout: timeout = float(timeout)
   #
   logger.info('Starting background tasks...')
   tasks = [
