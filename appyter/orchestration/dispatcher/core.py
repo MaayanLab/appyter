@@ -40,6 +40,7 @@ async def dispatcher_ctx(app):
   #
   app['dispatch_queue'] = asyncio.Queue()
   app['tasks'] = LockedOrderedDict()
+  timeout = app['config']['TIMEOUT']
   #
   logger.info('Starting background tasks...')
   tasks = [
@@ -48,6 +49,7 @@ async def dispatcher_ctx(app):
         queued=app['dispatch_queue'],
         tasks=app['tasks'],
         jobs_per_image=app['config']['JOBS_PER_IMAGE'],
+        timeout=timeout,
       )
     )
     for _ in range(app['config']['JOBS'])
@@ -69,7 +71,16 @@ async def slow_put(queue, item):
   await asyncio.sleep(0.5 + random.random())
   await queue.put(item)
 
-async def dispatcher(queued=None, tasks=None, jobs_per_image=1):
+async def dispatch(job_id, job):
+  from appyter.ext.emitter import url_to_emitter
+  from appyter.execspec.core import url_to_executor
+  async with url_to_executor(job['executor']) as executor:
+    async with url_to_emitter(job['url']) as emitter:
+      logger.info(f"Dispatching job {job_id}")
+      async for msg in executor._run(**job):
+        await emitter(msg)
+
+async def dispatcher(queued=None, tasks=None, jobs_per_image=1, timeout=None):
   while True:
     job_id = await queued.get()
     async with tasks.lock:
@@ -87,13 +98,7 @@ async def dispatcher(queued=None, tasks=None, jobs_per_image=1):
         ).isoformat()
     #
     try:
-      from appyter.ext.emitter import url_to_emitter
-      from appyter.execspec.core import url_to_executor
-      async with url_to_executor(job['executor']) as executor:
-        async with url_to_emitter(job['url']) as emitter:
-          logger.info(f"Dispatching job {job_id}")
-          async for msg in executor._run(**job):
-            await emitter(msg)
+      await asyncio.wait_for(dispatch(job_id, job), timeout=timeout)
     except asyncio.CancelledError:
       raise
     except:

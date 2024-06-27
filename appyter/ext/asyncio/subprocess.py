@@ -36,14 +36,19 @@ async def sh(*args, chunk_size=65536, **kwargs):
     limit=chunk_size * 2,
     **kwargs,
   )
-  reader = asyncio.create_task(stream_readline_to_queue(proc.stdout, stdout_queue, chunk_size=chunk_size))
-  while True:
-    msg, done = await stdout_queue.get()
-    if isinstance(msg, bytes):
-      yield msg, False
-    elif isinstance(msg, Exception):
-      raise msg
-    stdout_queue.task_done()
-    if done: break
-  await reader
-  yield await proc.wait(), True
+  try:
+    reader = asyncio.create_task(stream_readline_to_queue(proc.stdout, stdout_queue, chunk_size=chunk_size))
+    while True:
+      msg, done = await stdout_queue.get()
+      if isinstance(msg, bytes):
+        yield msg, False
+      elif isinstance(msg, Exception):
+        raise msg
+      stdout_queue.task_done()
+      if done: break
+    await reader
+  except:
+    proc.terminate()
+    raise
+  else:
+    yield await proc.wait(), True
