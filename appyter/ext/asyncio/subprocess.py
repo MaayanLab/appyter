@@ -56,8 +56,8 @@ async def sh(*args, chunk_size=65536, **kwargs):
       stdout_queue.task_done()
       if done: break
     await reader
-  except:
-    asyncio.create_task(ensure_terminated(proc))
-    raise
-  else:
     yield await proc.wait(), True
+  except:
+    raise
+  finally:
+    asyncio.create_task(ensure_terminated(proc))
