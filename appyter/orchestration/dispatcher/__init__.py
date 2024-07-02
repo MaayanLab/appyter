@@ -19,6 +19,7 @@ def create_app(**kwargs):
     PROXY=kwargs.get('proxy'),
     JOBS=kwargs.get('jobs'),
     JOBS_PER_IMAGE=kwargs.get('jobs_per_image'),
+    TIMEOUT=kwargs.get('timeout'),
     DEBUG=kwargs.get('debug'),
     PREFIX=kwargs.get('prefix', '').rstrip('/'),
   )
@@ -48,6 +49,7 @@ def create_app(**kwargs):
 @click_option_setenv('--proxy', envvar='APPYTER_PROXY', type=bool, default=False, help='Whether this is running behind a proxy and the IP should be fixed for CORS')
 @click_option_setenv('--jobs', envvar='APPYTER_JOBS', type=int, default=2, help='Number of concurrent jobs to dispatch')
 @click_option_setenv('--jobs-per-image', envvar='APPYTER_JOBS_PER_IMAGE', type=int, default=1, help='Number of concurrent jobs to dispatch for any individual appyter image')
+@click_option_setenv('--timeout', envvar='APPYTER_TIMEOUT', type=float, default=None, help='How long in seconds a job can run before it is cancelled')
 @click_option_setenv('--debug', envvar='APPYTER_DEBUG', type=bool, default=True, help='Whether or not we should be in debugging mode, not for use in multi-tenant situations')
 def dispatcher(*args, **kwargs):
   from appyter.ext.aiohttp import run_app

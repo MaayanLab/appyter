@@ -71,6 +71,7 @@ class DockerExecutor(AbstractExecutor):
     async for msg, done in self._submit(**job):
       if not done:
         try: yield await async_json_loads(msg)
+        except asyncio.CancelledError: raise
         except: logger.warning(traceback.format_exc())
     if msg != 0:
       yield dict(type='error', data=f"Container exited with error code")
