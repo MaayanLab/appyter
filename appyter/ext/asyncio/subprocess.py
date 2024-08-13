@@ -24,6 +24,15 @@ async def stream_readline_to_queue(stream, queue, chunk_size=65536):
   else:
     await queue.put((None, True))
 
+async def ensure_terminated(proc: asyncio.subprocess.Process):
+  try:
+    if proc.returncode is None:
+      proc.terminate()
+    await asyncio.sleep(5000)
+  finally:
+    if proc.returncode is None:
+      proc.kill()
+
 async def sh(*args, chunk_size=65536, **kwargs):
   ''' An opinionated asyncio shell that logs stderr & yields stdout, done
   Unlike standard create_subprocess_exec: LimitOverrunError should not be possible.
@@ -36,14 +45,19 @@ async def sh(*args, chunk_size=65536, **kwargs):
     limit=chunk_size * 2,
     **kwargs,
   )
-  reader = asyncio.create_task(stream_readline_to_queue(proc.stdout, stdout_queue, chunk_size=chunk_size))
-  while True:
-    msg, done = await stdout_queue.get()
-    if isinstance(msg, bytes):
-      yield msg, False
-    elif isinstance(msg, Exception):
-      raise msg
-    stdout_queue.task_done()
-    if done: break
-  await reader
-  yield await proc.wait(), True
+  try:
+    reader = asyncio.create_task(stream_readline_to_queue(proc.stdout, stdout_queue, chunk_size=chunk_size))
+    while True:
+      msg, done = await stdout_queue.get()
+      if isinstance(msg, bytes):
+        yield msg, False
+      elif isinstance(msg, Exception):
+        raise msg
+      stdout_queue.task_done()
+      if done: break
+    await reader
+    yield await proc.wait(), True
+  except:
+    raise
+  finally:
+    asyncio.create_task(ensure_terminated(proc))
