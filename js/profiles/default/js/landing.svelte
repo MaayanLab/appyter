@@ -76,6 +76,18 @@
       let cell_index = value_index[1]
       await tick()
       nb.cells[cell_index] = {...nb.cells[cell_index], ...value}
+      if (window._config.EXTRAS.indexOf('ipywidgets') !== -1) {
+        if ((value.metadata || {}).widgets !== undefined) {
+          if (nb.metadata === undefined) nb.metadata = {}
+          if (nb.metadata.widgets === undefined) nb.metadata.widgets = {}
+          if (nb.metadata.widgets['application/vnd.jupyter.widget-state+json'] === undefined) {
+            nb.metadata.widgets['application/vnd.jupyter.widget-state+json'] = value.metadata.widgets
+          } else {
+            Object.assign(nb.metadata.widgets['application/vnd.jupyter.widget-state+json'].state, (value.metadata.widgets.state || {}))
+          }
+          nb.metadata.widgets = nb.metadata.widgets
+        }
+      }
     })
     setup_chunking(socket)
   }

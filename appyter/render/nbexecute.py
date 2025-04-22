@@ -96,34 +96,38 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
             iopub_hook=iopub_hook,
           )
           await emit({ 'type': 'nb', 'data': nb_to_json(nb) })
-          async with client.async_setup_kernel(
-            env=dict(
-              { k: v for k, v in os.environ.items() if not k.startswith('APPYTER_') },
-              PYTHONPATH=':'.join(sys.path),
-            ),
-          ):
-            logger.info('executing')
-            state.update(status='Executing...', progress=0)
-            await emit({ 'type': 'status', 'data': state['status'] })
-            await emit({ 'type': 'progress', 'data': state['progress'] })
-            n_cells = len(nb.cells)
-            exec_count = 1
-            for index, cell in enumerate(nb.cells):
-              logger.debug(f"executing cell {index}")
-              cell = await client.async_execute_cell(
-                cell, index,
-                execution_count=exec_count,
-              )
-              if cell_is_code(cell):
-                if cell_has_error(cell):
-                  raise Exception('Cell execution error on cell %d' % (exec_count))
-                exec_count += 1
-              if index < n_cells-1:
-                state['progress'] = index + 1
-                await emit({ 'type': 'progress', 'data': state['progress'] })
-              else:
-                state['status'] = 'Success'
-                await emit({ 'type': 'status', 'data': state['status'] })
+          try:
+            async with client.async_setup_kernel(
+              env=dict(
+                { k: v for k, v in os.environ.items() if not k.startswith('APPYTER_') },
+                PYTHONPATH=':'.join(sys.path),
+              ),
+            ):
+              logger.info('executing')
+              state.update(status='Executing...', progress=0)
+              await emit({ 'type': 'status', 'data': state['status'] })
+              await emit({ 'type': 'progress', 'data': state['progress'] })
+              client.set_widgets_metadata()
+              n_cells = len(nb.cells)
+              exec_count = 1
+              for index, cell in enumerate(nb.cells):
+                logger.debug(f"executing cell {index}")
+                cell = await client.async_execute_cell(
+                  cell, index,
+                  execution_count=exec_count,
+                )
+                if cell_is_code(cell):
+                  if cell_has_error(cell):
+                    raise Exception('Cell execution error on cell %d' % (exec_count))
+                  exec_count += 1
+                if index < n_cells-1:
+                  state['progress'] = index + 1
+                  await emit({ 'type': 'progress', 'data': state['progress'] })
+                else:
+                  state['status'] = 'Success'
+                  await emit({ 'type': 'status', 'data': state['status'] })
+          finally:
+            client.set_widgets_metadata()
         except asyncio.CancelledError:
           logger.info('cancelled')
           raise

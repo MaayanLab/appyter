@@ -1,5 +1,6 @@
 <script>
   import Lazy from '@/components/Lazy.svelte'
+  import HTML from '@/components/HTML.svelte'
 
   import Cell from '@/components/jupyter/Cell.svelte'
   import Input from '@/components/jupyter/Input.svelte'
@@ -65,4 +66,7 @@
       {/if}
     {/if}
   {/each}
+  {#if window._config.EXTRAS.indexOf('ipywidgets') !== -1 && nb.metadata.widgets !== undefined && nb.metadata.widgets['application/vnd.jupyter.widget-state+json'] !== undefined}
+    <HTML data="<script type='application/vnd.jupyter.widget-state+json'>{JSON.stringify(nb.metadata.widgets['application/vnd.jupyter.widget-state+json'])}</script>" />
+  {/if}
 </Lazy>
