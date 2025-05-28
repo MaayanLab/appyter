@@ -27,6 +27,9 @@ def url_for(directory, public=False, **kwargs):
       raise
     except:
       url = join_url(config['PREFIX'], url)
+  else:
+    url = join_url(config['PREFIX'], url)
+
   #
   if config['MODE'] == 'magic':
     # jupyter notebook magic mode
