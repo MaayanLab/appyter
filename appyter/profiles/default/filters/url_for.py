@@ -16,7 +16,7 @@ def url_for(directory, public=False, **kwargs):
     # url_for outside of flask
     filename = kwargs.get('filename', kwargs.get('path'))
     assert filename is not None
-    url = join_url(config['PREFIX'], directory, filename)
+    url = join_url(directory, filename)
   #
   if config['MODE'] == 'default' and public:
     # url_for public modifier -- return the public facing url
@@ -26,7 +26,7 @@ def url_for(directory, public=False, **kwargs):
     except RuntimeError:
       raise
     except:
-      pass
+      url = join_url(config['PREFIX'], url)
   #
   if config['MODE'] == 'magic':
     # jupyter notebook magic mode
