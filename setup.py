@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
   name='appyter',
-  python_requires='>=3.7.0',
+  python_requires='>=3.7.0,<3.11',
   version=open('appyter/VERSION', 'r').read(),
   url='https://github.com/maayanLab/appyter/',
   author='Daniel J. B. Clarke',
