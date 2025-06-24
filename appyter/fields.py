@@ -3,7 +3,7 @@ This module contains :class:`appyter.fields.Field`, the base class for all field
 defined in :mod:`appyter.profiles.default.fields`.
 ``` '''
 
-from flask import Markup
+from markupsafe import Markup
 from appyter.ext.flask import request_get
 
 class PartialField:
@@ -71,7 +71,7 @@ class Field(dict):
     :param default: (Any) A default value as an example and for use during prototyping
     :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
     :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-    :param \**kwargs: Additional keyword arguments used by other fields
+    :param **kwargs: Additional keyword arguments used by other fields
     '''
     super().__init__(
       field=self.field,

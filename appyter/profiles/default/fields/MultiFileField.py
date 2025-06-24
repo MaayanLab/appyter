@@ -17,7 +17,7 @@ class MultiFileField(FileField):
       raw_value = list(self.args['value'])
     else:
       raw_value = []
-    return [v for v in raw_value if re.sub('\s+', '', v)]
+    return [v for v in raw_value if re.sub(r'\s+', '', v)]
 
   @property
   def uri(self):

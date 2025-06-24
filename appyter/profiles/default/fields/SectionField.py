@@ -13,7 +13,7 @@ class SectionField(Field):
   :param subtitle: (str) A human readable subtitle for the section
   :param img: (str) The path to an image used in the field relative to the static folder
   :param icon: (str) A font-awesome icon identifier, used if img is not provided
-  :param \**kwargs: Additional keyword arguments used by other fields
+  :param **kwargs: Additional keyword arguments used by other fields
   '''
   def __init__(self, icon='cogs', **kwargs):
     super().__init__(icon=icon, **kwargs)

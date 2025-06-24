@@ -19,7 +19,7 @@ class TextField(Field):
   :param cols: (Optional[int]) The number of cols (horizontal characters) in the textarea
   :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-  :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
+  :param **kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
   def __init__(self, constraint=None, hint=None, required=None, **kwargs):
     if constraint is None: constraint = r'.+' if required else r'.*'

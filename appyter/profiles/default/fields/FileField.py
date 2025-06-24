@@ -28,7 +28,7 @@ class FileField(Field):
     paths can be relative i.e. `{ "my_file.txt": url_for('static', filename='my_file.txt') }`, or a remote url.
   :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-  :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
+  :param **kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
   def __init__(self, default=None, constraint=r'.*', **kwargs):
     super().__init__(

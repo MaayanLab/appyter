@@ -21,7 +21,7 @@ class AutocompleteField(Field):
   :param examples: (Optional[Union[List[str], Dict[str, str]]]) Named strings to provide as clickable examples
   :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-  :param \**kwargs: Additional keyword arguments used by other fields
+  :param **kwargs: Additional keyword arguments used by other fields
   '''
   def __init__(self, constraint=r'.*', hint=None, **kwargs):
     super().__init__(

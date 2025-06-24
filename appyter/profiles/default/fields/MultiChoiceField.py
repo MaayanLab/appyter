@@ -13,7 +13,7 @@ class MultiChoiceField(Field):
   :param default: (float) A default value as an example and for use during prototyping
   :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-  :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
+  :param **kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
   def __init__(self, **kwargs):
     super().__init__(**kwargs)

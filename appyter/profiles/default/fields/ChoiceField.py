@@ -11,7 +11,7 @@ class ChoiceField(Field):
   :param default: (str) A default value as an example and for use during prototyping
   :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-  :param \**kwargs: Additional keyword arguments used by other fields
+  :param **kwargs: Additional keyword arguments used by other fields
   '''
   def __init__(self, **kwargs):
     super().__init__(**kwargs)

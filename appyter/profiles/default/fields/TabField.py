@@ -26,7 +26,7 @@ class TabField(Field):
   :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
   :param label: (str) A human readable label for the field for the HTML form
   :param description: (Optional[str]) A long human readable description for the field for the HTML form
-  :param \**kwargs: Additional keyword arguments used by other fields
+  :param **kwargs: Additional keyword arguments used by other fields
   ```
   '''
   def __init__(self, choices={}, **kwargs):
