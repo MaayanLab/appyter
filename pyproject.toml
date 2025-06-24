@@ -72,6 +72,9 @@ exclude = [
 [tool.poetry.scripts]
 appyter = 'appyter.__main__:main'
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.1"
+
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
