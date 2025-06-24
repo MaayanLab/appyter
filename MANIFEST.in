@@ -1,4 +1,0 @@
-include README.md LICENSE appyter/VERSION requirements.txt requirements.production.txt
-global-exclude *.pyc *.vscode
-recursive-include appyter *.j2 *.js *.css *.eot *.svg *.ttf *.woff *.woff2
-recursive-include appyter/helpers/cookiecutter *
