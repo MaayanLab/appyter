@@ -2,5 +2,6 @@
 '''
 import os
 from appyter.magic import init
+from importlib.metadata import version
 
-__version__ = open(os.path.join(os.path.dirname(__file__), 'VERSION'), 'r').read().strip()
+__version__ = version(__package__)
