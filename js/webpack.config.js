@@ -1,5 +1,5 @@
 import path from 'path'
-import glob from 'glob'
+import * as glob from 'glob'
 import webpack from 'webpack'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
@@ -81,7 +81,14 @@ export default function (_env, argv) {
           use: [
             MiniCssExtractPlugin.loader,
             'css-loader',
-            'sass-loader',
+            {
+              loader: 'sass-loader',
+              options: {
+                sassOptions: {
+                  loadPaths: ['.']
+                },
+              },
+            },
           ],
         },
         {

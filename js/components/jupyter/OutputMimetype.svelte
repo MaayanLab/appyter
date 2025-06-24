@@ -33,6 +33,9 @@
     report_error(error_data)
     return JSON.stringify(error_data)
   }
+
+  let Component
+  $: Component = output_mimetypes[mimetype]
 </script>
 
 {#if data.data}
@@ -44,7 +47,7 @@
       </div>
     {/if}
     {#if mimetype}
-      <svelte:component this={output_mimetypes[mimetype]} data={data.data[mimetype]} />
+      <Component data={data.data[mimetype]} />
     {/if}
   </div>
 {/if}

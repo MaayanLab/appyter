@@ -1,5 +1,5 @@
 <script>
-  import AnsiUp from 'ansi_up'
+  import { AnsiUp } from 'ansi_up'
 
   export let data
   let rendered
