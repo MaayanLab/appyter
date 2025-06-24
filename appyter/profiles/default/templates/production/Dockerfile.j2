@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM python:3.9
 
 ENV DEBIAN_FRONTEND "noninteractive"
 ENV TZ "America/New_York"
@@ -11,8 +11,6 @@ RUN set -x \
     fuse \
     git \
     nginx \
-    python3-dev \
-    python3-pip \
   && curl https://get.docker.com | sh \
   && rm -rf /var/lib/apt/lists/* \
   && pip3 install --no-cache-dir --upgrade pip

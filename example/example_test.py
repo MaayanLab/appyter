@@ -5,7 +5,6 @@ from appyter.render.nbconstruct import render_nb_from_nbtemplate
 from appyter.render.form import render_form_from_nbtemplate
 from appyter.context import get_jinja2_env, get_env
 from appyter.parse.nbtemplate import parse_fields_from_nbtemplate
-from appyter.parse.nb import parse_markdown
 
 with open('example.ipynb', 'r') as fr:
   nbtemplate = nb_from_ipynb_io(fr)
