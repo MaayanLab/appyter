@@ -2,7 +2,7 @@ from appyter.fields import Field, FieldConstraintException
 from appyter.ext.json import try_json_loads
 
 class MultiChoiceField(Field):
-  ''' Represing a multi-selectable combo box.
+  r''' Represing a multi-selectable combo box.
   The resulting selection is represented with a list of strings that were chosen.
 
   :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
@@ -13,7 +13,7 @@ class MultiChoiceField(Field):
   :param default: (float) A default value as an example and for use during prototyping
   :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-  :param **kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
+  :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
   def __init__(self, **kwargs):
     super().__init__(**kwargs)

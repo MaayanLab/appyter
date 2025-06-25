@@ -1,4 +1,5 @@
-''' IPython magic for making templating easy~. This basically
+r'''
+IPython magic for making templating easy~. This basically
 just allows our jinja-type language to be executed in place
 injecting the defaults into the environment so we can easily
 debug the notebook at the same time as building the appyter.
@@ -10,25 +11,24 @@ for import.
 
 Usage (put the following in the first cell):
 
-```python
-#%%appyter init
-from appyter import magic
-magic.init(lambda _=globals: _())
-```
+.. code-block:: python
+
+  #%%appyter init
+  from appyter import magic
+  magic.init(lambda _=globals: _())
 '''
 
 '''
 Setup given globals
 '''
 def init(_globals, verbose=False, ipynb='app.ipynb', mode='magic', safe_mode=False, **kwargs):
-  ''' Initialize appyter magic.
+  r''' Initialize appyter magic.
 
   Sets up a jinj2 environment and injects %%appyter magic into your environment.
   
-  :param _globals: (Dict[str, Any]) A callable with your globals for the purpose of injection, basically just: `lambda _=globals: _()`
+  :param _globals: (Dict[str, Any]) A callable with your globals for the purpose of injection, basically just: ``lambda _=globals: _()``
   :param verbose: (Optional[bool]) Expand exception reporting to be more verbose
   '''
-  import os
   import jinja2
   import jinja2.meta
   import traceback
@@ -37,23 +37,29 @@ def init(_globals, verbose=False, ipynb='app.ipynb', mode='magic', safe_mode=Fal
   from IPython.core.magic import register_cell_magic
   from IPython.display import display, Markdown, HTML
 
-  '''
+  r'''
   register_cell_magic allows function to execute an entire cell with the following call structure:
-  ```python
-  %%my_magic whatever
-  all
-  my
-  data
-  ```
-  Results in a call:
-  ```python
-  my_magic(
-    "whatever",
-    """all
+
+  .. code-block:: python
+
+    %%my_magic whatever
+    all
     my
-    data"""
-  )
-  ```
+    data
+
+  Results in a call:
+
+  .. code-block:: python
+
+    my_magic(
+      "whatever",
+      """
+      all
+      my
+      data
+      """
+    )
+
   '''
 
   @register_cell_magic

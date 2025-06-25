@@ -3,7 +3,7 @@ from appyter.fields import Field
 from appyter.ext.re import re_full
 
 class StringField(Field):
-  ''' Representing a field that accepts a string
+  r''' Representing a field that accepts a string
 
   Be careful with this field, consider defining a constraint regex.
 
@@ -19,7 +19,7 @@ class StringField(Field):
   :param examples: (Optional[Union[List[str], Dict[str, str]]]) Named strings to provide as clickable examples
   :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-  :param **kwargs: Additional keyword arguments used by other fields
+  :param \**kwargs: Additional keyword arguments used by other fields
   '''
   def __init__(self, constraint=None, hint=None, required=None, **kwargs):
     if constraint is None: constraint = r'.+' if required else r'.*'

@@ -3,13 +3,12 @@ from appyter.fields import Field, FieldConstraintException
 from appyter.ext.re import re_full
 
 class TextListField(Field):
-  ''' Representing a field that accepts a set of strings separated by newlines
+  r''' Representing a field that accepts a set of strings separated by newlines
 
   Be careful with this field, consider defining a constraint regex.
-  ```eval_rst
+  
   Unlike :class:`appyter.profiles.default.fields.TextField`, this class will return
-   a list and potentially render differently.
-  ```
+  a list and potentially render differently.
 
   :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
   :param label: (str) A human readable label for the field for the HTML form
@@ -24,7 +23,7 @@ class TextListField(Field):
   :param cols: (Optional[int]) The number of cols (horizontal characters) in the textarea
   :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-  :param **kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
+  :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
   def __init__(self, constraint=r'[^\n]*', hint=None, **kwargs):
     super().__init__(
