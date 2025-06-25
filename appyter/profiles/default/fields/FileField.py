@@ -6,13 +6,15 @@ from appyter.ext.urllib import URI
 from appyter.ext.re import re_full
 
 class FileField(Field):
-  ''' Representing a File URL.
+  r'''
+  Representing a File URL.
 
   The field ends up being a string of the file path, which will be relative to the appyter notebook.
-  ```python
-  import pandas as pd
-  df = pd.read_csv({{ FileField(name='my-csv', label='My CSV') }})
-  ```
+
+  .. code-block:: python
+
+    import pandas as pd
+    df = pd.read_csv({{ FileField(name='my-csv', label='My CSV') }})
 
   Importantly, a FileField ultimately resolves to a URL supporting several schemes. Appyters ensure
    that url is available as an actual file when the appyter executes.

@@ -5,21 +5,21 @@
   export let props = {}
   export let children = false
 
-  let component
+  let Component
   onMount(() =>
     module()
-      .then(({ default: mod }) => component = mod)
+      .then(({ default: mod }) => Component = mod)
       .catch((e) => console.error(e))
   )
 </script>
 
-{#if component !== undefined}
+{#if Component !== undefined}
   {#if children}
-    <svelte:component this={component} {...props}>
+    <Component {...props}>
       <slot></slot>
-    </svelte:component>
+    </Component>
   {:else}
-    <svelte:component this={component} {...props} />
+    <Component {...props} />
   {/if}
 {:else}
   <Loader />

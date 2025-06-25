@@ -2,7 +2,7 @@ from appyter.fields import Field, FieldConstraintException
 from appyter.ext.json import try_json_loads
 
 class MultiChoiceField(Field):
-  ''' Represing a multi-selectable combo box.
+  r''' Represing a multi-selectable combo box.
   The resulting selection is represented with a list of strings that were chosen.
 
   :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.

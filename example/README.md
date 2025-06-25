@@ -16,6 +16,8 @@ docker push $DOCKER_TAG
 
 docker run \
   -p 5000:5000 \
+  --device /dev/fuse \
+  --cap-add SYS_ADMIN \
   -it $DOCKER_TAG \
   appyter --profile=biojupies example.ipynb
 

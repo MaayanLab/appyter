@@ -1,7 +1,7 @@
 from appyter.fields import Field
 
 class BoolField(Field):
-  ''' Represing a true or false value with a checkbox.
+  r''' Represing a true or false value with a checkbox.
 
   :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
   :param label: (str) A human readable label for the field for the HTML form

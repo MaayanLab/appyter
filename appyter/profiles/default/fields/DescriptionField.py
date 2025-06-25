@@ -1,15 +1,15 @@
 from appyter.fields import Field
 
 class DescriptionField(Field):
-  ''' Representing text between fields
+  r'''
+  Representing text between fields
 
-  Usage:
-  ```python
-  {% do DescriptionField(
-    name='my_fieldname',
-    text='My Description',
-  ) %}
-  ```
+  .. code-block:: python
+
+    {% do DescriptionField(
+      name='my_fieldname',
+      text='My Description',
+    ) %}
 
   :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
   :param text: (str) A human readable, HTML parsable text

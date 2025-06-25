@@ -1,7 +1,7 @@
 from appyter.fields import Field
 
 class FloatField(Field):
-  ''' Representing a field that accepts a floating point value
+  r''' Representing a field that accepts a floating point value
 
   :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
   :param label: (str) A human readable label for the field for the HTML form

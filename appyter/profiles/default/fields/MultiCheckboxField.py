@@ -2,12 +2,10 @@ from appyter.fields import Field, FieldConstraintException
 from appyter.ext.json import try_json_loads
 
 class MultiCheckboxField(Field):
-  ''' Represing a set of independently selectable check boxes.
+  r''' Represing a set of independently selectable check boxes.
 
-  ```eval_rst
   Like :class:`appyter.profiles.default.fields.MultiChoiceField`, but with
    a different rendering (check boxes instead of select)
-  ```
 
   :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
   :param label: (str) A human readable label for the field for the HTML form

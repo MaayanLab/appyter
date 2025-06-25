@@ -1,7 +1,7 @@
 from appyter.fields import Field
 
 class ChoiceField(Field):
-  ''' Represing a choice of string values with a combo box.
+  r''' Represing a choice of string values with a combo box.
 
   :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
   :param label: (str) A human readable label for the field for the HTML form

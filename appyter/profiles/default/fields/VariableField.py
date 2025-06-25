@@ -4,22 +4,23 @@ from appyter.ext.json import try_json_loads
 from appyter.ext.itertools import ensure_list
 
 class VariableField(Field):
-  ''' Represing a variable number of instances of a given Field
-  Usage:
-  ```j2
-  {{ VariableField(
-    nane='files'
-    label='Files',
-    field=FileField(
-      name='file',
-      label='File',
-      default='file.txt',
-    ),
-    default=['file.txt'],
-    min=0,
-    max=10,
-  ) }}
-  ```
+  r'''Represing a variable number of instances of a given Field
+
+  .. code-block:: j2
+
+    {{ VariableField(
+      nane='files'
+      label='Files',
+      field=FileField(
+        name='file',
+        label='File',
+        default='file.txt',
+      ),
+      default=['file.txt'],
+      min=0,
+      max=10,
+    ) }}
+  
   :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.
   :param label: (str) A human readable label for the field for the HTML form
   :param description: (Optional[str]) A long human readable description for the field for the HTML form
@@ -42,17 +43,19 @@ class VariableField(Field):
     for forms we support json pointer refs for compatibility with older form fields -- these
     pointers are resolved during prepare. Basically:
 
-    ```json
-    {
-      "variablefield": [{"$ref":"#/singlefield0"},{"$ref":"#/singlefield1"}],
-      "singlefield0": "a",
-      "singlefield1": "b"
-    }
-    ```json
+    .. code-block:: json
+
+      {
+        "variablefield": [{"$ref":"#/singlefield0"},{"$ref":"#/singlefield1"}],
+        "singlefield0": "a",
+        "singlefield1": "b"
+      }
+
     Will resolve to
-    ```json
-    {"variablefield": ["a", "b"]}
-    ```
+
+    .. code-block:: json
+
+      {"variablefield": ["a", "b"]}
 
     Letting us construct the form as before but permitting us to reference form fields
      generated on the fly that end up in the form request.

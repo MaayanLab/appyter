@@ -3,7 +3,7 @@ from appyter.fields import Field
 from appyter.ext.re import re_full
 
 class AutocompleteField(Field):
-  ''' Representing a field that accepts a string with autocomplete.
+  r''' Representing a field that accepts a string with autocomplete.
   Auto complete will use `choices` or alternatively `file_path` -- a url to load the choices as an array.
 
   Be careful with this field, consider defining a constraint regex. Note that it is equivalent to

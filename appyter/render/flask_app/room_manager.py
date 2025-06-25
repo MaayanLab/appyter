@@ -37,7 +37,7 @@ async def enter_room(client_sid, room_id):
     logger.debug(f"client {client_sid} joined room {room_id}")
     # add client to room and relay old messages to the client
     room['clients'].add(client_sid)
-    socketio.enter_room(client_sid, room_id)
+    await socketio.enter_room(client_sid, room_id)
     async with socketio.session(client_sid) as client_sess:
       client_uid = client_sess['uid']
     for msg in room['messages'][room['users'].get(client_uid, 0):]:

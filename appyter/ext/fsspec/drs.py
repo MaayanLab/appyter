@@ -94,6 +94,6 @@ class DRSFileSystem(SyncAsyncFileSystem, AsyncFileSystem):
     path_info = self.info(path)
     kwargs = dict(loop=get_event_loop())
     if path_info['_url'].startswith('https://'):
-      kwargs.update(client_kwargs=dict(connector=aiohttp.TCPConnector(ssl=self.ssl_verify)))
+      kwargs.update(client_kwargs=dict(connector=aiohttp.TCPConnector(ssl=self.ssl_verify, loop=kwargs['loop'])))
     fs, fo = url_to_fs_ex(path_info['_url'], **kwargs)
     return fs.open(fo, mode)

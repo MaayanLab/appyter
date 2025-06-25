@@ -3,7 +3,7 @@ from appyter.fields import Field
 from appyter.ext.re import re_full
 
 class TextField(Field):
-  ''' Representing a field that accepts a multi-line string
+  r''' Representing a field that accepts a multi-line string
 
   Be careful with this field, consider defining a constraint regex.
 

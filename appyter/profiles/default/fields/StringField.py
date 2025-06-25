@@ -3,7 +3,7 @@ from appyter.fields import Field
 from appyter.ext.re import re_full
 
 class StringField(Field):
-  ''' Representing a field that accepts a string
+  r''' Representing a field that accepts a string
 
   Be careful with this field, consider defining a constraint regex.
 
