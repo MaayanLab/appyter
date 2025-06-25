@@ -48,7 +48,8 @@ dependencies = [
 [project.optional-dependencies]
 appyter_init = ["cookiecutter (>=2.6.0,<3.0.0)"]
 production = ["aiobotocore (>=2.23.0,<3.0.0)", "kubernetes (>=33.1.0,<34.0.0)", "s3fs (>=2025.5.1,<2026.0.0)", "supervisor (>=4.2.5,<5.0.0)"]
-docs = ["jinja2 (>=3.1.6,<4.0.0)", "m2r2 (<0.3)", "recommonmark (>=0.7.1,<0.8.0)", "sphinx (<8)"]
+docs = ["sphinx-mdinclude (<0.6.2)", "sphinx (<8)"]
+doc = []
 
 
 [tool.poetry]
