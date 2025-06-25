@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.execspec.implementations.cavatica &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,28 +34,30 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.execspec.implementations.cavatica</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">appyter.execspec.implementations.wes</span> <span class="kn">import</span> <span class="n">WESExecutor</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.contextlib</span> <span class="kn">import</span> <span class="n">ensure_context</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_fs_ex</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.util</span> <span class="kn">import</span> <span class="n">fsspec_cp</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.sbfs</span> <span class="kn">import</span> <span class="n">SBFSFileSystem</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.chroot</span> <span class="kn">import</span> <span class="n">ChrootFileSystem</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.writecache</span> <span class="kn">import</span> <span class="n">WriteCacheFileSystem</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">join_slash</span><span class="p">,</span> <span class="n">join_url</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.asyncio.helpers</span> <span class="kn">import</span> <span class="n">ensure_async</span><span class="p">,</span> <span class="n">ensure_async_contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.execspec.implementations.wes</span><span class="w"> </span><span class="kn">import</span> <span class="n">WESExecutor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">url_to_fs_ex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">fsspec_cp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.sbfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">SBFSFileSystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.chroot</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChrootFileSystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.writecache</span><span class="w"> </span><span class="kn">import</span> <span class="n">WriteCacheFileSystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.urllib</span><span class="w"> </span><span class="kn">import</span> <span class="n">join_slash</span><span class="p">,</span> <span class="n">join_url</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.asyncio.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_async</span><span class="p">,</span> <span class="n">ensure_async_contextmanager</span>
 
 
-<div class="viewcode-block" id="CavaticaExecutor"><a class="viewcode-back" href="../../../../appyter.execspec.implementations.html#appyter.execspec.implementations.cavatica.CavaticaExecutor">[docs]</a><span class="k">class</span> <span class="nc">CavaticaExecutor</span><span class="p">(</span><span class="n">WESExecutor</span><span class="p">):</span>
+<div class="viewcode-block" id="CavaticaExecutor">
+<a class="viewcode-back" href="../../../../appyter.execspec.implementations.html#appyter.execspec.implementations.cavatica.CavaticaExecutor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CavaticaExecutor</span><span class="p">(</span><span class="n">WESExecutor</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; Run executions in CAVATICA</span>
 <span class="sd">  cavatica?project=myuser/myproject&amp;auth_token=MYKEY&amp;cwl=example.cwl</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">protocol</span> <span class="o">=</span> <span class="s1">&#39;cavatica&#39;</span>
 
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
     <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">auth_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -81,7 +81,7 @@
       <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
 
-  <span class="k">async</span> <span class="k">def</span> <span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__aenter__</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">WriteCacheFileSystem</span><span class="p">(</span>
       <span class="n">fs</span><span class="o">=</span><span class="n">ChrootFileSystem</span><span class="p">(</span>
@@ -112,11 +112,11 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cwl</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 
-  <span class="k">async</span> <span class="k">def</span> <span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
     <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs_ctx</span><span class="o">.</span><span class="fm">__aexit__</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
     <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__aexit__</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
 
-  <span class="k">async</span> <span class="k">def</span> <span class="nf">_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job</span><span class="p">):</span>
     <span class="n">wes_job</span> <span class="o">=</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_prepare</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
     <span class="c1"># TODO: could potentially use CAVATICA&#39;s DRS import for this</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">wes_job</span><span class="p">[</span><span class="s1">&#39;workflow_params&#39;</span><span class="p">][</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -145,7 +145,7 @@
     <span class="n">wes_job</span><span class="p">[</span><span class="s1">&#39;workflow_params&#39;</span><span class="p">][</span><span class="s1">&#39;inputs&#39;</span><span class="p">][</span><span class="s1">&#39;w&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;tmp-appyter-output-</span><span class="si">{</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">return</span> <span class="n">wes_job</span>
 
-  <span class="k">async</span> <span class="k">def</span> <span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job</span><span class="p">,</span> <span class="n">wes_job</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job</span><span class="p">,</span> <span class="n">wes_job</span><span class="p">):</span>
     <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_finalize</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">wes_job</span><span class="p">)</span>
     <span class="c1"># move appyter output to the correct subdirectory</span>
     <span class="k">await</span> <span class="n">ensure_async</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">mv</span><span class="p">)(</span>
@@ -153,29 +153,30 @@
       <span class="sa">f</span><span class="s2">&quot;appyter/output/</span><span class="si">{</span><span class="n">job</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
       <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -190,8 +191,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

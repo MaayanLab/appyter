@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.ext.socketio.priority_queued_emit &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,21 +34,23 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.socketio.priority_queued_emit</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PriorityQueuedEmitMixin"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin">[docs]</a><span class="k">class</span> <span class="nc">PriorityQueuedEmitMixin</span><span class="p">:</span>
+<div class="viewcode-block" id="PriorityQueuedEmitMixin">
+<a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PriorityQueuedEmitMixin</span><span class="p">:</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; A mixin for queuing `emit` calls to get triggered sequentially when `emit_enabled` event is set</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="k">async</span> <span class="k">def</span> <span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_emit_enabled</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_emit_counter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">PriorityQueue</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_emit_dispatcher_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_emit_dispatcher</span><span class="p">())</span>
 
-  <span class="k">async</span> <span class="k">def</span> <span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
       <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span><span class="o">.</span><span class="n">qsize</span><span class="p">()</span><span class="si">}</span><span class="s2"> items in queue weren&#39;t processed...&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
@@ -59,7 +59,7 @@
     <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
       <span class="k">pass</span>
 
-  <span class="k">async</span> <span class="k">def</span> <span class="nf">_emit_dispatcher</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_emit_dispatcher</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
       <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
       <span class="k">try</span><span class="p">:</span>
@@ -68,46 +68,53 @@
       <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
         <span class="k">raise</span>
       <span class="k">except</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">traceback</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
       <span class="k">finally</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
 
-<div class="viewcode-block" id="PriorityQueuedEmitMixin.emit"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="PriorityQueuedEmitMixin.emit">
+<a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.emit">[docs]</a>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span>
       <span class="n">priority</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_emit_counter</span><span class="p">),</span> 
       <span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">data</span><span class="p">),</span>
       <span class="n">kwargs</span><span class="p">,</span>
     <span class="p">))</span></div>
 
-<div class="viewcode-block" id="PriorityQueuedEmitMixin.disconnect"><a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.disconnect">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PriorityQueuedEmitMixin.disconnect">
+<a class="viewcode-back" href="../../../../appyter.ext.socketio.html#appyter.ext.socketio.priority_queued_emit.PriorityQueuedEmitMixin.disconnect">[docs]</a>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_enabled</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
       <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Ensuring emit queue has been fully processed...&#39;</span><span class="p">)</span>
       <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_queue</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-    <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div></div>
+    <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -122,8 +129,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

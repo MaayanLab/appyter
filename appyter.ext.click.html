@@ -1,22 +1,20 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>appyter.ext.click package &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,16 +34,16 @@
           <div class="body" role="main">
             
   <section id="appyter-ext-click-package">
-<h1>appyter.ext.click package<a class="headerlink" href="#appyter-ext-click-package" title="Permalink to this headline">¶</a></h1>
+<h1>appyter.ext.click package<a class="headerlink" href="#appyter-ext-click-package" title="Link to this heading">¶</a></h1>
 <section id="module-appyter.ext.click">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.ext.click" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.ext.click" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.ext.click.Json">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.click.</code><code class="sig-name descname">Json</code><a class="reference internal" href="_modules/appyter/ext/click.html#Json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.click.Json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">click.types.ParamType</span></code></p>
+<dt class="sig sig-object py" id="appyter.ext.click.Json">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.ext.click.</span></span><span class="sig-name descname"><span class="pre">Json</span></span><a class="reference internal" href="_modules/appyter/ext/click.html#Json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.click.Json" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ParamType</span></code></p>
 <dl class="py method">
-<dt id="appyter.ext.click.Json.convert">
-<code class="sig-name descname">convert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">param</span></em>, <em class="sig-param"><span class="n">ctx</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/click.html#Json.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.click.Json.convert" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.click.Json.convert">
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/click.html#Json.convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.click.Json.convert" title="Link to this definition">¶</a></dt>
 <dd><p>Convert the value to the correct type. This is not called if
 the value is <code class="docutils literal notranslate"><span class="pre">None</span></code> (the missing value).</p>
 <p>This must accept string values from the command line, as well as
@@ -53,32 +51,33 @@ values that are already the correct type. It may also convert
 other compatible types.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">param</span></code> and <code class="docutils literal notranslate"><span class="pre">ctx</span></code> arguments may be <code class="docutils literal notranslate"><span class="pre">None</span></code> in certain
 situations, such as when converting prompt input.</p>
-<p>If the value cannot be converted, call :meth:<code class="docutils literal notranslate"><span class="pre">fail</span></code> with a
+<p>If the value cannot be converted, call <code class="xref py py-meth docutils literal notranslate"><span class="pre">fail()</span></code> with a
 descriptive message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>value</strong> – The value to convert.</p></li>
-<li><p><strong>param</strong> – The parameter that is using this type to convert</p></li>
+<li><p><strong>param</strong> – The parameter that is using this type to convert
+its value. May be <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>ctx</strong> – The current context that arrived at this value. May
+be <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
-<p>its value. May be <code class="docutils literal notranslate"><span class="pre">None</span></code>.
-:param ctx: The current context that arrived at this value. May
-be <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="appyter.ext.click.Json.name">
-<code class="sig-name descname">name</code><em class="property">: str</em><em class="property"> = 'Json'</em><a class="headerlink" href="#appyter.ext.click.Json.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="appyter.ext.click.Json.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Json'</span></em><a class="headerlink" href="#appyter.ext.click.Json.name" title="Link to this definition">¶</a></dt>
+<dd><p>the descriptive name of this type</p>
+</dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.click.Json.split_envvar_value">
-<code class="sig-name descname">split_envvar_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rv</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/click.html#Json.split_envvar_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.click.Json.split_envvar_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.click.Json.split_envvar_value">
+<span class="sig-name descname"><span class="pre">split_envvar_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/click.html#Json.split_envvar_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.click.Json.split_envvar_value" title="Link to this definition">¶</a></dt>
 <dd><p>Given a value from an environment variable this splits it up
 into small chunks depending on the defined envvar list splitter.</p>
-<p>If the splitter is set to <code class="docutils literal notranslate"><span class="pre">None</span></code>, which means that whitespace splits,
+<p>If the splitter is set to <cite>None</cite>, which means that whitespace splits,
 then leading and trailing whitespace is ignored.  Otherwise, leading
 and trailing splitters usually lead to empty items being included.</p>
 </dd></dl>
@@ -86,14 +85,14 @@ and trailing splitters usually lead to empty items being included.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.ext.click.click_argument_setenv">
-<code class="sig-prename descclassname">appyter.ext.click.</code><code class="sig-name descname">click_argument_setenv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">var</span></em>, <em class="sig-param"><span class="n">envvar</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/click.html#click_argument_setenv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.click.click_argument_setenv" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.click.click_argument_setenv">
+<span class="sig-prename descclassname"><span class="pre">appyter.ext.click.</span></span><span class="sig-name descname"><span class="pre">click_argument_setenv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">envvar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/click.html#click_argument_setenv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.click.click_argument_setenv" title="Link to this definition">¶</a></dt>
 <dd><p>Like click.argument but explicitly set os.environ as well.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.ext.click.click_option_setenv">
-<code class="sig-prename descclassname">appyter.ext.click.</code><code class="sig-name descname">click_option_setenv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spec</span></em>, <em class="sig-param"><span class="n">envvar</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/click.html#click_option_setenv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.click.click_option_setenv" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.click.click_option_setenv">
+<span class="sig-prename descclassname"><span class="pre">appyter.ext.click.</span></span><span class="sig-name descname"><span class="pre">click_option_setenv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">envvar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/click.html#click_option_setenv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.click.click_option_setenv" title="Link to this definition">¶</a></dt>
 <dd><p>Like click.option but explicitly set os.environ as well.</p>
 </dd></dl>
 
@@ -105,16 +104,28 @@ and trailing splitters usually lead to empty items being included.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">appyter.ext.click package</a><ul>
-<li><a class="reference internal" href="#module-appyter.ext.click">Module contents</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.click">Module contents</a><ul>
+<li><a class="reference internal" href="#appyter.ext.click.Json"><code class="docutils literal notranslate"><span class="pre">Json</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.ext.click.Json.convert"><code class="docutils literal notranslate"><span class="pre">Json.convert()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.click.Json.name"><code class="docutils literal notranslate"><span class="pre">Json.name</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.click.Json.split_envvar_value"><code class="docutils literal notranslate"><span class="pre">Json.split_envvar_value()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#appyter.ext.click.click_argument_setenv"><code class="docutils literal notranslate"><span class="pre">click_argument_setenv()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.click.click_option_setenv"><code class="docutils literal notranslate"><span class="pre">click_option_setenv()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -122,21 +133,21 @@ and trailing splitters usually lead to empty items being included.</p>
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -150,8 +161,8 @@ and trailing splitters usually lead to empty items being included.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

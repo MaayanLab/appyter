@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.ext.watchgod.watcher &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,21 +34,25 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.watchgod.watcher</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">fnmatch</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">watchgod.watcher</span> <span class="kn">import</span> <span class="n">AllWatcher</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">fnmatch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">watchgod.watcher</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllWatcher</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GlobWatcher"><a class="viewcode-back" href="../../../../appyter.ext.watchgod.html#appyter.ext.watchgod.watcher.GlobWatcher">[docs]</a><span class="k">class</span> <span class="nc">GlobWatcher</span><span class="p">(</span><span class="n">AllWatcher</span><span class="p">):</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="GlobWatcher">
+<a class="viewcode-back" href="../../../../appyter.ext.watchgod.html#appyter.ext.watchgod.watcher.GlobWatcher">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GlobWatcher</span><span class="p">(</span><span class="n">AllWatcher</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">include_file_glob</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;include_file_glob&#39;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">include_dir_glob</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;include_dir_glob&#39;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">exclude_file_glob</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;exclude_file_glob&#39;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">exclude_dir_glob</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;exclude_dir_glob&#39;</span><span class="p">)</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GlobWatcher.should_watch_file"><a class="viewcode-back" href="../../../../appyter.ext.watchgod.html#appyter.ext.watchgod.watcher.GlobWatcher.should_watch_file">[docs]</a>  <span class="k">def</span> <span class="nf">should_watch_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
+<div class="viewcode-block" id="GlobWatcher.should_watch_file">
+<a class="viewcode-back" href="../../../../appyter.ext.watchgod.html#appyter.ext.watchgod.watcher.GlobWatcher.should_watch_file">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">should_watch_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
     <span class="n">included</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
       <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
       <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">include_file_glob</span>
@@ -61,7 +63,10 @@
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">included</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">excluded</span></div>
 
-<div class="viewcode-block" id="GlobWatcher.should_watch_dir"><a class="viewcode-back" href="../../../../appyter.ext.watchgod.html#appyter.ext.watchgod.watcher.GlobWatcher.should_watch_dir">[docs]</a>  <span class="k">def</span> <span class="nf">should_watch_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
+
+<div class="viewcode-block" id="GlobWatcher.should_watch_dir">
+<a class="viewcode-back" href="../../../../appyter.ext.watchgod.html#appyter.ext.watchgod.watcher.GlobWatcher.should_watch_dir">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">should_watch_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
     <span class="n">included</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
       <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
       <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">include_dir_glob</span>
@@ -70,30 +75,32 @@
       <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
       <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_dir_glob</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">included</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">excluded</span></div></div>
+    <span class="k">return</span> <span class="n">included</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">excluded</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -108,8 +115,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.ext.fsspec.spec.composable &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,15 +34,19 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.fsspec.spec.composable</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">fsspec</span> <span class="kn">import</span> <span class="n">AbstractFileSystem</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">fsspec</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractFileSystem</span>
 
-<div class="viewcode-block" id="ComposableAbstractFileSystem"><a class="viewcode-back" href="../../../../../appyter.ext.fsspec.spec.html#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem">[docs]</a><span class="k">class</span> <span class="nc">ComposableAbstractFileSystem</span><span class="p">:</span>
+<div class="viewcode-block" id="ComposableAbstractFileSystem">
+<a class="viewcode-back" href="../../../../../appyter.ext.fsspec.spec.html#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ComposableAbstractFileSystem</span><span class="p">:</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; Expansion of AbstractFileSystem&#39;s json serialization methods to support composition</span>
 <span class="sd">  by calling to_json() on any filesystems in storage_args during serialization,</span>
 <span class="sd">  and loading them in during deserialization.</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-<div class="viewcode-block" id="ComposableAbstractFileSystem.to_json"><a class="viewcode-back" href="../../../../../appyter.ext.fsspec.spec.html#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.to_json">[docs]</a>  <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">json</span>
+<div class="viewcode-block" id="ComposableAbstractFileSystem.to_json">
+<a class="viewcode-back" href="../../../../../appyter.ext.fsspec.spec.html#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.to_json">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
     <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="bp">cls</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
     <span class="n">proto</span> <span class="o">=</span> <span class="p">(</span>
@@ -62,10 +64,13 @@
       <span class="p">)</span>
     <span class="p">)</span></div>
 
-<div class="viewcode-block" id="ComposableAbstractFileSystem.from_json"><a class="viewcode-back" href="../../../../../appyter.ext.fsspec.spec.html#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.from_json">[docs]</a>  <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">blob</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">json</span>
-    <span class="kn">from</span> <span class="nn">fsspec.registry</span> <span class="kn">import</span> <span class="n">_import_class</span><span class="p">,</span> <span class="n">get_filesystem_class</span>
+
+<div class="viewcode-block" id="ComposableAbstractFileSystem.from_json">
+<a class="viewcode-back" href="../../../../../appyter.ext.fsspec.spec.html#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.from_json">[docs]</a>
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">from_json</span><span class="p">(</span><span class="n">blob</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">fsspec.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">_import_class</span><span class="p">,</span> <span class="n">get_filesystem_class</span>
     <span class="n">dic</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span>
     <span class="n">protocol</span> <span class="o">=</span> <span class="n">dic</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;protocol&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
@@ -78,30 +83,32 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dic</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
       <span class="p">})</span>
     <span class="k">else</span><span class="p">:</span>
-      <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span></div></div>
+      <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -116,8 +123,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

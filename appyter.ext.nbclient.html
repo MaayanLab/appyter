@@ -1,22 +1,20 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>appyter.ext.nbclient package &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,44 +34,103 @@
           <div class="body" role="main">
             
   <section id="appyter-ext-nbclient-package">
-<h1>appyter.ext.nbclient package<a class="headerlink" href="#appyter-ext-nbclient-package" title="Permalink to this headline">¶</a></h1>
+<h1>appyter.ext.nbclient package<a class="headerlink" href="#appyter-ext-nbclient-package" title="Link to this heading">¶</a></h1>
 <section id="module-appyter.ext.nbclient">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.ext.nbclient" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.ext.nbclient" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.ext.nbclient.NotebookClientIOPubHook">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.nbclient.</code><code class="sig-name descname">NotebookClientIOPubHook</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">nbclient.client.NotebookClient</span></code></p>
+<dt class="sig sig-object py" id="appyter.ext.nbclient.NotebookClientIOPubHook">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.ext.nbclient.</span></span><span class="sig-name descname"><span class="pre">NotebookClientIOPubHook</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">NotebookClient</span></code></p>
 <p>A notebook client with the ability to hook into iopub updates</p>
 <dl class="py method">
-<dt id="appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell">
-<em class="property">async </em><code class="sig-name descname">async_execute_cell</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cell</span><span class="p">:</span> <span class="n">nbformat.notebooknode.NotebookNode</span></em>, <em class="sig-param"><span class="n">cell_index</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">execution_count</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">, </span>None<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">store_history</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; nbformat.notebooknode.NotebookNode<a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook.async_execute_cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">async_execute_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NotebookNode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">execution_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_history</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NotebookNode</span></span></span><a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook.async_execute_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell" title="Link to this definition">¶</a></dt>
 <dd><p>Executes a single code cell.</p>
-<p>To execute all cells see :meth:<code class="docutils literal notranslate"><span class="pre">execute</span></code>.</p>
-<p>cell : nbformat.NotebookNode
-The cell which is currently being processed.
-cell_index : int
-The position of the cell within the notebook object.
-execution_count : int
-The execution count to be assigned to the cell (default: Use kernel response)
-store_history : bool
-Determines if history should be stored in the kernel (default: False).
+<p>To execute all cells see <code class="xref py py-meth docutils literal notranslate"><span class="pre">execute()</span></code>.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>cell<span class="classifier">nbformat.NotebookNode</span></dt><dd><p>The cell which is currently being processed.</p>
+</dd>
+<dt>cell_index<span class="classifier">int</span></dt><dd><p>The position of the cell within the notebook object.</p>
+</dd>
+<dt>execution_count<span class="classifier">int</span></dt><dd><p>The execution count to be assigned to the cell (default: Use kernel response)</p>
+</dd>
+<dt>store_history<span class="classifier">bool</span></dt><dd><p>Determines if history should be stored in the kernel (default: False).
 Specific to ipython kernels, which can store command histories.</p>
-<p>output : dict
-The execution output payload (or None for no output).</p>
-<p>CellExecutionError
-If execution failed and should raise an exception, this will be raised
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>output<span class="classifier">dict</span></dt><dd><p>The execution output payload (or None for no output).</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>CellExecutionError</dt><dd><p>If execution failed and should raise an exception, this will be raised
 with defaults about the failure.</p>
-<p>cell : NotebookNode
-The cell which was just processed.</p>
+</dd>
+</dl>
+</section>
+<section id="id1">
+<h3>Returns<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>cell<span class="classifier">NotebookNode</span></dt><dd><p>The cell which was just processed.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.nbclient.NotebookClientIOPubHook.async_setup_kernel">
-<code class="sig-name descname">async_setup_kernel</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; AsyncGenerator<a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook.async_setup_kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook.async_setup_kernel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.nbclient.NotebookClientIOPubHook.async_setup_kernel">
+<span class="sig-name descname"><span class="pre">async_setup_kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AsyncGenerator</span></span></span><a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook.async_setup_kernel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook.async_setup_kernel" title="Link to this definition">¶</a></dt>
 <dd><p>Context manager for setting up the kernel to execute a notebook.</p>
 <p>This assigns the Kernel Manager (<code class="docutils literal notranslate"><span class="pre">self.km</span></code>) if missing and Kernel Client(<code class="docutils literal notranslate"><span class="pre">self.kc</span></code>).</p>
 <p>When control returns from the yield it stops the client’s zmq channels, and shuts
 down the kernel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="appyter.ext.nbclient.NotebookClientIOPubHook.handle_comm_msg">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">handle_comm_msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook.handle_comm_msg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook.handle_comm_msg" title="Link to this definition">¶</a></dt>
+<dd><p>Store ipywidget state in each cell during execution and trigger iopub_hook</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="appyter.ext.nbclient.NotebookClientIOPubHook.process_message">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NotebookNode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/appyter/ext/nbclient.html#NotebookClientIOPubHook.process_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.nbclient.NotebookClientIOPubHook.process_message" title="Link to this definition">¶</a></dt>
+<dd><p>Processes a kernel message, updates cell state, and returns the
+resulting output object that was appended to cell.outputs.</p>
+<p>The input argument <em>cell</em> is modified in-place.</p>
+<section id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>msg<span class="classifier">dict</span></dt><dd><p>The kernel message being processed.</p>
+</dd>
+<dt>cell<span class="classifier">nbformat.NotebookNode</span></dt><dd><p>The cell which is currently being processed.</p>
+</dd>
+<dt>cell_index<span class="classifier">int</span></dt><dd><p>The position of the cell within the notebook object.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>output<span class="classifier">dict</span></dt><dd><p>The execution output payload (or None for no output).</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Raises<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>CellExecutionComplete</dt><dd><p>Once a message arrives which indicates computation completeness.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </dd></dl>
@@ -86,16 +143,27 @@ down the kernel.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">appyter.ext.nbclient package</a><ul>
-<li><a class="reference internal" href="#module-appyter.ext.nbclient">Module contents</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.nbclient">Module contents</a><ul>
+<li><a class="reference internal" href="#appyter.ext.nbclient.NotebookClientIOPubHook"><code class="docutils literal notranslate"><span class="pre">NotebookClientIOPubHook</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell"><code class="docutils literal notranslate"><span class="pre">NotebookClientIOPubHook.async_execute_cell()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.nbclient.NotebookClientIOPubHook.async_setup_kernel"><code class="docutils literal notranslate"><span class="pre">NotebookClientIOPubHook.async_setup_kernel()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.nbclient.NotebookClientIOPubHook.handle_comm_msg"><code class="docutils literal notranslate"><span class="pre">NotebookClientIOPubHook.handle_comm_msg()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.nbclient.NotebookClientIOPubHook.process_message"><code class="docutils literal notranslate"><span class="pre">NotebookClientIOPubHook.process_message()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -103,21 +171,21 @@ down the kernel.</p>
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -131,8 +199,8 @@ down the kernel.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

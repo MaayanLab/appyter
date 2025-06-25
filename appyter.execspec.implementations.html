@@ -1,22 +1,20 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>appyter.execspec.implementations package &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,146 +34,146 @@
           <div class="body" role="main">
             
   <section id="appyter-execspec-implementations-package">
-<h1>appyter.execspec.implementations package<a class="headerlink" href="#appyter-execspec-implementations-package" title="Permalink to this headline">¶</a></h1>
+<h1>appyter.execspec.implementations package<a class="headerlink" href="#appyter-execspec-implementations-package" title="Link to this heading">¶</a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
 <section id="module-appyter.execspec.implementations.cavatica">
-<span id="appyter-execspec-implementations-cavatica-module"></span><h2>appyter.execspec.implementations.cavatica module<a class="headerlink" href="#module-appyter.execspec.implementations.cavatica" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-execspec-implementations-cavatica-module"></span><h2>appyter.execspec.implementations.cavatica module<a class="headerlink" href="#module-appyter.execspec.implementations.cavatica" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.execspec.implementations.cavatica.CavaticaExecutor">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.execspec.implementations.cavatica.</code><code class="sig-name descname">CavaticaExecutor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">project</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">auth_token</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">api_endpoint</span><span class="o">=</span><span class="default_value">'https://cavatica-api.sbgenomics.com'</span></em>, <em class="sig-param"><span class="n">wes_endpoint</span><span class="o">=</span><span class="default_value">'wes://cavatica-ga4gh-api.sbgenomics.com'</span></em>, <em class="sig-param"><span class="n">drs_endpoint</span><span class="o">=</span><span class="default_value">'drs://cavatica-ga4gh-api.sbgenomics.com'</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">headers</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/cavatica.html#CavaticaExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.execspec.implementations.cavatica.CavaticaExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#appyter.execspec.implementations.wes.WESExecutor" title="appyter.execspec.implementations.wes.WESExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.execspec.implementations.wes.WESExecutor</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.cavatica.CavaticaExecutor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.execspec.implementations.cavatica.</span></span><span class="sig-name descname"><span class="pre">CavaticaExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth_token</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://cavatica-api.sbgenomics.com'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wes_endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'wes://cavatica-ga4gh-api.sbgenomics.com'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drs_endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'drs://cavatica-ga4gh-api.sbgenomics.com'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/cavatica.html#CavaticaExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.execspec.implementations.cavatica.CavaticaExecutor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#appyter.execspec.implementations.wes.WESExecutor" title="appyter.execspec.implementations.wes.WESExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">WESExecutor</span></code></a></p>
 <p>Run executions in CAVATICA
 cavatica?project=myuser/myproject&amp;auth_token=MYKEY&amp;cwl=example.cwl</p>
 <dl class="py attribute">
-<dt id="appyter.execspec.implementations.cavatica.CavaticaExecutor.protocol">
-<code class="sig-name descname">protocol</code><em class="property"> = 'cavatica'</em><a class="headerlink" href="#appyter.execspec.implementations.cavatica.CavaticaExecutor.protocol" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.cavatica.CavaticaExecutor.protocol">
+<span class="sig-name descname"><span class="pre">protocol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cavatica'</span></em><a class="headerlink" href="#appyter.execspec.implementations.cavatica.CavaticaExecutor.protocol" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.execspec.implementations.dispatch">
-<span id="appyter-execspec-implementations-dispatch-module"></span><h2>appyter.execspec.implementations.dispatch module<a class="headerlink" href="#module-appyter.execspec.implementations.dispatch" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-execspec-implementations-dispatch-module"></span><h2>appyter.execspec.implementations.dispatch module<a class="headerlink" href="#module-appyter.execspec.implementations.dispatch" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.execspec.implementations.dispatch.DispatchExecutor">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.execspec.implementations.dispatch.</code><code class="sig-name descname">DispatchExecutor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/dispatch.html#DispatchExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.execspec.implementations.dispatch.DispatchExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.execspec.spec.AbstractExecutor</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.dispatch.DispatchExecutor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.execspec.implementations.dispatch.</span></span><span class="sig-name descname"><span class="pre">DispatchExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/dispatch.html#DispatchExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.execspec.implementations.dispatch.DispatchExecutor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractExecutor</span></code></a></p>
 <p>Submit executions to be run by an appyter orchestration dispatcher</p>
-<p>This executor only supports submit and not wait_for/run
-as it submits jobs to a queue which manages the execution.</p>
+<dl class="simple">
+<dt>This executor only supports submit and not wait_for/run</dt><dd><p>as it submits jobs to a queue which manages the execution.</p>
+</dd>
+</dl>
 <p>usage:
 dispatch::http://appyter-orchestrator:5000?params.executor=docker::maayanlab/appyter-example:latest</p>
 <dl class="py attribute">
-<dt id="appyter.execspec.implementations.dispatch.DispatchExecutor.protocol">
-<code class="sig-name descname">protocol</code><em class="property"> = 'dispatch'</em><a class="headerlink" href="#appyter.execspec.implementations.dispatch.DispatchExecutor.protocol" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.dispatch.DispatchExecutor.protocol">
+<span class="sig-name descname"><span class="pre">protocol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dispatch'</span></em><a class="headerlink" href="#appyter.execspec.implementations.dispatch.DispatchExecutor.protocol" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.execspec.implementations.docker">
-<span id="appyter-execspec-implementations-docker-module"></span><h2>appyter.execspec.implementations.docker module<a class="headerlink" href="#module-appyter.execspec.implementations.docker" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-execspec-implementations-docker-module"></span><h2>appyter.execspec.implementations.docker module<a class="headerlink" href="#module-appyter.execspec.implementations.docker" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.execspec.implementations.docker.DockerExecutor">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.execspec.implementations.docker.</code><code class="sig-name descname">DockerExecutor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/docker.html#DockerExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.execspec.implementations.docker.DockerExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.execspec.spec.AbstractExecutor</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.docker.DockerExecutor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.execspec.implementations.docker.</span></span><span class="sig-name descname"><span class="pre">DockerExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/docker.html#DockerExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.execspec.implementations.docker.DockerExecutor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractExecutor</span></code></a></p>
 <p>Run executions in a docker job
 Example uri:
 docker::maayanlab/myimage:latest?flags.v=/mydatadir:/data&amp;args.data-dir=/data</p>
 <dl class="py attribute">
-<dt id="appyter.execspec.implementations.docker.DockerExecutor.protocol">
-<code class="sig-name descname">protocol</code><em class="property"> = 'docker'</em><a class="headerlink" href="#appyter.execspec.implementations.docker.DockerExecutor.protocol" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.docker.DockerExecutor.protocol">
+<span class="sig-name descname"><span class="pre">protocol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'docker'</span></em><a class="headerlink" href="#appyter.execspec.implementations.docker.DockerExecutor.protocol" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.execspec.implementations.kube">
-<span id="appyter-execspec-implementations-kube-module"></span><h2>appyter.execspec.implementations.kube module<a class="headerlink" href="#module-appyter.execspec.implementations.kube" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-execspec-implementations-kube-module"></span><h2>appyter.execspec.implementations.kube module<a class="headerlink" href="#module-appyter.execspec.implementations.kube" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.execspec.implementations.kube.KubernetesExecutor">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.execspec.implementations.kube.</code><code class="sig-name descname">KubernetesExecutor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/kube.html#KubernetesExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.execspec.implementations.kube.KubernetesExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.execspec.spec.AbstractExecutor</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.kube.KubernetesExecutor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.execspec.implementations.kube.</span></span><span class="sig-name descname"><span class="pre">KubernetesExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/kube.html#KubernetesExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.execspec.implementations.kube.KubernetesExecutor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractExecutor</span></code></a></p>
 <p>Run executions as kubernetes jobs
 Example uri:
 kube::maayanlab/myimage:latest?namespace=default</p>
 <dl class="py attribute">
-<dt id="appyter.execspec.implementations.kube.KubernetesExecutor.protocol">
-<code class="sig-name descname">protocol</code><em class="property"> = 'kube'</em><a class="headerlink" href="#appyter.execspec.implementations.kube.KubernetesExecutor.protocol" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.kube.KubernetesExecutor.protocol">
+<span class="sig-name descname"><span class="pre">protocol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'kube'</span></em><a class="headerlink" href="#appyter.execspec.implementations.kube.KubernetesExecutor.protocol" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.execspec.implementations.kube.KubernetesExecutor.submit">
-<em class="property">async </em><code class="sig-name descname">submit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">job</span></em>, <em class="sig-param"><span class="n">namespace</span><span class="o">=</span><span class="default_value">'default'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#appyter.execspec.implementations.kube.KubernetesExecutor.submit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.kube.KubernetesExecutor.submit">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#appyter.execspec.implementations.kube.KubernetesExecutor.submit" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.execspec.implementations.kube.KubernetesExecutor.wait_for">
-<em class="property">async </em><code class="sig-name descname">wait_for</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">run_id</span></em>, <em class="sig-param"><span class="n">namespace</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#appyter.execspec.implementations.kube.KubernetesExecutor.wait_for" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.kube.KubernetesExecutor.wait_for">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wait_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#appyter.execspec.implementations.kube.KubernetesExecutor.wait_for" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.execspec.implementations.kube.endless_watch">
-<code class="sig-prename descclassname">appyter.execspec.implementations.kube.</code><code class="sig-name descname">endless_watch</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/kube.html#endless_watch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.execspec.implementations.kube.endless_watch" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.kube.endless_watch">
+<span class="sig-prename descclassname"><span class="pre">appyter.execspec.implementations.kube.</span></span><span class="sig-name descname"><span class="pre">endless_watch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/kube.html#endless_watch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.execspec.implementations.kube.endless_watch" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-appyter.execspec.implementations.local">
-<span id="appyter-execspec-implementations-local-module"></span><h2>appyter.execspec.implementations.local module<a class="headerlink" href="#module-appyter.execspec.implementations.local" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-execspec-implementations-local-module"></span><h2>appyter.execspec.implementations.local module<a class="headerlink" href="#module-appyter.execspec.implementations.local" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.execspec.implementations.local.LocalExecutor">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.execspec.implementations.local.</code><code class="sig-name descname">LocalExecutor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/local.html#LocalExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.execspec.implementations.local.LocalExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.execspec.spec.AbstractExecutor</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.local.LocalExecutor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.execspec.implementations.local.</span></span><span class="sig-name descname"><span class="pre">LocalExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/local.html#LocalExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.execspec.implementations.local.LocalExecutor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractExecutor</span></code></a></p>
 <p>Run executions with the same process</p>
-<p>Not ideal in most circumstances:</p>
-<ul class="simple">
-<li><p>it can leak errors to the notebook</p></li>
-<li><p>internal state can get messed with</p></li>
-</ul>
+<p>Not ideal in most circumstances:
+- it can leak errors to the notebook
+- internal state can get messed with</p>
 <dl class="py attribute">
-<dt id="appyter.execspec.implementations.local.LocalExecutor.protocol">
-<code class="sig-name descname">protocol</code><em class="property"> = 'local'</em><a class="headerlink" href="#appyter.execspec.implementations.local.LocalExecutor.protocol" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.local.LocalExecutor.protocol">
+<span class="sig-name descname"><span class="pre">protocol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'local'</span></em><a class="headerlink" href="#appyter.execspec.implementations.local.LocalExecutor.protocol" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.execspec.implementations.subprocess">
-<span id="appyter-execspec-implementations-subprocess-module"></span><h2>appyter.execspec.implementations.subprocess module<a class="headerlink" href="#module-appyter.execspec.implementations.subprocess" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-execspec-implementations-subprocess-module"></span><h2>appyter.execspec.implementations.subprocess module<a class="headerlink" href="#module-appyter.execspec.implementations.subprocess" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.execspec.implementations.subprocess.SubprocessExecutor">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.execspec.implementations.subprocess.</code><code class="sig-name descname">SubprocessExecutor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/subprocess.html#SubprocessExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.execspec.implementations.subprocess.SubprocessExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.execspec.spec.AbstractExecutor</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.subprocess.SubprocessExecutor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.execspec.implementations.subprocess.</span></span><span class="sig-name descname"><span class="pre">SubprocessExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/subprocess.html#SubprocessExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.execspec.implementations.subprocess.SubprocessExecutor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractExecutor</span></code></a></p>
 <p>Run executions in a subprocess</p>
 <dl class="py attribute">
-<dt id="appyter.execspec.implementations.subprocess.SubprocessExecutor.protocol">
-<code class="sig-name descname">protocol</code><em class="property"> = 'subprocess'</em><a class="headerlink" href="#appyter.execspec.implementations.subprocess.SubprocessExecutor.protocol" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.subprocess.SubprocessExecutor.protocol">
+<span class="sig-name descname"><span class="pre">protocol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'subprocess'</span></em><a class="headerlink" href="#appyter.execspec.implementations.subprocess.SubprocessExecutor.protocol" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.execspec.implementations.wes">
-<span id="appyter-execspec-implementations-wes-module"></span><h2>appyter.execspec.implementations.wes module<a class="headerlink" href="#module-appyter.execspec.implementations.wes" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-execspec-implementations-wes-module"></span><h2>appyter.execspec.implementations.wes module<a class="headerlink" href="#module-appyter.execspec.implementations.wes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.execspec.implementations.wes.WESExecutor">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.execspec.implementations.wes.</code><code class="sig-name descname">WESExecutor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/wes.html#WESExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.execspec.implementations.wes.WESExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.execspec.spec.AbstractExecutor</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.wes.WESExecutor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.execspec.implementations.wes.</span></span><span class="sig-name descname"><span class="pre">WESExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/execspec/implementations/wes.html#WESExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.execspec.implementations.wes.WESExecutor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.execspec.html#appyter.execspec.spec.AbstractExecutor" title="appyter.execspec.spec.AbstractExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractExecutor</span></code></a></p>
 <p>Run executions via a workflow execution service endpoint</p>
 <dl class="py attribute">
-<dt id="appyter.execspec.implementations.wes.WESExecutor.protocol">
-<code class="sig-name descname">protocol</code><em class="property"> = 'wes'</em><a class="headerlink" href="#appyter.execspec.implementations.wes.WESExecutor.protocol" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.execspec.implementations.wes.WESExecutor.protocol">
+<span class="sig-name descname"><span class="pre">protocol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'wes'</span></em><a class="headerlink" href="#appyter.execspec.implementations.wes.WESExecutor.protocol" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.execspec.implementations">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.execspec.implementations" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.execspec.implementations" title="Link to this heading">¶</a></h2>
 </section>
 </section>
 
@@ -184,24 +182,71 @@ kube::maayanlab/myimage:latest?namespace=default</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">appyter.execspec.implementations package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-appyter.execspec.implementations.cavatica">appyter.execspec.implementations.cavatica module</a></li>
-<li><a class="reference internal" href="#module-appyter.execspec.implementations.dispatch">appyter.execspec.implementations.dispatch module</a></li>
-<li><a class="reference internal" href="#module-appyter.execspec.implementations.docker">appyter.execspec.implementations.docker module</a></li>
-<li><a class="reference internal" href="#module-appyter.execspec.implementations.kube">appyter.execspec.implementations.kube module</a></li>
-<li><a class="reference internal" href="#module-appyter.execspec.implementations.local">appyter.execspec.implementations.local module</a></li>
-<li><a class="reference internal" href="#module-appyter.execspec.implementations.subprocess">appyter.execspec.implementations.subprocess module</a></li>
-<li><a class="reference internal" href="#module-appyter.execspec.implementations.wes">appyter.execspec.implementations.wes module</a></li>
+<li><a class="reference internal" href="#module-appyter.execspec.implementations.cavatica">appyter.execspec.implementations.cavatica module</a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.cavatica.CavaticaExecutor"><code class="docutils literal notranslate"><span class="pre">CavaticaExecutor</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.cavatica.CavaticaExecutor.protocol"><code class="docutils literal notranslate"><span class="pre">CavaticaExecutor.protocol</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.execspec.implementations.dispatch">appyter.execspec.implementations.dispatch module</a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.dispatch.DispatchExecutor"><code class="docutils literal notranslate"><span class="pre">DispatchExecutor</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.dispatch.DispatchExecutor.protocol"><code class="docutils literal notranslate"><span class="pre">DispatchExecutor.protocol</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.execspec.implementations.docker">appyter.execspec.implementations.docker module</a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.docker.DockerExecutor"><code class="docutils literal notranslate"><span class="pre">DockerExecutor</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.docker.DockerExecutor.protocol"><code class="docutils literal notranslate"><span class="pre">DockerExecutor.protocol</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.execspec.implementations.kube">appyter.execspec.implementations.kube module</a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.kube.KubernetesExecutor"><code class="docutils literal notranslate"><span class="pre">KubernetesExecutor</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.kube.KubernetesExecutor.protocol"><code class="docutils literal notranslate"><span class="pre">KubernetesExecutor.protocol</span></code></a></li>
+<li><a class="reference internal" href="#appyter.execspec.implementations.kube.KubernetesExecutor.submit"><code class="docutils literal notranslate"><span class="pre">KubernetesExecutor.submit()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.execspec.implementations.kube.KubernetesExecutor.wait_for"><code class="docutils literal notranslate"><span class="pre">KubernetesExecutor.wait_for()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#appyter.execspec.implementations.kube.endless_watch"><code class="docutils literal notranslate"><span class="pre">endless_watch()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.execspec.implementations.local">appyter.execspec.implementations.local module</a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.local.LocalExecutor"><code class="docutils literal notranslate"><span class="pre">LocalExecutor</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.local.LocalExecutor.protocol"><code class="docutils literal notranslate"><span class="pre">LocalExecutor.protocol</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.execspec.implementations.subprocess">appyter.execspec.implementations.subprocess module</a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.subprocess.SubprocessExecutor"><code class="docutils literal notranslate"><span class="pre">SubprocessExecutor</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.subprocess.SubprocessExecutor.protocol"><code class="docutils literal notranslate"><span class="pre">SubprocessExecutor.protocol</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.execspec.implementations.wes">appyter.execspec.implementations.wes module</a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.wes.WESExecutor"><code class="docutils literal notranslate"><span class="pre">WESExecutor</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.execspec.implementations.wes.WESExecutor.protocol"><code class="docutils literal notranslate"><span class="pre">WESExecutor.protocol</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-appyter.execspec.implementations">Module contents</a></li>
 </ul>
 </li>
 </ul>
 
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -209,21 +254,21 @@ kube::maayanlab/myimage:latest?namespace=default</p>
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -237,8 +282,8 @@ kube::maayanlab/myimage:latest?namespace=default</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

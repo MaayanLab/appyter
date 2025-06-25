@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.ext.dict &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css?v=0f882399" />
+    <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,15 +34,23 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.dict</h1><div class="highlight"><pre>
-<div class="viewcode-block" id="dict_filter_none"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_filter_none">[docs]</a><span></span><span class="k">def</span> <span class="nf">dict_filter_none</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+<div class="viewcode-block" id="dict_filter_none">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_filter_none">[docs]</a>
+<span></span><span class="k">def</span><span class="w"> </span><span class="nf">dict_filter_none</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
   <span class="k">return</span> <span class="p">{</span> <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">}</span></div>
 
-<div class="viewcode-block" id="dict_collision_free_update"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_collision_free_update">[docs]</a><span class="k">def</span> <span class="nf">dict_collision_free_update</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="dict_collision_free_update">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_collision_free_update">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dict_collision_free_update</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
   <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="k">assert</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">,</span> <span class="s1">&#39;Collision in update&#39;</span>
     <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
 
-<div class="viewcode-block" id="dict_flatten"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_flatten">[docs]</a><span class="k">def</span> <span class="nf">dict_flatten</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+
+<div class="viewcode-block" id="dict_flatten">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_flatten">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dict_flatten</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
   <span class="n">Q</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">tuple</span><span class="p">(),</span> <span class="n">d</span><span class="p">)]</span>
   <span class="n">F</span> <span class="o">=</span> <span class="p">[]</span>
   <span class="k">while</span> <span class="n">Q</span><span class="p">:</span>
@@ -56,7 +62,10 @@
       <span class="n">F</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="n">V</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">F</span></div>
 
-<div class="viewcode-block" id="dict_unflatten"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_unflatten">[docs]</a><span class="k">def</span> <span class="nf">dict_unflatten</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+
+<div class="viewcode-block" id="dict_unflatten">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_unflatten">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dict_unflatten</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
   <span class="n">D</span> <span class="o">=</span> <span class="p">{}</span>
   <span class="k">for</span> <span class="n">K</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">o</span> <span class="o">=</span> <span class="n">D</span>
@@ -67,10 +76,16 @@
     <span class="n">o</span><span class="p">[</span><span class="n">K</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">v</span>
   <span class="k">return</span> <span class="n">D</span></div>
 
-<div class="viewcode-block" id="dict_merge"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_merge">[docs]</a><span class="k">def</span> <span class="nf">dict_merge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="dict_merge">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_merge">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dict_merge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">dict_unflatten</span><span class="p">(</span><span class="n">dict_flatten</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="n">dict_flatten</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="expand_dotmap"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.expand_dotmap">[docs]</a><span class="k">def</span> <span class="nf">expand_dotmap</span><span class="p">(</span><span class="n">dotmap</span><span class="p">):</span>
+
+<div class="viewcode-block" id="expand_dotmap">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.expand_dotmap">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">expand_dotmap</span><span class="p">(</span><span class="n">dotmap</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; Convert dot-notation into deep dict</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
@@ -84,7 +99,10 @@
     <span class="n">_params_n_2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
   <span class="k">return</span> <span class="n">params</span></div>
 
-<div class="viewcode-block" id="dict_typed_flatten"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_typed_flatten">[docs]</a><span class="k">def</span> <span class="nf">dict_typed_flatten</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+
+<div class="viewcode-block" id="dict_typed_flatten">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_typed_flatten">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dict_typed_flatten</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; dict_flatten but preserves lists &amp; ordering</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">Q</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">tuple</span><span class="p">(),</span> <span class="n">d</span><span class="p">)]</span>
@@ -101,7 +119,10 @@
       <span class="n">F</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="n">V</span><span class="p">))</span>
   <span class="k">return</span> <span class="n">F</span></div>
 
-<div class="viewcode-block" id="dict_typed_unflatten"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_typed_unflatten">[docs]</a><span class="k">def</span> <span class="nf">dict_typed_unflatten</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+
+<div class="viewcode-block" id="dict_typed_unflatten">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.dict.dict_typed_unflatten">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dict_typed_unflatten</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; opposite of dict_typed_unflatten</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">D</span> <span class="o">=</span> <span class="p">{}</span>
@@ -121,29 +142,30 @@
       <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">K</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> <span class="n">o</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">o</span><span class="p">[</span><span class="n">K</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">v</span>
   <span class="k">return</span> <span class="n">D</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -158,8 +180,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

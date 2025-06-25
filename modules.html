@@ -1,22 +1,20 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>appyter &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,7 +34,7 @@
           <div class="body" role="main">
             
   <section id="appyter">
-<h1>appyter<a class="headerlink" href="#appyter" title="Permalink to this headline">¶</a></h1>
+<h1>appyter<a class="headerlink" href="#appyter" title="Link to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="appyter.html">appyter package</a><ul>
@@ -125,9 +123,56 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.html#module-appyter.cli">appyter.cli module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.html#module-appyter.context">appyter.context module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.html#module-appyter.fields">appyter.fields module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appyter.html#module-appyter.magic">appyter.magic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.html#module-appyter.context">appyter.context module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.filter_blueprints"><code class="docutils literal notranslate"><span class="pre">filter_blueprints()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.find_blueprints"><code class="docutils literal notranslate"><span class="pre">find_blueprints()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.find_blueprints_dir_mappings"><code class="docutils literal notranslate"><span class="pre">find_blueprints_dir_mappings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.find_fields"><code class="docutils literal notranslate"><span class="pre">find_fields()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.find_fields_dir_mappings"><code class="docutils literal notranslate"><span class="pre">find_fields_dir_mappings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.find_filters"><code class="docutils literal notranslate"><span class="pre">find_filters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.find_filters_dir_mappings"><code class="docutils literal notranslate"><span class="pre">find_filters_dir_mappings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.find_templates_dir"><code class="docutils literal notranslate"><span class="pre">find_templates_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.get_appyter_directory"><code class="docutils literal notranslate"><span class="pre">get_appyter_directory()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.get_env"><code class="docutils literal notranslate"><span class="pre">get_env()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.get_env_from_click"><code class="docutils literal notranslate"><span class="pre">get_env_from_click()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.get_env_from_flask"><code class="docutils literal notranslate"><span class="pre">get_env_from_flask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.get_env_from_kwargs"><code class="docutils literal notranslate"><span class="pre">get_env_from_kwargs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.get_extra_files"><code class="docutils literal notranslate"><span class="pre">get_extra_files()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.context.get_jinja2_env"><code class="docutils literal notranslate"><span class="pre">get_jinja2_env()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.html#module-appyter.fields">appyter.fields module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.fields.Field"><code class="docutils literal notranslate"><span class="pre">Field</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.args"><code class="docutils literal notranslate"><span class="pre">Field.args</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.choices"><code class="docutils literal notranslate"><span class="pre">Field.choices</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.constraint"><code class="docutils literal notranslate"><span class="pre">Field.constraint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.field"><code class="docutils literal notranslate"><span class="pre">Field.field</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.js_url"><code class="docutils literal notranslate"><span class="pre">Field.js_url</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.prepare"><code class="docutils literal notranslate"><span class="pre">Field.prepare()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.raw_value"><code class="docutils literal notranslate"><span class="pre">Field.raw_value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.render"><code class="docutils literal notranslate"><span class="pre">Field.render()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.render_value"><code class="docutils literal notranslate"><span class="pre">Field.render_value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.safe_value"><code class="docutils literal notranslate"><span class="pre">Field.safe_value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.template"><code class="docutils literal notranslate"><span class="pre">Field.template</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.to_click"><code class="docutils literal notranslate"><span class="pre">Field.to_click()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.to_cwl"><code class="docutils literal notranslate"><span class="pre">Field.to_cwl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.to_cwl_value"><code class="docutils literal notranslate"><span class="pre">Field.to_cwl_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">Field.to_jsonschema()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.Field.value"><code class="docutils literal notranslate"><span class="pre">Field.value</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.fields.FieldConstraintException"><code class="docutils literal notranslate"><span class="pre">FieldConstraintException</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="appyter.html#appyter.fields.FieldConstraintException.as_dict"><code class="docutils literal notranslate"><span class="pre">FieldConstraintException.as_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.fields.PartialField"><code class="docutils literal notranslate"><span class="pre">PartialField</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.fields.build_fields"><code class="docutils literal notranslate"><span class="pre">build_fields()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="appyter.html#module-appyter.magic">appyter.magic module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="appyter.html#appyter.magic.init"><code class="docutils literal notranslate"><span class="pre">init()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="appyter.html#module-appyter">Module contents</a></li>
 </ul>
 </li>
@@ -140,7 +185,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -149,21 +194,21 @@
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -177,8 +222,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

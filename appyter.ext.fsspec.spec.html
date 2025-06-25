@@ -1,22 +1,20 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>appyter.ext.fsspec.spec package &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,41 +34,41 @@
           <div class="body" role="main">
             
   <section id="appyter-ext-fsspec-spec-package">
-<h1>appyter.ext.fsspec.spec package<a class="headerlink" href="#appyter-ext-fsspec-spec-package" title="Permalink to this headline">¶</a></h1>
+<h1>appyter.ext.fsspec.spec package<a class="headerlink" href="#appyter-ext-fsspec-spec-package" title="Link to this heading">¶</a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
 <section id="module-appyter.ext.fsspec.spec.composable">
-<span id="appyter-ext-fsspec-spec-composable-module"></span><h2>appyter.ext.fsspec.spec.composable module<a class="headerlink" href="#module-appyter.ext.fsspec.spec.composable" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-ext-fsspec-spec-composable-module"></span><h2>appyter.ext.fsspec.spec.composable module<a class="headerlink" href="#module-appyter.ext.fsspec.spec.composable" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.fsspec.spec.composable.</code><code class="sig-name descname">ComposableAbstractFileSystem</code><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/composable.html#ComposableAbstractFileSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.ext.fsspec.spec.composable.</span></span><span class="sig-name descname"><span class="pre">ComposableAbstractFileSystem</span></span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/composable.html#ComposableAbstractFileSystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Expansion of AbstractFileSystem’s json serialization methods to support composition
 by calling to_json() on any filesystems in storage_args during serialization,
 and loading them in during deserialization.</p>
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.from_json">
-<em class="property">static </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">blob</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/composable.html#ComposableAbstractFileSystem.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.from_json" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.from_json">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blob</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/composable.html#ComposableAbstractFileSystem.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.from_json" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.to_json">
-<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/composable.html#ComposableAbstractFileSystem.to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.to_json" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/composable.html#ComposableAbstractFileSystem.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.to_json" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.ext.fsspec.spec.mountable">
-<span id="appyter-ext-fsspec-spec-mountable-module"></span><h2>appyter.ext.fsspec.spec.mountable module<a class="headerlink" href="#module-appyter.ext.fsspec.spec.mountable" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-ext-fsspec-spec-mountable-module"></span><h2>appyter.ext.fsspec.spec.mountable module<a class="headerlink" href="#module-appyter.ext.fsspec.spec.mountable" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.ext.fsspec.spec.mountable.MountableAbstractFileSystem">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.fsspec.spec.mountable.</code><code class="sig-name descname">MountableAbstractFileSystem</code><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/mountable.html#MountableAbstractFileSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.mountable.MountableAbstractFileSystem" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.mountable.MountableAbstractFileSystem">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.ext.fsspec.spec.mountable.</span></span><span class="sig-name descname"><span class="pre">MountableAbstractFileSystem</span></span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/mountable.html#MountableAbstractFileSystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.mountable.MountableAbstractFileSystem" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.mountable.MountableAbstractFileSystem.mount">
-<code class="sig-name descname">mount</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">passthrough</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/mountable.html#MountableAbstractFileSystem.mount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.mountable.MountableAbstractFileSystem.mount" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.mountable.MountableAbstractFileSystem.mount">
+<span class="sig-name descname"><span class="pre">mount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passthrough</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/mountable.html#MountableAbstractFileSystem.mount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.mountable.MountableAbstractFileSystem.mount" title="Link to this definition">¶</a></dt>
 <dd><p>mount fallback: defer to chroot-filesystem</p>
 </dd></dl>
 
@@ -78,88 +76,88 @@ and loading them in during deserialization.</p>
 
 </section>
 <section id="module-appyter.ext.fsspec.spec.sync_async">
-<span id="appyter-ext-fsspec-spec-sync-async-module"></span><h2>appyter.ext.fsspec.spec.sync_async module<a class="headerlink" href="#module-appyter.ext.fsspec.spec.sync_async" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-ext-fsspec-spec-sync-async-module"></span><h2>appyter.ext.fsspec.spec.sync_async module<a class="headerlink" href="#module-appyter.ext.fsspec.spec.sync_async" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.fsspec.spec.sync_async.</code><code class="sig-name descname">SyncAsyncFileSystem</code><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.ext.fsspec.spec.sync_async.</span></span><span class="sig-name descname"><span class="pre">SyncAsyncFileSystem</span></span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A helper for fsspec AsyncFileSystems to use our own
-<code class="docutils literal notranslate"><span class="pre">ensure_sync</span></code> for all sync methods.</p>
+<cite>ensure_sync</cite> for all sync methods.</p>
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.cat_file">
-<code class="sig-name descname">cat_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.cat_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.cat_file" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.cat_file">
+<span class="sig-name descname"><span class="pre">cat_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.cat_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.cat_file" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.cp_file">
-<code class="sig-name descname">cp_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.cp_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.cp_file" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.cp_file">
+<span class="sig-name descname"><span class="pre">cp_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.cp_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.cp_file" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.exists">
-<code class="sig-name descname">exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.exists" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.exists">
+<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.exists" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.get_file">
-<code class="sig-name descname">get_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.get_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.get_file" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.get_file">
+<span class="sig-name descname"><span class="pre">get_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.get_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.get_file" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.glob">
-<code class="sig-name descname">glob</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.glob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.glob" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.glob">
+<span class="sig-name descname"><span class="pre">glob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.glob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.glob" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.info">
-<code class="sig-name descname">info</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.info" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.info" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.ls">
-<code class="sig-name descname">ls</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.ls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.ls" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.ls">
+<span class="sig-name descname"><span class="pre">ls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.ls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.ls" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.makedirs">
-<code class="sig-name descname">makedirs</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.makedirs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.makedirs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.makedirs">
+<span class="sig-name descname"><span class="pre">makedirs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.makedirs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.makedirs" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.mkdir">
-<code class="sig-name descname">mkdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.mkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.mkdir" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.mkdir">
+<span class="sig-name descname"><span class="pre">mkdir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.mkdir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.mkdir" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.mv">
-<code class="sig-name descname">mv</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.mv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.mv" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.mv">
+<span class="sig-name descname"><span class="pre">mv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.mv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.mv" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.put_file">
-<code class="sig-name descname">put_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.put_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.put_file" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.put_file">
+<span class="sig-name descname"><span class="pre">put_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.put_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.put_file" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rm">
-<code class="sig-name descname">rm</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.rm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rm" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rm">
+<span class="sig-name descname"><span class="pre">rm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.rm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rm" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rm_file">
-<code class="sig-name descname">rm_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.rm_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rm_file" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rm_file">
+<span class="sig-name descname"><span class="pre">rm_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.rm_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rm_file" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rmdir">
-<code class="sig-name descname">rmdir</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.rmdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rmdir" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rmdir">
+<span class="sig-name descname"><span class="pre">rmdir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/fsspec/spec/sync_async.html#SyncAsyncFileSystem.rmdir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rmdir" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.ext.fsspec.spec">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.ext.fsspec.spec" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.ext.fsspec.spec" title="Link to this heading">¶</a></h2>
 </section>
 </section>
 
@@ -168,20 +166,54 @@ and loading them in during deserialization.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">appyter.ext.fsspec.spec package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-appyter.ext.fsspec.spec.composable">appyter.ext.fsspec.spec.composable module</a></li>
-<li><a class="reference internal" href="#module-appyter.ext.fsspec.spec.mountable">appyter.ext.fsspec.spec.mountable module</a></li>
-<li><a class="reference internal" href="#module-appyter.ext.fsspec.spec.sync_async">appyter.ext.fsspec.spec.sync_async module</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.spec.composable">appyter.ext.fsspec.spec.composable module</a><ul>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem"><code class="docutils literal notranslate"><span class="pre">ComposableAbstractFileSystem</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.from_json"><code class="docutils literal notranslate"><span class="pre">ComposableAbstractFileSystem.from_json()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.composable.ComposableAbstractFileSystem.to_json"><code class="docutils literal notranslate"><span class="pre">ComposableAbstractFileSystem.to_json()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.spec.mountable">appyter.ext.fsspec.spec.mountable module</a><ul>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.mountable.MountableAbstractFileSystem"><code class="docutils literal notranslate"><span class="pre">MountableAbstractFileSystem</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.mountable.MountableAbstractFileSystem.mount"><code class="docutils literal notranslate"><span class="pre">MountableAbstractFileSystem.mount()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.ext.fsspec.spec.sync_async">appyter.ext.fsspec.spec.sync_async module</a><ul>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.cat_file"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.cat_file()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.cp_file"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.cp_file()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.exists"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.exists()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.get_file"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.get_file()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.glob"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.glob()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.info"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.info()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.ls"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.ls()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.makedirs"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.makedirs()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.mkdir"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.mkdir()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.mv"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.mv()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.put_file"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.put_file()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rm"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.rm()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rm_file"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.rm_file()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.fsspec.spec.sync_async.SyncAsyncFileSystem.rmdir"><code class="docutils literal notranslate"><span class="pre">SyncAsyncFileSystem.rmdir()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-appyter.ext.fsspec.spec">Module contents</a></li>
 </ul>
 </li>
 </ul>
 
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -189,21 +221,21 @@ and loading them in during deserialization.</p>
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -217,8 +249,8 @@ and loading them in during deserialization.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

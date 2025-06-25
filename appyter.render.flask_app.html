@@ -1,22 +1,20 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>appyter.render.flask_app package &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,335 +34,335 @@
           <div class="body" role="main">
             
   <section id="appyter-render-flask-app-package">
-<h1>appyter.render.flask_app package<a class="headerlink" href="#appyter-render-flask-app-package" title="Permalink to this headline">¶</a></h1>
+<h1>appyter.render.flask_app package<a class="headerlink" href="#appyter-render-flask-app-package" title="Link to this heading">¶</a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
 <section id="module-appyter.render.flask_app.constants">
-<span id="appyter-render-flask-app-constants-module"></span><h2>appyter.render.flask_app.constants module<a class="headerlink" href="#module-appyter.render.flask_app.constants" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-render-flask-app-constants-module"></span><h2>appyter.render.flask_app.constants module<a class="headerlink" href="#module-appyter.render.flask_app.constants" title="Link to this heading">¶</a></h2>
 <p>Constants that can be cached in thread-local storage</p>
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_base_files">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_base_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_base_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_base_files" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_base_files">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_base_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_base_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_base_files" title="Link to this definition">¶</a></dt>
 <dd><p>Include all (non-hidden) files in cwd (include requirements.txt, utils, etc..)</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_cwd_fs">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_cwd_fs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_cwd_fs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_cwd_fs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_cwd_fs">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_cwd_fs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_cwd_fs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_cwd_fs" title="Link to this definition">¶</a></dt>
 <dd><p>Return fsspec compatible chroot to the current directory</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_deep_fields">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_deep_fields</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_deep_fields"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_deep_fields" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_deep_fields">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_deep_fields</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_deep_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_deep_fields" title="Link to this definition">¶</a></dt>
 <dd><p>Parse the nbtemplate fields</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_env">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_env</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_env" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_env">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_env"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_env" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_fields">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_fields</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_fields"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_fields" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_fields">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_fields</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_fields" title="Link to this definition">¶</a></dt>
 <dd><p>Parse the nbtemplate fields</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_form">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_form</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_form"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_form" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_form">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_form</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_form"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_form" title="Link to this definition">¶</a></dt>
 <dd><p>Render a form for the nbtemplate</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_html_exporer">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_html_exporer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_html_exporer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_html_exporer" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_html_exporer">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_html_exporer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_html_exporer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_html_exporer" title="Link to this definition">¶</a></dt>
 <dd><p>nbconvert html export</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_input_fs">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_input_fs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_input_fs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_input_fs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_input_fs">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_input_fs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_input_fs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_input_fs" title="Link to this definition">¶</a></dt>
 <dd><p>Return fsspec compatible chroot to the static directory</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_ipynb_hash">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_ipynb_hash</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_ipynb_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_ipynb_hash" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_ipynb_hash">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_ipynb_hash</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_ipynb_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_ipynb_hash" title="Link to this definition">¶</a></dt>
 <dd><p>A hash for the ipynb</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_ipynb_io">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_ipynb_io</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_ipynb_io"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_ipynb_io" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_ipynb_io">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_ipynb_io</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_ipynb_io"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_ipynb_io" title="Link to this definition">¶</a></dt>
 <dd><p>Reuse the BytesIO stream</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_j2_env">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_j2_env</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_j2_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_j2_env" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_j2_env">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_j2_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_j2_env"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_j2_env" title="Link to this definition">¶</a></dt>
 <dd><p>Get an initialized bare jinja2 environment (no context)</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_nbtemplate">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_nbtemplate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_nbtemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_nbtemplate" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_nbtemplate">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_nbtemplate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_nbtemplate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_nbtemplate" title="Link to this definition">¶</a></dt>
 <dd><p>Parse the ipynb</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_nbtemplate_json">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_nbtemplate_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_nbtemplate_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_nbtemplate_json" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_nbtemplate_json">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_nbtemplate_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_nbtemplate_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_nbtemplate_json" title="Link to this definition">¶</a></dt>
 <dd><p>Render the nbtemplate as nbtemplate_json</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_output_fs">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_output_fs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_output_fs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_output_fs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_output_fs">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_output_fs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_output_fs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_output_fs" title="Link to this definition">¶</a></dt>
 <dd><p>Return fsspec compatible chroot to the static directory</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.constants.get_static_fs">
-<code class="sig-prename descclassname">appyter.render.flask_app.constants.</code><code class="sig-name descname">get_static_fs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_static_fs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_static_fs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.constants.get_static_fs">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.constants.</span></span><span class="sig-name descname"><span class="pre">get_static_fs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/constants.html#get_static_fs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.constants.get_static_fs" title="Link to this definition">¶</a></dt>
 <dd><p>Return fsspec compatible chroot to the static directory</p>
 </dd></dl>
 
 </section>
 <section id="module-appyter.render.flask_app.core">
-<span id="appyter-render-flask-app-core-module"></span><h2>appyter.render.flask_app.core module<a class="headerlink" href="#module-appyter.render.flask_app.core" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-render-flask-app-core-module"></span><h2>appyter.render.flask_app.core module<a class="headerlink" href="#module-appyter.render.flask_app.core" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.render.flask_app.core.post_index">
-<code class="sig-prename descclassname">appyter.render.flask_app.core.</code><code class="sig-name descname">post_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/core.html#post_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.core.post_index" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.core.post_index">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.core.</span></span><span class="sig-name descname"><span class="pre">post_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/core.html#post_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.core.post_index" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.core.post_ssr">
-<code class="sig-prename descclassname">appyter.render.flask_app.core.</code><code class="sig-name descname">post_ssr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/core.html#post_ssr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.core.post_ssr" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.core.post_ssr">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.core.</span></span><span class="sig-name descname"><span class="pre">post_ssr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/core.html#post_ssr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.core.post_ssr" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-appyter.render.flask_app.development">
-<span id="appyter-render-flask-app-development-module"></span><h2>appyter.render.flask_app.development module<a class="headerlink" href="#module-appyter.render.flask_app.development" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-render-flask-app-development-module"></span><h2>appyter.render.flask_app.development module<a class="headerlink" href="#module-appyter.render.flask_app.development" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.render.flask_app.development.app_messager">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.development.</code><code class="sig-name descname">app_messager</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">emitter</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/development.html#app_messager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.development.app_messager" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.development.app_messager">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.development.</span></span><span class="sig-name descname"><span class="pre">app_messager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emitter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/development.html#app_messager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.development.app_messager" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.development.app_runner">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.development.</code><code class="sig-name descname">app_runner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">emitter</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/development.html#app_runner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.development.app_runner" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.development.app_runner">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.development.</span></span><span class="sig-name descname"><span class="pre">app_runner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emitter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/development.html#app_runner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.development.app_runner" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.development.file_watcher">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.development.</code><code class="sig-name descname">file_watcher</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">emitter</span></em>, <em class="sig-param"><span class="n">evt</span></em>, <em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/development.html#file_watcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.development.file_watcher" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.development.file_watcher">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.development.</span></span><span class="sig-name descname"><span class="pre">file_watcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emitter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/development.html#file_watcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.development.file_watcher" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.development.run_app">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.development.</code><code class="sig-name descname">run_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/development.html#run_app"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.development.run_app" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.development.run_app">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.development.</span></span><span class="sig-name descname"><span class="pre">run_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/development.html#run_app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.development.run_app" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.development.serve">
-<code class="sig-prename descclassname">appyter.render.flask_app.development.</code><code class="sig-name descname">serve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app_path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/development.html#serve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.development.serve" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.development.serve">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.development.</span></span><span class="sig-name descname"><span class="pre">serve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/development.html#serve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.development.serve" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-appyter.render.flask_app.drs">
-<span id="appyter-render-flask-app-drs-module"></span><h2>appyter.render.flask_app.drs module<a class="headerlink" href="#module-appyter.render.flask_app.drs" title="Permalink to this headline">¶</a></h2>
-<p>A DRS endpoint for accessing <code class="docutils literal notranslate"><span class="pre">storage://input</span></code></p>
+<span id="appyter-render-flask-app-drs-module"></span><h2>appyter.render.flask_app.drs module<a class="headerlink" href="#module-appyter.render.flask_app.drs" title="Link to this heading">¶</a></h2>
+<p>A DRS endpoint for accessing <cite>storage://input</cite></p>
 <dl class="py function">
-<dt id="appyter.render.flask_app.drs.drs_objects">
-<code class="sig-prename descclassname">appyter.render.flask_app.drs.</code><code class="sig-name descname">drs_objects</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/drs.html#drs_objects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.drs.drs_objects" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.drs.drs_objects">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.drs.</span></span><span class="sig-name descname"><span class="pre">drs_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/drs.html#drs_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.drs.drs_objects" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.drs.drs_objects_access">
-<code class="sig-prename descclassname">appyter.render.flask_app.drs.</code><code class="sig-name descname">drs_objects_access</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_id</span></em>, <em class="sig-param"><span class="n">access_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/drs.html#drs_objects_access"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.drs.drs_objects_access" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.drs.drs_objects_access">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.drs.</span></span><span class="sig-name descname"><span class="pre">drs_objects_access</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/drs.html#drs_objects_access"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.drs.drs_objects_access" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.drs.drs_objects_fetch">
-<code class="sig-prename descclassname">appyter.render.flask_app.drs.</code><code class="sig-name descname">drs_objects_fetch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/drs.html#drs_objects_fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.drs.drs_objects_fetch" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.drs.drs_objects_fetch">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.drs.</span></span><span class="sig-name descname"><span class="pre">drs_objects_fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/drs.html#drs_objects_fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.drs.drs_objects_fetch" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.drs.drs_service_info">
-<code class="sig-prename descclassname">appyter.render.flask_app.drs.</code><code class="sig-name descname">drs_service_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/drs.html#drs_service_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.drs.drs_service_info" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.drs.drs_service_info">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.drs.</span></span><span class="sig-name descname"><span class="pre">drs_service_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/drs.html#drs_service_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.drs.drs_service_info" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-appyter.render.flask_app.execution">
-<span id="appyter-render-flask-app-execution-module"></span><h2>appyter.render.flask_app.execution module<a class="headerlink" href="#module-appyter.render.flask_app.execution" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-render-flask-app-execution-module"></span><h2>appyter.render.flask_app.execution module<a class="headerlink" href="#module-appyter.render.flask_app.execution" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.render.flask_app.execution.submit">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.execution.</code><code class="sig-name descname">submit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sid</span></em>, <em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/execution.html#submit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.execution.submit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.execution.submit">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.execution.</span></span><span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/execution.html#submit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.execution.submit" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-appyter.render.flask_app.export">
-<span id="appyter-render-flask-app-export-module"></span><h2>appyter.render.flask_app.export module<a class="headerlink" href="#module-appyter.render.flask_app.export" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-render-flask-app-export-module"></span><h2>appyter.render.flask_app.export module<a class="headerlink" href="#module-appyter.render.flask_app.export" title="Link to this heading">¶</a></h2>
 <p>Endpoints for exporting results</p>
 <dl class="py function">
-<dt id="appyter.render.flask_app.export.export">
-<code class="sig-prename descclassname">appyter.render.flask_app.export.</code><code class="sig-name descname">export</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/export.html#export"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.export.export" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.export.export">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.export.</span></span><span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/export.html#export"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.export.export" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-appyter.render.flask_app.livereload">
-<span id="appyter-render-flask-app-livereload-module"></span><h2>appyter.render.flask_app.livereload module<a class="headerlink" href="#module-appyter.render.flask_app.livereload" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-render-flask-app-livereload-module"></span><h2>appyter.render.flask_app.livereload module<a class="headerlink" href="#module-appyter.render.flask_app.livereload" title="Link to this heading">¶</a></h2>
 </section>
 <section id="module-appyter.render.flask_app.prepare">
-<span id="appyter-render-flask-app-prepare-module"></span><h2>appyter.render.flask_app.prepare module<a class="headerlink" href="#module-appyter.render.flask_app.prepare" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-render-flask-app-prepare-module"></span><h2>appyter.render.flask_app.prepare module<a class="headerlink" href="#module-appyter.render.flask_app.prepare" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.render.flask_app.prepare.prepare_data">
-<code class="sig-prename descclassname">appyter.render.flask_app.prepare.</code><code class="sig-name descname">prepare_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">req</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/prepare.html#prepare_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.prepare.prepare_data" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.prepare.prepare_data">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.prepare.</span></span><span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/prepare.html#prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.prepare.prepare_data" title="Link to this definition">¶</a></dt>
 <dd><p>Extract fields from submission</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.prepare.prepare_executor">
-<code class="sig-prename descclassname">appyter.render.flask_app.prepare.</code><code class="sig-name descname">prepare_executor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">fallback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#appyter.render.flask_app.prepare.prepare_executor" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.prepare.prepare_executor">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.prepare.</span></span><span class="sig-name descname"><span class="pre">prepare_executor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fallback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#appyter.render.flask_app.prepare.prepare_executor" title="Link to this definition">¶</a></dt>
 <dd><p>Figure out the executor to use for this request</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.prepare.prepare_request">
-<code class="sig-prename descclassname">appyter.render.flask_app.prepare.</code><code class="sig-name descname">prepare_request</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">req</span></em><span class="sig-paren">)</span><a class="headerlink" href="#appyter.render.flask_app.prepare.prepare_request" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.prepare.prepare_request">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.prepare.</span></span><span class="sig-name descname"><span class="pre">prepare_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#appyter.render.flask_app.prepare.prepare_request" title="Link to this definition">¶</a></dt>
 <dd><p>Extract internal session variables from request</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.prepare.prepare_results">
-<code class="sig-prename descclassname">appyter.render.flask_app.prepare.</code><code class="sig-name descname">prepare_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#appyter.render.flask_app.prepare.prepare_results" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.prepare.prepare_results">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.prepare.</span></span><span class="sig-name descname"><span class="pre">prepare_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#appyter.render.flask_app.prepare.prepare_results" title="Link to this definition">¶</a></dt>
 <dd><p>Compute instance id &amp; ensure results exist in storage</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.prepare.prepare_storage">
-<code class="sig-prename descclassname">appyter.render.flask_app.prepare.</code><code class="sig-name descname">prepare_storage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#appyter.render.flask_app.prepare.prepare_storage" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.prepare.prepare_storage">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.prepare.</span></span><span class="sig-name descname"><span class="pre">prepare_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#appyter.render.flask_app.prepare.prepare_storage" title="Link to this definition">¶</a></dt>
 <dd><p>Figure out the storage fsspec URI to use for this request</p>
 </dd></dl>
 
 </section>
 <section id="module-appyter.render.flask_app.production">
-<span id="appyter-render-flask-app-production-module"></span><h2>appyter.render.flask_app.production module<a class="headerlink" href="#module-appyter.render.flask_app.production" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-render-flask-app-production-module"></span><h2>appyter.render.flask_app.production module<a class="headerlink" href="#module-appyter.render.flask_app.production" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.render.flask_app.production.serve">
-<code class="sig-prename descclassname">appyter.render.flask_app.production.</code><code class="sig-name descname">serve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app_path</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/production.html#serve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.production.serve" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.production.serve">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.production.</span></span><span class="sig-name descname"><span class="pre">serve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/production.html#serve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.production.serve" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-appyter.render.flask_app.room_manager">
-<span id="appyter-render-flask-app-room-manager-module"></span><h2>appyter.render.flask_app.room_manager module<a class="headerlink" href="#module-appyter.render.flask_app.room_manager" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-render-flask-app-room-manager-module"></span><h2>appyter.render.flask_app.room_manager module<a class="headerlink" href="#module-appyter.render.flask_app.room_manager" title="Link to this heading">¶</a></h2>
 <p>Manage rooms
-NOTE: <code class="docutils literal notranslate"><span class="pre">rooms</span></code> state would need to be distributed if the
+NOTE: <cite>rooms</cite> state would need to be distributed if the
 server was distributed.</p>
 <dl class="py function">
-<dt id="appyter.render.flask_app.room_manager.ensure_joined">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.room_manager.</code><code class="sig-name descname">ensure_joined</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client_sid</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#ensure_joined"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.ensure_joined" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.room_manager.ensure_joined">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.room_manager.</span></span><span class="sig-name descname"><span class="pre">ensure_joined</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_sid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#ensure_joined"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.ensure_joined" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.room_manager.ensure_room">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.room_manager.</code><code class="sig-name descname">ensure_room</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">room</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#ensure_room"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.ensure_room" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.room_manager.ensure_room">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.room_manager.</span></span><span class="sig-name descname"><span class="pre">ensure_room</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">room</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#ensure_room"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.ensure_room" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.room_manager.enter_room">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.room_manager.</code><code class="sig-name descname">enter_room</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client_sid</span></em>, <em class="sig-param"><span class="n">room_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#enter_room"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.enter_room" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.room_manager.enter_room">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.room_manager.</span></span><span class="sig-name descname"><span class="pre">enter_room</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_sid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">room_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#enter_room"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.enter_room" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.room_manager.find_room">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.room_manager.</code><code class="sig-name descname">find_room</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">room_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#find_room"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.find_room" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.room_manager.find_room">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.room_manager.</span></span><span class="sig-name descname"><span class="pre">find_room</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">room_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#find_room"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.find_room" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.room_manager.on_join">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.room_manager.</code><code class="sig-name descname">on_join</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client_sid</span></em>, <em class="sig-param"><span class="n">room_data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#on_join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.on_join" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.room_manager.on_join">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.room_manager.</span></span><span class="sig-name descname"><span class="pre">on_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client_sid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">room_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#on_join"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.on_join" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.room_manager.remove_client_from_room">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.room_manager.</code><code class="sig-name descname">remove_client_from_room</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">room_id</span></em>, <em class="sig-param"><span class="n">client_sid</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#remove_client_from_room"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.remove_client_from_room" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.room_manager.remove_client_from_room">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.room_manager.</span></span><span class="sig-name descname"><span class="pre">remove_client_from_room</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">room_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_sid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#remove_client_from_room"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.remove_client_from_room" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.room_manager.room_lock">
-<code class="sig-prename descclassname">appyter.render.flask_app.room_manager.</code><code class="sig-name descname">room_lock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">room_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#room_lock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.room_lock" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.room_manager.room_lock">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.room_manager.</span></span><span class="sig-name descname"><span class="pre">room_lock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">room_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/room_manager.html#room_lock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.room_manager.room_lock" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-appyter.render.flask_app.socketio">
-<span id="appyter-render-flask-app-socketio-module"></span><h2>appyter.render.flask_app.socketio module<a class="headerlink" href="#module-appyter.render.flask_app.socketio" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-render-flask-app-socketio-module"></span><h2>appyter.render.flask_app.socketio module<a class="headerlink" href="#module-appyter.render.flask_app.socketio" title="Link to this heading">¶</a></h2>
 </section>
 <section id="module-appyter.render.flask_app.static">
-<span id="appyter-render-flask-app-static-module"></span><h2>appyter.render.flask_app.static module<a class="headerlink" href="#module-appyter.render.flask_app.static" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-render-flask-app-static-module"></span><h2>appyter.render.flask_app.static module<a class="headerlink" href="#module-appyter.render.flask_app.static" title="Link to this heading">¶</a></h2>
 <p>Represent the areas that can be handled externally in production</p>
 <dl class="py function">
-<dt id="appyter.render.flask_app.static.data_files">
-<code class="sig-prename descclassname">appyter.render.flask_app.static.</code><code class="sig-name descname">data_files</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/static.html#data_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.static.data_files" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.static.data_files">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.static.</span></span><span class="sig-name descname"><span class="pre">data_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/static.html#data_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.static.data_files" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.static.favicon">
-<code class="sig-prename descclassname">appyter.render.flask_app.static.</code><code class="sig-name descname">favicon</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/static.html#favicon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.static.favicon" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.static.favicon">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.static.</span></span><span class="sig-name descname"><span class="pre">favicon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/static.html#favicon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.static.favicon" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.static.get_index">
-<code class="sig-prename descclassname">appyter.render.flask_app.static.</code><code class="sig-name descname">get_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/static.html#get_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.static.get_index" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.static.get_index">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.static.</span></span><span class="sig-name descname"><span class="pre">get_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/static.html#get_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.static.get_index" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.static.static">
-<code class="sig-prename descclassname">appyter.render.flask_app.static.</code><code class="sig-name descname">static</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/static.html#static"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.static.static" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.static.static">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.static.</span></span><span class="sig-name descname"><span class="pre">static</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/static.html#static"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.static.static" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-appyter.render.flask_app.upload">
-<span id="appyter-render-flask-app-upload-module"></span><h2>appyter.render.flask_app.upload module<a class="headerlink" href="#module-appyter.render.flask_app.upload" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-render-flask-app-upload-module"></span><h2>appyter.render.flask_app.upload module<a class="headerlink" href="#module-appyter.render.flask_app.upload" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.render.flask_app.upload.check">
-<code class="sig-prename descclassname">appyter.render.flask_app.upload.</code><code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/upload.html#check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.upload.check" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.upload.check">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.upload.</span></span><span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/upload.html#check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.upload.check" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.upload.organize_file_content">
-<code class="sig-prename descclassname">appyter.render.flask_app.upload.</code><code class="sig-name descname">organize_file_content</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_fs</span></em>, <em class="sig-param"><span class="n">tmp_fs</span></em>, <em class="sig-param"><span class="n">tmp_path</span></em>, <em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/upload.html#organize_file_content"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.upload.organize_file_content" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.upload.organize_file_content">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.upload.</span></span><span class="sig-name descname"><span class="pre">organize_file_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_fs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_fs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/upload.html#organize_file_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.upload.organize_file_content" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.upload.siofu_done">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.upload.</code><code class="sig-name descname">siofu_done</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sid</span></em>, <em class="sig-param"><span class="n">evt</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/upload.html#siofu_done"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.upload.siofu_done" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.upload.siofu_done">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.upload.</span></span><span class="sig-name descname"><span class="pre">siofu_done</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/upload.html#siofu_done"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.upload.siofu_done" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.upload.siofu_progress">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.upload.</code><code class="sig-name descname">siofu_progress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sid</span></em>, <em class="sig-param"><span class="n">evt</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/upload.html#siofu_progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.upload.siofu_progress" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.upload.siofu_progress">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.upload.</span></span><span class="sig-name descname"><span class="pre">siofu_progress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/upload.html#siofu_progress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.upload.siofu_progress" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.upload.siofu_start">
-<em class="property">async </em><code class="sig-prename descclassname">appyter.render.flask_app.upload.</code><code class="sig-name descname">siofu_start</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sid</span></em>, <em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/upload.html#siofu_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.upload.siofu_start" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.upload.siofu_start">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.upload.</span></span><span class="sig-name descname"><span class="pre">siofu_start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/upload.html#siofu_start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.upload.siofu_start" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="appyter.render.flask_app.upload.upload_from_request">
-<code class="sig-prename descclassname">appyter.render.flask_app.upload.</code><code class="sig-name descname">upload_from_request</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">req</span></em>, <em class="sig-param"><span class="n">fname</span></em>, <em class="sig-param"><span class="n">multiple</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/upload.html#upload_from_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.upload.upload_from_request" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.upload.upload_from_request">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.upload.</span></span><span class="sig-name descname"><span class="pre">upload_from_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app/upload.html#upload_from_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.upload.upload_from_request" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-appyter.render.flask_app">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.render.flask_app" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.render.flask_app" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.render.flask_app.create_app">
-<code class="sig-prename descclassname">appyter.render.flask_app.</code><code class="sig-name descname">create_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app.html#create_app"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.render.flask_app.create_app" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.render.flask_app.create_app">
+<span class="sig-prename descclassname"><span class="pre">appyter.render.flask_app.</span></span><span class="sig-name descname"><span class="pre">create_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/render/flask_app.html#create_app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.render.flask_app.create_app" title="Link to this definition">¶</a></dt>
 <dd><p>Completely initialize the flask application</p>
 </dd></dl>
 
@@ -376,30 +374,108 @@ server was distributed.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">appyter.render.flask_app package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-appyter.render.flask_app.constants">appyter.render.flask_app.constants module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.flask_app.core">appyter.render.flask_app.core module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.flask_app.development">appyter.render.flask_app.development module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.flask_app.drs">appyter.render.flask_app.drs module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.flask_app.execution">appyter.render.flask_app.execution module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.flask_app.export">appyter.render.flask_app.export module</a></li>
+<li><a class="reference internal" href="#module-appyter.render.flask_app.constants">appyter.render.flask_app.constants module</a><ul>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_base_files"><code class="docutils literal notranslate"><span class="pre">get_base_files()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_cwd_fs"><code class="docutils literal notranslate"><span class="pre">get_cwd_fs()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_deep_fields"><code class="docutils literal notranslate"><span class="pre">get_deep_fields()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_env"><code class="docutils literal notranslate"><span class="pre">get_env()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_fields"><code class="docutils literal notranslate"><span class="pre">get_fields()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_form"><code class="docutils literal notranslate"><span class="pre">get_form()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_html_exporer"><code class="docutils literal notranslate"><span class="pre">get_html_exporer()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_input_fs"><code class="docutils literal notranslate"><span class="pre">get_input_fs()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_ipynb_hash"><code class="docutils literal notranslate"><span class="pre">get_ipynb_hash()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_ipynb_io"><code class="docutils literal notranslate"><span class="pre">get_ipynb_io()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_j2_env"><code class="docutils literal notranslate"><span class="pre">get_j2_env()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_nbtemplate"><code class="docutils literal notranslate"><span class="pre">get_nbtemplate()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_nbtemplate_json"><code class="docutils literal notranslate"><span class="pre">get_nbtemplate_json()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_output_fs"><code class="docutils literal notranslate"><span class="pre">get_output_fs()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.constants.get_static_fs"><code class="docutils literal notranslate"><span class="pre">get_static_fs()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.render.flask_app.core">appyter.render.flask_app.core module</a><ul>
+<li><a class="reference internal" href="#appyter.render.flask_app.core.post_index"><code class="docutils literal notranslate"><span class="pre">post_index()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.core.post_ssr"><code class="docutils literal notranslate"><span class="pre">post_ssr()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.render.flask_app.development">appyter.render.flask_app.development module</a><ul>
+<li><a class="reference internal" href="#appyter.render.flask_app.development.app_messager"><code class="docutils literal notranslate"><span class="pre">app_messager()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.development.app_runner"><code class="docutils literal notranslate"><span class="pre">app_runner()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.development.file_watcher"><code class="docutils literal notranslate"><span class="pre">file_watcher()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.development.run_app"><code class="docutils literal notranslate"><span class="pre">run_app()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.development.serve"><code class="docutils literal notranslate"><span class="pre">serve()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.render.flask_app.drs">appyter.render.flask_app.drs module</a><ul>
+<li><a class="reference internal" href="#appyter.render.flask_app.drs.drs_objects"><code class="docutils literal notranslate"><span class="pre">drs_objects()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.drs.drs_objects_access"><code class="docutils literal notranslate"><span class="pre">drs_objects_access()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.drs.drs_objects_fetch"><code class="docutils literal notranslate"><span class="pre">drs_objects_fetch()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.drs.drs_service_info"><code class="docutils literal notranslate"><span class="pre">drs_service_info()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.render.flask_app.execution">appyter.render.flask_app.execution module</a><ul>
+<li><a class="reference internal" href="#appyter.render.flask_app.execution.submit"><code class="docutils literal notranslate"><span class="pre">submit()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.render.flask_app.export">appyter.render.flask_app.export module</a><ul>
+<li><a class="reference internal" href="#appyter.render.flask_app.export.export"><code class="docutils literal notranslate"><span class="pre">export()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-appyter.render.flask_app.livereload">appyter.render.flask_app.livereload module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.flask_app.prepare">appyter.render.flask_app.prepare module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.flask_app.production">appyter.render.flask_app.production module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.flask_app.room_manager">appyter.render.flask_app.room_manager module</a></li>
+<li><a class="reference internal" href="#module-appyter.render.flask_app.prepare">appyter.render.flask_app.prepare module</a><ul>
+<li><a class="reference internal" href="#appyter.render.flask_app.prepare.prepare_data"><code class="docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.prepare.prepare_executor"><code class="docutils literal notranslate"><span class="pre">prepare_executor()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.prepare.prepare_request"><code class="docutils literal notranslate"><span class="pre">prepare_request()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.prepare.prepare_results"><code class="docutils literal notranslate"><span class="pre">prepare_results()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.prepare.prepare_storage"><code class="docutils literal notranslate"><span class="pre">prepare_storage()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.render.flask_app.production">appyter.render.flask_app.production module</a><ul>
+<li><a class="reference internal" href="#appyter.render.flask_app.production.serve"><code class="docutils literal notranslate"><span class="pre">serve()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.render.flask_app.room_manager">appyter.render.flask_app.room_manager module</a><ul>
+<li><a class="reference internal" href="#appyter.render.flask_app.room_manager.ensure_joined"><code class="docutils literal notranslate"><span class="pre">ensure_joined()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.room_manager.ensure_room"><code class="docutils literal notranslate"><span class="pre">ensure_room()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.room_manager.enter_room"><code class="docutils literal notranslate"><span class="pre">enter_room()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.room_manager.find_room"><code class="docutils literal notranslate"><span class="pre">find_room()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.room_manager.on_join"><code class="docutils literal notranslate"><span class="pre">on_join()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.room_manager.remove_client_from_room"><code class="docutils literal notranslate"><span class="pre">remove_client_from_room()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.room_manager.room_lock"><code class="docutils literal notranslate"><span class="pre">room_lock()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-appyter.render.flask_app.socketio">appyter.render.flask_app.socketio module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.flask_app.static">appyter.render.flask_app.static module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.flask_app.upload">appyter.render.flask_app.upload module</a></li>
-<li><a class="reference internal" href="#module-appyter.render.flask_app">Module contents</a></li>
+<li><a class="reference internal" href="#module-appyter.render.flask_app.static">appyter.render.flask_app.static module</a><ul>
+<li><a class="reference internal" href="#appyter.render.flask_app.static.data_files"><code class="docutils literal notranslate"><span class="pre">data_files()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.static.favicon"><code class="docutils literal notranslate"><span class="pre">favicon()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.static.get_index"><code class="docutils literal notranslate"><span class="pre">get_index()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.static.static"><code class="docutils literal notranslate"><span class="pre">static()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.render.flask_app.upload">appyter.render.flask_app.upload module</a><ul>
+<li><a class="reference internal" href="#appyter.render.flask_app.upload.check"><code class="docutils literal notranslate"><span class="pre">check()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.upload.organize_file_content"><code class="docutils literal notranslate"><span class="pre">organize_file_content()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.upload.siofu_done"><code class="docutils literal notranslate"><span class="pre">siofu_done()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.upload.siofu_progress"><code class="docutils literal notranslate"><span class="pre">siofu_progress()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.upload.siofu_start"><code class="docutils literal notranslate"><span class="pre">siofu_start()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.render.flask_app.upload.upload_from_request"><code class="docutils literal notranslate"><span class="pre">upload_from_request()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.render.flask_app">Module contents</a><ul>
+<li><a class="reference internal" href="#appyter.render.flask_app.create_app"><code class="docutils literal notranslate"><span class="pre">create_app()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -407,21 +483,21 @@ server was distributed.</p>
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -435,8 +511,8 @@ server was distributed.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

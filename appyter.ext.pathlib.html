@@ -1,22 +1,20 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>appyter.ext.pathlib package &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,43 +34,40 @@
           <div class="body" role="main">
             
   <section id="appyter-ext-pathlib-package">
-<h1>appyter.ext.pathlib package<a class="headerlink" href="#appyter-ext-pathlib-package" title="Permalink to this headline">¶</a></h1>
+<h1>appyter.ext.pathlib package<a class="headerlink" href="#appyter-ext-pathlib-package" title="Link to this heading">¶</a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</section>
-<section id="appyter-ext-pathlib-assertions-module">
-<h2>appyter.ext.pathlib.assertions module<a class="headerlink" href="#appyter-ext-pathlib-assertions-module" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
 <section id="module-appyter.ext.pathlib.chroot">
-<span id="appyter-ext-pathlib-chroot-module"></span><h2>appyter.ext.pathlib.chroot module<a class="headerlink" href="#module-appyter.ext.pathlib.chroot" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-ext-pathlib-chroot-module"></span><h2>appyter.ext.pathlib.chroot module<a class="headerlink" href="#module-appyter.ext.pathlib.chroot" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.ext.pathlib.chroot.ChrootPurePosixPath">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.ext.pathlib.chroot.</code><code class="sig-name descname">ChrootPurePosixPath</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">root</span></em>, <em class="sig-param"><span class="n">_path</span><span class="o">=</span><span class="default_value">PurePosixPath('.')</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/pathlib/chroot.html#ChrootPurePosixPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.pathlib.chroot.ChrootPurePosixPath" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.pathlib.chroot.ChrootPurePosixPath">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.ext.pathlib.chroot.</span></span><span class="sig-name descname"><span class="pre">ChrootPurePosixPath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PurePosixPath('.')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/pathlib/chroot.html#ChrootPurePosixPath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.pathlib.chroot.ChrootPurePosixPath" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Similar to pathlib but guaranteed to stay within the <code class="docutils literal notranslate"><span class="pre">root</span></code> directory.</p>
+<p>Similar to pathlib but guaranteed to stay within the <cite>root</cite> directory.</p>
 <dl class="py method">
-<dt id="appyter.ext.pathlib.chroot.ChrootPurePosixPath.join">
-<code class="sig-name descname">join</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">others</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/pathlib/chroot.html#ChrootPurePosixPath.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.pathlib.chroot.ChrootPurePosixPath.join" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.pathlib.chroot.ChrootPurePosixPath.join">
+<span class="sig-name descname"><span class="pre">join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">others</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/pathlib/chroot.html#ChrootPurePosixPath.join"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.pathlib.chroot.ChrootPurePosixPath.join" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.pathlib.chroot.ChrootPurePosixPath.realpath">
-<code class="sig-name descname">realpath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/pathlib/chroot.html#ChrootPurePosixPath.realpath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.pathlib.chroot.ChrootPurePosixPath.realpath" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.pathlib.chroot.ChrootPurePosixPath.realpath">
+<span class="sig-name descname"><span class="pre">realpath</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/pathlib/chroot.html#ChrootPurePosixPath.realpath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.pathlib.chroot.ChrootPurePosixPath.realpath" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.ext.pathlib.chroot.ChrootPurePosixPath.relative_to">
-<code class="sig-name descname">relative_to</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/pathlib/chroot.html#ChrootPurePosixPath.relative_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.pathlib.chroot.ChrootPurePosixPath.relative_to" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.pathlib.chroot.ChrootPurePosixPath.relative_to">
+<span class="sig-name descname"><span class="pre">relative_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/pathlib/chroot.html#ChrootPurePosixPath.relative_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.pathlib.chroot.ChrootPurePosixPath.relative_to" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.ext.pathlib">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.ext.pathlib" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.ext.pathlib" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt id="appyter.ext.pathlib.is_relative_to">
-<code class="sig-prename descclassname">appyter.ext.pathlib.</code><code class="sig-name descname">is_relative_to</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/pathlib.html#is_relative_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.ext.pathlib.is_relative_to" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.ext.pathlib.is_relative_to">
+<span class="sig-prename descclassname"><span class="pre">appyter.ext.pathlib.</span></span><span class="sig-name descname"><span class="pre">is_relative_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/ext/pathlib.html#is_relative_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.ext.pathlib.is_relative_to" title="Link to this definition">¶</a></dt>
 <dd><p>Re-impl of PurePosixPath.is_relative_to for older python versions</p>
 </dd></dl>
 
@@ -84,19 +79,31 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">appyter.ext.pathlib package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#appyter-ext-pathlib-assertions-module">appyter.ext.pathlib.assertions module</a></li>
-<li><a class="reference internal" href="#module-appyter.ext.pathlib.chroot">appyter.ext.pathlib.chroot module</a></li>
-<li><a class="reference internal" href="#module-appyter.ext.pathlib">Module contents</a></li>
+<li><a class="reference internal" href="#module-appyter.ext.pathlib.chroot">appyter.ext.pathlib.chroot module</a><ul>
+<li><a class="reference internal" href="#appyter.ext.pathlib.chroot.ChrootPurePosixPath"><code class="docutils literal notranslate"><span class="pre">ChrootPurePosixPath</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.ext.pathlib.chroot.ChrootPurePosixPath.join"><code class="docutils literal notranslate"><span class="pre">ChrootPurePosixPath.join()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.pathlib.chroot.ChrootPurePosixPath.realpath"><code class="docutils literal notranslate"><span class="pre">ChrootPurePosixPath.realpath()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.ext.pathlib.chroot.ChrootPurePosixPath.relative_to"><code class="docutils literal notranslate"><span class="pre">ChrootPurePosixPath.relative_to()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.ext.pathlib">Module contents</a><ul>
+<li><a class="reference internal" href="#appyter.ext.pathlib.is_relative_to"><code class="docutils literal notranslate"><span class="pre">is_relative_to()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -104,21 +111,21 @@
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -132,8 +139,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.ext.fsspec.chroot &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,27 +34,29 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.fsspec.chroot</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">contextlib</span>
-<span class="kn">import</span> <span class="nn">traceback</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">join_slash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.urllib</span><span class="w"> </span><span class="kn">import</span> <span class="n">join_slash</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PurePosixPath</span>
-<span class="kn">from</span> <span class="nn">fsspec</span> <span class="kn">import</span> <span class="n">AbstractFileSystem</span><span class="p">,</span> <span class="n">filesystem</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.spec.mountable</span> <span class="kn">import</span> <span class="n">MountableAbstractFileSystem</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.spec.composable</span> <span class="kn">import</span> <span class="n">ComposableAbstractFileSystem</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.pathlib.chroot</span> <span class="kn">import</span> <span class="n">ChrootPurePosixPath</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PurePosixPath</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fsspec</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractFileSystem</span><span class="p">,</span> <span class="n">filesystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.spec.mountable</span><span class="w"> </span><span class="kn">import</span> <span class="n">MountableAbstractFileSystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.spec.composable</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComposableAbstractFileSystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.pathlib.chroot</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChrootPurePosixPath</span>
 
-<div class="viewcode-block" id="ChrootFileSystem"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem">[docs]</a><span class="k">class</span> <span class="nc">ChrootFileSystem</span><span class="p">(</span><span class="n">MountableAbstractFileSystem</span><span class="p">,</span> <span class="n">ComposableAbstractFileSystem</span><span class="p">,</span> <span class="n">AbstractFileSystem</span><span class="p">):</span>
+<div class="viewcode-block" id="ChrootFileSystem">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChrootFileSystem</span><span class="p">(</span><span class="n">MountableAbstractFileSystem</span><span class="p">,</span> <span class="n">ComposableAbstractFileSystem</span><span class="p">,</span> <span class="n">AbstractFileSystem</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; chroot: update root and disallow access beyond chroot, only works on directories.</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">root_marker</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
   <span class="n">protocol</span> <span class="o">=</span> <span class="s1">&#39;chroot&#39;</span>
 
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_protocol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_protocol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -81,7 +81,7 @@
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">fs</span> <span class="k">if</span> <span class="n">fs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">filesystem</span><span class="p">(</span><span class="n">target_protocol</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
 
-  <span class="k">def</span> <span class="nf">_target_fo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">_target_fo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">if</span> <span class="s1">&#39;://&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fo&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
       <span class="n">target_fo_split</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fo&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
       <span class="c1"># [scheme://base-path][/path-part?...]</span>
@@ -89,7 +89,7 @@
     <span class="k">else</span><span class="p">:</span>
       <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fo&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 
-  <span class="k">def</span> <span class="nf">_resolve_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
     <span class="n">target_fo_base</span><span class="p">,</span> <span class="n">target_fo_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_fo</span><span class="p">()</span>
     <span class="n">resolved_path</span> <span class="o">=</span> <span class="n">join_slash</span><span class="p">(</span><span class="o">*</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="n">target_fo_base</span><span class="p">,</span> <span class="nb">str</span><span class="p">((</span><span class="n">ChrootPurePosixPath</span><span class="p">(</span><span class="n">target_fo_path</span><span class="p">)</span> <span class="o">/</span> <span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">realpath</span><span class="p">()))))</span>
     <span class="k">if</span> <span class="n">resolved_path</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
@@ -98,7 +98,7 @@
       <span class="n">resolved_path</span> <span class="o">=</span> <span class="n">resolved_path</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
     <span class="k">return</span> <span class="n">resolved_path</span>
 
-  <span class="k">def</span> <span class="nf">_unresolve_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">_unresolve_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
     <span class="n">target_fo_base</span><span class="p">,</span> <span class="n">target_fo_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_fo</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">target_fo_base</span><span class="p">):</span>
       <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -112,7 +112,7 @@
     <span class="k">return</span> <span class="n">unresolve_path</span>
 
   <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
-  <span class="k">def</span> <span class="nf">__masquerade_os_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">__masquerade_os_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
       <span class="k">yield</span>
     <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
@@ -135,19 +135,21 @@
       <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
       <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> occurred, details have been hidden for security reasons&quot;</span><span class="p">)</span>
 
-  <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="s1">&#39;__enter__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
       <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">():</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
     <span class="k">return</span> <span class="bp">self</span>
   
-  <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="s1">&#39;__exit__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
       <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">():</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ChrootFileSystem.mount"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.mount">[docs]</a>  <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
-  <span class="k">def</span> <span class="nf">mount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">mount_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fuse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ChrootFileSystem.mount">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.mount">[docs]</a>
+  <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">mount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">mount_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fuse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">passthrough</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">=}</span><span class="s2"> mount </span><span class="si">{</span><span class="n">mount_dir</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">fuse</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>
       <span class="k">if</span> <span class="n">passthrough</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="s1">&#39;mount&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -163,14 +165,14 @@
           <span class="k">yield</span> <span class="n">mount_dir</span>
       <span class="k">elif</span> <span class="n">fuse</span><span class="p">:</span>
         <span class="c1"># use fuse fs_mount</span>
-        <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.helpers</span> <span class="kn">import</span> <span class="n">ensure_sync</span>
-        <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.fuse</span> <span class="kn">import</span> <span class="n">fs_mount</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.asyncio.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_sync</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.fuse</span><span class="w"> </span><span class="kn">import</span> <span class="n">fs_mount</span>
         <span class="k">with</span> <span class="n">ensure_sync</span><span class="p">(</span><span class="n">fs_mount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mount_dir</span><span class="o">=</span><span class="n">mount_dir</span><span class="p">))</span> <span class="k">as</span> <span class="n">mount_dir</span><span class="p">:</span>
           <span class="k">yield</span> <span class="n">mount_dir</span>
       <span class="k">else</span><span class="p">:</span>
         <span class="c1"># no fuse -- resort to copying files</span>
-        <span class="kn">import</span> <span class="nn">shutil</span>
-        <span class="kn">from</span> <span class="nn">appyter.ext.tempfile</span> <span class="kn">import</span> <span class="n">tempdir</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">tempdir</span>
         <span class="c1"># can&#39;t use fuse, default is to just copy files into the mount_dir</span>
         <span class="k">with</span> <span class="n">tempdir</span><span class="p">(</span><span class="n">mount_dir</span><span class="p">)</span> <span class="k">as</span> <span class="n">mount_dir</span><span class="p">:</span>
           <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;copying files over...&quot;</span><span class="p">)</span>
@@ -192,64 +194,109 @@
           <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Ready&#39;</span><span class="p">)</span>
           <span class="k">yield</span> <span class="n">mount_dir</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.mkdir"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.mkdir">[docs]</a>  <span class="k">def</span> <span class="nf">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.mkdir">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.mkdir">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.makedirs"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.makedirs">[docs]</a>  <span class="k">def</span> <span class="nf">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.makedirs">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.makedirs">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="n">exist_ok</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.rmdir"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.rmdir">[docs]</a>  <span class="k">def</span> <span class="nf">rmdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.rmdir">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.rmdir">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">rmdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.rm_file"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.rm_file">[docs]</a>  <span class="k">def</span> <span class="nf">rm_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.rm_file">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.rm_file">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">rm_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">rm_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.rm"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.rm">[docs]</a>  <span class="k">def</span> <span class="nf">rm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.rm">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.rm">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">rm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">recursive</span><span class="o">=</span><span class="n">recursive</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="n">maxdepth</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.cat_file"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.cat_file">[docs]</a>  <span class="k">def</span> <span class="nf">cat_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.cat_file">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.cat_file">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">cat_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">():</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.put_file"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.put_file">[docs]</a>  <span class="k">def</span> <span class="nf">put_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lpath</span><span class="p">,</span> <span class="n">rpath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.put_file">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.put_file">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">put_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lpath</span><span class="p">,</span> <span class="n">rpath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">():</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">put_file</span><span class="p">(</span><span class="n">lpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">rpath</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.get_file"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.get_file">[docs]</a>  <span class="k">def</span> <span class="nf">get_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rpath</span><span class="p">,</span> <span class="n">lpath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.get_file">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.get_file">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">get_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rpath</span><span class="p">,</span> <span class="n">lpath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">():</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">rpath</span><span class="p">),</span> <span class="n">lpath</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.cp_file"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.cp_file">[docs]</a>  <span class="k">def</span> <span class="nf">cp_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path1</span><span class="p">,</span> <span class="n">path2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.cp_file">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.cp_file">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">cp_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path1</span><span class="p">,</span> <span class="n">path2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">():</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">cp_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path2</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.copy"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.copy">[docs]</a>  <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path1</span><span class="p">,</span> <span class="n">path2</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">on_error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.copy">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.copy">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path1</span><span class="p">,</span> <span class="n">path2</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">on_error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">():</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path2</span><span class="p">),</span> <span class="n">recursive</span><span class="o">=</span><span class="n">recursive</span><span class="p">,</span> <span class="n">on_error</span><span class="o">=</span><span class="n">on_error</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.mv"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.mv">[docs]</a>  <span class="k">def</span> <span class="nf">mv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path1</span><span class="p">,</span> <span class="n">path2</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.mv">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.mv">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">mv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path1</span><span class="p">,</span> <span class="n">path2</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">():</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path2</span><span class="p">),</span> <span class="n">recursive</span><span class="o">=</span><span class="n">recursive</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="n">maxdepth</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.exists"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.exists">[docs]</a>  <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.exists">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.exists">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.get_drs"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.get_drs">[docs]</a>  <span class="k">def</span> <span class="nf">get_drs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.get_drs">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.get_drs">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">get_drs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">get_drs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.info"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.info">[docs]</a>  <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.info">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.info">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>
       <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
       <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_unresolve_path</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span></div>
 
-<div class="viewcode-block" id="ChrootFileSystem.ls"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.ls">[docs]</a>  <span class="k">def</span> <span class="nf">ls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ChrootFileSystem.ls">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.chroot.ChrootFileSystem.ls">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">ls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ls(</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">) =&gt; fs.ls(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>
@@ -261,32 +308,34 @@
           <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_unresolve_path</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">results</span></div>
 
-  <span class="k">def</span> <span class="nf">_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__masquerade_os_error</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">_open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_path</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="n">block_size</span><span class="p">,</span> <span class="n">cache_options</span><span class="o">=</span><span class="n">cache_options</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -301,8 +350,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

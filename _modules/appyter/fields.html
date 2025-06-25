@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.fields &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nature.css?v=0f882399" />
+    <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,29 +34,34 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.fields</h1><div class="highlight"><pre>
-<span></span><span class="sd">&#39;&#39;&#39; ```eval_rst</span>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">This module contains :class:`appyter.fields.Field`, the base class for all fields</span>
 <span class="sd">defined in :mod:`appyter.profiles.default.fields`.</span>
-<span class="sd">``` &#39;&#39;&#39;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 
-<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Markup</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.flask</span> <span class="kn">import</span> <span class="n">request_get</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">markupsafe</span><span class="w"> </span><span class="kn">import</span> <span class="n">Markup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">request_get</span>
 
-<div class="viewcode-block" id="PartialField"><a class="viewcode-back" href="../../appyter.html#appyter.fields.PartialField">[docs]</a><span class="k">class</span> <span class="nc">PartialField</span><span class="p">:</span>
+<div class="viewcode-block" id="PartialField">
+<a class="viewcode-back" href="../../appyter.html#appyter.fields.PartialField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PartialField</span><span class="p">:</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; Partial instantiation of a field</span>
 <span class="sd">  Replaces a decorator so that we can still identify it as</span>
-<span class="sd">   a callable which will produce a field.</span>
+<span class="sd">  a callable which will produce a field.</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_field</span> <span class="o">=</span> <span class="n">field</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
 
-  <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;context&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">value</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_field</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="build_fields"><a class="viewcode-back" href="../../appyter.html#appyter.fields.build_fields">[docs]</a><span class="k">def</span> <span class="nf">build_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{},</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="build_fields">
+<a class="viewcode-back" href="../../appyter.html#appyter.fields.build_fields">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{},</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; INTERNAL: Build a dictionary of Field instances</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">return</span> <span class="p">{</span>
@@ -66,8 +69,11 @@
     <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
   <span class="p">}</span></div>
 
-<div class="viewcode-block" id="FieldConstraintException"><a class="viewcode-back" href="../../appyter.html#appyter.fields.FieldConstraintException">[docs]</a><span class="k">class</span> <span class="nc">FieldConstraintException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FieldConstraintException">
+<a class="viewcode-back" href="../../appyter.html#appyter.fields.FieldConstraintException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FieldConstraintException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="n">field</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">field_name</span> <span class="o">=</span> <span class="n">field_name</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
@@ -75,21 +81,26 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
   
-<div class="viewcode-block" id="FieldConstraintException.as_dict"><a class="viewcode-back" href="../../appyter.html#appyter.fields.FieldConstraintException.as_dict">[docs]</a>  <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FieldConstraintException.as_dict">
+<a class="viewcode-back" href="../../appyter.html#appyter.fields.FieldConstraintException.as_dict">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
       <span class="n">field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="p">,</span>
       <span class="n">field_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field_name</span><span class="p">,</span>
       <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
       <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span>
-    <span class="p">)</span></div></div>
+    <span class="p">)</span></div>
+</div>
 
-<div class="viewcode-block" id="Field"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field">[docs]</a><span class="k">class</span> <span class="nc">Field</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Field">
+<a class="viewcode-back" href="../../appyter.html#appyter.fields.Field">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Field</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; Base field for which all fields derive</span>
-<span class="sd">  ```eval_rst</span>
 <span class="sd">  Base class for all Field objects representing a value that will later be provided via a front-end form.</span>
 <span class="sd">  See :mod:`appyter.profiles.default.fields` for the actual fields.</span>
-<span class="sd">  ``` &#39;&#39;&#39;</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
       <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
       <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
       <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -100,7 +111,7 @@
       <span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
       <span class="n">_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
       <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.</span>
 <span class="sd">    :param label: (str) A human readable label for the field for the HTML form</span>
 <span class="sd">    :param description: (Optional[str]) A long human readable description for the field for the HTML form</span>
@@ -131,12 +142,14 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">_env</span> <span class="o">=</span> <span class="n">_env</span>
   
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Get the raw args, the values used to initialize this field</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Field.prepare"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.prepare">[docs]</a>  <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+<div class="viewcode-block" id="Field.prepare">
+<a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.prepare">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Given a flask request, capture relevant variables for this field</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">request_get</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">))</span>
@@ -144,14 +157,20 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
     <span class="k">return</span> <span class="p">{</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span> <span class="n">value</span> <span class="p">}</span></div>
 
-<div class="viewcode-block" id="Field.constraint"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.constraint">[docs]</a>  <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Field.constraint">
+<a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.constraint">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Return true if the received args.value satisfies constraints.</span>
 <span class="sd">    Should be overridden by subclasses.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Field.render"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.render">[docs]</a>  <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39; Return a rendered version of the field (form)</span>
+
+<div class="viewcode-block" id="Field.render">
+<a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.render">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39; Return a rendered version of the field (form)</span>
 
 <span class="sd">    :param \**kwargs: The instance values of the form e.g. `Field.render(**field.args)`</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -161,7 +180,10 @@
       <span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">this</span><span class="o">=</span><span class="bp">self</span><span class="p">))</span>
     <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Field.to_jsonschema"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.to_jsonschema">[docs]</a>  <span class="k">def</span> <span class="nf">to_jsonschema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Field.to_jsonschema">
+<a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.to_jsonschema">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_jsonschema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">):</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">):</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
@@ -169,7 +191,10 @@
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">):</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">schema</span></div>
 
-<div class="viewcode-block" id="Field.to_cwl"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.to_cwl">[docs]</a>  <span class="k">def</span> <span class="nf">to_cwl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Field.to_cwl">
+<a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.to_cwl">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_cwl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span>
       <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
       <span class="s1">&#39;inputBinding&#39;</span><span class="p">:</span> <span class="p">{</span>
@@ -195,11 +220,17 @@
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">):</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_cwl_value</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">schema</span></div>
 
-<div class="viewcode-block" id="Field.to_cwl_value"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.to_cwl_value">[docs]</a>  <span class="k">def</span> <span class="nf">to_cwl_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Field.to_cwl_value">
+<a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.to_cwl_value">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_cwl_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span></div>
 
-<div class="viewcode-block" id="Field.to_click"><a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.to_click">[docs]</a>  <span class="k">def</span> <span class="nf">to_click</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">click</span>
+
+<div class="viewcode-block" id="Field.to_click">
+<a class="viewcode-back" href="../../appyter.html#appyter.fields.Field.to_click">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_click</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">click</span>
     <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,)</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="c1">#</span>
@@ -218,39 +249,40 @@
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">):</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
 
+
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">field</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">field</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Field name</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">template</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">template</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Template to use for rendering field</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;fields&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">field</span> <span class="o">+</span> <span class="s1">&#39;.j2&#39;</span><span class="p">])</span>
 
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">js_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">js_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Template to use for rendering field</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="kn">from</span> <span class="nn">appyter.profiles.default.filters.url_for</span> <span class="kn">import</span> <span class="n">url_for</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">appyter.profiles.default.filters.url_for</span><span class="w"> </span><span class="kn">import</span> <span class="n">url_for</span>
     <span class="k">return</span> <span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;static&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;js/fields/&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">field</span> <span class="o">+</span> <span class="s1">&#39;.js&#39;</span><span class="p">)</span>
 
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">choices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">choices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Potential values to choose from</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;choices&#39;</span><span class="p">]</span>
 
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">raw_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">raw_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; (UNSAFE) Raw value of the field</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
 
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; (SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.</span>
 <span class="sd">    When instantiating code, you should use safe_value.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -284,44 +316,45 @@
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span>
 
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">safe_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">safe_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; (SAFE) Effective safe value for use in code, we use `repr` to escape values as necessary</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">render_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">render_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; (SAFE) Effective safe value ready to be displayed, specifically for Markdown output.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="n">Markup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
-  <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; (SAFE) The default str(Field) is just safe_value</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">safe_value</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -336,8 +369,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

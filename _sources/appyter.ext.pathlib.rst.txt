@@ -4,14 +4,6 @@ appyter.ext.pathlib package
 Submodules
 ----------
 
-appyter.ext.pathlib.assertions module
--------------------------------------
-
-.. automodule:: appyter.ext.pathlib.assertions
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 appyter.ext.pathlib.chroot module
 ---------------------------------
 

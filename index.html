@@ -1,22 +1,20 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Welcome to Ma’ayanlab Appyter’s documentation! &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,12 +34,12 @@
           <div class="body" role="main">
             
   <section id="welcome-to-ma-ayanlab-appyter-s-documentation">
-<h1>Welcome to Ma’ayanlab Appyter’s documentation!<a class="headerlink" href="#welcome-to-ma-ayanlab-appyter-s-documentation" title="Permalink to this headline">¶</a></h1>
+<h1>Welcome to Ma’ayanlab Appyter’s documentation!<a class="headerlink" href="#welcome-to-ma-ayanlab-appyter-s-documentation" title="Link to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
@@ -49,10 +47,10 @@
 </ul>
 </section>
 <section id="appyter">
-<h1>Appyter<a class="headerlink" href="#appyter" title="Permalink to this headline">¶</a></h1>
+<h1>Appyter<a class="headerlink" href="#appyter" title="Link to this heading">¶</a></h1>
 <p>This module enables you to turn your jupyter notebook into a jinja2 template-driven web application. Or just parse for other purposes.</p>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
 <p>NOTE: This application uses modern python features including async await (3.5) and fstrings (3.6), to ensure you have the best experience please use python &gt;= 3.8.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install package from pip</span>
 pip3<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>appyter
@@ -63,12 +61,12 @@ pip3<span class="w"> </span>install<span class="w"> </span>--upgrade<span class=
 </div>
 </section>
 <section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
 <p>Appyter enables you to serve that notebook on an executable webapp.</p>
 <p><code class="docutils literal notranslate"><span class="pre">appyter</span> <span class="pre">jupyter_notebook.ipynb</span></code></p>
 <p>If for some reason, <code class="docutils literal notranslate"><span class="pre">appyter</span></code> doesn’t end up discoverable in your PATH, you can use <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">appyter</span></code> instead.</p>
 <ul class="simple">
-<li><p>A dotenv file (<code class="docutils literal notranslate"><span class="pre">.env</span></code>) or environment variables can be use to configure HOST, PORT, and PREFIX of the webserver.</p></li>
+<li><p>A dotenv file (<code class="docutils literal notranslate"><span class="pre">.env</span></code>) or environment variables can be use to configure HOST (APPYTER_HOST), PORT (APPYTER_PORT), and PREFIX (APPYTER_PREFIX) of the webserver.</p></li>
 <li><p>Some pre-configured profiles can be used for styling the form (<code class="docutils literal notranslate"><span class="pre">--profile=profile_name</span></code>) see <code class="docutils literal notranslate"><span class="pre">appyter/profiles</span></code></p></li>
 <li><p>In debug mode (<code class="docutils literal notranslate"><span class="pre">--debug</span></code>), changes to the notebook will automatically update the webapp.</p></li>
 <li><p>Custom fields can be used by putting them in the directory of execution with the following format:</p>
@@ -90,7 +88,8 @@ pip3<span class="w"> </span>install<span class="w"> </span>--upgrade<span class=
 </li>
 <li><p>Custom externally-referenced resources (i.e. images) can be put under the static directory</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">./static/img/your_image.png</span></code>: Reference in templates with <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">static</span> <span class="pre">'img/your_image.png'</span> <span class="pre">%}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">./static/img/your_image.png</span></code>: Reference in templates with <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">url_for('static',</span> <span class="pre">path='img/your_image.png')</span> <span class="pre">%}</span></code> when expected to be displayed on the site</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">./static/python_file.txt</span></code>: Reference in templates with <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">url_for('static',</span> <span class="pre">path='python_file.txt',</span> <span class="pre">public=True)</span> <span class="pre">}}</span></code> when expected to be available when running the appyter</p></li>
 </ul>
 </li>
 <li><p>Custom blueprints to additionally mount with flask</p>
@@ -101,10 +100,10 @@ pip3<span class="w"> </span>install<span class="w"> </span>--upgrade<span class=
 </ul>
 </section>
 <section id="creating-an-appyter">
-<h2>Creating an Appyter<a class="headerlink" href="#creating-an-appyter" title="Permalink to this headline">¶</a></h2>
+<h2>Creating an Appyter<a class="headerlink" href="#creating-an-appyter" title="Link to this heading">¶</a></h2>
 <p>Create a standard python jupyter notebook, make the first cell:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#%%appyter init</span>
-<span class="kn">from</span> <span class="nn">appyter</span> <span class="kn">import</span> <span class="n">magic</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter</span><span class="w"> </span><span class="kn">import</span> <span class="n">magic</span>
 <span class="n">magic</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="o">=</span><span class="nb">globals</span><span class="p">:</span> <span class="n">_</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -121,7 +120,7 @@ pip3<span class="w"> </span>install<span class="w"> </span>--upgrade<span class=
 </ul>
 </section>
 <section id="discussion">
-<h2>Discussion<a class="headerlink" href="#discussion" title="Permalink to this headline">¶</a></h2>
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">¶</a></h2>
 <p>Consider the following notebook:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">appyter</span> <span class="n">markdown</span>
 <span class="c1"># {{ StringField(name=&#39;title&#39;, label=&#39;Title&#39;, default=&#39;My Title&#39;).render_value }}</span>
@@ -233,9 +232,9 @@ pip3<span class="w"> </span>install<span class="w"> </span>--upgrade<span class=
 <p><code class="docutils literal notranslate"><span class="pre">appyter</span></code> can be used to get these conversions, it can also be used to host standalone webapps using these mechanisms.</p>
 </section>
 <section id="development">
-<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<h2>Development<a class="headerlink" href="#development" title="Link to this heading">¶</a></h2>
 <section id="testing">
-<h3>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
+<h3>Testing<a class="headerlink" href="#testing" title="Link to this heading">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">pytest</span></code> is used for python testing. It can be invoked as follows:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># it is also prudent to test other protocols such as s3 (production) &amp; sbfs (CAVATICA)</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">FSSPEC_URI</span><span class="o">=</span><span class="s1">&#39;memory://&#39;</span>
@@ -251,10 +250,11 @@ pytest<span class="w"> </span>--log-cli-level<span class="o">=</span>DEBUG<span 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="#">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Welcome to Ma’ayanlab Appyter’s documentation!</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 <li><a class="reference internal" href="#appyter">Appyter</a><ul>
@@ -270,6 +270,7 @@ pytest<span class="w"> </span>--log-cli-level<span class="o">=</span>DEBUG<span 
 </li>
 </ul>
 
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -277,21 +278,21 @@ pytest<span class="w"> </span>--log-cli-level<span class="o">=</span>DEBUG<span 
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -305,8 +306,8 @@ pytest<span class="w"> </span>--log-cli-level<span class="o">=</span>DEBUG<span 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

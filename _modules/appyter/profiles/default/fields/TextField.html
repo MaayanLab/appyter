@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.profiles.default.fields.TextField &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,12 +34,14 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.profiles.default.fields.TextField</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">appyter.fields</span> <span class="kn">import</span> <span class="n">Field</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.re</span> <span class="kn">import</span> <span class="n">re_full</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.re</span><span class="w"> </span><span class="kn">import</span> <span class="n">re_full</span>
 
-<div class="viewcode-block" id="TextField"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.TextField.TextField">[docs]</a><span class="k">class</span> <span class="nc">TextField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
-<span class="w">  </span><span class="sd">&#39;&#39;&#39; Representing a field that accepts a multi-line string</span>
+<div class="viewcode-block" id="TextField">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.TextField.TextField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TextField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
+<span class="w">  </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39; Representing a field that accepts a multi-line string</span>
 
 <span class="sd">  Be careful with this field, consider defining a constraint regex.</span>
 
@@ -59,7 +59,7 @@
 <span class="sd">  :param value: (INTERNAL Any) The raw value of the field (from the form for instance)</span>
 <span class="sd">  :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`&#39;s constructor.</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">constraint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">constraint</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;.+&#39;</span> <span class="k">if</span> <span class="n">required</span> <span class="k">else</span> <span class="sa">r</span><span class="s1">&#39;.*&#39;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
       <span class="n">constraint</span><span class="o">=</span><span class="n">constraint</span><span class="p">,</span>
@@ -68,46 +68,53 @@
       <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
 
-<div class="viewcode-block" id="TextField.constraint"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.TextField.TextField.constraint">[docs]</a>  <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TextField.constraint">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.TextField.TextField.constraint">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">re_full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;constraint&#39;</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span></div>
 
+
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">safe_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">safe_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="c1"># use repr to escape things, revert newlines</span>
     <span class="n">v</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">r&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="c1"># convert single to triple quotes</span>
     <span class="k">return</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">v</span> <span class="o">+</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-<div class="viewcode-block" id="TextField.to_jsonschema"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.TextField.TextField.to_jsonschema">[docs]</a>  <span class="k">def</span> <span class="nf">to_jsonschema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TextField.to_jsonschema">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.TextField.TextField.to_jsonschema">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_jsonschema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="n">schema</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_jsonschema</span><span class="p">()</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;constraint&#39;</span><span class="p">):</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;pattern&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re_full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;constraint&#39;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">schema</span></div></div>
+    <span class="k">return</span> <span class="n">schema</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -122,8 +129,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

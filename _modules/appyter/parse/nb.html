@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.parse.nb &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css?v=0f882399" />
+    <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,22 +34,36 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.parse.nb</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">nbformat</span> <span class="k">as</span> <span class="nn">nbf</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">nbformat</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nbf</span>
 
-<div class="viewcode-block" id="nb_from_ipynb_string"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_from_ipynb_string">[docs]</a><span class="k">def</span> <span class="nf">nb_from_ipynb_string</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+<div class="viewcode-block" id="nb_from_ipynb_string">
+<a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_from_ipynb_string">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">nb_from_ipynb_string</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">nbf</span><span class="o">.</span><span class="n">reads</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">as_version</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="nb_from_ipynb_io"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_from_ipynb_io">[docs]</a><span class="k">def</span> <span class="nf">nb_from_ipynb_io</span><span class="p">(</span><span class="n">io</span><span class="p">):</span>
+
+<div class="viewcode-block" id="nb_from_ipynb_io">
+<a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_from_ipynb_io">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">nb_from_ipynb_io</span><span class="p">(</span><span class="n">io</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">nbf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="n">as_version</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="nb_from_json"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_from_json">[docs]</a><span class="k">def</span> <span class="nf">nb_from_json</span><span class="p">(</span><span class="n">j</span><span class="p">):</span>
+
+<div class="viewcode-block" id="nb_from_json">
+<a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_from_json">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">nb_from_json</span><span class="p">(</span><span class="n">j</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">nb_from_ipynb_string</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">j</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="nb_to_ipynb_string"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_to_ipynb_string">[docs]</a><span class="k">def</span> <span class="nf">nb_to_ipynb_string</span><span class="p">(</span><span class="n">nb</span><span class="p">):</span>
+
+<div class="viewcode-block" id="nb_to_ipynb_string">
+<a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_to_ipynb_string">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">nb_to_ipynb_string</span><span class="p">(</span><span class="n">nb</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">nbf</span><span class="o">.</span><span class="n">writes</span><span class="p">(</span><span class="n">nb</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="nb_to_ipynb_io"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_to_ipynb_io">[docs]</a><span class="k">def</span> <span class="nf">nb_to_ipynb_io</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="n">io</span><span class="p">):</span>
+
+<div class="viewcode-block" id="nb_to_ipynb_io">
+<a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_to_ipynb_io">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">nb_to_ipynb_io</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="n">io</span><span class="p">):</span>
   <span class="c1"># remove `id` when writing, this is added by nbclient</span>
   <span class="c1">#  but causes nbformat validation errors when reading.</span>
   <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">nb</span><span class="o">.</span><span class="n">cells</span><span class="p">:</span>
@@ -59,31 +71,35 @@
       <span class="k">del</span> <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
   <span class="k">return</span> <span class="n">nbf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="n">io</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="nb_to_json"><a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_to_json">[docs]</a><span class="k">def</span> <span class="nf">nb_to_json</span><span class="p">(</span><span class="n">nb</span><span class="p">):</span>
+
+<div class="viewcode-block" id="nb_to_json">
+<a class="viewcode-back" href="../../../appyter.parse.html#appyter.parse.nb.nb_to_json">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">nb_to_json</span><span class="p">(</span><span class="n">nb</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">nb_to_ipynb_string</span><span class="p">(</span><span class="n">nb</span><span class="p">))</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -98,8 +114,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.ext.nbclient &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css?v=0f882399" />
+    <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,29 +34,34 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.nbclient</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">asynccontextmanager</span>
-<span class="kn">from</span> <span class="nn">nbclient</span> <span class="kn">import</span> <span class="n">NotebookClient</span>
-<span class="kn">from</span> <span class="nn">nbformat</span> <span class="kn">import</span> <span class="n">NotebookNode</span>
-<span class="kn">from</span> <span class="nn">nbclient.exceptions</span> <span class="kn">import</span> <span class="n">CellExecutionComplete</span><span class="p">,</span> <span class="n">DeadKernelError</span><span class="p">,</span> <span class="n">CellControlSignal</span>
-<span class="kn">from</span> <span class="nn">nbclient.util</span> <span class="kn">import</span> <span class="n">run_hook</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.asyncio.event_loop</span> <span class="kn">import</span> <span class="n">get_event_loop</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.asyncio.helpers</span> <span class="kn">import</span> <span class="n">ensure_async</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">t</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">asynccontextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">nbclient</span><span class="w"> </span><span class="kn">import</span> <span class="n">NotebookClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">nbformat</span><span class="w"> </span><span class="kn">import</span> <span class="n">NotebookNode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">nbclient.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">CellExecutionComplete</span><span class="p">,</span> <span class="n">DeadKernelError</span><span class="p">,</span> <span class="n">CellControlSignal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">nbclient.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_hook</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">nbclient.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">timestamp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.asyncio.event_loop</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_event_loop</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.asyncio.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_async</span>
 
-<div class="viewcode-block" id="NotebookClientIOPubHook"><a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook">[docs]</a><span class="k">class</span> <span class="nc">NotebookClientIOPubHook</span><span class="p">(</span><span class="n">NotebookClient</span><span class="p">):</span>
+<div class="viewcode-block" id="NotebookClientIOPubHook">
+<a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NotebookClientIOPubHook</span><span class="p">(</span><span class="n">NotebookClient</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; A notebook client with the ability to hook into iopub updates</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">iopub_hook</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">iopub_hook</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">iopub_hook</span> <span class="o">=</span> <span class="n">iopub_hook</span>
 
-  <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_poll_output_msg</span><span class="p">(</span>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_async_poll_output_msg</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">parent_msg_id</span><span class="p">,</span>
     <span class="n">cell</span><span class="p">,</span>
     <span class="n">cell_index</span>
   <span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Override output_msg polling to send to iopub_hook</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">kc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="n">complete</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">while</span> <span class="ow">not</span> <span class="n">complete</span><span class="p">:</span>
@@ -66,17 +69,50 @@
       <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;parent_header&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;msg_id&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">parent_msg_id</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
           <span class="c1"># Will raise CellExecutionComplete when completed</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">process_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
+          <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">CellExecutionComplete</span><span class="p">:</span>
           <span class="n">complete</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">finally</span><span class="p">:</span>
           <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iopub_hook</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">iopub_hook</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
 
-  <span class="k">def</span> <span class="nf">_kc_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="NotebookClientIOPubHook.handle_comm_msg">
+<a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook.handle_comm_msg">[docs]</a>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">handle_comm_msg</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">outs</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">,</span>
+    <span class="n">msg</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">,</span>
+    <span class="n">cell_index</span><span class="p">:</span> <span class="nb">int</span>
+  <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Store ipywidget state in each cell during execution and trigger iopub_hook</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">handle_comm_msg</span><span class="p">(</span><span class="n">outs</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_widget_state</span> <span class="ow">and</span> <span class="s1">&#39;state&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>  <span class="c1"># ignore custom msg&#39;es</span>
+      <span class="c1"># Here we store the updated state in the cell during execution, and trigger an iopub_hook</span>
+      <span class="c1"># we&#39;ll arbitrarily choose to store it in the cell&#39;s metadata.widget-state</span>
+      <span class="n">cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb</span><span class="p">[</span><span class="s1">&#39;cells&#39;</span><span class="p">][</span><span class="n">cell_index</span><span class="p">]</span>
+      <span class="n">cell</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;metadata&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;widgets&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;version_major&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s1">&#39;version_minor&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="p">})</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;state&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+        <span class="n">content</span><span class="p">[</span><span class="s1">&#39;comm_id&#39;</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialize_widget_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_state</span><span class="p">[</span><span class="n">content</span><span class="p">[</span><span class="s1">&#39;comm_id&#39;</span><span class="p">]]),</span>
+      <span class="p">})</span>
+      <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;widgets&#39;</span><span class="p">][</span><span class="s1">&#39;state&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">buffers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_buffers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">buffers</span><span class="p">:</span>
+            <span class="n">widget</span><span class="p">[</span><span class="s1">&#39;buffers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">buffers</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iopub_hook</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">iopub_hook</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span></div>
+
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_kc_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kc</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="NotebookClientIOPubHook.async_execute_cell"><a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell">[docs]</a>  <span class="k">async</span> <span class="k">def</span> <span class="nf">async_execute_cell</span><span class="p">(</span>
+<div class="viewcode-block" id="NotebookClientIOPubHook.async_execute_cell">
+<a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook.async_execute_cell">[docs]</a>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">async_execute_cell</span><span class="p">(</span>
       <span class="bp">self</span><span class="p">,</span>
       <span class="n">cell</span><span class="p">:</span> <span class="n">NotebookNode</span><span class="p">,</span>
       <span class="n">cell_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -168,8 +204,11 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">nb</span><span class="p">[</span><span class="s1">&#39;cells&#39;</span><span class="p">][</span><span class="n">cell_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span>
     <span class="k">return</span> <span class="n">cell</span></div>
 
-<div class="viewcode-block" id="NotebookClientIOPubHook.async_setup_kernel"><a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook.async_setup_kernel">[docs]</a>  <span class="nd">@asynccontextmanager</span>
-  <span class="k">async</span> <span class="k">def</span> <span class="nf">async_setup_kernel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">AsyncGenerator</span><span class="p">:</span>
+
+<div class="viewcode-block" id="NotebookClientIOPubHook.async_setup_kernel">
+<a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook.async_setup_kernel">[docs]</a>
+  <span class="nd">@asynccontextmanager</span>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">async_setup_kernel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">AsyncGenerator</span><span class="p">:</span>
 <span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">      Context manager for setting up the kernel to execute a notebook.</span>
 
@@ -197,30 +236,101 @@
       <span class="k">finally</span><span class="p">:</span>
           <span class="k">if</span> <span class="n">cleanup_kc</span><span class="p">:</span>
               <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_cleanup_kernel</span><span class="p">()</span>
-          <span class="k">await</span> <span class="n">run_hook</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_notebook_complete</span><span class="p">,</span> <span class="n">notebook</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nb</span><span class="p">)</span></div></div>
+          <span class="k">await</span> <span class="n">run_hook</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_notebook_complete</span><span class="p">,</span> <span class="n">notebook</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nb</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NotebookClientIOPubHook.process_message">
+<a class="viewcode-back" href="../../../appyter.ext.nbclient.html#appyter.ext.nbclient.NotebookClientIOPubHook.process_message">[docs]</a>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process_message</span><span class="p">(</span>
+      <span class="bp">self</span><span class="p">,</span>
+      <span class="n">msg</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">,</span>
+      <span class="n">cell</span><span class="p">:</span> <span class="n">NotebookNode</span><span class="p">,</span>
+      <span class="n">cell_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Processes a kernel message, updates cell state, and returns the</span>
+<span class="sd">    resulting output object that was appended to cell.outputs.</span>
+
+<span class="sd">    The input argument *cell* is modified in-place.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    msg : dict</span>
+<span class="sd">      The kernel message being processed.</span>
+<span class="sd">    cell : nbformat.NotebookNode</span>
+<span class="sd">      The cell which is currently being processed.</span>
+<span class="sd">    cell_index : int</span>
+<span class="sd">      The position of the cell within the notebook object.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output : dict</span>
+<span class="sd">      The execution output payload (or None for no output).</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    CellExecutionComplete</span>
+<span class="sd">      Once a message arrives which indicates computation completeness.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg_type</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;msg_type&#39;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;msg_type: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">msg_type</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;content: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+
+    <span class="n">display_id</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transient&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;display_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">display_id</span> <span class="ow">and</span> <span class="n">msg_type</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;execute_result&#39;</span><span class="p">,</span> <span class="s1">&#39;display_data&#39;</span><span class="p">,</span> <span class="s1">&#39;update_display_data&#39;</span><span class="p">}:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_update_display_id</span><span class="p">(</span><span class="n">display_id</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># set the prompt number for the input and the output</span>
+    <span class="k">if</span> <span class="s1">&#39;execution_count&#39;</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+      <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;execution_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s1">&#39;execution_count&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_timing</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="s1">&#39;status&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">content</span><span class="p">[</span><span class="s1">&#39;execution_state&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;idle&#39;</span><span class="p">:</span>
+          <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;execution&#39;</span><span class="p">][</span><span class="s1">&#39;iopub.status.idle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">content</span><span class="p">[</span><span class="s1">&#39;execution_state&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;busy&#39;</span><span class="p">:</span>
+          <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;execution&#39;</span><span class="p">][</span><span class="s1">&#39;iopub.status.busy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp</span><span class="p">()</span>
+      <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="s1">&#39;execute_input&#39;</span><span class="p">:</span>
+        <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;execution&#39;</span><span class="p">][</span><span class="s1">&#39;iopub.execute_input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="s1">&#39;status&#39;</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">content</span><span class="p">[</span><span class="s1">&#39;execution_state&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;idle&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">CellExecutionComplete</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">msg_type</span> <span class="o">==</span> <span class="s1">&#39;clear_output&#39;</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">clear_output</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">msg_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">):</span>
+      <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_comm_msg</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
+    <span class="c1"># Check for remaining messages we don&#39;t process</span>
+    <span class="k">elif</span> <span class="n">msg_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;execute_input&#39;</span><span class="p">,</span> <span class="s1">&#39;update_display_data&#39;</span><span class="p">]:</span>
+      <span class="c1"># Assign output as our processed &quot;result&quot;</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">display_id</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -235,8 +345,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

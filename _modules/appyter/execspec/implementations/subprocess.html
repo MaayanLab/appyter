@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.execspec.implementations.subprocess &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,23 +34,25 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.execspec.implementations.subprocess</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">traceback</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
 
-<span class="kn">from</span> <span class="nn">appyter.execspec.spec</span> <span class="kn">import</span> <span class="n">AbstractExecutor</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.asyncio.subprocess</span> <span class="kn">import</span> <span class="n">sh</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.json</span> <span class="kn">import</span> <span class="n">async_json_loads</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.execspec.spec</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractExecutor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.asyncio.subprocess</span><span class="w"> </span><span class="kn">import</span> <span class="n">sh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.json</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_json_loads</span>
 
-<div class="viewcode-block" id="SubprocessExecutor"><a class="viewcode-back" href="../../../../appyter.execspec.implementations.html#appyter.execspec.implementations.subprocess.SubprocessExecutor">[docs]</a><span class="k">class</span> <span class="nc">SubprocessExecutor</span><span class="p">(</span><span class="n">AbstractExecutor</span><span class="p">):</span>
+<div class="viewcode-block" id="SubprocessExecutor">
+<a class="viewcode-back" href="../../../../appyter.execspec.implementations.html#appyter.execspec.implementations.subprocess.SubprocessExecutor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubprocessExecutor</span><span class="p">(</span><span class="n">AbstractExecutor</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; Run executions in a subprocess</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">protocol</span> <span class="o">=</span> <span class="s1">&#39;subprocess&#39;</span>
 
-  <span class="k">async</span> <span class="k">def</span> <span class="nf">_submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">job</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">job</span><span class="p">):</span>
     <span class="k">async</span> <span class="k">for</span> <span class="n">msg</span><span class="p">,</span> <span class="n">done</span> <span class="ow">in</span> <span class="n">sh</span><span class="p">(</span>
       <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-u&#39;</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span>
       <span class="s1">&#39;appyter&#39;</span><span class="p">,</span> <span class="s1">&#39;nbexecute&#39;</span><span class="p">,</span>
@@ -70,7 +70,7 @@
     <span class="p">):</span>
       <span class="k">yield</span> <span class="n">msg</span><span class="p">,</span> <span class="n">done</span>
 
-  <span class="k">async</span> <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">job</span><span class="p">):</span>
+  <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">job</span><span class="p">):</span>
     <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Launching subprocess...&quot;</span><span class="p">)</span>
     <span class="k">async</span> <span class="k">for</span> <span class="n">msg</span><span class="p">,</span> <span class="n">done</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_submit</span><span class="p">(</span><span class="o">**</span><span class="n">job</span><span class="p">):</span>
       <span class="k">if</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
@@ -78,29 +78,30 @@
         <span class="k">except</span><span class="p">:</span> <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">msg</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
       <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Subprocess exited with error code&quot;</span><span class="p">)</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -115,8 +116,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

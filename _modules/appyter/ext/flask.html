@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.ext.flask &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nature.css?v=0f882399" />
+    <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,21 +34,26 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.flask</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">urllib.parse</span>
-<span class="kn">from</span> <span class="nn">werkzeug.security</span> <span class="kn">import</span> <span class="n">safe_join</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">werkzeug.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">safe_join</span>
 
-<span class="kn">from</span> <span class="nn">appyter.ext.itertools</span> <span class="kn">import</span> <span class="n">collapse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">collapse</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<div class="viewcode-block" id="join_routes"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.join_routes">[docs]</a><span class="k">def</span> <span class="nf">join_routes</span><span class="p">(</span><span class="o">*</span><span class="n">routes</span><span class="p">):</span>
+<div class="viewcode-block" id="join_routes">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.join_routes">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">join_routes</span><span class="p">(</span><span class="o">*</span><span class="n">routes</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; Utility function for joining routes while striping extraneous slashes</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">return</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">route</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">routes</span> <span class="k">if</span> <span class="n">route</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)])</span></div>
 
-<div class="viewcode-block" id="secure_filepath"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.secure_filepath">[docs]</a><span class="k">def</span> <span class="nf">secure_filepath</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+
+<div class="viewcode-block" id="secure_filepath">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.secure_filepath">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">secure_filepath</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; Ensures this will be a sanitized relative path</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">secured_filepath</span> <span class="o">=</span> <span class="n">safe_join</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">filepath</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span>
@@ -61,19 +64,28 @@
     <span class="k">return</span> <span class="s1">&#39;&#39;</span>
   <span class="k">return</span> <span class="n">secured_filepath</span></div>
 
-<div class="viewcode-block" id="secure_url"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.secure_url">[docs]</a><span class="k">def</span> <span class="nf">secure_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+
+<div class="viewcode-block" id="secure_url">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.secure_url">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">secure_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
   <span class="n">parsed</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
   <span class="k">assert</span> <span class="n">parsed</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;https&#39;</span><span class="p">,</span> <span class="s1">&#39;http&#39;</span><span class="p">,</span> <span class="s1">&#39;ftp&#39;</span><span class="p">},</span> <span class="s1">&#39;Invalid scheme&#39;</span>
   <span class="k">return</span> <span class="n">url</span></div>
 
-<div class="viewcode-block" id="is_remote"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.is_remote">[docs]</a><span class="k">def</span> <span class="nf">is_remote</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+
+<div class="viewcode-block" id="is_remote">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.is_remote">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_remote</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
   <span class="k">try</span><span class="p">:</span>
     <span class="n">secure_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="k">return</span> <span class="kc">True</span>
   <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
     <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="request_get"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.request_get">[docs]</a><span class="k">def</span> <span class="nf">request_get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="request_get">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.request_get">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">request_get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
   <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">request</span> <span class="k">else</span> <span class="n">default</span>
   <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -86,10 +98,13 @@
   <span class="k">else</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="route_join_with_or_without_slash"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.route_join_with_or_without_slash">[docs]</a><span class="k">def</span> <span class="nf">route_join_with_or_without_slash</span><span class="p">(</span><span class="n">blueprint</span><span class="p">,</span> <span class="o">*</span><span class="n">routes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="route_join_with_or_without_slash">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.route_join_with_or_without_slash">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">route_join_with_or_without_slash</span><span class="p">(</span><span class="n">blueprint</span><span class="p">,</span> <span class="o">*</span><span class="n">routes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; Like @app.route but doesn&#39;t care about trailing slash or not</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="n">routes_stripped</span> <span class="o">=</span> <span class="n">join_routes</span><span class="p">(</span><span class="o">*</span><span class="n">routes</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">routes_stripped</span><span class="p">:</span>
       <span class="n">blueprint</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="n">routes_stripped</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)(</span><span class="n">func</span><span class="p">)</span>
@@ -97,13 +112,16 @@
     <span class="k">return</span> <span class="n">func</span>
   <span class="k">return</span> <span class="n">wrapper</span></div>
 
-<div class="viewcode-block" id="decorator_in_production"><a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.decorator_in_production">[docs]</a><span class="k">def</span> <span class="nf">decorator_in_production</span><span class="p">(</span><span class="n">production_decorator</span><span class="p">):</span>
-  <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+
+<div class="viewcode-block" id="decorator_in_production">
+<a class="viewcode-back" href="../../../appyter.ext.html#appyter.ext.flask.decorator_in_production">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">decorator_in_production</span><span class="p">(</span><span class="n">production_decorator</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="n">production_func</span> <span class="o">=</span> <span class="n">production_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
     <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
       <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">current_app</span>
         <span class="k">if</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">]:</span>
           <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
       <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
@@ -111,29 +129,30 @@
       <span class="k">return</span> <span class="n">production_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wrapper</span>
   <span class="k">return</span> <span class="n">decorator</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -148,8 +167,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

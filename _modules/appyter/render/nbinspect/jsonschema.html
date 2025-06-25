@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.render.nbinspect.jsonschema &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,20 +34,22 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.render.nbinspect.jsonschema</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">click</span>
-<span class="kn">import</span> <span class="nn">fsspec</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">click</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">fsspec</span>
 
-<span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_env</span><span class="p">,</span> <span class="n">get_jinja2_env</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.click</span> <span class="kn">import</span> <span class="n">click_option_setenv</span><span class="p">,</span> <span class="n">click_argument_setenv</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">join_slash</span>
-<span class="kn">from</span> <span class="nn">appyter.parse.nb</span> <span class="kn">import</span> <span class="n">nb_from_ipynb_io</span>
-<span class="kn">from</span> <span class="nn">appyter.parse.nbtemplate</span> <span class="kn">import</span> <span class="n">parse_fields_from_nbtemplate</span>
-<span class="kn">from</span> <span class="nn">appyter.render.nbinspect.cli</span> <span class="kn">import</span> <span class="n">nbinspect</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.dict</span> <span class="kn">import</span> <span class="n">dict_filter_none</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_env</span><span class="p">,</span> <span class="n">get_jinja2_env</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.click</span><span class="w"> </span><span class="kn">import</span> <span class="n">click_option_setenv</span><span class="p">,</span> <span class="n">click_argument_setenv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.urllib</span><span class="w"> </span><span class="kn">import</span> <span class="n">join_slash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.parse.nb</span><span class="w"> </span><span class="kn">import</span> <span class="n">nb_from_ipynb_io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.parse.nbtemplate</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_fields_from_nbtemplate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.render.nbinspect.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">nbinspect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.dict</span><span class="w"> </span><span class="kn">import</span> <span class="n">dict_filter_none</span>
 
-<div class="viewcode-block" id="render_jsonschema_from_nbtemplate"><a class="viewcode-back" href="../../../../appyter.render.nbinspect.html#appyter.render.nbinspect.jsonschema.render_jsonschema_from_nbtemplate">[docs]</a><span class="k">def</span> <span class="nf">render_jsonschema_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nb</span><span class="p">):</span>
+<div class="viewcode-block" id="render_jsonschema_from_nbtemplate">
+<a class="viewcode-back" href="../../../../appyter.render.nbinspect.html#appyter.render.nbinspect.jsonschema.render_jsonschema_from_nbtemplate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">render_jsonschema_from_nbtemplate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">nb</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; Render a jsonschema representing the relevant Fields throughout the notebook.</span>
 <span class="sd">  TODO: branch with tabs</span>
 <span class="sd">  &#39;&#39;&#39;</span>
@@ -69,11 +69,12 @@
   <span class="k">if</span> <span class="n">required</span><span class="p">:</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">required</span>
   <span class="k">return</span> <span class="n">schema</span></div>
 
+
 <span class="nd">@nbinspect</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">help</span><span class="o">=</span><span class="s1">&#39;Create JSON Schema for appyter input&#39;</span><span class="p">)</span>
 <span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--output&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">),</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The output location of the inspection json&#39;</span><span class="p">)</span>
 <span class="nd">@click_option_setenv</span><span class="p">(</span><span class="s1">&#39;--cwd&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_CWD&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The directory to treat as the current working directory for templates and execution&#39;</span><span class="p">)</span>
 <span class="nd">@click_argument_setenv</span><span class="p">(</span><span class="s1">&#39;ipynb&#39;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s1">&#39;APPYTER_IPYNB&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">jsonschema</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="n">ipynb</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">jsonschema</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="n">ipynb</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
   <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span>
   <span class="n">env</span> <span class="o">=</span> <span class="n">get_jinja2_env</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">get_env</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">ipynb</span><span class="o">=</span><span class="n">ipynb</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;inspect&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
   <span class="k">with</span> <span class="n">fsspec</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">join_slash</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="n">ipynb</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fr</span><span class="p">:</span>
@@ -85,23 +86,23 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -116,8 +117,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

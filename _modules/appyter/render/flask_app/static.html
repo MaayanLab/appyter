@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.render.flask_app.static &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -39,21 +37,23 @@
   <h1>Source code for appyter.render.flask_app.static</h1><div class="highlight"><pre>
 <span></span><span class="sd">&#39;&#39;&#39; Represent the areas that can be handled externally in production</span>
 <span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">request</span><span class="p">,</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">send_file</span><span class="p">,</span> <span class="n">send_from_directory</span><span class="p">,</span> <span class="n">abort</span><span class="p">,</span> <span class="n">jsonify</span>
-<span class="kn">from</span> <span class="nn">werkzeug.exceptions</span> <span class="kn">import</span> <span class="n">NotFound</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">request</span><span class="p">,</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">send_file</span><span class="p">,</span> <span class="n">send_from_directory</span><span class="p">,</span> <span class="n">abort</span><span class="p">,</span> <span class="n">jsonify</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">werkzeug.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">NotFound</span>
 
-<span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">URI</span><span class="p">,</span> <span class="n">join_url</span>
-<span class="kn">from</span> <span class="nn">appyter.render.flask_app.constants</span> <span class="kn">import</span> <span class="n">get_form</span><span class="p">,</span> <span class="n">get_ipynb_io</span><span class="p">,</span> <span class="n">get_nbtemplate_json</span><span class="p">,</span> <span class="n">get_static_fs</span><span class="p">,</span> <span class="n">get_j2_env</span>
-<span class="kn">from</span> <span class="nn">appyter.render.flask_app.core</span> <span class="kn">import</span> <span class="n">core</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.flask</span> <span class="kn">import</span> <span class="n">route_join_with_or_without_slash</span>
-<span class="kn">from</span> <span class="nn">appyter.context</span> <span class="kn">import</span> <span class="n">get_appyter_directory</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.contextlib</span> <span class="kn">import</span> <span class="n">ContextManagerAsHandle</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_chroot_fs</span>
-<span class="kn">from</span> <span class="nn">appyter.render.flask_app.prepare</span> <span class="kn">import</span> <span class="n">prepare_request</span><span class="p">,</span> <span class="n">prepare_storage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.urllib</span><span class="w"> </span><span class="kn">import</span> <span class="n">URI</span><span class="p">,</span> <span class="n">join_url</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.render.flask_app.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_form</span><span class="p">,</span> <span class="n">get_ipynb_io</span><span class="p">,</span> <span class="n">get_nbtemplate_json</span><span class="p">,</span> <span class="n">get_static_fs</span><span class="p">,</span> <span class="n">get_j2_env</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.render.flask_app.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">route_join_with_or_without_slash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_appyter_directory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextManagerAsHandle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">url_to_chroot_fs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.render.flask_app.prepare</span><span class="w"> </span><span class="kn">import</span> <span class="n">prepare_request</span><span class="p">,</span> <span class="n">prepare_storage</span>
 
-<div class="viewcode-block" id="get_index"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.static.get_index">[docs]</a><span class="nd">@route_join_with_or_without_slash</span><span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
-<span class="k">def</span> <span class="nf">get_index</span><span class="p">():</span>
+<div class="viewcode-block" id="get_index">
+<a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.static.get_index">[docs]</a>
+<span class="nd">@route_join_with_or_without_slash</span><span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_index</span><span class="p">():</span>
   <span class="n">mimetype</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">accept_mimetypes</span><span class="o">.</span><span class="n">best_match</span><span class="p">([</span>
     <span class="s1">&#39;text/html&#39;</span><span class="p">,</span>
     <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
@@ -64,22 +64,28 @@
   <span class="k">elif</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;application/json&#39;</span><span class="p">}:</span>
     <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">get_nbtemplate_json</span><span class="p">())</span>
   <span class="k">elif</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;application/vnd.jupyter&#39;</span><span class="p">}:</span>
-    <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">get_ipynb_io</span><span class="p">(),</span> <span class="n">attachment_filename</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">],</span> <span class="n">mimetype</span><span class="o">=</span><span class="n">mimetype</span><span class="p">,</span> <span class="n">conditional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">get_ipynb_io</span><span class="p">(),</span> <span class="n">as_attachment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download_name</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">],</span> <span class="n">mimetype</span><span class="o">=</span><span class="n">mimetype</span><span class="p">,</span> <span class="n">conditional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="favicon"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.static.favicon">[docs]</a><span class="nd">@core</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/favicon.ico&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
-<span class="k">def</span> <span class="nf">favicon</span><span class="p">():</span>
+
+<div class="viewcode-block" id="favicon">
+<a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.static.favicon">[docs]</a>
+<span class="nd">@core</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/favicon.ico&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">favicon</span><span class="p">():</span>
   <span class="n">static</span> <span class="o">=</span> <span class="n">get_static_fs</span><span class="p">()</span>
   <span class="k">if</span> <span class="n">static</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;favicon.ico&#39;</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">static</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;favicon.ico&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">),</span> <span class="n">attachment_filename</span><span class="o">=</span><span class="s1">&#39;favicon.ico&#39;</span><span class="p">,</span> <span class="n">conditional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">static</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;favicon.ico&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">),</span> <span class="n">as_attachment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download_name</span><span class="o">=</span><span class="s1">&#39;favicon.ico&#39;</span><span class="p">,</span> <span class="n">conditional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
   <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="static"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.static.static">[docs]</a><span class="nd">@core</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/static/&lt;path:filename&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
-<span class="k">def</span> <span class="nf">static</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+
+<div class="viewcode-block" id="static">
+<a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.static.static">[docs]</a>
+<span class="nd">@core</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/static/&lt;path:filename&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">static</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
   <span class="n">static</span> <span class="o">=</span> <span class="n">get_static_fs</span><span class="p">()</span>
   <span class="k">if</span> <span class="n">static</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">static</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">),</span> <span class="n">attachment_filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">conditional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">send_file</span><span class="p">(</span><span class="n">static</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">),</span> <span class="n">as_attachment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download_name</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">conditional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1">#</span>
   <span class="k">try</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="n">get_appyter_directory</span><span class="p">(</span><span class="s1">&#39;static&#39;</span><span class="p">),</span> <span class="n">path</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
@@ -89,8 +95,11 @@
     <span class="k">except</span> <span class="n">NotFound</span><span class="p">:</span>
       <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="n">get_appyter_directory</span><span class="p">(</span><span class="s1">&#39;static/profiles/default&#39;</span><span class="p">),</span> <span class="n">path</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="data_files"><a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.static.data_files">[docs]</a><span class="nd">@route_join_with_or_without_slash</span><span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="s1">&#39;&lt;path:path&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
-<span class="k">def</span> <span class="nf">data_files</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="data_files">
+<a class="viewcode-back" href="../../../../appyter.render.flask_app.html#appyter.render.flask_app.static.data_files">[docs]</a>
+<span class="nd">@route_join_with_or_without_slash</span><span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="s1">&#39;&lt;path:path&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">data_files</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
   <span class="n">data</span> <span class="o">=</span> <span class="n">prepare_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
   <span class="c1">#</span>
   <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
@@ -108,7 +117,7 @@
       <span class="n">output_fs</span> <span class="o">=</span> <span class="n">output_fs_ctx</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
       <span class="n">path</span> <span class="o">=</span> <span class="n">join_url</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">])</span>
       <span class="k">if</span> <span class="n">output_fs</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="n">send_file</span><span class="p">(</span><span class="n">output_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">),</span> <span class="n">attachment_filename</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">],</span> <span class="n">conditional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">send_file</span><span class="p">(</span><span class="n">output_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">),</span> <span class="n">as_attachment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download_name</span><span class="o">=</span><span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;IPYNB&#39;</span><span class="p">],</span> <span class="n">conditional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">response</span><span class="o">.</span><span class="n">call_on_close</span><span class="p">(</span><span class="n">output_fs_ctx</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">response</span>
       <span class="k">else</span><span class="p">:</span>
@@ -117,36 +126,37 @@
     <span class="n">output_fs_ctx</span> <span class="o">=</span> <span class="n">ContextManagerAsHandle</span><span class="p">(</span><span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">URI</span><span class="p">(</span><span class="n">prepare_storage</span><span class="p">(</span><span class="n">data</span><span class="p">))</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">))))</span>
     <span class="n">output_fs</span> <span class="o">=</span> <span class="n">output_fs_ctx</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">output_fs</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-      <span class="n">response</span> <span class="o">=</span> <span class="n">send_file</span><span class="p">(</span><span class="n">output_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">),</span> <span class="n">attachment_filename</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">conditional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+      <span class="n">response</span> <span class="o">=</span> <span class="n">send_file</span><span class="p">(</span><span class="n">output_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">),</span> <span class="n">as_attachment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">conditional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
       <span class="n">response</span><span class="o">.</span><span class="n">call_on_close</span><span class="p">(</span><span class="n">output_fs_ctx</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
       <span class="k">return</span> <span class="n">response</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="n">output_fs_ctx</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
   <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -162,8 +172,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

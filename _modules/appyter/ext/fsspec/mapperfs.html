@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.ext.fsspec.mapperfs &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,24 +34,26 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.fsspec.mapperfs</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.spec.composable</span> <span class="kn">import</span> <span class="n">ComposableAbstractFileSystem</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.spec.composable</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComposableAbstractFileSystem</span>
 
-<span class="kn">from</span> <span class="nn">appyter.ext.urllib</span> <span class="kn">import</span> <span class="n">join_slash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.urllib</span><span class="w"> </span><span class="kn">import</span> <span class="n">join_slash</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">fsspec</span> <span class="kn">import</span> <span class="n">AbstractFileSystem</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.spec.mountable</span> <span class="kn">import</span> <span class="n">MountableAbstractFileSystem</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.fsspec.core</span> <span class="kn">import</span> <span class="n">url_to_fs_ex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fsspec</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractFileSystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.spec.mountable</span><span class="w"> </span><span class="kn">import</span> <span class="n">MountableAbstractFileSystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">url_to_fs_ex</span>
 
-<div class="viewcode-block" id="MapperFileSystem"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem">[docs]</a><span class="k">class</span> <span class="nc">MapperFileSystem</span><span class="p">(</span><span class="n">MountableAbstractFileSystem</span><span class="p">,</span> <span class="n">AbstractFileSystem</span><span class="p">):</span>
+<div class="viewcode-block" id="MapperFileSystem">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MapperFileSystem</span><span class="p">(</span><span class="n">MountableAbstractFileSystem</span><span class="p">,</span> <span class="n">AbstractFileSystem</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&#39;&#39;&#39; MapperFS is the inverse of a fsspec.mapper -- it lets you use a mapping to</span>
 <span class="sd">  define a virtual filesystem.</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="n">root_marker</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
   <span class="n">protocol</span> <span class="o">=</span> <span class="s1">&#39;mapperfs&#39;</span>
 
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathmap</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathmap</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -91,7 +91,7 @@
           <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">listing</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">listing</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-  <span class="k">def</span> <span class="nf">_pathmap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">_pathmap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Return (fs, path) depending on whether we hit a mapped paths or not</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathmap</span><span class="p">:</span>
@@ -105,53 +105,85 @@
           <span class="k">return</span> <span class="n">fs</span><span class="p">,</span> <span class="n">join_slash</span><span class="p">(</span><span class="n">fo</span><span class="p">,</span> <span class="o">*</span><span class="n">path_split</span><span class="p">[</span><span class="o">-</span><span class="n">i</span><span class="p">:]),</span> <span class="n">base_path</span>
       <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
-  <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">fs</span><span class="p">,</span> <span class="n">_fo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathmap</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
       <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="s1">&#39;__enter__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fs</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
     <span class="k">return</span> <span class="bp">self</span>
 
-  <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">fs</span><span class="p">,</span> <span class="n">_fo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathmap</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
       <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="s1">&#39;__exit__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fs</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MapperFileSystem.mkdir"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.mkdir">[docs]</a>  <span class="k">def</span> <span class="nf">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MapperFileSystem.mkdir">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.mkdir">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
   
-<div class="viewcode-block" id="MapperFileSystem.makedirs"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.makedirs">[docs]</a>  <span class="k">def</span> <span class="nf">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="MapperFileSystem.makedirs">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.makedirs">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MapperFileSystem.rmdir"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.rmdir">[docs]</a>  <span class="k">def</span> <span class="nf">rmdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MapperFileSystem.rmdir">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.rmdir">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">rmdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
     <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MapperFileSystem.rm_file"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.rm_file">[docs]</a>  <span class="k">def</span> <span class="nf">rm_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MapperFileSystem.rm_file">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.rm_file">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">rm_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
     <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MapperFileSystem.rm"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.rm">[docs]</a>  <span class="k">def</span> <span class="nf">rm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MapperFileSystem.rm">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.rm">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">rm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MapperFileSystem.cat_file"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.cat_file">[docs]</a>  <span class="k">def</span> <span class="nf">cat_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MapperFileSystem.cat_file">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.cat_file">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">cat_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">fs</span><span class="p">,</span> <span class="n">fs_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pathmap</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">fs</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="n">fs_path</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MapperFileSystem.copy"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.copy">[docs]</a>  <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path1</span><span class="p">,</span> <span class="n">path2</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">on_error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MapperFileSystem.copy">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.copy">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path1</span><span class="p">,</span> <span class="n">path2</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">on_error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="n">path2</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MapperFileSystem.mv"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.mv">[docs]</a>  <span class="k">def</span> <span class="nf">mv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path1</span><span class="p">,</span> <span class="n">path2</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MapperFileSystem.mv">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.mv">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">mv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path1</span><span class="p">,</span> <span class="n">path2</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="n">path1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MapperFileSystem.exists"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.exists">[docs]</a>  <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MapperFileSystem.exists">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.exists">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">listing</span> <span class="ow">or</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathmap</span></div>
 
-<div class="viewcode-block" id="MapperFileSystem.get_drs"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.get_drs">[docs]</a>  <span class="k">def</span> <span class="nf">get_drs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MapperFileSystem.get_drs">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.get_drs">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">get_drs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">listing</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">IsADirectoryError</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="n">fs</span><span class="p">,</span> <span class="n">fs_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pathmap</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
       <span class="k">return</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_drs</span><span class="p">(</span><span class="n">fs_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MapperFileSystem.info"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.info">[docs]</a>  <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MapperFileSystem.info">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.info">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">listing</span><span class="p">:</span>
       <span class="k">return</span> <span class="p">{</span>
         <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">path</span><span class="p">,</span>
@@ -163,7 +195,10 @@
       <span class="n">info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
       <span class="k">return</span> <span class="n">info</span></div>
 
-<div class="viewcode-block" id="MapperFileSystem.ls"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.ls">[docs]</a>  <span class="k">def</span> <span class="nf">ls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MapperFileSystem.ls">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.ls">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">ls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39; Aggregate results based on pathmap listing &amp; underlying fs</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ls(</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
@@ -186,7 +221,8 @@
         <span class="k">pass</span>
     <span class="k">return</span> <span class="n">results</span></div>
 
-  <span class="k">def</span> <span class="nf">_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">,</span> <span class="n">block_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">fs</span><span class="p">,</span> <span class="n">fs_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pathmap</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="k">if</span> <span class="s1">&#39;r&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">fs</span><span class="o">.</span><span class="n">_open</span><span class="p">(</span>
@@ -198,8 +234,10 @@
       <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
 
-<div class="viewcode-block" id="MapperFileSystem.to_json"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.to_json">[docs]</a>  <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">json</span>
+<div class="viewcode-block" id="MapperFileSystem.to_json">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.to_json">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
     <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="bp">cls</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
     <span class="n">proto</span> <span class="o">=</span> <span class="p">(</span>
@@ -220,10 +258,13 @@
       <span class="p">)</span>
     <span class="p">)</span></div>
 
-<div class="viewcode-block" id="MapperFileSystem.from_json"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.from_json">[docs]</a>  <span class="nd">@staticmethod</span>
-  <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">blob</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">json</span>
-    <span class="kn">from</span> <span class="nn">fsspec.registry</span> <span class="kn">import</span> <span class="n">_import_class</span><span class="p">,</span> <span class="n">get_filesystem_class</span>
+
+<div class="viewcode-block" id="MapperFileSystem.from_json">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.mapperfs.MapperFileSystem.from_json">[docs]</a>
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">from_json</span><span class="p">(</span><span class="n">blob</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">fsspec.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">_import_class</span><span class="p">,</span> <span class="n">get_filesystem_class</span>
     <span class="n">dic</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span>
     <span class="n">protocol</span> <span class="o">=</span> <span class="n">dic</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;protocol&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
@@ -240,30 +281,32 @@
         <span class="o">**</span><span class="n">dic</span><span class="p">,</span>
       <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-      <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span></div></div>
+      <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -278,8 +321,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

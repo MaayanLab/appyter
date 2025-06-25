@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.profiles.default.fields.MultiChoiceField &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,11 +34,13 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.profiles.default.fields.MultiChoiceField</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">appyter.fields</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">FieldConstraintException</span>
-<span class="kn">from</span> <span class="nn">appyter.ext.json</span> <span class="kn">import</span> <span class="n">try_json_loads</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">appyter.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">FieldConstraintException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.json</span><span class="w"> </span><span class="kn">import</span> <span class="n">try_json_loads</span>
 
-<div class="viewcode-block" id="MultiChoiceField"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField">[docs]</a><span class="k">class</span> <span class="nc">MultiChoiceField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
-<span class="w">  </span><span class="sd">&#39;&#39;&#39; Represing a multi-selectable combo box.</span>
+<div class="viewcode-block" id="MultiChoiceField">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiChoiceField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
+<span class="w">  </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39; Represing a multi-selectable combo box.</span>
 <span class="sd">  The resulting selection is represented with a list of strings that were chosen.</span>
 
 <span class="sd">  :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.</span>
@@ -53,12 +53,12 @@
 <span class="sd">  :param value: (INTERNAL Any) The raw value of the field (from the form for instance)</span>
 <span class="sd">  :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`&#39;s constructor.</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span> <span class="s1">&#39;MultiChoiceField requires choices&#39;</span>
 
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">raw_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">raw_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">try_json_loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
       <span class="k">return</span> <span class="p">[]</span>
@@ -69,14 +69,17 @@
     <span class="k">else</span><span class="p">:</span>
       <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]]</span>
 
-<div class="viewcode-block" id="MultiChoiceField.constraint"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.constraint">[docs]</a>  <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiChoiceField.constraint">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.constraint">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">:</span>
       <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">)</span></div>
 
+
   <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraint</span><span class="p">():</span>
       <span class="k">raise</span> <span class="n">FieldConstraintException</span><span class="p">(</span>
         <span class="n">field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="p">,</span>
@@ -88,7 +91,9 @@
     <span class="k">else</span><span class="p">:</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span>
 
-<div class="viewcode-block" id="MultiChoiceField.to_jsonschema"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_jsonschema">[docs]</a>  <span class="k">def</span> <span class="nf">to_jsonschema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiChoiceField.to_jsonschema">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_jsonschema">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_jsonschema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span> <span class="p">}</span> <span class="p">}</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">):</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">):</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
@@ -96,7 +101,10 @@
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">):</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">schema</span></div>
 
-<div class="viewcode-block" id="MultiChoiceField.to_cwl"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl">[docs]</a>  <span class="k">def</span> <span class="nf">to_cwl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MultiChoiceField.to_cwl">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_cwl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="n">schema</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_cwl</span><span class="p">()</span>
     <span class="c1"># NOTE: CWL&#39;s array enum is broken upstream</span>
     <span class="c1"># if self.args.get(&#39;required&#39;) == True:</span>
@@ -118,39 +126,47 @@
     <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;string</span><span class="si">{</span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">True</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;?&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">return</span> <span class="n">schema</span></div>
 
-<div class="viewcode-block" id="MultiChoiceField.to_cwl_value"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl_value">[docs]</a>  <span class="k">def</span> <span class="nf">to_cwl_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">json</span>
+
+<div class="viewcode-block" id="MultiChoiceField.to_cwl_value">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl_value">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_cwl_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MultiChoiceField.to_click"><a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_click">[docs]</a>  <span class="k">def</span> <span class="nf">to_click</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MultiChoiceField.to_click">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_click">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_click</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_click</span><span class="p">()</span>
     <span class="c1"># kwargs[&#39;multiple&#39;] = True</span>
-    <span class="kn">import</span> <span class="nn">click</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">click</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">STRING</span>
-    <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div></div>
+    <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -165,8 +181,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

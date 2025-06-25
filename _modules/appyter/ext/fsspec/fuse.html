@@ -1,21 +1,19 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>appyter.ext.fsspec.fuse &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,17 +34,17 @@
           <div class="body" role="main">
             
   <h1>Source code for appyter.ext.fsspec.fuse</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">contextlib</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_fuse_run</span><span class="p">(</span><span class="n">fs_json</span><span class="p">,</span> <span class="n">fs_path</span><span class="p">,</span> <span class="n">mount_dir</span><span class="p">):</span>
-  <span class="kn">import</span> <span class="nn">fsspec.fuse</span>
-  <span class="kn">import</span> <span class="nn">appyter.ext.fsspec</span>
-  <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.event_loop</span> <span class="kn">import</span> <span class="n">with_event_loop</span>
-  <span class="kn">from</span> <span class="nn">appyter.ext.fsspec.spec.composable</span> <span class="kn">import</span> <span class="n">ComposableAbstractFileSystem</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fuse_run</span><span class="p">(</span><span class="n">fs_json</span><span class="p">,</span> <span class="n">fs_path</span><span class="p">,</span> <span class="n">mount_dir</span><span class="p">):</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">fsspec.fuse</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">appyter.ext.fsspec</span>
+  <span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.asyncio.event_loop</span><span class="w"> </span><span class="kn">import</span> <span class="n">with_event_loop</span>
+  <span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.spec.composable</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComposableAbstractFileSystem</span>
   <span class="k">with</span> <span class="n">with_event_loop</span><span class="p">():</span>
     <span class="n">fs</span> <span class="o">=</span> <span class="n">ComposableAbstractFileSystem</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">fs_json</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;preparing </span><span class="si">{</span><span class="n">fs</span><span class="si">}</span><span class="s1">..&#39;</span><span class="p">)</span>
@@ -55,15 +53,17 @@
       <span class="n">fsspec</span><span class="o">.</span><span class="n">fuse</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">fs_path</span><span class="p">,</span> <span class="n">mount_dir</span><span class="p">)</span>
       <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;teardown..&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="fs_mount"><a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.fuse.fs_mount">[docs]</a><span class="nd">@contextlib</span><span class="o">.</span><span class="n">asynccontextmanager</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">fs_mount</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">fs_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">mount_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-  <span class="kn">import</span> <span class="nn">os</span>
-  <span class="kn">import</span> <span class="nn">signal</span>
-  <span class="kn">import</span> <span class="nn">traceback</span>
-  <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.try_n_times</span> <span class="kn">import</span> <span class="n">async_try_n_times</span>
-  <span class="kn">from</span> <span class="nn">appyter.ext.asyncio.helpers</span> <span class="kn">import</span> <span class="n">ensure_async</span>
-  <span class="kn">from</span> <span class="nn">appyter.ext.tempfile</span> <span class="kn">import</span> <span class="n">tempdir</span>
-  <span class="k">def</span> <span class="nf">assert_true</span><span class="p">(</span><span class="n">val</span><span class="p">):</span> <span class="k">assert</span> <span class="n">val</span>
+<div class="viewcode-block" id="fs_mount">
+<a class="viewcode-back" href="../../../../appyter.ext.fsspec.html#appyter.ext.fsspec.fuse.fs_mount">[docs]</a>
+<span class="nd">@contextlib</span><span class="o">.</span><span class="n">asynccontextmanager</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">fs_mount</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">fs_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">mount_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">signal</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+  <span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.asyncio.try_n_times</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_try_n_times</span>
+  <span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.asyncio.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_async</span>
+  <span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">tempdir</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">assert_true</span><span class="p">(</span><span class="n">val</span><span class="p">):</span> <span class="k">assert</span> <span class="n">val</span>
   <span class="k">with</span> <span class="n">tempdir</span><span class="p">(</span><span class="n">mount_dir</span><span class="p">)</span> <span class="k">as</span> <span class="n">mount_dir</span><span class="p">:</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;mounting </span><span class="si">{</span><span class="n">fs</span><span class="si">}</span><span class="s1"> onto </span><span class="si">{</span><span class="n">mount_dir</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">proc</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span>
@@ -89,29 +89,30 @@
           <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">)</span> <span class="c1"># SIGTERM unclean stop</span>
         <span class="k">await</span> <span class="n">async_try_n_times</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">ensure_async</span><span class="p">(</span><span class="k">lambda</span> <span class="n">path</span><span class="p">:</span> <span class="n">assert_true</span><span class="p">(</span><span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_mount</span><span class="p">())),</span> <span class="n">mount_dir</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;done&quot;</span><span class="p">)</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -126,8 +127,8 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>

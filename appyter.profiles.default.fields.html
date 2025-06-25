@@ -1,22 +1,20 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>appyter.profiles.default.fields package &#8212; Appyter 0.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=0f882399" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,20 +34,22 @@
           <div class="body" role="main">
             
   <section id="appyter-profiles-default-fields-package">
-<h1>appyter.profiles.default.fields package<a class="headerlink" href="#appyter-profiles-default-fields-package" title="Permalink to this headline">¶</a></h1>
+<h1>appyter.profiles.default.fields package<a class="headerlink" href="#appyter-profiles-default-fields-package" title="Link to this heading">¶</a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
 <section id="module-appyter.profiles.default.fields.AutocompleteField">
-<span id="appyter-profiles-default-fields-autocompletefield-module"></span><h2>appyter.profiles.default.fields.AutocompleteField module<a class="headerlink" href="#module-appyter.profiles.default.fields.AutocompleteField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-autocompletefield-module"></span><h2>appyter.profiles.default.fields.AutocompleteField module<a class="headerlink" href="#module-appyter.profiles.default.fields.AutocompleteField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.AutocompleteField.AutocompleteField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.AutocompleteField.</code><code class="sig-name descname">AutocompleteField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">'.*'</span></em>, <em class="sig-param"><span class="n">hint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/AutocompleteField.html#AutocompleteField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.AutocompleteField.AutocompleteField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.AutocompleteField.AutocompleteField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.AutocompleteField.</span></span><span class="sig-name descname"><span class="pre">AutocompleteField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.*'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/AutocompleteField.html#AutocompleteField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.AutocompleteField.AutocompleteField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Representing a field that accepts a string with autocomplete.
-Auto complete will use <code class="docutils literal notranslate"><span class="pre">choices</span></code> or alternatively <code class="docutils literal notranslate"><span class="pre">file_path</span></code> – a url to load the choices as an array.</p>
-<p>Be careful with this field, consider defining a constraint regex. Note that it is equivalent to
-a string field, and still accepts choices not being autocompleted.</p>
+Auto complete will use <cite>choices</cite> or alternatively <cite>file_path</cite> – a url to load the choices as an array.</p>
+<dl class="simple">
+<dt>Be careful with this field, consider defining a constraint regex. Note that it is equivalent to</dt><dd><p>a string field, and still accepts choices not being autocompleted.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -65,14 +65,13 @@ a string field, and still accepts choices not being autocompleted.</p>
 <li><p><strong>examples</strong> – (Optional[Union[List[str], Dict[str, str]]]) Named strings to provide as clickable examples</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
-<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments used by other fields</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.AutocompleteField.AutocompleteField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/AutocompleteField.html#AutocompleteField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.AutocompleteField.AutocompleteField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.AutocompleteField.AutocompleteField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/AutocompleteField.html#AutocompleteField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.AutocompleteField.AutocompleteField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
 </dd></dl>
@@ -81,11 +80,11 @@ Should be overridden by subclasses.</p>
 
 </section>
 <section id="module-appyter.profiles.default.fields.BoolField">
-<span id="appyter-profiles-default-fields-boolfield-module"></span><h2>appyter.profiles.default.fields.BoolField module<a class="headerlink" href="#module-appyter.profiles.default.fields.BoolField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-boolfield-module"></span><h2>appyter.profiles.default.fields.BoolField module<a class="headerlink" href="#module-appyter.profiles.default.fields.BoolField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.BoolField.BoolField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.BoolField.</code><code class="sig-name descname">BoolField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/BoolField.html#BoolField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.BoolField.BoolField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.BoolField.</span></span><span class="sig-name descname"><span class="pre">BoolField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/BoolField.html#BoolField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Represing a true or false value with a checkbox.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -99,47 +98,46 @@ Should be overridden by subclasses.</p>
 <li><p><strong>yes_label</strong> – (Optional[str]) The text instead of “Yes”</p></li>
 <li><p><strong>no_label</strong> – (Optional[str]) The text instead of “No”</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
-<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments used by other fields</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.BoolField.BoolField.choices">
-<em class="property">property </em><code class="sig-name descname">choices</code><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField.choices" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.BoolField.BoolField.choices">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">choices</span></span><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField.choices" title="Link to this definition">¶</a></dt>
 <dd><p>Potential values to choose from</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.BoolField.BoolField.raw_value">
-<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.BoolField.BoolField.raw_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField.raw_value" title="Link to this definition">¶</a></dt>
 <dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.BoolField.BoolField.to_click">
-<code class="sig-name descname">to_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/BoolField.html#BoolField.to_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField.to_click" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.BoolField.BoolField.to_click">
+<span class="sig-name descname"><span class="pre">to_click</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/BoolField.html#BoolField.to_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField.to_click" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.BoolField.BoolField.to_cwl">
-<code class="sig-name descname">to_cwl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/BoolField.html#BoolField.to_cwl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField.to_cwl" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.BoolField.BoolField.to_cwl">
+<span class="sig-name descname"><span class="pre">to_cwl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/BoolField.html#BoolField.to_cwl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField.to_cwl" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.BoolField.BoolField.to_jsonschema">
-<code class="sig-name descname">to_jsonschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/BoolField.html#BoolField.to_jsonschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField.to_jsonschema" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.BoolField.BoolField.to_jsonschema">
+<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/BoolField.html#BoolField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.BoolField.BoolField.to_jsonschema" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.profiles.default.fields.ChoiceField">
-<span id="appyter-profiles-default-fields-choicefield-module"></span><h2>appyter.profiles.default.fields.ChoiceField module<a class="headerlink" href="#module-appyter.profiles.default.fields.ChoiceField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-choicefield-module"></span><h2>appyter.profiles.default.fields.ChoiceField module<a class="headerlink" href="#module-appyter.profiles.default.fields.ChoiceField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.ChoiceField.ChoiceField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.ChoiceField.</code><code class="sig-name descname">ChoiceField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/ChoiceField.html#ChoiceField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.ChoiceField.ChoiceField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.ChoiceField.</span></span><span class="sig-name descname"><span class="pre">ChoiceField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/ChoiceField.html#ChoiceField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Represing a choice of string values with a combo box.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -152,35 +150,33 @@ Should be overridden by subclasses.</p>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
-<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments used by other fields</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.ChoiceField.ChoiceField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/ChoiceField.html#ChoiceField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.ChoiceField.ChoiceField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/ChoiceField.html#ChoiceField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.ChoiceField.ChoiceField.safe_value">
-<em class="property">property </em><code class="sig-name descname">safe_value</code><a class="headerlink" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField.safe_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>(SAFE) Effective safe value for use in code, we use <code class="docutils literal notranslate"><span class="pre">repr</span></code> to escape values as necessary</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.ChoiceField.ChoiceField.safe_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">safe_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField.safe_value" title="Link to this definition">¶</a></dt>
+<dd><p>(SAFE) Effective safe value for use in code, we use <cite>repr</cite> to escape values as necessary</p>
 </dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.profiles.default.fields.DescriptionField">
-<span id="appyter-profiles-default-fields-descriptionfield-module"></span><h2>appyter.profiles.default.fields.DescriptionField module<a class="headerlink" href="#module-appyter.profiles.default.fields.DescriptionField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-descriptionfield-module"></span><h2>appyter.profiles.default.fields.DescriptionField module<a class="headerlink" href="#module-appyter.profiles.default.fields.DescriptionField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.DescriptionField.DescriptionField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.DescriptionField.</code><code class="sig-name descname">DescriptionField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/DescriptionField.html#DescriptionField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.DescriptionField.DescriptionField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.DescriptionField.</span></span><span class="sig-name descname"><span class="pre">DescriptionField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/DescriptionField.html#DescriptionField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Representing text between fields</p>
-<p>Usage:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="o">%</span> <span class="n">do</span> <span class="n">DescriptionField</span><span class="p">(</span>
   <span class="n">name</span><span class="o">=</span><span class="s1">&#39;my_fieldname&#39;</span><span class="p">,</span>
   <span class="n">text</span><span class="o">=</span><span class="s1">&#39;My Description&#39;</span><span class="p">,</span>
@@ -193,54 +189,55 @@ Should be overridden by subclasses.</p>
 <li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
 <li><p><strong>text</strong> – (str) A human readable, HTML parsable text</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
-<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments used by other fields</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.DescriptionField.DescriptionField.raw_value">
-<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.DescriptionField.DescriptionField.raw_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.raw_value" title="Link to this definition">¶</a></dt>
 <dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.DescriptionField.DescriptionField.to_click">
-<code class="sig-name descname">to_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/DescriptionField.html#DescriptionField.to_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.to_click" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.DescriptionField.DescriptionField.to_click">
+<span class="sig-name descname"><span class="pre">to_click</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/DescriptionField.html#DescriptionField.to_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.to_click" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.DescriptionField.DescriptionField.to_cwl">
-<code class="sig-name descname">to_cwl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/DescriptionField.html#DescriptionField.to_cwl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.to_cwl" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.DescriptionField.DescriptionField.to_cwl">
+<span class="sig-name descname"><span class="pre">to_cwl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/DescriptionField.html#DescriptionField.to_cwl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.to_cwl" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.DescriptionField.DescriptionField.to_cwl_value">
-<code class="sig-name descname">to_cwl_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/DescriptionField.html#DescriptionField.to_cwl_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.to_cwl_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.DescriptionField.DescriptionField.to_cwl_value">
+<span class="sig-name descname"><span class="pre">to_cwl_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/DescriptionField.html#DescriptionField.to_cwl_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.to_cwl_value" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.DescriptionField.DescriptionField.to_jsonschema">
-<code class="sig-name descname">to_jsonschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/DescriptionField.html#DescriptionField.to_jsonschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.to_jsonschema" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.DescriptionField.DescriptionField.to_jsonschema">
+<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/DescriptionField.html#DescriptionField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.to_jsonschema" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.profiles.default.fields.FileField">
-<span id="appyter-profiles-default-fields-filefield-module"></span><h2>appyter.profiles.default.fields.FileField module<a class="headerlink" href="#module-appyter.profiles.default.fields.FileField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-filefield-module"></span><h2>appyter.profiles.default.fields.FileField module<a class="headerlink" href="#module-appyter.profiles.default.fields.FileField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.FileField.FileField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.FileField.</code><code class="sig-name descname">FileField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">'.*'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.FileField.</span></span><span class="sig-name descname"><span class="pre">FileField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.*'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Representing a File URL.</p>
 <p>The field ends up being a string of the file path, which will be relative to the appyter notebook.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">({{</span> <span class="n">FileField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;my-csv&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;My CSV&#39;</span><span class="p">)</span> <span class="p">}})</span>
 </pre></div>
 </div>
-<p>Importantly, a FileField ultimately resolves to a URL supporting several schemes. Appyters ensure
-that url is available as an actual file when the appyter executes.</p>
+<dl class="simple">
+<dt>Importantly, a FileField ultimately resolves to a URL supporting several schemes. Appyters ensure</dt><dd><p>that url is available as an actual file when the appyter executes.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -251,67 +248,67 @@ that url is available as an actual file when the appyter executes.</p>
 <li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
 <li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>storage</strong> – (Optional[str]) A storage prefix for browsing</p></li>
-<li><p><strong>examples</strong> – (Optional[Dict[str, str]]) Named url paths to example files to upload</p></li>
+<li><p><strong>examples</strong> – (Optional[Dict[str, str]]) Named url paths to example files to upload
+paths can be relative i.e. <cite>{ “my_file.txt”: url_for(‘static’, filename=’my_file.txt’) }</cite>, or a remote url.</p></li>
+<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
+<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
+<li><p><strong>**kwargs</strong> – Remaining arguments passed down to <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a>’s constructor.</p></li>
 </ul>
 </dd>
 </dl>
-<p>paths can be relative i.e. <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">&quot;my_file.txt&quot;:</span> <span class="pre">url_for('static',</span> <span class="pre">filename='my_file.txt')</span> <span class="pre">}</span></code>, or a remote url.
-:param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField
-:param value: (INTERNAL Any) The raw value of the field (from the form for instance)
-:param <a href="#system-message-5"><span class="problematic" id="problematic-5">**</span></a>kwargs: Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.FileField.FileField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.FileField.FileField.prepare">
-<code class="sig-name descname">prepare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">req</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.prepare" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.prepare" title="Link to this definition">¶</a></dt>
 <dd><p>Convert file in request into URI</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.FileField.FileField.prepare_uri">
-<code class="sig-name descname">prepare_uri</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">raw_value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.prepare_uri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.prepare_uri" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.prepare_uri">
+<span class="sig-name descname"><span class="pre">prepare_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.prepare_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.prepare_uri" title="Link to this definition">¶</a></dt>
 <dd><p>The fully resolved URI for this file</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.FileField.FileField.public_url">
-<em class="property">property </em><code class="sig-name descname">public_url</code><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.public_url" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.public_url">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">public_url</span></span><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.public_url" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.FileField.FileField.raw_value">
-<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.raw_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.raw_value" title="Link to this definition">¶</a></dt>
 <dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.FileField.FileField.to_cwl">
-<code class="sig-name descname">to_cwl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.to_cwl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.to_cwl" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.to_cwl">
+<span class="sig-name descname"><span class="pre">to_cwl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.to_cwl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.to_cwl" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.FileField.FileField.to_cwl_value">
-<code class="sig-name descname">to_cwl_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.to_cwl_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.to_cwl_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.to_cwl_value">
+<span class="sig-name descname"><span class="pre">to_cwl_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.to_cwl_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.to_cwl_value" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.FileField.FileField.to_jsonschema">
-<code class="sig-name descname">to_jsonschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.to_jsonschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.to_jsonschema" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.to_jsonschema">
+<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.to_jsonschema" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.FileField.FileField.uri">
-<em class="property">property </em><code class="sig-name descname">uri</code><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.uri" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.uri">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uri</span></span><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.uri" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.FileField.FileField.value">
-<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.value" title="Link to this definition">¶</a></dt>
 <dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
 When instantiating code, you should use safe_value.</p>
 </dd></dl>
@@ -320,11 +317,11 @@ When instantiating code, you should use safe_value.</p>
 
 </section>
 <section id="module-appyter.profiles.default.fields.FloatField">
-<span id="appyter-profiles-default-fields-floatfield-module"></span><h2>appyter.profiles.default.fields.FloatField module<a class="headerlink" href="#module-appyter.profiles.default.fields.FloatField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-floatfield-module"></span><h2>appyter.profiles.default.fields.FloatField module<a class="headerlink" href="#module-appyter.profiles.default.fields.FloatField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.FloatField.FloatField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.FloatField.</code><code class="sig-name descname">FloatField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FloatField.html#FloatField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FloatField.FloatField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.FloatField.</span></span><span class="sig-name descname"><span class="pre">FloatField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FloatField.html#FloatField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Representing a field that accepts a floating point value</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -336,48 +333,47 @@ When instantiating code, you should use safe_value.</p>
 <li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
-<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments used by other fields</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.FloatField.FloatField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FloatField.html#FloatField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FloatField.FloatField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FloatField.html#FloatField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.FloatField.FloatField.raw_value">
-<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FloatField.FloatField.raw_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField.raw_value" title="Link to this definition">¶</a></dt>
 <dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.FloatField.FloatField.to_click">
-<code class="sig-name descname">to_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FloatField.html#FloatField.to_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField.to_click" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FloatField.FloatField.to_click">
+<span class="sig-name descname"><span class="pre">to_click</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FloatField.html#FloatField.to_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField.to_click" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.FloatField.FloatField.to_cwl">
-<code class="sig-name descname">to_cwl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FloatField.html#FloatField.to_cwl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField.to_cwl" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FloatField.FloatField.to_cwl">
+<span class="sig-name descname"><span class="pre">to_cwl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FloatField.html#FloatField.to_cwl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField.to_cwl" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.FloatField.FloatField.to_jsonschema">
-<code class="sig-name descname">to_jsonschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FloatField.html#FloatField.to_jsonschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField.to_jsonschema" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.FloatField.FloatField.to_jsonschema">
+<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FloatField.html#FloatField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FloatField.FloatField.to_jsonschema" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.profiles.default.fields.IntField">
-<span id="appyter-profiles-default-fields-intfield-module"></span><h2>appyter.profiles.default.fields.IntField module<a class="headerlink" href="#module-appyter.profiles.default.fields.IntField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-intfield-module"></span><h2>appyter.profiles.default.fields.IntField module<a class="headerlink" href="#module-appyter.profiles.default.fields.IntField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.IntField.IntField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.IntField.</code><code class="sig-name descname">IntField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">min</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/IntField.html#IntField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.IntField.IntField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.IntField.</span></span><span class="sig-name descname"><span class="pre">IntField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/IntField.html#IntField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Representing a field that accepts an integer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -392,53 +388,52 @@ Should be overridden by subclasses.</p>
 <li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
-<li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Remaining arguments passed down to <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a>’s constructor.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.IntField.IntField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/IntField.html#IntField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.IntField.IntField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/IntField.html#IntField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.IntField.IntField.raw_value">
-<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.IntField.IntField.raw_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.raw_value" title="Link to this definition">¶</a></dt>
 <dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.IntField.IntField.to_click">
-<code class="sig-name descname">to_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/IntField.html#IntField.to_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.to_click" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.IntField.IntField.to_click">
+<span class="sig-name descname"><span class="pre">to_click</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/IntField.html#IntField.to_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.to_click" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.IntField.IntField.to_cwl">
-<code class="sig-name descname">to_cwl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/IntField.html#IntField.to_cwl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.to_cwl" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.IntField.IntField.to_cwl">
+<span class="sig-name descname"><span class="pre">to_cwl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/IntField.html#IntField.to_cwl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.to_cwl" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.IntField.IntField.to_jsonschema">
-<code class="sig-name descname">to_jsonschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/IntField.html#IntField.to_jsonschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.to_jsonschema" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.IntField.IntField.to_jsonschema">
+<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/IntField.html#IntField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.IntField.IntField.to_jsonschema" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.profiles.default.fields.MultiCheckboxField">
-<span id="appyter-profiles-default-fields-multicheckboxfield-module"></span><h2>appyter.profiles.default.fields.MultiCheckboxField module<a class="headerlink" href="#module-appyter.profiles.default.fields.MultiCheckboxField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-multicheckboxfield-module"></span><h2>appyter.profiles.default.fields.MultiCheckboxField module<a class="headerlink" href="#module-appyter.profiles.default.fields.MultiCheckboxField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.MultiCheckboxField.</code><code class="sig-name descname">MultiCheckboxField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
-<p>Represing a set of independently selectable check boxes.
-Like <a class="reference internal" href="#module-appyter.profiles.default.fields.MultiChoiceField" title="appyter.profiles.default.fields.MultiChoiceField"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.profiles.default.fields.MultiChoiceField</span></code></a>, but with</p>
-<blockquote>
-<div><p>a different rendering (check boxes instead of select)</p>
-</div></blockquote>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.MultiCheckboxField.</span></span><span class="sig-name descname"><span class="pre">MultiCheckboxField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
+<p>Represing a set of independently selectable check boxes.</p>
+<dl class="simple">
+<dt>Like <a class="reference internal" href="#module-appyter.profiles.default.fields.MultiChoiceField" title="appyter.profiles.default.fields.MultiChoiceField"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.profiles.default.fields.MultiChoiceField</span></code></a>, but with</dt><dd><p>a different rendering (check boxes instead of select)</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -451,47 +446,46 @@ Like <a class="reference internal" href="#module-appyter.profiles.default.fields
 <li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
-<li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Remaining arguments passed down to <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a>’s constructor.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.raw_value">
-<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.raw_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.raw_value" title="Link to this definition">¶</a></dt>
 <dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_click">
-<code class="sig-name descname">to_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField.to_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_click" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_click">
+<span class="sig-name descname"><span class="pre">to_click</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField.to_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_click" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_cwl">
-<code class="sig-name descname">to_cwl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField.to_cwl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_cwl" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_cwl">
+<span class="sig-name descname"><span class="pre">to_cwl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField.to_cwl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_cwl" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_cwl_value">
-<code class="sig-name descname">to_cwl_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField.to_cwl_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_cwl_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_cwl_value">
+<span class="sig-name descname"><span class="pre">to_cwl_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField.to_cwl_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_cwl_value" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_jsonschema">
-<code class="sig-name descname">to_jsonschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField.to_jsonschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_jsonschema" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_jsonschema">
+<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiCheckboxField.html#MultiCheckboxField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_jsonschema" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.value">
-<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.value" title="Link to this definition">¶</a></dt>
 <dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
 When instantiating code, you should use safe_value.</p>
 </dd></dl>
@@ -500,11 +494,11 @@ When instantiating code, you should use safe_value.</p>
 
 </section>
 <section id="module-appyter.profiles.default.fields.MultiChoiceField">
-<span id="appyter-profiles-default-fields-multichoicefield-module"></span><h2>appyter.profiles.default.fields.MultiChoiceField module<a class="headerlink" href="#module-appyter.profiles.default.fields.MultiChoiceField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-multichoicefield-module"></span><h2>appyter.profiles.default.fields.MultiChoiceField module<a class="headerlink" href="#module-appyter.profiles.default.fields.MultiChoiceField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.MultiChoiceField.</code><code class="sig-name descname">MultiChoiceField</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.MultiChoiceField.</span></span><span class="sig-name descname"><span class="pre">MultiChoiceField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Represing a multi-selectable combo box.
 The resulting selection is represented with a list of strings that were chosen.</p>
 <dl class="field-list simple">
@@ -518,47 +512,46 @@ The resulting selection is represented with a list of strings that were chosen.<
 <li><p><strong>default</strong> – (float) A default value as an example and for use during prototyping</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
-<li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Remaining arguments passed down to <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a>’s constructor.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.raw_value">
-<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.raw_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.raw_value" title="Link to this definition">¶</a></dt>
 <dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_click">
-<code class="sig-name descname">to_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField.to_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_click" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_click">
+<span class="sig-name descname"><span class="pre">to_click</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField.to_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_click" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl">
-<code class="sig-name descname">to_cwl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField.to_cwl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl">
+<span class="sig-name descname"><span class="pre">to_cwl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField.to_cwl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl_value">
-<code class="sig-name descname">to_cwl_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField.to_cwl_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl_value">
+<span class="sig-name descname"><span class="pre">to_cwl_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField.to_cwl_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl_value" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_jsonschema">
-<code class="sig-name descname">to_jsonschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField.to_jsonschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_jsonschema" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_jsonschema">
+<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiChoiceField.html#MultiChoiceField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_jsonschema" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.value">
-<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.value" title="Link to this definition">¶</a></dt>
 <dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
 When instantiating code, you should use safe_value.</p>
 </dd></dl>
@@ -567,73 +560,73 @@ When instantiating code, you should use safe_value.</p>
 
 </section>
 <section id="module-appyter.profiles.default.fields.MultiFileField">
-<span id="appyter-profiles-default-fields-multifilefield-module"></span><h2>appyter.profiles.default.fields.MultiFileField module<a class="headerlink" href="#module-appyter.profiles.default.fields.MultiFileField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-multifilefield-module"></span><h2>appyter.profiles.default.fields.MultiFileField module<a class="headerlink" href="#module-appyter.profiles.default.fields.MultiFileField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.MultiFileField.</code><code class="sig-name descname">MultiFileField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">multiple</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField" title="appyter.profiles.default.fields.FileField.FileField"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.profiles.default.fields.FileField.FileField</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.MultiFileField.</span></span><span class="sig-name descname"><span class="pre">MultiFileField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiple</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField" title="appyter.profiles.default.fields.FileField.FileField"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileField</span></code></a></p>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField.prepare">
-<code class="sig-name descname">prepare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">req</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.prepare" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.prepare" title="Link to this definition">¶</a></dt>
 <dd><p>Convert file in request into URI</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField.public_url">
-<em class="property">property </em><code class="sig-name descname">public_url</code><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.public_url" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.public_url">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">public_url</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.public_url" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField.public_urls">
-<em class="property">property </em><code class="sig-name descname">public_urls</code><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.public_urls" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.public_urls">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">public_urls</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.public_urls" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField.raw_value">
-<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.raw_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.raw_value" title="Link to this definition">¶</a></dt>
 <dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField.to_click">
-<code class="sig-name descname">to_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.to_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_click" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.to_click">
+<span class="sig-name descname"><span class="pre">to_click</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.to_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_click" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl">
-<code class="sig-name descname">to_cwl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.to_cwl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl">
+<span class="sig-name descname"><span class="pre">to_cwl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.to_cwl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl_value">
-<code class="sig-name descname">to_cwl_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.to_cwl_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl_value">
+<span class="sig-name descname"><span class="pre">to_cwl_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.to_cwl_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl_value" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField.to_jsonschema">
-<code class="sig-name descname">to_jsonschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.to_jsonschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_jsonschema" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.to_jsonschema">
+<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_jsonschema" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField.uri">
-<em class="property">property </em><code class="sig-name descname">uri</code><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.uri" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.uri">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uri</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.uri" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField.uris">
-<em class="property">property </em><code class="sig-name descname">uris</code><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.uris" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.uris">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uris</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.uris" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.MultiFileField.MultiFileField.value">
-<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.value" title="Link to this definition">¶</a></dt>
 <dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
 When instantiating code, you should use safe_value.</p>
 </dd></dl>
@@ -642,15 +635,15 @@ When instantiating code, you should use safe_value.</p>
 
 </section>
 <section id="module-appyter.profiles.default.fields.SectionField">
-<span id="appyter-profiles-default-fields-sectionfield-module"></span><h2>appyter.profiles.default.fields.SectionField module<a class="headerlink" href="#module-appyter.profiles.default.fields.SectionField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-sectionfield-module"></span><h2>appyter.profiles.default.fields.SectionField module<a class="headerlink" href="#module-appyter.profiles.default.fields.SectionField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.SectionField.SectionField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.SectionField.</code><code class="sig-name descname">SectionField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">icon</span><span class="o">=</span><span class="default_value">'cogs'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/SectionField.html#SectionField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.SectionField.SectionField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.SectionField.</span></span><span class="sig-name descname"><span class="pre">SectionField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">icon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cogs'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/SectionField.html#SectionField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Representing section header which other fields can be a part of</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">appyter</span> <span class="n">hide_code</span>
-<span class="p">{</span><span class="o">%</span> <span class="n">do</span> <span class="n">SectionField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;section1&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;My Section&#39;</span><span class="p">,</span> <span class="n">subtitle</span><span class="o">=</span><span class="s1">&#39;is awesome&#39;</span><span class="p">)</span> <span class="o">%</span><span class="p">}</span>
-<span class="p">{</span><span class="o">%</span> <span class="nb">set</span> <span class="n">x</span> <span class="o">=</span> <span class="n">IntField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;int1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;My Int&#39;</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s1">&#39;section1&#39;</span><span class="p">)</span> <span class="o">%</span><span class="p">}</span>
+  <span class="p">{</span><span class="o">%</span> <span class="n">do</span> <span class="n">SectionField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;section1&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;My Section&#39;</span><span class="p">,</span> <span class="n">subtitle</span><span class="o">=</span><span class="s1">&#39;is awesome&#39;</span><span class="p">)</span> <span class="o">%</span><span class="p">}</span>
+  <span class="p">{</span><span class="o">%</span> <span class="nb">set</span> <span class="n">x</span> <span class="o">=</span> <span class="n">IntField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;int1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;My Int&#39;</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s1">&#39;section1&#39;</span><span class="p">)</span> <span class="o">%</span><span class="p">}</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -661,46 +654,45 @@ When instantiating code, you should use safe_value.</p>
 <li><p><strong>subtitle</strong> – (str) A human readable subtitle for the section</p></li>
 <li><p><strong>img</strong> – (str) The path to an image used in the field relative to the static folder</p></li>
 <li><p><strong>icon</strong> – (str) A font-awesome icon identifier, used if img is not provided</p></li>
-<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments used by other fields</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.SectionField.SectionField.raw_value">
-<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.SectionField.SectionField.raw_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField.raw_value" title="Link to this definition">¶</a></dt>
 <dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.SectionField.SectionField.to_click">
-<code class="sig-name descname">to_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/SectionField.html#SectionField.to_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField.to_click" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.SectionField.SectionField.to_click">
+<span class="sig-name descname"><span class="pre">to_click</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/SectionField.html#SectionField.to_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField.to_click" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.SectionField.SectionField.to_cwl">
-<code class="sig-name descname">to_cwl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/SectionField.html#SectionField.to_cwl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField.to_cwl" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.SectionField.SectionField.to_cwl">
+<span class="sig-name descname"><span class="pre">to_cwl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/SectionField.html#SectionField.to_cwl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField.to_cwl" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.SectionField.SectionField.to_cwl_value">
-<code class="sig-name descname">to_cwl_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/SectionField.html#SectionField.to_cwl_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField.to_cwl_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.SectionField.SectionField.to_cwl_value">
+<span class="sig-name descname"><span class="pre">to_cwl_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/SectionField.html#SectionField.to_cwl_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField.to_cwl_value" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.SectionField.SectionField.to_jsonschema">
-<code class="sig-name descname">to_jsonschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/SectionField.html#SectionField.to_jsonschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField.to_jsonschema" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.SectionField.SectionField.to_jsonschema">
+<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/SectionField.html#SectionField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.SectionField.SectionField.to_jsonschema" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.profiles.default.fields.StringField">
-<span id="appyter-profiles-default-fields-stringfield-module"></span><h2>appyter.profiles.default.fields.StringField module<a class="headerlink" href="#module-appyter.profiles.default.fields.StringField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-stringfield-module"></span><h2>appyter.profiles.default.fields.StringField module<a class="headerlink" href="#module-appyter.profiles.default.fields.StringField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.StringField.StringField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.StringField.</code><code class="sig-name descname">StringField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">required</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/StringField.html#StringField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.StringField.StringField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.StringField.StringField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.StringField.</span></span><span class="sig-name descname"><span class="pre">StringField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/StringField.html#StringField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.StringField.StringField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Representing a field that accepts a string</p>
 <p>Be careful with this field, consider defining a constraint regex.</p>
 <dl class="field-list simple">
@@ -718,32 +710,31 @@ When instantiating code, you should use safe_value.</p>
 <li><p><strong>examples</strong> – (Optional[Union[List[str], Dict[str, str]]]) Named strings to provide as clickable examples</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
-<li><p><strong>**kwargs</strong> – <p>Additional keyword arguments used by other fields</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments used by other fields</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.StringField.StringField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/StringField.html#StringField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.StringField.StringField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.StringField.StringField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/StringField.html#StringField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.StringField.StringField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.StringField.StringField.to_jsonschema">
-<code class="sig-name descname">to_jsonschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/StringField.html#StringField.to_jsonschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.StringField.StringField.to_jsonschema" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.StringField.StringField.to_jsonschema">
+<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/StringField.html#StringField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.StringField.StringField.to_jsonschema" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.profiles.default.fields.TabField">
-<span id="appyter-profiles-default-fields-tabfield-module"></span><h2>appyter.profiles.default.fields.TabField module<a class="headerlink" href="#module-appyter.profiles.default.fields.TabField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-tabfield-module"></span><h2>appyter.profiles.default.fields.TabField module<a class="headerlink" href="#module-appyter.profiles.default.fields.TabField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.TabField.TabField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.TabField.</code><code class="sig-name descname">TabField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TabField.TabField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.TabField.</span></span><span class="sig-name descname"><span class="pre">TabField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Representing a tab field which contains inner fields to choose from.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">appyter</span> <span class="n">hide_code</span>
 <span class="p">{</span><span class="o">%</span> <span class="n">myfield</span> <span class="o">=</span> <span class="n">TabField</span><span class="p">(</span>
@@ -763,23 +754,28 @@ Should be overridden by subclasses.</p>
     <span class="p">]</span>
   <span class="p">}</span>
 <span class="p">)</span> <span class="o">%</span><span class="p">}</span>
-
-<span class="p">:</span><span class="n">param</span> <span class="n">name</span><span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="n">A</span> <span class="n">name</span> <span class="n">that</span> <span class="n">will</span> <span class="n">be</span> <span class="n">used</span> <span class="n">to</span> <span class="n">refer</span> <span class="n">to</span> <span class="n">the</span> <span class="nb">object</span> <span class="k">as</span> <span class="n">a</span> <span class="n">variable</span> <span class="ow">and</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">HTML</span> <span class="n">form</span><span class="o">.</span>
-<span class="p">:</span><span class="n">param</span> <span class="n">label</span><span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="n">A</span> <span class="n">human</span> <span class="n">readable</span> <span class="n">label</span> <span class="k">for</span> <span class="n">the</span> <span class="n">field</span> <span class="k">for</span> <span class="n">the</span> <span class="n">HTML</span> <span class="n">form</span>
-<span class="p">:</span><span class="n">param</span> <span class="n">description</span><span class="p">:</span> <span class="p">(</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="n">A</span> <span class="n">long</span> <span class="n">human</span> <span class="n">readable</span> <span class="n">description</span> <span class="k">for</span> <span class="n">the</span> <span class="n">field</span> <span class="k">for</span> <span class="n">the</span> <span class="n">HTML</span> <span class="n">form</span>
-<span class="p">:</span><span class="n">param</span> \<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Additional</span> <span class="n">keyword</span> <span class="n">arguments</span> <span class="n">used</span> <span class="n">by</span> <span class="n">other</span> <span class="n">fields</span>
 </pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
+<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
+<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments used by other fields</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.TabField.TabField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TabField.TabField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.TabField.TabField.prepare">
-<code class="sig-name descname">prepare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">req</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField.prepare" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TabField.TabField.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TabField.html#TabField.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.TabField.TabField.prepare" title="Link to this definition">¶</a></dt>
 <dd><p>Given a flask request, capture relevant variables for this field</p>
 </dd></dl>
 
@@ -787,11 +783,11 @@ Should be overridden by subclasses.</p>
 
 </section>
 <section id="module-appyter.profiles.default.fields.TextField">
-<span id="appyter-profiles-default-fields-textfield-module"></span><h2>appyter.profiles.default.fields.TextField module<a class="headerlink" href="#module-appyter.profiles.default.fields.TextField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-textfield-module"></span><h2>appyter.profiles.default.fields.TextField module<a class="headerlink" href="#module-appyter.profiles.default.fields.TextField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.TextField.TextField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.TextField.</code><code class="sig-name descname">TextField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">required</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextField.html#TextField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextField.TextField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TextField.TextField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.TextField.</span></span><span class="sig-name descname"><span class="pre">TextField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextField.html#TextField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextField.TextField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Representing a field that accepts a multi-line string</p>
 <p>Be careful with this field, consider defining a constraint regex.</p>
 <dl class="field-list simple">
@@ -809,44 +805,41 @@ Should be overridden by subclasses.</p>
 <li><p><strong>cols</strong> – (Optional[int]) The number of cols (horizontal characters) in the textarea</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
-<li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Remaining arguments passed down to <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a>’s constructor.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.TextField.TextField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextField.html#TextField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextField.TextField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TextField.TextField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextField.html#TextField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextField.TextField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.TextField.TextField.safe_value">
-<em class="property">property </em><code class="sig-name descname">safe_value</code><a class="headerlink" href="#appyter.profiles.default.fields.TextField.TextField.safe_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>(SAFE) Effective safe value for use in code, we use <code class="docutils literal notranslate"><span class="pre">repr</span></code> to escape values as necessary</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TextField.TextField.safe_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">safe_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.TextField.TextField.safe_value" title="Link to this definition">¶</a></dt>
+<dd><p>(SAFE) Effective safe value for use in code, we use <cite>repr</cite> to escape values as necessary</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.TextField.TextField.to_jsonschema">
-<code class="sig-name descname">to_jsonschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextField.html#TextField.to_jsonschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextField.TextField.to_jsonschema" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TextField.TextField.to_jsonschema">
+<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextField.html#TextField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextField.TextField.to_jsonschema" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </section>
 <section id="module-appyter.profiles.default.fields.TextListField">
-<span id="appyter-profiles-default-fields-textlistfield-module"></span><h2>appyter.profiles.default.fields.TextListField module<a class="headerlink" href="#module-appyter.profiles.default.fields.TextListField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-textlistfield-module"></span><h2>appyter.profiles.default.fields.TextListField module<a class="headerlink" href="#module-appyter.profiles.default.fields.TextListField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.TextListField.TextListField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.TextListField.</code><code class="sig-name descname">TextListField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">constraint</span><span class="o">=</span><span class="default_value">'[^\\n]*'</span></em>, <em class="sig-param"><span class="n">hint</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TextListField.TextListField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.TextListField.</span></span><span class="sig-name descname"><span class="pre">TextListField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'[^\\n]*'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
 <p>Representing a field that accepts a set of strings separated by newlines</p>
-<p>Be careful with this field, consider defining a constraint regex.
-Unlike <a class="reference internal" href="#module-appyter.profiles.default.fields.TextField" title="appyter.profiles.default.fields.TextField"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.profiles.default.fields.TextField</span></code></a>, this class will return</p>
-<blockquote>
-<div><p>a list and potentially render differently.</p>
-</div></blockquote>
+<p>Be careful with this field, consider defining a constraint regex.</p>
+<p>Unlike <a class="reference internal" href="#module-appyter.profiles.default.fields.TextField" title="appyter.profiles.default.fields.TextField"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.profiles.default.fields.TextField</span></code></a>, this class will return
+a list and potentially render differently.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -863,47 +856,46 @@ Unlike <a class="reference internal" href="#module-appyter.profiles.default.fiel
 <li><p><strong>cols</strong> – (Optional[int]) The number of cols (horizontal characters) in the textarea</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
-<li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Remaining arguments passed down to <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a>’s constructor.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.TextListField.TextListField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TextListField.TextListField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Return true if the received args.value satisfies constraints.
 Should be overridden by subclasses.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.TextListField.TextListField.raw_value">
-<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TextListField.TextListField.raw_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.raw_value" title="Link to this definition">¶</a></dt>
 <dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.TextListField.TextListField.to_click">
-<code class="sig-name descname">to_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField.to_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.to_click" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TextListField.TextListField.to_click">
+<span class="sig-name descname"><span class="pre">to_click</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField.to_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.to_click" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.TextListField.TextListField.to_cwl">
-<code class="sig-name descname">to_cwl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField.to_cwl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.to_cwl" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TextListField.TextListField.to_cwl">
+<span class="sig-name descname"><span class="pre">to_cwl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField.to_cwl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.to_cwl" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.TextListField.TextListField.to_cwl_value">
-<code class="sig-name descname">to_cwl_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField.to_cwl_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.to_cwl_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TextListField.TextListField.to_cwl_value">
+<span class="sig-name descname"><span class="pre">to_cwl_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField.to_cwl_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.to_cwl_value" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.TextListField.TextListField.to_jsonschema">
-<code class="sig-name descname">to_jsonschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField.to_jsonschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.to_jsonschema" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TextListField.TextListField.to_jsonschema">
+<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/TextListField.html#TextListField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.to_jsonschema" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.TextListField.TextListField.value">
-<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.TextListField.TextListField.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.TextListField.TextListField.value" title="Link to this definition">¶</a></dt>
 <dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
 When instantiating code, you should use safe_value.</p>
 </dd></dl>
@@ -912,13 +904,12 @@ When instantiating code, you should use safe_value.</p>
 
 </section>
 <section id="module-appyter.profiles.default.fields.VariableField">
-<span id="appyter-profiles-default-fields-variablefield-module"></span><h2>appyter.profiles.default.fields.VariableField module<a class="headerlink" href="#module-appyter.profiles.default.fields.VariableField" title="Permalink to this headline">¶</a></h2>
+<span id="appyter-profiles-default-fields-variablefield-module"></span><h2>appyter.profiles.default.fields.VariableField module<a class="headerlink" href="#module-appyter.profiles.default.fields.VariableField" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt id="appyter.profiles.default.fields.VariableField.VariableField">
-<em class="property">class </em><code class="sig-prename descclassname">appyter.profiles.default.fields.VariableField.</code><code class="sig-name descname">VariableField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">field</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/VariableField.html#VariableField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a></p>
-<p>Represing a variable number of instances of a given Field
-Usage:</p>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.VariableField.VariableField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.VariableField.</span></span><span class="sig-name descname"><span class="pre">VariableField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/VariableField.html#VariableField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
+<p>Represing a variable number of instances of a given Field</p>
 <div class="highlight-j2 notranslate"><div class="highlight"><pre><span></span>{{ VariableField(
   nane=&#39;files&#39;
   label=&#39;Files&#39;,
@@ -944,48 +935,49 @@ Usage:</p>
 <li><p><strong>max</strong> – (int) The maximum number of fields that can be specified</p></li>
 <li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
 <li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
-<li><p><strong>**kwargs</strong> – <p>Remaining arguments passed down to :class:<code class="docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code>’s constructor.</p>
-</p></li>
+<li><p><strong>**kwargs</strong> – Remaining arguments passed down to <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a>’s constructor.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.VariableField.VariableField.constraint">
-<code class="sig-name descname">constraint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/VariableField.html#VariableField.constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField.constraint" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.VariableField.VariableField.constraint">
+<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/VariableField.html#VariableField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField.constraint" title="Link to this definition">¶</a></dt>
 <dd><p>Number of values should satisfy bounded constraints and
 all values should satisfy the field constraints.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="appyter.profiles.default.fields.VariableField.VariableField.prepare">
-<code class="sig-name descname">prepare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">req</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/VariableField.html#VariableField.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField.prepare" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.VariableField.VariableField.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/VariableField.html#VariableField.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField.prepare" title="Link to this definition">¶</a></dt>
 <dd><p>Typically, you’ll just provide a list of values satisfying the Field type,
 for forms we support json pointer refs for compatibility with older form fields – these
 pointers are resolved during prepare. Basically:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
-  &quot;variablefield&quot;: [{&quot;$ref&quot;:&quot;#/singlefield0&quot;},{&quot;$ref&quot;:&quot;#/singlefield1&quot;}],
-  &quot;singlefield0&quot;: &quot;a&quot;,
-  &quot;singlefield1&quot;: &quot;b&quot;
-}
-```json
-Will resolve to
-```json
-{&quot;variablefield&quot;: [&quot;a&quot;, &quot;b&quot;]}
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;variablefield&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="s2">&quot;#/singlefield0&quot;</span><span class="p">},{</span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="s2">&quot;#/singlefield1&quot;</span><span class="p">}],</span>
+<span class="w">  </span><span class="nt">&quot;singlefield0&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;a&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;singlefield1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;b&quot;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p>Letting us construct the form as before but permitting us to reference form fields
-generated on the fly that end up in the form request.</p>
+<p>Will resolve to</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;variablefield&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;b&quot;</span><span class="p">]}</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>Letting us construct the form as before but permitting us to reference form fields</dt><dd><p>generated on the fly that end up in the form request.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.VariableField.VariableField.raw_value">
-<em class="property">property </em><code class="sig-name descname">raw_value</code><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField.raw_value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.VariableField.VariableField.raw_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField.raw_value" title="Link to this definition">¶</a></dt>
 <dd><p>(UNSAFE) Raw value of the field</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="appyter.profiles.default.fields.VariableField.VariableField.value">
-<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField.value" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="appyter.profiles.default.fields.VariableField.VariableField.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.VariableField.VariableField.value" title="Link to this definition">¶</a></dt>
 <dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
 When instantiating code, you should use safe_value.</p>
 </dd></dl>
@@ -994,7 +986,7 @@ When instantiating code, you should use safe_value.</p>
 
 </section>
 <section id="module-appyter.profiles.default.fields">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.profiles.default.fields" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-appyter.profiles.default.fields" title="Link to this heading">¶</a></h2>
 <dl class="simple">
 <dt>Filters represent classes derived from <code class="xref py py-class docutils literal notranslate"><span class="pre">appyters.fields.Field</span></code></dt><dd><p>implementing more specific field types and are rendered in
 <code class="xref py py-mod docutils literal notranslate"><span class="pre">appyters.profiles.default.templates</span></code>. The various other profiles
@@ -1009,33 +1001,197 @@ can be used to extend or override those definitions.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">appyter.profiles.default.fields package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.AutocompleteField">appyter.profiles.default.fields.AutocompleteField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.BoolField">appyter.profiles.default.fields.BoolField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.ChoiceField">appyter.profiles.default.fields.ChoiceField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.DescriptionField">appyter.profiles.default.fields.DescriptionField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.FileField">appyter.profiles.default.fields.FileField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.FloatField">appyter.profiles.default.fields.FloatField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.IntField">appyter.profiles.default.fields.IntField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.MultiCheckboxField">appyter.profiles.default.fields.MultiCheckboxField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.MultiChoiceField">appyter.profiles.default.fields.MultiChoiceField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.MultiFileField">appyter.profiles.default.fields.MultiFileField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.SectionField">appyter.profiles.default.fields.SectionField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.StringField">appyter.profiles.default.fields.StringField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.TabField">appyter.profiles.default.fields.TabField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.TextField">appyter.profiles.default.fields.TextField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.TextListField">appyter.profiles.default.fields.TextListField module</a></li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.VariableField">appyter.profiles.default.fields.VariableField module</a></li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.AutocompleteField">appyter.profiles.default.fields.AutocompleteField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.AutocompleteField.AutocompleteField"><code class="docutils literal notranslate"><span class="pre">AutocompleteField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.AutocompleteField.AutocompleteField.constraint"><code class="docutils literal notranslate"><span class="pre">AutocompleteField.constraint()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.BoolField">appyter.profiles.default.fields.BoolField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.BoolField.BoolField"><code class="docutils literal notranslate"><span class="pre">BoolField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.BoolField.BoolField.choices"><code class="docutils literal notranslate"><span class="pre">BoolField.choices</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.BoolField.BoolField.raw_value"><code class="docutils literal notranslate"><span class="pre">BoolField.raw_value</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.BoolField.BoolField.to_click"><code class="docutils literal notranslate"><span class="pre">BoolField.to_click()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.BoolField.BoolField.to_cwl"><code class="docutils literal notranslate"><span class="pre">BoolField.to_cwl()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.BoolField.BoolField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">BoolField.to_jsonschema()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.ChoiceField">appyter.profiles.default.fields.ChoiceField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField"><code class="docutils literal notranslate"><span class="pre">ChoiceField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField.constraint"><code class="docutils literal notranslate"><span class="pre">ChoiceField.constraint()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.ChoiceField.ChoiceField.safe_value"><code class="docutils literal notranslate"><span class="pre">ChoiceField.safe_value</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.DescriptionField">appyter.profiles.default.fields.DescriptionField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField"><code class="docutils literal notranslate"><span class="pre">DescriptionField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.raw_value"><code class="docutils literal notranslate"><span class="pre">DescriptionField.raw_value</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.to_click"><code class="docutils literal notranslate"><span class="pre">DescriptionField.to_click()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.to_cwl"><code class="docutils literal notranslate"><span class="pre">DescriptionField.to_cwl()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.to_cwl_value"><code class="docutils literal notranslate"><span class="pre">DescriptionField.to_cwl_value()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.DescriptionField.DescriptionField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">DescriptionField.to_jsonschema()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.FileField">appyter.profiles.default.fields.FileField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField"><code class="docutils literal notranslate"><span class="pre">FileField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.constraint"><code class="docutils literal notranslate"><span class="pre">FileField.constraint()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.prepare"><code class="docutils literal notranslate"><span class="pre">FileField.prepare()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.prepare_uri"><code class="docutils literal notranslate"><span class="pre">FileField.prepare_uri()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.public_url"><code class="docutils literal notranslate"><span class="pre">FileField.public_url</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.raw_value"><code class="docutils literal notranslate"><span class="pre">FileField.raw_value</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.to_cwl"><code class="docutils literal notranslate"><span class="pre">FileField.to_cwl()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.to_cwl_value"><code class="docutils literal notranslate"><span class="pre">FileField.to_cwl_value()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">FileField.to_jsonschema()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.uri"><code class="docutils literal notranslate"><span class="pre">FileField.uri</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.value"><code class="docutils literal notranslate"><span class="pre">FileField.value</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.FloatField">appyter.profiles.default.fields.FloatField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FloatField.FloatField"><code class="docutils literal notranslate"><span class="pre">FloatField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FloatField.FloatField.constraint"><code class="docutils literal notranslate"><span class="pre">FloatField.constraint()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FloatField.FloatField.raw_value"><code class="docutils literal notranslate"><span class="pre">FloatField.raw_value</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FloatField.FloatField.to_click"><code class="docutils literal notranslate"><span class="pre">FloatField.to_click()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FloatField.FloatField.to_cwl"><code class="docutils literal notranslate"><span class="pre">FloatField.to_cwl()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.FloatField.FloatField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">FloatField.to_jsonschema()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.IntField">appyter.profiles.default.fields.IntField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.IntField.IntField"><code class="docutils literal notranslate"><span class="pre">IntField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.IntField.IntField.constraint"><code class="docutils literal notranslate"><span class="pre">IntField.constraint()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.IntField.IntField.raw_value"><code class="docutils literal notranslate"><span class="pre">IntField.raw_value</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.IntField.IntField.to_click"><code class="docutils literal notranslate"><span class="pre">IntField.to_click()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.IntField.IntField.to_cwl"><code class="docutils literal notranslate"><span class="pre">IntField.to_cwl()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.IntField.IntField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">IntField.to_jsonschema()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.MultiCheckboxField">appyter.profiles.default.fields.MultiCheckboxField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField"><code class="docutils literal notranslate"><span class="pre">MultiCheckboxField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.constraint"><code class="docutils literal notranslate"><span class="pre">MultiCheckboxField.constraint()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.raw_value"><code class="docutils literal notranslate"><span class="pre">MultiCheckboxField.raw_value</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_click"><code class="docutils literal notranslate"><span class="pre">MultiCheckboxField.to_click()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_cwl"><code class="docutils literal notranslate"><span class="pre">MultiCheckboxField.to_cwl()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_cwl_value"><code class="docutils literal notranslate"><span class="pre">MultiCheckboxField.to_cwl_value()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">MultiCheckboxField.to_jsonschema()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiCheckboxField.MultiCheckboxField.value"><code class="docutils literal notranslate"><span class="pre">MultiCheckboxField.value</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.MultiChoiceField">appyter.profiles.default.fields.MultiChoiceField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField"><code class="docutils literal notranslate"><span class="pre">MultiChoiceField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.constraint"><code class="docutils literal notranslate"><span class="pre">MultiChoiceField.constraint()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.raw_value"><code class="docutils literal notranslate"><span class="pre">MultiChoiceField.raw_value</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_click"><code class="docutils literal notranslate"><span class="pre">MultiChoiceField.to_click()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl"><code class="docutils literal notranslate"><span class="pre">MultiChoiceField.to_cwl()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_cwl_value"><code class="docutils literal notranslate"><span class="pre">MultiChoiceField.to_cwl_value()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">MultiChoiceField.to_jsonschema()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiChoiceField.MultiChoiceField.value"><code class="docutils literal notranslate"><span class="pre">MultiChoiceField.value</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.MultiFileField">appyter.profiles.default.fields.MultiFileField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField"><code class="docutils literal notranslate"><span class="pre">MultiFileField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.constraint"><code class="docutils literal notranslate"><span class="pre">MultiFileField.constraint()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.prepare"><code class="docutils literal notranslate"><span class="pre">MultiFileField.prepare()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.public_url"><code class="docutils literal notranslate"><span class="pre">MultiFileField.public_url</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.public_urls"><code class="docutils literal notranslate"><span class="pre">MultiFileField.public_urls</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.raw_value"><code class="docutils literal notranslate"><span class="pre">MultiFileField.raw_value</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_click"><code class="docutils literal notranslate"><span class="pre">MultiFileField.to_click()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl"><code class="docutils literal notranslate"><span class="pre">MultiFileField.to_cwl()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl_value"><code class="docutils literal notranslate"><span class="pre">MultiFileField.to_cwl_value()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">MultiFileField.to_jsonschema()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.uri"><code class="docutils literal notranslate"><span class="pre">MultiFileField.uri</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.uris"><code class="docutils literal notranslate"><span class="pre">MultiFileField.uris</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.value"><code class="docutils literal notranslate"><span class="pre">MultiFileField.value</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.SectionField">appyter.profiles.default.fields.SectionField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.SectionField.SectionField"><code class="docutils literal notranslate"><span class="pre">SectionField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.SectionField.SectionField.raw_value"><code class="docutils literal notranslate"><span class="pre">SectionField.raw_value</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.SectionField.SectionField.to_click"><code class="docutils literal notranslate"><span class="pre">SectionField.to_click()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.SectionField.SectionField.to_cwl"><code class="docutils literal notranslate"><span class="pre">SectionField.to_cwl()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.SectionField.SectionField.to_cwl_value"><code class="docutils literal notranslate"><span class="pre">SectionField.to_cwl_value()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.SectionField.SectionField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">SectionField.to_jsonschema()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.StringField">appyter.profiles.default.fields.StringField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.StringField.StringField"><code class="docutils literal notranslate"><span class="pre">StringField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.StringField.StringField.constraint"><code class="docutils literal notranslate"><span class="pre">StringField.constraint()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.StringField.StringField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">StringField.to_jsonschema()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.TabField">appyter.profiles.default.fields.TabField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TabField.TabField"><code class="docutils literal notranslate"><span class="pre">TabField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TabField.TabField.constraint"><code class="docutils literal notranslate"><span class="pre">TabField.constraint()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TabField.TabField.prepare"><code class="docutils literal notranslate"><span class="pre">TabField.prepare()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.TextField">appyter.profiles.default.fields.TextField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TextField.TextField"><code class="docutils literal notranslate"><span class="pre">TextField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TextField.TextField.constraint"><code class="docutils literal notranslate"><span class="pre">TextField.constraint()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TextField.TextField.safe_value"><code class="docutils literal notranslate"><span class="pre">TextField.safe_value</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TextField.TextField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">TextField.to_jsonschema()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.TextListField">appyter.profiles.default.fields.TextListField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TextListField.TextListField"><code class="docutils literal notranslate"><span class="pre">TextListField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TextListField.TextListField.constraint"><code class="docutils literal notranslate"><span class="pre">TextListField.constraint()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TextListField.TextListField.raw_value"><code class="docutils literal notranslate"><span class="pre">TextListField.raw_value</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TextListField.TextListField.to_click"><code class="docutils literal notranslate"><span class="pre">TextListField.to_click()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TextListField.TextListField.to_cwl"><code class="docutils literal notranslate"><span class="pre">TextListField.to_cwl()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TextListField.TextListField.to_cwl_value"><code class="docutils literal notranslate"><span class="pre">TextListField.to_cwl_value()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TextListField.TextListField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">TextListField.to_jsonschema()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.TextListField.TextListField.value"><code class="docutils literal notranslate"><span class="pre">TextListField.value</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-appyter.profiles.default.fields.VariableField">appyter.profiles.default.fields.VariableField module</a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.VariableField.VariableField"><code class="docutils literal notranslate"><span class="pre">VariableField</span></code></a><ul>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.VariableField.VariableField.constraint"><code class="docutils literal notranslate"><span class="pre">VariableField.constraint()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.VariableField.VariableField.prepare"><code class="docutils literal notranslate"><span class="pre">VariableField.prepare()</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.VariableField.VariableField.raw_value"><code class="docutils literal notranslate"><span class="pre">VariableField.raw_value</span></code></a></li>
+<li><a class="reference internal" href="#appyter.profiles.default.fields.VariableField.VariableField.value"><code class="docutils literal notranslate"><span class="pre">VariableField.value</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields">Module contents</a></li>
 </ul>
 </li>
 </ul>
 
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -1043,21 +1199,21 @@ can be used to extend or override those definitions.</p>
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -1071,8 +1227,8 @@ can be used to extend or override those definitions.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Ma&#39;ayanlab.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.1.
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     </div>
   </body>
 </html>
