@@ -74,7 +74,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
   try:
     files = nb.metadata['appyter']['nbconstruct'].get('files')
     logger.debug(f"{cwd=} {files=}")
-    async with ensure_async_contextmanager(url_to_chroot_fs(cwd, pathmap=files)) as fs:
+    async with ensure_async_contextmanager(url_to_chroot_fs(cwd, pathmap=files, cached=fuse)) as fs:
       async with ensure_async_contextmanager(fs.mount(fuse=fuse)) as mnt:
         # setup execution_info with start time
         nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
