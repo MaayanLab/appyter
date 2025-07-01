@@ -129,7 +129,7 @@ class KubernetesExecutor(AbstractExecutor):
 
   async def _run(self, **job):
     yield dict(type='status', data=f"Submitting appyter for execution..")
-    await async_try_n_times(3, self._submit, job, namespace=self.executor_options.get('namespace', 'default'))
+    await self._submit(job, namespace=self.executor_options.get('namespace', 'default'))
     yield dict(type='status', data=f"Queued successfully, your execution will begin when resources are available..")
     # TODO: kubernetes probably reports some additional status we can report
     await self._wait_for(job['id'], namespace=self.executor_options.get('namespace', 'default'), debug=self.executor_options.get('debug'))
