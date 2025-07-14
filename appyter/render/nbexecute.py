@@ -13,7 +13,7 @@ from appyter import __version__
 from appyter.cli import cli
 from appyter.ext.emitter import json_emitter_factory
 from appyter.ext.fsspec.core import url_to_chroot_fs
-from appyter.ext.asyncio.helpers import ensure_async_contextmanager, ensure_sync
+from appyter.ext.asyncio.helpers import ensure_async_contextmanager, ensure_sync, ensure_async
 from appyter.ext.nbclient import NotebookClientIOPubHook
 from appyter.parse.nb import nb_from_ipynb_io, nb_to_ipynb_io, nb_to_json
 from appyter.ext.click import click_option_setenv, click_argument_setenv
@@ -33,11 +33,32 @@ def iopub_hook_factory(nb, emit):
     await emit({ 'type': 'cell', 'data': [cell, cell_index] })
   return iopub_hook
 
+def nb_from_storage(cwd, ipynb):
+  with fsspec.open(str(URI(cwd).join(ipynb)), 'r') as fr:
+    return nb_from_ipynb_io(fr)
+nb_from_storage_async = ensure_async(nb_from_storage)
+
+def nb_files_from_disk(mnt: pathlib.Path, ipynb, files: dict):
+  return {
+    path: path
+    for path in (
+      str(p.relative_to(mnt))
+      for p in mnt.rglob('*')
+      if p.is_file()
+    )
+    if path not in (files.keys()|{ipynb})
+  }
+nb_files_from_disk_async = ensure_async(nb_files_from_disk)
+
+def nb_to_disk(nb, mnt: pathlib.Path, ipynb):
+  with (mnt/ipynb).open('w') as fw:
+    nb_to_ipynb_io(nb, fw)
+nb_to_disk_async = ensure_async(nb_to_disk)
+
 async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='', subscribe=None, fuse=False):
   logger.info('starting')
   assert callable(emit), 'Emit must be callable'
-  with fsspec.open(str(URI(cwd).join(ipynb)), 'r') as fr:
-    nb = nb_from_ipynb_io(fr)
+  nb = await nb_from_storage_async(cwd, ipynb)
   #
   if 'appyter' not in nb.metadata:
     logger.warning('detected legacy format, upgrading..')
@@ -78,8 +99,7 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
       async with ensure_async_contextmanager(fs.mount(fuse=fuse)) as mnt:
         # setup execution_info with start time
         nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
-        with (mnt/ipynb).open('w') as fw:
-          nb_to_ipynb_io(nb, fw)
+        await nb_to_disk_async(nb, mnt, ipynb)
         #
         logger.info('initializing')
         if callable(subscribe):
@@ -132,21 +152,9 @@ async def nbexecute_async(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='
           await emit({ 'type': 'error', 'data': str(e) })
         # Save execution completion time
         logger.info('saving')
+        nb.metadata['appyter']['nbexecute']['files'] = await nb_files_from_disk_async(mnt, ipynb, files)
         nb.metadata['appyter']['nbexecute']['completed'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
-        # save additional files
-        # TODO: in the future we should individual files and include the original urls here
-        nb.metadata['appyter']['nbexecute']['files'] = {
-          path: path
-          for path in (
-            str(p.relative_to(mnt))
-            for p in mnt.rglob('*')
-            if p.is_file()
-          )
-          if path not in (files.keys()|{ipynb})
-        }
-        #
-        with (mnt/ipynb).open('w') as fw:
-          nb_to_ipynb_io(nb, fw)
+        await nb_to_disk_async(nb, mnt, ipynb)
         #
         logger.info('finalized')
   except asyncio.CancelledError:
