@@ -42,30 +42,13 @@
       <div class="offset-sm-2 col-sm-8 col-md-12">
         <div class="mt-5">
           <legend>Table Of Contents</legend>
-          <a href="#abstract" class="toc h2">
-            Abstract
-          </a>
-          <a href="#introduction" class="toc h2">
-            Introduction
-          </a>
-          <a href="#methods" class="toc h2">
-            Methods
-          </a>
-          <a href="#results" class="toc h2">
-            Results
-          </a>
-          <a href="#discussion" class="toc h2">
-            Discussion
-          </a>
-          <a href="#conclusions" class="toc h2">
-            Conclusions
-          </a>
-          <a href="#conclusions" class="toc h2">
-            References
-          </a>
+          {#each toc as {h, id, textContent}}
+            <a href="#{id}" class="toc h{h}">
+              {textContent}
+            </a>
+          {/each}
         </div>
       </div>
     </div>
   </div>
 {/if}
-        
