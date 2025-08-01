@@ -14,7 +14,9 @@ class AsyncServer(
   `async with` is necessary for initialization
   '''
   def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
+    ChunkedEmitMixin.__init__()
+    PriorityQueuedEmitMixin.__init__()
+    socketio.AsyncServer.__init__(*args, **kwargs)
     self._listeners = { 'forward': [] }
 
   async def __aenter__(self):
