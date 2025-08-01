@@ -7,9 +7,11 @@
       {%- if _config.PROXY %}
       proxy_set_header Host $http_x_forwarded_host;
       proxy_set_header X-Forwarded-For $http_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
       {% else %}
       proxy_set_header Host $http_host;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $proxy_add_x_forwarded_proto;
       {%- endif %}
       {%- if ws %}
       proxy_http_version 1.1;
