@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 
 from appyter.ext.socketio import AsyncServer
 
-socketio = AsyncServer(async_mode='aiohttp', cors_allowed_origins=[])
+socketio = AsyncServer(async_mode='aiohttp', cors_allowed_origins='*')
 
 @socketio.on('connect')
 async def _(sid, environ):
