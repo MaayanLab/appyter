@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.profiles.default.fields.FileField &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.profiles.default.fields.FileField</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.profiles.default.fields.FileField</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">FieldConstraintException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.render.flask_app.upload</span><span class="w"> </span><span class="kn">import</span> <span class="n">upload_from_request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">secure_filepath</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.urllib</span><span class="w"> </span><span class="kn">import</span> <span class="n">URI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.re</span><span class="w"> </span><span class="kn">import</span> <span class="n">re_full</span>
+
+<div class="viewcode-block" id="FileField">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.FileField.FileField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FileField</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
+<span class="w">  </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  Representing a File URL.</span>
+
+<span class="sd">  The field ends up being a string of the file path, which will be relative to the appyter notebook.</span>
+
+<span class="sd">  .. code-block:: python</span>
+
+<span class="sd">    import pandas as pd</span>
+<span class="sd">    df = pd.read_csv({{ FileField(name=&#39;my-csv&#39;, label=&#39;My CSV&#39;) }})</span>
+
+<span class="sd">  Importantly, a FileField ultimately resolves to a URL supporting several schemes. Appyters ensure</span>
+<span class="sd">   that url is available as an actual file when the appyter executes.</span>
+
+<span class="sd">  :param name: (str) A name that will be used to refer to the object as a variable and in the HTML form.</span>
+<span class="sd">  :param label: (str) A human readable label for the field for the HTML form</span>
+<span class="sd">  :param description: (Optional[str]) A long human readable description for the field for the HTML form</span>
+<span class="sd">  :param constraint: A regular expression for validating the file name.</span>
+<span class="sd">  :param required: (Optional[bool]) Whether or not this field is required (defaults to false)</span>
+<span class="sd">  :param default: (str) A default value as an example and for use during prototyping</span>
+<span class="sd">  :param storage: (Optional[str]) A storage prefix for browsing</span>
+<span class="sd">  :param examples: (Optional[Dict[str, str]]) Named url paths to example files to upload</span>
+<span class="sd">    paths can be relative i.e. `{ &quot;my_file.txt&quot;: url_for(&#39;static&#39;, filename=&#39;my_file.txt&#39;) }`, or a remote url.</span>
+<span class="sd">  :param section: (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</span>
+<span class="sd">  :param value: (INTERNAL Any) The raw value of the field (from the form for instance)</span>
+<span class="sd">  :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`&#39;s constructor.</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraint</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;.*&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+      <span class="n">constraint</span><span class="o">=</span><span class="n">constraint</span><span class="p">,</span>
+      <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span>
+      <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">raw_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="FileField.prepare_uri">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.FileField.FileField.prepare_uri">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">prepare_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; The fully resolved URI for this file</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">raw_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">uri_parsed</span> <span class="o">=</span> <span class="n">URI</span><span class="p">(</span><span class="n">raw_value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">uri_parsed</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">globals</span><span class="p">[</span><span class="s1">&#39;_config&#39;</span><span class="p">][</span><span class="s1">&#39;SAFE_MODE&#39;</span><span class="p">]:</span>
+        <span class="n">uri_parsed</span> <span class="o">=</span> <span class="p">(</span>
+          <span class="n">URI</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">globals</span><span class="p">[</span><span class="s1">&#39;_config&#39;</span><span class="p">][</span><span class="s1">&#39;PUBLIC_URL&#39;</span><span class="p">])</span>
+            <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;static&#39;</span><span class="p">,</span> <span class="n">uri_parsed</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">with_query_string</span><span class="p">(</span><span class="n">uri_parsed</span><span class="o">.</span><span class="n">query_string</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">with_fragment_path</span><span class="p">(</span><span class="n">secure_filepath</span><span class="p">(</span><span class="n">uri_parsed</span><span class="o">.</span><span class="n">fragment_name</span> <span class="ow">or</span> <span class="n">uri_parsed</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">with_fragment_query_string</span><span class="p">(</span><span class="n">uri_parsed</span><span class="o">.</span><span class="n">fragment_query_string</span><span class="p">)</span>
+        <span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">uri_parsed</span> <span class="o">=</span> <span class="n">uri_parsed</span><span class="o">.</span><span class="n">with_scheme</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">with_fragment_path</span><span class="p">(</span><span class="n">raw_value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">uri_parsed</span><span class="o">.</span><span class="n">fragment_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">uri_parsed</span> <span class="o">=</span> <span class="n">uri_parsed</span><span class="o">.</span><span class="n">with_fragment_path</span><span class="p">(</span><span class="n">uri_parsed</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">uri_parsed</span></div>
+
+
+  <span class="nd">@property</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">uri</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_uri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FileField.prepare">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.FileField.FileField.prepare">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; Convert file in request into URI</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">data_path</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># get data from request upload</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="s1">&#39;files&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+      <span class="n">data_path</span> <span class="o">=</span> <span class="n">upload_from_request</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+    <span class="c1"># fallback to default (URI in request)</span>
+    <span class="k">if</span> <span class="n">data_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">data_path</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">req</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span>
+    <span class="n">data_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_uri</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_path</span><span class="p">)}</span>
+    <span class="k">if</span> <span class="n">data_path</span><span class="o">.</span><span class="n">fragment_path</span><span class="p">:</span>
+      <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span> <span class="sa">f</span><span class="s2">&quot;_file:</span><span class="si">{</span><span class="n">data_path</span><span class="o">.</span><span class="n">fragment_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_path</span><span class="o">.</span><span class="n">with_fragment_path</span><span class="p">(</span><span class="kc">None</span><span class="p">))})</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="FileField.constraint">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.FileField.FileField.constraint">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="o">.</span><span class="n">globals</span><span class="p">[</span><span class="s1">&#39;_config&#39;</span><span class="p">][</span><span class="s1">&#39;SAFE_MODE&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;drs&#39;</span><span class="p">,</span> <span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="s1">&#39;gs&#39;</span><span class="p">,</span> <span class="s1">&#39;ftp&#39;</span><span class="p">,</span> <span class="s1">&#39;http&#39;</span><span class="p">,</span> <span class="s1">&#39;https&#39;</span><span class="p">,</span> <span class="s1">&#39;storage&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">}:</span>
+          <span class="k">return</span> <span class="kc">False</span>
+      <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">re_full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;constraint&#39;</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">fragment_path</span><span class="p">)</span></div>
+
+
+  <span class="nd">@property</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraint</span><span class="p">():</span>
+      <span class="k">raise</span> <span class="n">FieldConstraintException</span><span class="p">(</span>
+        <span class="n">field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="p">,</span>
+        <span class="n">field_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+        <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span><span class="p">,</span>
+      <span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">fragment_path</span>
+
+<div class="viewcode-block" id="FileField.to_cwl">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.FileField.FileField.to_cwl">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_cwl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_cwl</span><span class="p">()</span>
+    <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;File</span><span class="si">{</span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">True</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;?&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">schema</span></div>
+
+
+<div class="viewcode-block" id="FileField.to_cwl_value">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.FileField.FileField.to_cwl_value">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_cwl_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;File&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">with_fragment_path</span><span class="p">(</span><span class="kc">None</span><span class="p">)),</span>
+      <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">fragment_path</span><span class="p">,</span>
+    <span class="p">}</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="FileField.to_jsonschema">
+<a class="viewcode-back" href="../../../../../appyter.profiles.default.fields.html#appyter.profiles.default.fields.FileField.FileField.to_jsonschema">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">to_jsonschema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_jsonschema</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;constraint&#39;</span><span class="p">):</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;pattern&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re_full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;constraint&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">schema</span></div>
+
+
+  <span class="nd">@property</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">public_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">with_fragment_path</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.profiles.default.fields.FileField</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    </div>
+  </body>
+</html>

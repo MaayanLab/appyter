@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>appyter.extras.catalog_integration.userfs &#8212; Appyter 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/nature.css?v=0f882399" />
+    <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.extras.catalog_integration.userfs</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for appyter.extras.catalog_integration.userfs</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.asyncio.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_async</span><span class="p">,</span> <span class="n">ensure_async_contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">url_to_chroot_fs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.urllib</span><span class="w"> </span><span class="kn">import</span> <span class="n">URI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.extras.catalog_integration.uploads</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_files</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.extras.catalog_integration.user_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_user_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appyter.render.flask_app.upload</span><span class="w"> </span><span class="kn">import</span> <span class="n">organize_file_content</span>
+
+<div class="viewcode-block" id="create_userfs">
+<a class="viewcode-back" href="../../../../appyter.extras.catalog_integration.html#appyter.extras.catalog_integration.userfs.create_userfs">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_userfs</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+  <span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.fsspec.mapperfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">MapperFileSystem</span>
+  <span class="n">pathmap</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="n">user_config</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_user_config</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;_auth&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;_config&#39;</span><span class="p">])</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="k">await</span> <span class="n">list_files</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;_auth&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;_config&#39;</span><span class="p">])</span>
+    <span class="n">pathmap</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+      <span class="sa">f</span><span class="s2">&quot;uploads/</span><span class="si">{</span><span class="n">file</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+      <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span>
+    <span class="p">})</span>
+  <span class="k">except</span><span class="p">:</span>
+    <span class="k">pass</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cavatica_api_key&#39;</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">PermissionError</span>
+    <span class="k">assert</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^[0-9a-f]+$&#39;</span><span class="p">,</span> <span class="n">user_config</span><span class="p">[</span><span class="s1">&#39;cavatica_api_key&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Malformed CAVATICA API Key&#39;</span>
+    <span class="n">pathmap</span><span class="p">[</span><span class="s1">&#39;integrations/cavatica&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;chroot::sbfs://#?sbfs.auth_token=</span><span class="si">{</span><span class="n">user_config</span><span class="p">[</span><span class="s1">&#39;cavatica_api_key&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="k">except</span><span class="p">:</span>
+    <span class="k">pass</span>
+  <span class="k">return</span> <span class="n">MapperFileSystem</span><span class="p">(</span><span class="n">pathmap</span><span class="o">=</span><span class="n">pathmap</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="upload_user_to_storage">
+<a class="viewcode-back" href="../../../../appyter.extras.catalog_integration.html#appyter.extras.catalog_integration.userfs.upload_user_to_storage">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">upload_user_to_storage</span><span class="p">(</span><span class="n">storage</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&#39;&#39;&#39; Convert all `user://` file_uris into `drs://` or `storage://` uris</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="c1"># TODO: this is a hack for now,</span>
+  <span class="c1">#  the whole thing should probably be part of the file field</span>
+  <span class="n">files</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">k</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;_file:&#39;</span><span class="p">):]:</span> <span class="n">v</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_file:&#39;</span><span class="p">)</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+    <span class="n">file_uri</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;user://&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">file_uri</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+  <span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">appyter.ext.dict</span><span class="w"> </span><span class="kn">import</span> <span class="n">dict_typed_flatten</span><span class="p">,</span> <span class="n">dict_typed_unflatten</span>
+    <span class="n">flat_data</span> <span class="o">=</span> <span class="n">dict_typed_flatten</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">ensure_async_contextmanager</span><span class="p">(</span><span class="k">await</span> <span class="n">create_userfs</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="k">as</span> <span class="n">userfs</span><span class="p">:</span>
+      <span class="k">async</span> <span class="k">with</span> <span class="n">ensure_async_contextmanager</span><span class="p">(</span><span class="n">url_to_chroot_fs</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">URI</span><span class="p">(</span><span class="n">storage</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">))))</span> <span class="k">as</span> <span class="n">storagefs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">file_uri</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+          <span class="k">if</span> <span class="n">file_uri</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;user://&#39;</span><span class="p">):</span>
+            <span class="n">existing_file_uri</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">URI</span><span class="p">(</span><span class="n">file_uri</span><span class="p">)</span><span class="o">.</span><span class="n">with_fragment_path</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+              <span class="c1"># Use DRS if it&#39;s available</span>
+              <span class="n">new_file_uri_without_filename</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ensure_async</span><span class="p">(</span><span class="n">userfs</span><span class="o">.</span><span class="n">get_drs</span><span class="p">)(</span><span class="n">file_uri</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;user://&#39;</span><span class="p">):])</span>
+              <span class="n">new_file_uri</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">URI</span><span class="p">(</span><span class="n">new_file_uri_without_filename</span><span class="p">)</span><span class="o">.</span><span class="n">with_fragment_path</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+              <span class="c1"># Otherwise put it into `storage://`</span>
+              <span class="n">new_file_uri</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ensure_async</span><span class="p">(</span><span class="n">organize_file_content</span><span class="p">)(</span><span class="n">storagefs</span><span class="p">,</span> <span class="n">userfs</span><span class="p">,</span> <span class="n">file_uri</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;user://&#39;</span><span class="p">):],</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+              <span class="n">new_file_uri_without_filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">URI</span><span class="p">(</span><span class="n">new_file_uri</span><span class="p">)</span><span class="o">.</span><span class="n">with_fragment_path</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+            <span class="c1"># replace the uri if it appears in `data`</span>
+            <span class="n">flat_data</span> <span class="o">=</span> <span class="p">[</span>
+              <span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">new_file_uri_without_filename</span><span class="p">)</span> <span class="k">if</span> <span class="n">K</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;_file:</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">else</span> <span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">new_file_uri</span> <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">existing_file_uri</span> <span class="k">else</span> <span class="n">v</span><span class="p">)</span>
+              <span class="k">for</span> <span class="n">K</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">flat_data</span>
+            <span class="p">]</span>
+    <span class="k">return</span> <span class="n">dict_typed_unflatten</span><span class="p">(</span><span class="n">flat_data</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">data</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Appyter 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">appyter.extras.catalog_integration.userfs</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2020, Ma&#39;ayanlab.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    </div>
+  </body>
+</html>
