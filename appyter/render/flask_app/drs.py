@@ -91,4 +91,4 @@ def drs_objects_fetch(file_id):
   except:
     return abort(404)
   #
-  return send_file(fs.open(file_info['name'], 'rb'), attachment_filename=url_filename(file_info['name']), conditional=True)
+  return send_file(fs.open(file_info['name'], 'rb'), as_attachment=True, download_name=url_filename(file_info['name']), conditional=True)

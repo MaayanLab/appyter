@@ -28,7 +28,7 @@ def export(path):
         if format == 'html':
           exporter = get_html_exporer()
           body, _rcs = exporter.from_notebook_node(nb)
-          return send_file(io.BytesIO(body.encode()), mimetype='text/html', as_attachment=True, attachment_filename='output.html')
+          return send_file(io.BytesIO(body.encode()), mimetype='text/html', as_attachment=True, download_name='output.html')
         elif format == 'zip':
           metadata = nb.get('metadata', {}).get('appyter', {})
           files = metadata.get('nbexecute', {}).get('files', metadata.get('nbconstruct', {}).get('files', {}))
@@ -42,5 +42,5 @@ def export(path):
                     with data_fs.open(f, 'rb') as fr:
                       with zf.open(f, 'w') as zfw:
                         shutil.copyfileobj(fr, zfw)
-            return send_file(tmp_fs.open('output.zip', 'rb'), mimetype='application/zip', as_attachment=True, attachment_filename='output.zip')
+            return send_file(tmp_fs.open('output.zip', 'rb'), mimetype='application/zip', as_attachment=True, download_name='output.zip')
   abort(404)
