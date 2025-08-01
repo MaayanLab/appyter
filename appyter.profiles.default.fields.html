@@ -222,99 +222,8 @@ Should be overridden by subclasses.</p>
 </dd></dl>
 
 </section>
-<section id="module-appyter.profiles.default.fields.FileField">
-<span id="appyter-profiles-default-fields-filefield-module"></span><h2>appyter.profiles.default.fields.FileField module<a class="headerlink" href="#module-appyter.profiles.default.fields.FileField" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.FileField.</span></span><span class="sig-name descname"><span class="pre">FileField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.*'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a></p>
-<p>Representing a File URL.</p>
-<p>The field ends up being a string of the file path, which will be relative to the appyter notebook.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">({{</span> <span class="n">FileField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;my-csv&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;My CSV&#39;</span><span class="p">)</span> <span class="p">}})</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt>Importantly, a FileField ultimately resolves to a URL supporting several schemes. Appyters ensure</dt><dd><p>that url is available as an actual file when the appyter executes.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – (str) A name that will be used to refer to the object as a variable and in the HTML form.</p></li>
-<li><p><strong>label</strong> – (str) A human readable label for the field for the HTML form</p></li>
-<li><p><strong>description</strong> – (Optional[str]) A long human readable description for the field for the HTML form</p></li>
-<li><p><strong>constraint</strong> – A regular expression for validating the file name.</p></li>
-<li><p><strong>required</strong> – (Optional[bool]) Whether or not this field is required (defaults to false)</p></li>
-<li><p><strong>default</strong> – (str) A default value as an example and for use during prototyping</p></li>
-<li><p><strong>storage</strong> – (Optional[str]) A storage prefix for browsing</p></li>
-<li><p><strong>examples</strong> – (Optional[Dict[str, str]]) Named url paths to example files to upload
-paths can be relative i.e. <cite>{ “my_file.txt”: url_for(‘static’, filename=’my_file.txt’) }</cite>, or a remote url.</p></li>
-<li><p><strong>section</strong> – (Optional[str]) The name of a SectionField for which to nest this field under, defaults to a root SectionField</p></li>
-<li><p><strong>value</strong> – (INTERNAL Any) The raw value of the field (from the form for instance)</p></li>
-<li><p><strong>**kwargs</strong> – Remaining arguments passed down to <a class="reference internal" href="appyter.html#appyter.fields.Field" title="appyter.fields.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">appyter.fields.Field</span></code></a>’s constructor.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.constraint">
-<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.constraint" title="Link to this definition">¶</a></dt>
-<dd><p>Return true if the received args.value satisfies constraints.
-Should be overridden by subclasses.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.prepare">
-<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.prepare" title="Link to this definition">¶</a></dt>
-<dd><p>Convert file in request into URI</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.prepare_uri">
-<span class="sig-name descname"><span class="pre">prepare_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.prepare_uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.prepare_uri" title="Link to this definition">¶</a></dt>
-<dd><p>The fully resolved URI for this file</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.public_url">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">public_url</span></span><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.public_url" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.raw_value">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.raw_value" title="Link to this definition">¶</a></dt>
-<dd><p>(UNSAFE) Raw value of the field</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.to_cwl">
-<span class="sig-name descname"><span class="pre">to_cwl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.to_cwl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.to_cwl" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.to_cwl_value">
-<span class="sig-name descname"><span class="pre">to_cwl_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.to_cwl_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.to_cwl_value" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.to_jsonschema">
-<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/FileField.html#FileField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.to_jsonschema" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.uri">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uri</span></span><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.uri" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.FileField.FileField.value">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.FileField.FileField.value" title="Link to this definition">¶</a></dt>
-<dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
-When instantiating code, you should use safe_value.</p>
-</dd></dl>
-
-</dd></dl>
-
+<section id="appyter-profiles-default-fields-filefield-module">
+<h2>appyter.profiles.default.fields.FileField module<a class="headerlink" href="#appyter-profiles-default-fields-filefield-module" title="Link to this heading">¶</a></h2>
 </section>
 <section id="module-appyter.profiles.default.fields.FloatField">
 <span id="appyter-profiles-default-fields-floatfield-module"></span><h2>appyter.profiles.default.fields.FloatField module<a class="headerlink" href="#module-appyter.profiles.default.fields.FloatField" title="Link to this heading">¶</a></h2>
@@ -559,80 +468,8 @@ When instantiating code, you should use safe_value.</p>
 </dd></dl>
 
 </section>
-<section id="module-appyter.profiles.default.fields.MultiFileField">
-<span id="appyter-profiles-default-fields-multifilefield-module"></span><h2>appyter.profiles.default.fields.MultiFileField module<a class="headerlink" href="#module-appyter.profiles.default.fields.MultiFileField" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">appyter.profiles.default.fields.MultiFileField.</span></span><span class="sig-name descname"><span class="pre">MultiFileField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiple</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField" title="appyter.profiles.default.fields.FileField.FileField"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileField</span></code></a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.constraint">
-<span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.constraint" title="Link to this definition">¶</a></dt>
-<dd><p>Return true if the received args.value satisfies constraints.
-Should be overridden by subclasses.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.prepare">
-<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.prepare" title="Link to this definition">¶</a></dt>
-<dd><p>Convert file in request into URI</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.public_url">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">public_url</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.public_url" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.public_urls">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">public_urls</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.public_urls" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.raw_value">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">raw_value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.raw_value" title="Link to this definition">¶</a></dt>
-<dd><p>(UNSAFE) Raw value of the field</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.to_click">
-<span class="sig-name descname"><span class="pre">to_click</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.to_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_click" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl">
-<span class="sig-name descname"><span class="pre">to_cwl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.to_cwl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl_value">
-<span class="sig-name descname"><span class="pre">to_cwl_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.to_cwl_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl_value" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.to_jsonschema">
-<span class="sig-name descname"><span class="pre">to_jsonschema</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appyter/profiles/default/fields/MultiFileField.html#MultiFileField.to_jsonschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_jsonschema" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.uri">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uri</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.uri" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.uris">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uris</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.uris" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="appyter.profiles.default.fields.MultiFileField.MultiFileField.value">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.value" title="Link to this definition">¶</a></dt>
-<dd><p>(SEMI-SAFE) Effective raw value of the field when parsed and constraints are asserted.
-When instantiating code, you should use safe_value.</p>
-</dd></dl>
-
-</dd></dl>
-
+<section id="appyter-profiles-default-fields-multifilefield-module">
+<h2>appyter.profiles.default.fields.MultiFileField module<a class="headerlink" href="#appyter-profiles-default-fields-multifilefield-module" title="Link to this heading">¶</a></h2>
 </section>
 <section id="module-appyter.profiles.default.fields.SectionField">
 <span id="appyter-profiles-default-fields-sectionfield-module"></span><h2>appyter.profiles.default.fields.SectionField module<a class="headerlink" href="#module-appyter.profiles.default.fields.SectionField" title="Link to this heading">¶</a></h2>
@@ -1045,22 +882,7 @@ can be used to extend or override those definitions.</p>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.FileField">appyter.profiles.default.fields.FileField module</a><ul>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField"><code class="docutils literal notranslate"><span class="pre">FileField</span></code></a><ul>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.constraint"><code class="docutils literal notranslate"><span class="pre">FileField.constraint()</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.prepare"><code class="docutils literal notranslate"><span class="pre">FileField.prepare()</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.prepare_uri"><code class="docutils literal notranslate"><span class="pre">FileField.prepare_uri()</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.public_url"><code class="docutils literal notranslate"><span class="pre">FileField.public_url</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.raw_value"><code class="docutils literal notranslate"><span class="pre">FileField.raw_value</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.to_cwl"><code class="docutils literal notranslate"><span class="pre">FileField.to_cwl()</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.to_cwl_value"><code class="docutils literal notranslate"><span class="pre">FileField.to_cwl_value()</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">FileField.to_jsonschema()</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.uri"><code class="docutils literal notranslate"><span class="pre">FileField.uri</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.FileField.FileField.value"><code class="docutils literal notranslate"><span class="pre">FileField.value</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#appyter-profiles-default-fields-filefield-module">appyter.profiles.default.fields.FileField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.FloatField">appyter.profiles.default.fields.FloatField module</a><ul>
 <li><a class="reference internal" href="#appyter.profiles.default.fields.FloatField.FloatField"><code class="docutils literal notranslate"><span class="pre">FloatField</span></code></a><ul>
 <li><a class="reference internal" href="#appyter.profiles.default.fields.FloatField.FloatField.constraint"><code class="docutils literal notranslate"><span class="pre">FloatField.constraint()</span></code></a></li>
@@ -1109,24 +931,7 @@ can be used to extend or override those definitions.</p>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-appyter.profiles.default.fields.MultiFileField">appyter.profiles.default.fields.MultiFileField module</a><ul>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField"><code class="docutils literal notranslate"><span class="pre">MultiFileField</span></code></a><ul>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.constraint"><code class="docutils literal notranslate"><span class="pre">MultiFileField.constraint()</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.prepare"><code class="docutils literal notranslate"><span class="pre">MultiFileField.prepare()</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.public_url"><code class="docutils literal notranslate"><span class="pre">MultiFileField.public_url</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.public_urls"><code class="docutils literal notranslate"><span class="pre">MultiFileField.public_urls</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.raw_value"><code class="docutils literal notranslate"><span class="pre">MultiFileField.raw_value</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_click"><code class="docutils literal notranslate"><span class="pre">MultiFileField.to_click()</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl"><code class="docutils literal notranslate"><span class="pre">MultiFileField.to_cwl()</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_cwl_value"><code class="docutils literal notranslate"><span class="pre">MultiFileField.to_cwl_value()</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.to_jsonschema"><code class="docutils literal notranslate"><span class="pre">MultiFileField.to_jsonschema()</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.uri"><code class="docutils literal notranslate"><span class="pre">MultiFileField.uri</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.uris"><code class="docutils literal notranslate"><span class="pre">MultiFileField.uris</span></code></a></li>
-<li><a class="reference internal" href="#appyter.profiles.default.fields.MultiFileField.MultiFileField.value"><code class="docutils literal notranslate"><span class="pre">MultiFileField.value</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#appyter-profiles-default-fields-multifilefield-module">appyter.profiles.default.fields.MultiFileField module</a></li>
 <li><a class="reference internal" href="#module-appyter.profiles.default.fields.SectionField">appyter.profiles.default.fields.SectionField module</a><ul>
 <li><a class="reference internal" href="#appyter.profiles.default.fields.SectionField.SectionField"><code class="docutils literal notranslate"><span class="pre">SectionField</span></code></a><ul>
 <li><a class="reference internal" href="#appyter.profiles.default.fields.SectionField.SectionField.raw_value"><code class="docutils literal notranslate"><span class="pre">SectionField.raw_value</span></code></a></li>

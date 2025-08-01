@@ -52,7 +52,9 @@
 <span class="sd">  `async with` is necessary for initialization</span>
 <span class="sd">  &#39;&#39;&#39;</span>
   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">ChunkedEmitMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+    <span class="n">PriorityQueuedEmitMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+    <span class="n">socketio</span><span class="o">.</span><span class="n">AsyncServer</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_listeners</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span> <span class="p">[]</span> <span class="p">}</span>
 
   <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
