@@ -124,6 +124,7 @@ def get_pdf_exporter():
   '''
   from nbconvert import WebPDFExporter
   pdf_exporter = WebPDFExporter()
+  pdf_exporter.allow_chromium_download = True
   pdf_exporter.template_name = 'classic'
   pdf_exporter.exclude_input = True
   return pdf_exporter

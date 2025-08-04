@@ -82,7 +82,7 @@
                   <a
                     class="dropdown-item"
                     href={`../export/${instance_id}/${window.location.search ? `${window.location.search}&` : "?"}format=pdf`}
-                    title="An archive with the notebook and dependent files for running it"
+                    title="A PDF export of the notebook"
                     >PDF Export (.pdf)</a
                   >
                 </div>
