@@ -65,7 +65,7 @@
       <span class="k">raise</span>
     <span class="k">except</span><span class="p">:</span>
       <span class="n">url</span> <span class="o">=</span> <span class="n">join_url</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span> <span class="n">url</span><span class="p">)</span>
-  <span class="k">else</span><span class="p">:</span>
+  <span class="k">elif</span> <span class="ow">not</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">]:</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">join_url</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span> <span class="n">url</span><span class="p">)</span>
 
   <span class="c1">#</span>
