@@ -116,7 +116,7 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
         # try to use underlying fs mount
         with self.fs.mount(path=self._resolve_path(path), mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
           yield mount_dir
-      elif not fuse and self.fs.protocol == 'file':
+      elif not fuse and 'file' in self.fs.protocol:
         # shortcut if we're talking about `file://` -- just use the actual directory
         yield Path(self._resolve_path(path))
       elif path:
@@ -152,7 +152,10 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
               else:
                 raise NotImplementedError
           logger.debug('Ready')
-          yield mount_dir
+          try:
+            yield mount_dir
+          finally:
+            logger.warning('Not copying back')
 
   def mkdir(self, path, **kwargs):
     with self.__masquerade_os_error(path=path):
