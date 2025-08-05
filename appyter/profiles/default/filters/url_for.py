@@ -27,7 +27,7 @@ def url_for(directory, public=False, **kwargs):
       raise
     except:
       url = join_url(config['PREFIX'], url)
-  else:
+  elif not config['DEBUG']:
     url = join_url(config['PREFIX'], url)
 
   #
