@@ -32,7 +32,7 @@ class FileField(Field):
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
   :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
-  def __init__(self, default=None, constraint=r'.*', valid_schemes={'drs', 's3', 'gs', 'ftp', 'http', 'https', 'storage', 'user'}, **kwargs):
+  def __init__(self, default=None, constraint=r'.*', valid_schemes=['drs', 's3', 'gs', 'ftp', 'http', 'https', 'storage', 'user'], **kwargs):
     super().__init__(
       constraint=constraint,
       default=default,
