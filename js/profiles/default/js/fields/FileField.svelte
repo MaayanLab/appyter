@@ -11,6 +11,7 @@
     value: 'Upload',
     choices: [
       'Upload',
+      window._config.EXTRAS.includes('storage-file-field') && 'Storage',
       window._config.EXTRAS.includes('catalog-integration') && 'Locate',
       'Passthrough'
     ].filter(choice => choice !== false),
@@ -27,6 +28,11 @@
           label: `Choose file${args.multiple ? 's' : ''}`,
         }
       }}
+    />
+  {:else if window._config.EXTRAS.includes('storage-file-field') && tab === 'Storage'}
+    <Lazy
+      module={() => import('@/extras/file-field/Storage.svelte')}
+      props={{ args }}
     />
   {:else if window._config.EXTRAS.includes('catalog-integration') && tab === 'Locate'}
     <Lazy
