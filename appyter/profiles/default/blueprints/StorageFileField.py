@@ -10,7 +10,7 @@ def StorageFileField(flask_app, url_prefix=None):
 
     from flask import Blueprint, abort, jsonify, request
     import traceback
-    from appyter.ext.fsspec.core import url_to_fs_ex
+    from appyter.ext.fsspec.core import url_to_chroot_fs
     from appyter.ext.flask import route_join_with_or_without_slash
 
     blueprint = Blueprint('StorageFileField', __name__)
@@ -23,8 +23,8 @@ def StorageFileField(flask_app, url_prefix=None):
     @route_join_with_or_without_slash(blueprint, 'ls', '<path:path>', methods=['GET'])
     def ls(path=''):
       try:
-        fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
-        return jsonify(fs.ls(fs_path))
+        fs = url_to_chroot_fs(path + '#?' + request.query_string.decode())
+        return jsonify(fs.ls('/'))
       except KeyboardInterrupt:
         raise
       except Exception:
@@ -35,8 +35,8 @@ def StorageFileField(flask_app, url_prefix=None):
     @route_join_with_or_without_slash(blueprint, 'info', '<path:path>', methods=['GET'])
     def info(path=''):
       try:
-        fs, fs_path = url_to_fs_ex(path + '#?' + request.query_string.decode())
-        return jsonify(fs.info(fs_path))
+        fs = url_to_chroot_fs(path + '#?' + request.query_string.decode())
+        return jsonify(fs.info('/'))
       except KeyboardInterrupt:
         raise
       except Exception:
