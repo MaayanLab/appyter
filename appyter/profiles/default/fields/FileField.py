@@ -32,10 +32,11 @@ class FileField(Field):
   :param value: (INTERNAL Any) The raw value of the field (from the form for instance)
   :param \**kwargs: Remaining arguments passed down to :class:`appyter.fields.Field`'s constructor.
   '''
-  def __init__(self, default=None, constraint=r'.*', **kwargs):
+  def __init__(self, default=None, constraint=r'.*', valid_schemes={'drs', 's3', 'gs', 'ftp', 'http', 'https', 'storage', 'user'}, **kwargs):
     super().__init__(
       constraint=constraint,
       default=default,
+      valid_schemes=valid_schemes,
       **kwargs,
     )
 
@@ -90,7 +91,7 @@ class FileField(Field):
       return not self.args.get('required')
     else:
       if self._env.globals['_config']['SAFE_MODE']:
-        if self.uri.scheme not in {'drs', 's3', 'gs', 'ftp', 'http', 'https', 'storage', 'user'}:
+        if self.uri.scheme not in self.args['valid_schemes']:
           return False
       return re.match(re_full(self.args['constraint']), self.uri.fragment_path)
 
