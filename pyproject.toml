@@ -1,6 +1,6 @@
 [project]
 name = "appyter"
-version = "0.21.5"
+version = "0.21.6"
 description = "This module enables you to turn your jupyter notebook into a jinja2 template-driven web application."
 authors = [
     {name = "Daniel Clarke",email = "u8sand@gmail.com"}
