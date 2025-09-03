@@ -21,7 +21,15 @@
           class="nav-link{args.value === choice_name ? ' active' : ''}"
           aria-controls="tab-content-{args.name}-{choice_name}"
           role="tab"
-          on:click={() => args.value = choice_name}
+          on:click={() => {
+            if (args.value === choice_name) {
+              const el = document.querySelector('.custom-file-input[id="file"]')
+              if (el !== null) {
+                el.click()
+              }
+            }
+            args.value = choice_name
+          }}
         >
           {choice_name}
         </button>
