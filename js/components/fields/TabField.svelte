@@ -23,9 +23,12 @@
           role="tab"
           on:click={() => {
             if (args.value === choice_name) {
-              const el = document.querySelector('.custom-file-input[id="file"]')
-              if (el !== null) {
-                el.click()
+              const m = /^(.+?)-type$/.exec(args.name)
+              if (m != null) {
+                const el = document.querySelector(`.custom-file-input[id="${m[1]}"]`)
+                if (el !== null) {
+                  el.click()
+                }
               }
             }
             args.value = choice_name
