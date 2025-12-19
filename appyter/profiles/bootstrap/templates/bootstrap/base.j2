@@ -10,7 +10,7 @@
 <script>
   require.config({
     paths: {
-      'bootstrap': {{ url_for('static', filename='js/lib/bootstrap/bootstrap.bundle.min')|jsonify }},
+      'bootstrap': {{ url_for('static', filename='js/lib/bootstrap')|jsonify }},
       'select2': {{ url_for('static', filename='js/lib/select2/select2.min')|jsonify }},
     },
     shim: {
@@ -27,4 +27,15 @@
 
 {% block script %}
 {{ super() }}
+<script>
+require(['jquery', 'bootstrap'], function ($) {
+  $(document).ready(function () {
+    $('.dropdown-toggle').dropdown()
+    $('.collapse').collapse({ toggle: false })
+    $('[data-toggle="tooltip"]').tooltip({ boundary: 'window' })
+    $('.select2').select2()
+  })
+})
+</script>
 {% endblock %}
+

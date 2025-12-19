@@ -114,6 +114,10 @@ export default function (_env, argv) {
           },
           {
             from: path.resolve(__dirname, 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js'),
+            to: path.resolve(__dirname, '../appyter/static/profiles/bootstrap/js/lib/bootstrap.js'),
+          },
+          {
+            from: path.resolve(__dirname, 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js'),
             to: path.resolve(__dirname, '../appyter/static/profiles/biojupies/js/lib/bootstrap.js'),
           },
           {
