@@ -16,7 +16,7 @@ classifiers = [
     "Framework :: Jupyter"
 ]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.9,<4"
 dependencies = [
     "aiohttp (>=3.12.13,<4.0.0)",
     "aiohttp-wsgi (>=0.10.0,<0.11.0)",
@@ -50,6 +50,7 @@ appyter_init = ["cookiecutter (>=2.6.0,<3.0.0)"]
 production = ["aiobotocore (>=2.23.0,<3.0.0)", "kubernetes (>=33.1.0,<34.0.0)", "s3fs (>=2025.5.1,<2026.0.0)", "supervisor (>=4.2.5,<5.0.0)"]
 docs = ["sphinx-mdinclude (<0.6.2)", "sphinx (<8)"]
 doc = []
+pg_orchestrator = ["asyncpg (>=0.31.0,<0.32.0)"]
 
 
 [tool.poetry]
