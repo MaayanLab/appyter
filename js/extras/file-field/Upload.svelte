@@ -136,18 +136,85 @@
 </script>
 
 <style>
-.progress {
-  height: 25px;
+.custom-file {
+  position: relative;
+  display: inline-block;
   width: 100%;
-  background-color: grey;
+}
+
+.custom-file-input {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.custom-file-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  color: rgb(0, 0, 79);
+  background-color: #fff;
+  border: 1.5px solid #dde4f0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.custom-file-input:hover + .custom-file-label,
+.custom-file-input:focus + .custom-file-label {
+  border-color: rgb(103, 168, 210);
+  box-shadow: 0 0 0 3px rgba(103, 168, 210, 0.25);
+}
+
+.progress {
+  height: 10px;
+  width: 100%;
+  margin-top: 8px;
+  background-color: #e8ecf3;
+  border-radius: 6px;
+  overflow: hidden;
 }
 .progress-bar {
   height: 100%;
-  background-color: blue;
+  background-color: rgb(103, 168, 210);
+  transition: width 0.2s ease;
 }
 .progress-bar.bg-success {
   height: 100%;
-  background-color: green;
+  background-color: #3aa76d;
+}
+.progress-bar.bg-danger {
+  height: 100%;
+  background-color: #d9534f;
+}
+
+.text-btn {
+  background: none;
+  border: none;
+  color: rgb(0, 0, 120);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.text-btn:hover {
+  color: rgb(0, 0, 79);
 }
 </style>
 
