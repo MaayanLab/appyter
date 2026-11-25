@@ -39,7 +39,8 @@ class MultiFileField(FileField):
       data_paths = upload_from_request(req, self.args['name'], multiple=True)
     # fallback to default (URI in request)
     if data_paths is None:
-      data_paths = [s for f in ensure_list(Field.prepare(self, req)[self.args['name']]) for s in f.splitlines()]
+      # an empty field may be None (e.g. null in json given to nbconstruct)
+      data_paths = [s for f in ensure_list(Field.prepare(self, req)[self.args['name']]) if f for s in f.splitlines()]
     # convert strings into uris
     data_paths = [self.prepare_uri(data_path) for data_path in data_paths]
     data = {self.args['name']: [str(data_path) for data_path in data_paths]}
