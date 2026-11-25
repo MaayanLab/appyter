@@ -75,27 +75,39 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
 
   @contextlib.contextmanager
   def __masquerade_os_error(self, path=None):
+    ''' Errors from the underlying filesystem may reveal the configured storage (e.g. a DATA_DIR
+    with credentials) which must not leak into user-facing notebook executions. We re-raise them
+    with at most the caller's (chroot-relative) path, and `from None` so that the original
+    exception isn't attached as context (and thus shown in tracebacks). The full error is only
+    logged server-side.
+    '''
     try:
       yield
     except FileNotFoundError:
       if path:
-        raise FileNotFoundError(path)
+        raise FileNotFoundError(path) from None
       else:
-        raise FileNotFoundError
+        raise FileNotFoundError from None
     except PermissionError:
       if path:
-        raise PermissionError(path)
+        raise PermissionError(path) from None
       else:
-        raise PermissionError
+        raise PermissionError from None
+    except (FileExistsError, IsADirectoryError, NotADirectoryError) as e:
+      # preserve the type so callers can handle these
+      if path:
+        raise type(e)(path) from None
+      else:
+        raise type(e) from None
     except OSError as e:
       logger.error(traceback.format_exc())
       if e.errno:
-        raise type(e)(e.errno, f'{e.__class__.__name__} occurred, details have been hidden for security reasons')
+        raise type(e)(e.errno, f'{e.__class__.__name__} occurred, details have been hidden for security reasons') from None
       else:
-        raise Exception(f"{e.__class__.__name__} occurred, details have been hidden for security reasons")
+        raise Exception(f"{e.__class__.__name__} occurred, details have been hidden for security reasons") from None
     except Exception as e:
       logger.error(traceback.format_exc())
-      raise Exception(f"{e.__class__.__name__} occurred, details have been hidden for security reasons")
+      raise Exception(f"{e.__class__.__name__} occurred, details have been hidden for security reasons") from None
 
   def __enter__(self):
     if getattr(self.fs, '__enter__', None) is not None:
@@ -109,19 +121,25 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
         self.fs.__exit__(type, value, traceback)
 
   @contextlib.contextmanager
-  def mount(self, path='', mount_dir=None, fuse=True, passthrough=True, **kwargs):
+  def mount(self, path='', mount_dir=None, fuse=True, passthrough=True, copy_back=True, overwrite=False, **kwargs):
+    ''' Mount this filesystem on a local directory.
+
+    fuse       use a fuse mount, otherwise files are copied into the directory
+    copy_back  (without fuse) write new, modified & deleted files back to this filesystem on exit
+    overwrite  (without fuse) replace files already present in mount_dir (e.g. from another layer)
+    '''
     logger.debug(f"{self=} mount {mount_dir=} {fuse=}")
     with self.__masquerade_os_error(path=path):
       if passthrough and getattr(self.fs, 'mount', None) is not None:
         # try to use underlying fs mount
-        with self.fs.mount(path=self._resolve_path(path), mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+        with self.fs.mount(path=self._resolve_path(path), mount_dir=mount_dir, fuse=fuse, copy_back=copy_back, overwrite=overwrite, **kwargs) as mount_dir:
           yield mount_dir
-      elif not fuse and 'file' in self.fs.protocol:
+      elif not fuse and mount_dir is None and 'file' in self.fs.protocol:
         # shortcut if we're talking about `file://` -- just use the actual directory
         yield Path(self._resolve_path(path))
       elif path:
         # just make another wrapper to deal with subpath mounting
-        with ChrootFileSystem(fs=self.fs, fo=join_slash(self.storage_options.get('fo', ''), path)).mount(path='', mount_dir=mount_dir, fuse=fuse, passthrough=passthrough, **kwargs) as mount_dir:
+        with ChrootFileSystem(fs=self.fs, fo=join_slash(self.storage_options.get('fo', ''), path)).mount(path='', mount_dir=mount_dir, fuse=fuse, passthrough=passthrough, copy_back=copy_back, overwrite=overwrite, **kwargs) as mount_dir:
           yield mount_dir
       elif fuse:
         # use fuse fs_mount
@@ -131,31 +149,71 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
           yield mount_dir
       else:
         # no fuse -- resort to copying files
-        import shutil
         from appyter.ext.tempfile import tempdir
-        # can't use fuse, default is to just copy files into the mount_dir
         with tempdir(mount_dir) as mount_dir:
-          logger.debug(f"copying files over...")
-          for f1_rel in self.glob('**', detail=True).values():
-            f2_rel = mount_dir / f1_rel['name']
-            f2_rel.parent.mkdir(parents=True, exist_ok=True)
-            if not f2_rel.exists():
-              if f1_rel['type'] == 'file':
-                logger.debug(f"copying {f1_rel['name']} to {str(f2_rel)}")
-                # TODO: if we're backed by a normal filesystem, make a link
-                with self.open(f1_rel['name'], 'rb') as fr:
-                  with f2_rel.open('wb') as fw:
-                    shutil.copyfileobj(fr, fw)
-              elif f1_rel['type'] == 'directory':
-                logger.debug(f"making directory {f1_rel['name']}")
-                f2_rel.mkdir(exist_ok=True)
-              else:
-                raise NotImplementedError
+          copied = self._copy_into(mount_dir, overwrite=overwrite)
+          snapshot = _snapshot(mount_dir)
+          _wait_for_newer_mtime(snapshot)
           logger.debug('Ready')
           try:
             yield mount_dir
           finally:
-            logger.warning('Not copying back')
+            if copy_back:
+              self._copy_back(mount_dir, copied, snapshot)
+
+  def _copy_into(self, mount_dir, overwrite=False):
+    ''' Copy all files & directories into mount_dir, returning the relative paths we created
+    '''
+    import shutil
+    logger.debug(f"copying files over...")
+    copied = set()
+    for f1_rel in self.glob('**', detail=True).values():
+      f2_rel = mount_dir / f1_rel['name']
+      f2_rel.parent.mkdir(parents=True, exist_ok=True)
+      if f1_rel['type'] == 'file':
+        if overwrite or not f2_rel.exists():
+          logger.debug(f"copying {f1_rel['name']} to {str(f2_rel)}")
+          # TODO: if we're backed by a normal filesystem, make a link
+          with self.open(f1_rel['name'], 'rb') as fr:
+            with f2_rel.open('wb') as fw:
+              shutil.copyfileobj(fr, fw)
+          copied.add(f1_rel['name'])
+      elif f1_rel['type'] == 'directory':
+        logger.debug(f"making directory {f1_rel['name']}")
+        f2_rel.mkdir(exist_ok=True)
+        copied.add(f1_rel['name'])
+      else:
+        raise NotImplementedError
+    return copied
+
+  def _copy_back(self, mount_dir, copied, snapshot):
+    ''' Write changes made in mount_dir since `snapshot` back to this filesystem:
+    new or modified files & directories are written, files & directories we copied in which
+    no longer exist are removed. Files which came from elsewhere (e.g. another layer) are only
+    written back if they were modified.
+    '''
+    import shutil
+    logger.debug(f"copying changes back...")
+    current = _snapshot(mount_dir)
+    for rel, stat in sorted(current.items()):
+      if snapshot.get(rel) == stat: continue
+      if stat[0] == 'd':
+        logger.debug(f"making directory {rel}")
+        self.makedirs(rel, exist_ok=True)
+      else:
+        logger.debug(f"copying back {rel}")
+        with (mount_dir / rel).open('rb') as fr:
+          with self.open(rel, 'wb') as fw:
+            shutil.copyfileobj(fr, fw)
+    for rel in sorted(copied - current.keys(), key=lambda rel: -rel.count('/')):
+      if snapshot.get(rel, ('',))[0] == 'd':
+        logger.debug(f"removing directory {rel}")
+        try: self.rm(rel, recursive=True)
+        except FileNotFoundError: pass
+      else:
+        logger.debug(f"removing {rel}")
+        try: self.rm_file(rel)
+        except FileNotFoundError: pass
 
   def mkdir(self, path, **kwargs):
     with self.__masquerade_os_error(path=path):
@@ -229,3 +287,28 @@ class ChrootFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSystem
   def _open(self, path, mode="rb", block_size=None, cache_options=None, **kwargs):
     with self.__masquerade_os_error(path=path):
       return self.fs._open(self._resolve_path(path), mode=mode, block_size=block_size, cache_options=cache_options, **kwargs)
+
+def _snapshot(mount_dir):
+  ''' Relative path => ('d',) for directories or ('f', size, mtime_ns) for files
+  '''
+  snapshot = {}
+  for p in Path(mount_dir).rglob('*'):
+    rel = str(p.relative_to(mount_dir))
+    if p.is_dir():
+      snapshot[rel] = ('d',)
+    elif p.is_file():
+      st = p.stat()
+      snapshot[rel] = ('f', st.st_size, st.st_mtime_ns)
+  return snapshot
+
+def _wait_for_newer_mtime(snapshot, margin_ns=20_000_000, max_wait_ns=1_000_000_000):
+  ''' File mtimes come from a coarse clock, so a modification made right after the snapshot
+  could keep the same size & mtime and go unnoticed. Like git's "racy" timestamp handling, we wait
+  until the clock is past the newest mtime in the snapshot so that later writes get newer mtimes.
+  '''
+  import time
+  newest = max((stat[2] for stat in snapshot.values() if stat[0] == 'f'), default=None)
+  if newest is None: return
+  deadline = time.time_ns() + max_wait_ns
+  while time.time_ns() <= newest + margin_ns and time.time_ns() < deadline:
+    time.sleep(0.005)

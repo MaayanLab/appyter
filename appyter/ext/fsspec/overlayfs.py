@@ -51,12 +51,15 @@ class OverlayFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSyste
       self.lower_fs.__exit__(type, value, traceback)
 
   @contextlib.contextmanager
-  def mount(self, path='', mount_dir=None, fuse=True, **kwargs):
+  def mount(self, path='', mount_dir=None, fuse=True, copy_back=True, overwrite=False, **kwargs):
     if not fuse:
       upper_mount = self.upper_fs.mount if getattr(self.upper_fs, 'mount', None) else super().mount
       lower_mount = self.lower_fs.mount if getattr(self.lower_fs, 'mount', None) else super().mount
-      with upper_mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
-        with lower_mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
+      # the lower layer is read-only: copy it in first & never copy it back,
+      #  then the upper layer is copied over it (so it takes precedence) and is responsible
+      #  for writing changes back, lower files are only written back to it if they were modified
+      with lower_mount(path=path, mount_dir=mount_dir, fuse=fuse, copy_back=False, overwrite=overwrite, **kwargs) as mount_dir:
+        with upper_mount(path=path, mount_dir=mount_dir, fuse=fuse, copy_back=copy_back, overwrite=True, **kwargs) as mount_dir:
           yield mount_dir
     else:
       with super().mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:

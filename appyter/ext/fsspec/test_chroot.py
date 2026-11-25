@@ -57,3 +57,31 @@ def test_http_chroot():
         assert_eq(fs.cat('a/b/c'), b'C')
         assert_eq(fs.cat('a/d'), b'D')
         assert_eq(fs.cat('e'), b'E')
+
+def test_chroot_errors_hide_storage(tmp_path):
+  ''' Errors must not reveal the underlying storage location (it may contain credentials),
+  neither in the message nor in the traceback (via exception context)
+  '''
+  import traceback
+  secret = 'SECRET-TOKEN-1234'
+  root = tmp_path/secret
+  (root/'dir').mkdir(parents=True)
+  (root/'file').write_text('file')
+  fs = url_to_chroot_fs(str(root))
+  cases = [
+    (FileNotFoundError, lambda: fs.cat('missing')),
+    (FileNotFoundError, lambda: fs.info('missing')),
+    (FileExistsError, lambda: fs.mkdir('file', create_parents=False)),
+    (IsADirectoryError, lambda: fs.open('dir', 'rb').read()),
+    (NotADirectoryError, lambda: fs.ls('file/sub')),
+  ]
+  for expected, fn in cases:
+    try:
+      fn()
+    except Exception as e:
+      formatted = ''.join(traceback.format_exception(e))
+      assert secret not in str(e), f"{expected.__name__}: leaked in message: {e}"
+      assert secret not in formatted, f"{expected.__name__}: leaked in traceback:\n{formatted}"
+      assert e.__cause__ is None and e.__suppress_context__, f"{expected.__name__}: context not suppressed"
+    else:
+      assert False, f"expected an error for {expected.__name__}"

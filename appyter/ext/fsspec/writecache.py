@@ -51,7 +51,10 @@ class WriteCacheFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSy
 
   @contextlib.contextmanager
   def mount(self, path='', mount_dir=None, fuse=True, **kwargs):
-    mount = self.fs.mount if getattr(self.fs, 'mount', None) is not None else super().mount
+    # with fuse, mount *this* filesystem so writes go through the seekable local cache;
+    #  deferring to the underlying fs would bypass it, breaking writes to remote stores (e.g. s3)
+    #  whose files can only seek in read mode
+    mount = self.fs.mount if not fuse and getattr(self.fs, 'mount', None) is not None else super().mount
     with mount(path=path, mount_dir=mount_dir, fuse=fuse, **kwargs) as mount_dir:
       yield mount_dir
 

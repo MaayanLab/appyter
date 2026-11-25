@@ -75,7 +75,8 @@ def nbexecute_sync(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='', subs
   try:
     files = nb.metadata['appyter']['nbconstruct'].get('files')
     logger.debug(f"{cwd=} {files=}")
-    with url_to_chroot_fs(cwd, pathmap=files) as fs:
+    # writes through a fuse mount need a seekable local write cache (fsspec remote files only seek in read mode)
+    with url_to_chroot_fs(cwd, pathmap=files, cached=fuse) as fs:
       with fs.mount(fuse=fuse) as mnt:
         # setup execution_info with start time
         nb.metadata['appyter']['nbexecute']['started'] = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc).isoformat()
@@ -106,9 +107,13 @@ def nbexecute_sync(ipynb='', emit=json_emitter_factory(sys.stdout), cwd='', subs
           nb_to_ipynb_io(nb, fw)
         #
         logger.info('finalized')
+    # the mount is closed now so everything has been written to storage
+    if not exc and state['status'] == 'Saving...':
+      state['status'] = 'Success'
+      emit_sync({ 'type': 'status', 'data': state['status'] })
   except Exception:
     logger.error(traceback.format_exc())
-    if state['status'] != 'Success':
+    if state['status'] not in {'Saving...', 'Success'}:
       emit_sync({ 'type': 'error', 'data': f"Error occured while executing" })
     else:
       emit_sync({ 'type': 'error', 'data': f"Error occured while finalizing" })
@@ -160,7 +165,8 @@ async def nbexecute_async_inner(nb, mnt, emit=None, subscribe=None):
             state['progress'] = index + 1
             await emit({ 'type': 'progress', 'data': state['progress'] })
           else:
-            state['status'] = 'Success'
+            # 'Success' is only reported once the results are saved, see nbexecute_sync
+            state['status'] = 'Saving...'
             await emit({ 'type': 'status', 'data': state['status'] })
     finally:
       client.set_widgets_metadata()
