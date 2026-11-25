@@ -37,6 +37,9 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
       else:
         self.pathmap[path] = fs_uri, ''
 
+    # mapped files we had to download locally (see info)
+    self._materialized = {}
+
     self.listing = {}
     for mapping in self.pathmap:
       src_split = mapping.split('/')
@@ -119,11 +122,31 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
         'name': path,
         'type': 'directory',
       }
+    elif path in self._materialized:
+      import os
+      return {'name': path, 'type': 'file', 'size': os.path.getsize(self._materialized[path])}
     else:
       fs, fs_path, _ = self._pathmap(path)
       info = fs.info(fs_path, **kwargs)
       info = dict(info, name=path)
+      if info.get('type') == 'file' and info.get('size') is None:
+        # the size is unknown (e.g. a streamed http response without a Content-Length),
+        #  which fuse requires, so we fetch the file once and serve it locally from then on
+        import os
+        info['size'] = os.path.getsize(self._materialize(path))
       return info
+
+  def _materialize(self, path):
+    ''' Download a mapped file to a local temporary file, returning its path
+    '''
+    if path not in self._materialized:
+      from appyter.ext.tempfile import mktemp
+      fs, fs_path, _ = self._pathmap(path)
+      local_path = mktemp()
+      logger.debug(f"materializing {path} to {local_path}")
+      fs.get_file(fs_path, local_path)
+      self._materialized[path] = local_path
+    return self._materialized[path]
 
   def ls(self, path, detail=False, **kwargs):
     ''' Aggregate results based on pathmap listing & underlying fs
@@ -149,8 +172,11 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
     return results
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
-    fs, fs_path, _ = self._pathmap(path)
     if 'r' not in mode: raise PermissionError(path)
+    if path in self._materialized:
+      from fsspec.implementations.local import LocalFileOpener
+      return LocalFileOpener(self._materialized[path], mode)
+    fs, fs_path, _ = self._pathmap(path)
     return fs._open(
       fs_path,
       mode=mode,

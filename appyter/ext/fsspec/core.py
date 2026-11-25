@@ -8,7 +8,13 @@ def url_to_fs_ex(url, **kwargs):
   from fsspec.core import url_to_fs
   uri_parsed = URI(url)
   opts = dict(kwargs, **uri_parsed.fragment_query_ex)
-  fs, fspath = url_to_fs(str(uri_parsed.with_fragment(None)), **opts)
+  url = str(uri_parsed.with_fragment(None))
+  if uri_parsed.scheme in {'http', 'https'}:
+    # http(s) urls may legitimately contain `::` (fsspec's url chaining separator, e.g. in query strings)
+    #  so we don't let fsspec parse them
+    from fsspec import filesystem
+    return filesystem(uri_parsed.scheme, **opts), url
+  fs, fspath = url_to_fs(url, **opts)
   return fs, fspath
 
 def url_to_chroot_fs(url, pathmap=None, cached=False, appyter=None, **kwargs):
