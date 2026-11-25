@@ -55,6 +55,22 @@ def test_file_pathmap_chroot_fuse():
       with (fs/'E').open('w') as fw:
         fw.write('E!')
       assert_eq((fs/'E').open('rb').read(), b'E!')
+    # writes went to the upper layer, the mapped file is unchanged
+    assert_eq((tmpdir/'E').read_bytes(), b'E!')
+    assert_eq((tmpdir/'e').read_bytes(), b'E')
+
+def test_file_pathmap_chroot_fuse_edit():
+  ''' editing a mapped file in place copies it to the upper layer rather than modifying the source
+  '''
+  with _test_ctx() as tmpdir:
+    fs = url_to_chroot_fs(str(tmpdir), pathmap={'F': str(tmpdir/'a'/'d')})
+    with fs.mount(fuse=True) as fs:
+      with (fs/'F').open('r+b') as fw:
+        fw.seek(1)
+        fw.write(b'!')
+      assert_eq((fs/'F').read_bytes(), b'D!')
+    assert_eq((tmpdir/'F').read_bytes(), b'D!')
+    assert_eq((tmpdir/'a'/'d').read_bytes(), b'D')
 
 def test_http_pathmap_chroot():
   ''' Serve the test directory over http and ensure chroot_fs still works using the webserver

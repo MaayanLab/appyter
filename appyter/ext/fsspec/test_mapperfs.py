@@ -54,6 +54,38 @@ def _streaming_server(content, port=8891):
   with ensure_sync(with_app_running(app, port=port)):
     yield f"http://127.0.0.1:{port}"
 
+@contextlib.contextmanager
+def _no_range_server(content, port=8892):
+  ''' Serve `content` at any path with a Content-Length, ignoring Range headers
+  '''
+  from aiohttp import web
+  from appyter.ext.aiohttp import with_app_running
+  from appyter.ext.asyncio.helpers import ensure_sync
+  async def handler(request):
+    return web.Response(body=content, headers={'Accept-Ranges': 'none'})
+  app = web.Application()
+  app.add_routes([web.get('/{tail:.*}', handler)])
+  with ensure_sync(with_app_running(app, port=port)):
+    yield f"http://127.0.0.1:{port}"
+
+def test_mapperfs_no_range_fuse():
+  ''' http files from servers without range request support can be read at any offset
+  '''
+  import os
+  from appyter.ext.fsspec.core import url_to_chroot_fs
+  # larger than fsspec's default block size so reads need ranges past the start
+  content = os.urandom(3 * 2**20) * 4
+  with _no_range_server(content) as url:
+    with tempfile.TemporaryDirectory() as tmpdir:
+      fs = url_to_chroot_fs(tmpdir, pathmap={'test.bin': f"{url}/test.bin"})
+      with fs as fs:
+        with fs.mount(fuse=True) as mnt:
+          assert_eq(os.stat(mnt/'test.bin').st_size, len(content))
+          with (mnt/'test.bin').open('rb') as fr:
+            fr.seek(len(content) - 10)
+            assert_eq(fr.read(), content[-10:])
+          assert (mnt/'test.bin').read_bytes() == content
+
 def test_mapperfs_unknown_size_fuse():
   ''' files without a known size (e.g. streamed http responses) can still be mounted
   '''

@@ -42,6 +42,22 @@ def test_fuse_mount():
           fw.seek(0)
           fw.write('H')
         assert_eq((mnt_dir/'bye').open('r').read(), 'Hi!')
+        # existing files can be re-opened for reading & writing (e.g. PIL saves with w+b),
+        #  truncating them without leaving the old contents behind
+        with (mnt_dir/'bye').open('w+b') as fw:
+          fw.write(b'Hello there')
+        with (mnt_dir/'bye').open('w+b') as fw:
+          fw.write(b'Yo')
+        assert_eq((mnt_dir/'bye').read_bytes(), b'Yo')
+        # in place edits and appends preserve existing contents
+        with (mnt_dir/'bye').open('r+b') as fw:
+          fw.write(b'G')
+        with (mnt_dir/'bye').open('ab') as fw:
+          fw.write(b'!')
+        assert_eq((mnt_dir/'bye').read_bytes(), b'Go!')
+        with (mnt_dir/'bye').open('r+b') as fw:
+          fw.truncate(1)
+        assert_eq((mnt_dir/'bye').read_bytes(), b'G')
     finally:
       fs.rm('', recursive=True)
 

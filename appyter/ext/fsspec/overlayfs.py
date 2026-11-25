@@ -168,7 +168,8 @@ class OverlayFileSystem(MountableAbstractFileSystem, ComposableAbstractFileSyste
     return list(results.values())
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
-    if 'r' not in mode:
+    if 'r' not in mode or '+' in mode:
+      # writes always go to the upper layer, which needs the lower layer's contents unless we're truncating
       if 'w' in mode:
         pass
       elif not self.upper_fs.exists(path) and self.lower_fs.exists(path):

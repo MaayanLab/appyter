@@ -136,6 +136,11 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
         info['size'] = os.path.getsize(self._materialize(path))
       return info
 
+  def _is_http(self, path):
+    fs, _fs_path, _ = self._pathmap(path)
+    protocols = fs.protocol if isinstance(fs.protocol, (tuple, list)) else (fs.protocol,)
+    return any(p in {'http', 'https'} for p in protocols)
+
   def _materialize(self, path):
     ''' Download a mapped file to a local temporary file, returning its path
     '''
@@ -172,7 +177,11 @@ class MapperFileSystem(MountableAbstractFileSystem, AbstractFileSystem):
     return results
 
   def _open(self, path, mode="rb", block_size=None, autocommit=True, cache_options=None, **kwargs):
-    if 'r' not in mode: raise PermissionError(path)
+    if 'r' not in mode or '+' in mode: raise PermissionError(path)
+    if path not in self._materialized and self._is_http(path):
+      # http servers may not support the range requests random access relies on,
+      #  which we only discover mid-read, so we fetch the file once and serve it locally
+      self._materialize(path)
     if path in self._materialized:
       from fsspec.implementations.local import LocalFileOpener
       return LocalFileOpener(self._materialized[path], mode)
