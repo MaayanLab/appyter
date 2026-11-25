@@ -150,10 +150,17 @@ class URI:
   def fragment_query_ex(self):
     return expand_dotmap(parse_qs_values(self.fragment_query)) if self.fragment_query is not None else {}
 
+  def _authority_path(self):
+    authority_path = join_url(self.authority, self.path)
+    # join_url normalizes away a trailing slash, but servers may treat `/a/` and `/a` differently
+    if self.path.endswith('/') and self.path != '/' and not authority_path.endswith('/'):
+      authority_path += '/'
+    return authority_path
+
   def __str__(self):
     return ''.join(filter(None, (
       f"{self.scheme}://" if self.scheme is not None else None,
-      join_url(self.authority, self.path) if self.authority is not None else self.path,
+      self._authority_path() if self.authority is not None else self.path,
       f"?{self.query_string}" if self.query_string is not None else None,
       f"#{self.fragment}" if self.fragment is not None else None,
     )))
